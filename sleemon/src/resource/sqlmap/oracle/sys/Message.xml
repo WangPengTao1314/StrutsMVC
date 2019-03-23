@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="MESSAGE">
+	<!-- 
+		*@module 系统管理
+		*@func 人员信息维护
+		*@version 1.1
+		*@author chen_jianjun
+		*  -->
+	<typeAlias type="com.hoperun.sys.model.MessageModel" alias="MessageModel" />
+	<!-- 查询SQL -->
+	<!-- 查询所有短消息 -->
+	<select id="queryAllMessage" parameterClass="map" resultClass="MessageModel">
+		<![CDATA[ SELECT T.MESSAGEID,T.SENDID,T.SENDER,T.MSGINFO,TO_CHAR(T.SENDTIME,'yyyy-mm-dd hh24:mi:ss') AS SENDTIME,T.RECEIVEID,T.RECEIVER,
+    						decode(NVL(M.MSGTRACEID,'0'), '0','0','1') AS CKZT
+					FROM ${SYSSCHEMA}.T_SYS_MESSAGE T LEFT JOIN ${SYSSCHEMA}.T_SYS_MSGTRACE M ON T.MESSAGEID=M.MESSAGEID
+ 					ORDER BY CKZT ASC,SENDTIME DESC]]>
+	</select>
+	<!-- 点消息时，看这条消息是否已插入 -->
+	<select id="queryOldMessById" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[SELECT MESSAGEID FROM T_SYS_MSGTRACE WHERE MESSAGEID=#MESSAGEID#]]>
+	</select>
+	<!-- 点消息时，把消息插入已查看表 -->
+	<update id="insertCkztBydxxid" parameterClass="map">
+		<![CDATA[INSERT INTO ${SYSSCHEMA}.T_SYS_MSGTRACE VALUES(#MSGTRACEID#,#MESSAGEID#,SYSDATE)]]>
+	</update>
+	<!-- 发送短消息
+	<insert id="insertMessage" parameterClass="map">
+		<![CDATA[INSERT INTO ${SYSSCHEMA}.T_SYS_MESSAGE(MESSAGEID,SENDID,SENDER,MSGINFO,SENDTIME,RECEIVEID,RECEIVER)
+          			SELECT #YHBH#||TO_CHAR(SYSDATE,'yyyymmddhh24miss')||LTRIM(TO_CHAR(ROWNUM,'0000')),
+          					#SENDID#,#SENDER#,#MSGINFO#,SYSDATE, A.XTYHID,A.YHM
+					FROM ${SYSSCHEMA}.T_SYS_XTYH A WHERE (A.XTYHID IN ($XTYHID$) OR A.JGXXID IN ($JGXXID$) OR A.BMXXID IN ($BMXXID$))
+						 				AND A.DELFLAG =0 AND A.YHZT='启用']]>
+	</insert> -->
+	<!-- 发送短消息 modify zzb 2014-7-16 防止插入数据主键重复 -->
+	<insert id="insertMessage" parameterClass="map">
+		<![CDATA[INSERT INTO ${SYSSCHEMA}.T_SYS_MESSAGE(MESSAGEID,SENDID,SENDER,MSGINFO,SENDTIME,RECEIVEID,RECEIVER)
+          			SELECT rawtohex(sys_guid()) as UUID,
+          					#SENDID#,#SENDER#,#MSGINFO#,SYSDATE, A.XTYHID,A.YHM
+					FROM ${SYSSCHEMA}.T_SYS_XTYH A WHERE (A.XTYHID IN ($XTYHID$) OR A.JGXXID IN ($JGXXID$) OR A.BMXXID IN ($BMXXID$))
+						 				AND A.DELFLAG =0 AND A.YHZT='启用']]>
+	</insert>
+	
+	
+	
+	<!-- 审核时发送短消息 -->
+	<insert id="insertMessageByAudit" parameterClass="map">
+		<![CDATA[INSERT INTO ${SYSSCHEMA}.T_SYS_MESSAGE(MESSAGEID,SENDID,SENDER,MSGINFO,SENDTIME,RECEIVEID,RECEIVER)
+					SELECT #YHBH#||TO_CHAR(SYSDATE,'yyyymmddhh24miss')||LTRIM(TO_CHAR(ROWNUM,'0000')),
+                    	#SENDID#,#SENDER#,#MSGINFO#,SYSDATE, A.XTYHID,A.YHM
+          			FROM ${SYSSCHEMA}.T_SYS_XTYH A,${SYSSCHEMA}.T_SYS_XTYHJS B,${SYSSCHEMA}.T_SYS_XTJS C 
+          			WHERE A.XTYHID=B.XTYHID AND B.XTJSID=C.XTJSID
+                		AND (A.XTYHID IN ($XTYHID$) OR A.JGXXID IN ($JGXXID$) OR A.BMXXID IN ($BMXXID$) OR C.XTJSID IN ($XTJSID$))
+						AND A.DELFLAG =0 AND A.YHZT='启用' AND B.DELFLAG=0 AND C.DELFLAG=0 AND C.STATE='启用']]>
+	</insert>
+	<!-- 首页代办事宜 -->
+	<select id="queryDbsyByUser" parameterClass="String" resultClass="java.util.HashMap" >
+		<![CDATA[$SELECTSQL$]]>
+	</select>
+	<!-- 数据过滤 -->
+	<select id="queryFilterData" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[$SELECTSQL$]]>
+	</select>
+</sqlMap>
+

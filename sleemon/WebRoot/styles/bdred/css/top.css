@@ -1,0 +1,29 @@
+/* CSS Document */
+body,td {
+	font-size: 12px;
+	margin: 0px;
+}
+
+
+img,image,form { /* border style for all images */
+	border: 0;
+}
+
+label.fontcss {
+	font-size: 13px;
+	font-weight:bold;
+	color: white;	
+}
+
+.white {
+	color: #fff;	
+}
+.white a:link {
+	color: #fff;
+	text-decoration: none;
+}
+
+.white a:visited {
+	color: #fff;
+	text-decoration: none;
+}

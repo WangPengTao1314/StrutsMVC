@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ *@module 渠道管理-分销商管理
+ *@function   分销商购货月报
+ *@version 1.1
+ *@author gu_hx
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="distributerSalerpt">
+
+	<typeAlias type="com.hoperun.drp.distributer.distributersalerpt.model.DistributerSalerptModel" alias="DistributerSalerptModel" />
+	<typeAlias type="com.hoperun.drp.distributer.distributersalerpt.model.DistributerSalerptChildModel" alias="DistributerSalerptChildModel" />
+
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="DistributerSalerptModel" class="DistributerSalerptModel">	
+		<result column="DISTRIBUTOR_SALE_RPT_ID" property="DISTRIBUTOR_SALE_RPT_ID" />
+		<result column="DISTRIBUTOR_SALE_RPT_NO" property="DISTRIBUTOR_SALE_RPT_NO" />
+		<result column="CHANN_ID" property="CHANN_ID" />
+		<result column="CHANN_NO" property="CHANN_NO" />
+		<result column="CHANN_NAME" property="CHANN_NAME" />
+		<result column="MONTH" property="MONTH" />
+		<result column="YEAR" property="YEAR" />
+		<result column="STATE" property="STATE" />
+		<result column="CREATOR" property="CREATOR" />
+		<result column="CRE_NAME" property="CRE_NAME" />		
+		<result column="CRE_TIME" property="CRE_TIME" />
+		<result column="DISTRIBUTOR_SALE_RPT_ID" property="childList" select="distributerSalerpt.findChldByFkId"/>
+		
+	</resultMap>
+	<resultMap id="DistributerSalerptChildModel" class="DistributerSalerptChildModel">
+		<result column="DISTRIBUTOR_SALE_RPT_DTL_ID" property="DISTRIBUTOR_SALE_RPT_DTL_ID" />
+		<result column="DISTRIBUTOR_SALE_RPT_ID" property="DISTRIBUTOR_SALE_RPT_ID" />
+		<result column="DISTRIBUTOR_ID" property="DISTRIBUTOR_ID" />
+		<result column="DISTRIBUTOR_NO" property="DISTRIBUTOR_NO" />
+		<result column="DISTRIBUTOR_NAME" property="DISTRIBUTOR_NAME" />
+		<result column="DISTRIBUTOR_TYPE" property="DISTRIBUTOR_TYPE" />
+		<result column="PRD_ID" property="PRD_ID" />
+		<result column="PRD_NO" property="PRD_NO" />
+		<result column="PRD_NAME" property="PRD_NAME" />
+		<result column="PRD_SPEC" property="PRD_SPEC" />
+		<result column="STOREOUT_NUM" property="STOREOUT_NUM" />
+		<result column="STOREOUT_AMOUNT" property="STOREOUT_AMOUNT" />	
+	</resultMap>
+	
+	<!-- 动态查询 and 列表排序 -->
+	<sql id="queryDynSql">		
+	    c.DEL_FLAG = 0
+    	<isNotEmpty prepend="" property="CHANN_NAME"><![CDATA[and c.CHANN_NAME like '%'||#CHANN_NAME#||'%']]></isNotEmpty>
+    	<isNotEmpty prepend="" property="BEGIN_CRE_TIME">and c.CRE_TIME &gt;= to_date(#BEGIN_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')</isNotEmpty>
+		<isNotEmpty prepend="" property="END_CRE_TIME">and c.CRE_TIME &lt;= to_date(#END_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')</isNotEmpty>
+		<isNotEmpty prepend="" property="CRE_NAME"><![CDATA[and c.CRE_NAME like '%'||#CRE_NAME#||'%']]></isNotEmpty>
+    	<isNotEmpty prepend="" property="YEAR"><![CDATA[and c.YEAR = #YEAR# ]]></isNotEmpty>
+    	<isNotEmpty prepend="" property="MONTH"><![CDATA[and c.MONTH = #MONTH# ]]></isNotEmpty>
+    	<isNotEmpty prepend="" property="STATE">and c.STATE=#STATE#</isNotEmpty>
+	    <isNotEmpty prepend="" property="QXJBCON">
+	      and  $QXJBCON$
+	   </isNotEmpty>
+	   <isNotEmpty prepend="" property="CHANNS_CHARG">
+          and   c.CHANN_ID in $CHANNS_CHARG$
+        </isNotEmpty>
+	</sql>
+    <sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField"> $orderField$</isNotEmpty>
+	</sql>
+	
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[
+				select c.DISTRIBUTOR_SALE_RPT_ID,
+			       c.DISTRIBUTOR_SALE_RPT_NO,
+			       c.CHANN_ID,			       
+			       c.CHANN_NO,
+			       c.CHANN_NAME,			       
+			       c.MONTH,			       
+			       c.YEAR,			       
+			       c.CREATOR,
+			       c.CRE_NAME,
+			       to_char(c.CRE_TIME, 'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+			       c.DEPT_ID,
+			       c.DEPT_NAME,
+			       c.STATE			       
+			       from ERP_DISTRIBUTOR_SALE_RPT c			       			       	       
+				]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>	
+	
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(DISTRIBUTOR_SALE_RPT_ID) cnt FROM ${SYSSCHEMA}.ERP_DISTRIBUTOR_SALE_RPT c ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+
+   <!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	<!-- 根据ID查找 -->	
+	<select id="loadById" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[		
+				select 
+				   DISTRIBUTOR_SALE_RPT_ID,
+			       DISTRIBUTOR_SALE_RPT_NO,
+			       CHANN_ID,
+			       CHANN_NO,
+			       CHANN_NAME,
+			       MONTH,
+			       YEAR,
+			       STATE,
+			       CREATOR,
+			       CRE_NAME,
+			       to_char(CRE_TIME, 'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+			       UPDATOR,
+			       UPD_NAME,
+			       to_char(UPD_TIME, 'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+			       DEPT_ID,
+			       DEPT_NAME,
+			       ORG_ID,
+			       ORG_NAME,
+			       LEDGER_ID,
+			       LEDGER_NAME	
+				from ${SYSSCHEMA}.ERP_DISTRIBUTOR_SALE_RPT c where c.DISTRIBUTOR_SALE_RPT_ID = #DISTRIBUTOR_SALE_RPT_ID# and DEL_FLAG=0
+		]]>
+	</select>
+		
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.ERP_DISTRIBUTOR_SALE_RPT(
+		 	DISTRIBUTOR_SALE_RPT_ID,DISTRIBUTOR_SALE_RPT_NO,CHANN_ID,CHANN_NO,CHANN_NAME,MONTH,YEAR,
+			STATE,CREATOR,CRE_NAME,CRE_TIME,DEPT_ID,DEPT_NAME,ORG_ID,ORG_NAME,LEDGER_ID,LEDGER_NAME,DEL_FLAG
+		 	)
+		 values(		 	
+			#DISTRIBUTOR_SALE_RPT_ID#,#DISTRIBUTOR_SALE_RPT_NO#,#CHANN_ID#,#CHANN_NO#,#CHANN_NAME#,#MONTH#,#YEAR#,
+			#STATE#,#CREATOR#,#CRE_NAME#,sysdate,#DEPT_ID#,#DEPT_NAME#,#ORG_ID#,#ORG_NAME#,#LEDGER_ID#,#LEDGER_NAME#,#DEL_FLAG#			
+		 )
+		]]>
+	</insert>
+	
+	<update id="updateById" parameterClass="map">
+		 <![CDATA[ update ${SYSSCHEMA}.ERP_DISTRIBUTOR_SALE_RPT ]]>
+		<dynamic prepend="set">				
+			<isNotNull property="CHANN_ID" prepend=","><![CDATA[CHANN_ID = #CHANN_ID#]]></isNotNull>
+			<isNotNull property="CHANN_NO" prepend=","><![CDATA[CHANN_NO = #CHANN_NO#]]></isNotNull>
+			<isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME#]]></isNotNull>
+			<isNotNull property="MONTH" prepend=","><![CDATA[MONTH = #MONTH#]]></isNotNull>
+			<isNotNull property="YEAR" prepend=","><![CDATA[YEAR = #YEAR#]]></isNotNull>
+						
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where DISTRIBUTOR_SALE_RPT_ID = #DISTRIBUTOR_SALE_RPT_ID# ]]>
+	</update>
+	
+	<update id="updateStateById" parameterClass="map">	
+		<![CDATA[ update ${SYSSCHEMA}.ERP_DISTRIBUTOR_SALE_RPT ]]>
+		<dynamic prepend="set">
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME =sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where DISTRIBUTOR_SALE_RPT_ID = #DISTRIBUTOR_SALE_RPT_ID# ]]>	
+	</update>
+	
+	<update id="delete" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.ERP_DISTRIBUTOR_SALE_RPT ]]>
+		<dynamic prepend="set">
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where DISTRIBUTOR_SALE_RPT_ID = #DISTRIBUTOR_SALE_RPT_ID# ]]>	
+	</update>
+	
+	<!-- 明细操作开始-->
+	<!--明细查询条件定义 -->
+	<sql id="queryDynSqlChld">
+	  <isNotEmpty prepend="and" property="DEL_FLAG">
+	     u.DEL_FLAG=#DEL_FLAG#
+	  </isNotEmpty>
+	</sql>  
+	<!-- 查询SQL -->
+	<sql id="orderSqlChld">
+		 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+	</sql>
+	<sql id="coreSqlChld">
+		<![CDATA[ 
+	     select 
+			u.DISTRIBUTOR_SALE_RPT_DTL_ID,
+			u.DISTRIBUTOR_SALE_RPT_ID,
+			u.DISTRIBUTOR_ID,
+			u.DISTRIBUTOR_NO,
+			u.DISTRIBUTOR_NAME,
+			u.DISTRIBUTOR_TYPE,
+			u.PRD_ID,
+			u.PRD_NO,
+			u.PRD_NAME,
+			u.PRD_SPEC,
+			u.STOREOUT_NUM,
+			u.STOREOUT_AMOUNT,
+			u.DEL_FLAG,
+	       from ERP_DISTRIBUTOR_SALE_RPT_DTL u 
+	   ]]>
+	</sql>
+	 <!-- 根据主表ID查询明细 -->
+	  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+		  <include refid="coreSqlChld"/>
+		  <dynamic prepend="where">
+				u.DISTRIBUTOR_SALE_RPT_ID=#DISTRIBUTOR_SALE_RPT_ID#
+		  </dynamic>
+		  <dynamic prepend="and">
+		   <include refid="queryDynSqlChld" />
+		  </dynamic>
+		  <isNotNull prepend=" order by " property="orderField">
+				<include refid="orderSqlChld"/>
+		  </isNotNull>
+	  </select>
+	 <!--根据明细表IDS查询明细 -->
+	 <select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+		  <include refid="coreSqlChld"/>
+		  <dynamic prepend="where">
+		        u.DISTRIBUTOR_SALE_RPT_DTL_ID in ($DISTRIBUTOR_SALE_RPT_DTL_IDS$)
+		  </dynamic>
+		  <dynamic prepend="and">
+		   <include refid="queryDynSqlChld" />
+		  </dynamic>
+		  <isNotNull prepend=" order by " property="orderField">
+				<include refid="orderSqlChld"/>
+		  </isNotNull>
+	  </select>	  
+	<!--明细表插入 -->
+	<insert id="insertChld" parameterClass="map">
+	  <![CDATA[
+		  insert into ERP_DISTRIBUTOR_SALE_RPT_DTL(
+			DISTRIBUTOR_SALE_RPT_DTL_ID,
+			DISTRIBUTOR_SALE_RPT_ID,
+			DISTRIBUTOR_ID,
+			DISTRIBUTOR_NO,
+			DISTRIBUTOR_NAME,
+			DISTRIBUTOR_TYPE,
+			PRD_ID,
+			PRD_NO,
+			PRD_NAME,
+			PRD_SPEC,
+			STOREOUT_NUM,
+			STOREOUT_AMOUNT,
+			DEL_FLAG
+		   )values(			
+			#DISTRIBUTOR_SALE_RPT_DTL_ID#,
+			#DISTRIBUTOR_SALE_RPT_ID#,
+			#DISTRIBUTOR_ID#,
+			#DISTRIBUTOR_NO#,
+			#DISTRIBUTOR_NAME#,
+			#DISTRIBUTOR_TYPE#,
+			#PRD_ID#,
+			#PRD_NO#,
+			#PRD_NAME#,
+			#PRD_SPEC#,
+			#STOREOUT_NUM#,
+			#STOREOUT_AMOUNT#,
+			#DEL_FLAG#
+			)
+	   ]]>
+	</insert>
+	<!--明细表更新 -->
+	<update id="updateChldById" parameterClass="map">
+		<![CDATA[ update ERP_DISTRIBUTOR_SALE_RPT_DTL ]]>
+		<dynamic prepend="set">		
+		<isNotNull property="DISTRIBUTOR_ID" prepend=","><![CDATA[DISTRIBUTOR_ID = #DISTRIBUTOR_ID# ]]></isNotNull>
+	    <isNotNull property="DISTRIBUTOR_NO" prepend=","><![CDATA[DISTRIBUTOR_NO = #DISTRIBUTOR_NO# ]]></isNotNull>
+	    <isNotNull property="DISTRIBUTOR_NAME" prepend=","><![CDATA[DISTRIBUTOR_NAME = #DISTRIBUTOR_NAME# ]]></isNotNull>
+	    <isNotNull property="DISTRIBUTOR_TYPE" prepend=","><![CDATA[DISTRIBUTOR_TYPE = #DISTRIBUTOR_TYPE# ]]></isNotNull>
+		<isNotNull property="PRD_ID" prepend=","><![CDATA[PRD_ID = #PRD_ID# ]]></isNotNull>
+	    <isNotNull property="PRD_NO" prepend=","><![CDATA[PRD_NO = #PRD_NO# ]]></isNotNull>
+	    <isNotNull property="PRD_NAME" prepend=","><![CDATA[PRD_NAME = #PRD_NAME# ]]></isNotNull>
+	    <isNotNull property="PRD_SPEC" prepend=","><![CDATA[PRD_SPEC = #PRD_SPEC# ]]></isNotNull>
+		<isNotNull property="STOREOUT_NUM" prepend=","><![CDATA[STOREOUT_NUM = #STOREOUT_NUM# ]]></isNotNull>		
+	    <isNotNull property="STOREOUT_AMOUNT" prepend=","><![CDATA[STOREOUT_AMOUNT = #STOREOUT_AMOUNT# ]]></isNotNull>	    
+	    </dynamic>
+		<![CDATA[ where DISTRIBUTOR_SALE_RPT_DTL_ID = #DISTRIBUTOR_SALE_RPT_DTL_ID#]]>
+	</update>	
+	<!--根据明细IDs删除明细 -->
+	<delete id="deleteChldByIds" parameterClass="map">
+		<![CDATA[ update ERP_DISTRIBUTOR_SALE_RPT_DTL 
+		               set DEL_FLAG = #DEL_FLAG#	 
+	 	  where 
+		      DISTRIBUTOR_SALE_RPT_DTL_ID in ($DISTRIBUTOR_SALE_RPT_DTL_IDS$)
+	    ]]>
+	</delete>
+	<!--根据主键ID删除明细 -->
+	<delete id="delChldByFkId" parameterClass="map">
+		<![CDATA[ update ERP_DISTRIBUTOR_SALE_RPT_DTL 
+		               set DEL_FLAG = #DEL_FLAG#	 
+	 	  where 
+		      DISTRIBUTOR_SALE_RPT_ID = #DISTRIBUTOR_SALE_RPT_ID#
+	    ]]>
+	</delete>
+	
+	<!-- 根据主表ID查询明细(DistributerSalerptChildModel) -->
+	  <select id="findChldByFkId" parameterClass="String" resultMap="DistributerSalerptChildModel">
+		  select 
+			u.DISTRIBUTOR_SALE_RPT_DTL_ID,
+			u.DISTRIBUTOR_SALE_RPT_ID,
+			u.DISTRIBUTOR_ID,
+			u.DISTRIBUTOR_NO,
+			u.DISTRIBUTOR_NAME,
+			u.DISTRIBUTOR_TYPE,
+			u.PRD_ID,
+			u.PRD_NO,
+			u.PRD_NAME,
+			u.PRD_SPEC,
+			u.STOREOUT_NUM,
+			u.STOREOUT_AMOUNT,
+			u.DEL_FLAG
+	       from ERP_DISTRIBUTOR_SALE_RPT_DTL u
+	       where u.DEL_FLAG=0 and 
+	      	 u.DISTRIBUTOR_SALE_RPT_ID=#DISTRIBUTOR_SALE_RPT_ID#		 
+	  </select>
+	  
+	<!-- 根据ID查找 -->	
+	<select id="findById" parameterClass="String" resultMap="DistributerSalerptModel">
+		<![CDATA[		
+				select 
+				   DISTRIBUTOR_SALE_RPT_ID,
+			       DISTRIBUTOR_SALE_RPT_NO,
+			       CHANN_ID,
+			       CHANN_NO,
+			       CHANN_NAME,
+			       MONTH,
+			       YEAR,
+			       STATE,
+			       CREATOR,
+			       CRE_NAME,
+			       to_char(CRE_TIME, 'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+			       UPDATOR,
+			       UPD_NAME,
+			       to_char(UPD_TIME, 'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+			       DEPT_ID,
+			       DEPT_NAME,
+			       ORG_ID,
+			       ORG_NAME,
+			       LEDGER_ID,
+			       LEDGER_NAME	
+				from ${SYSSCHEMA}.ERP_DISTRIBUTOR_SALE_RPT c where c.DISTRIBUTOR_SALE_RPT_ID = #DISTRIBUTOR_SALE_RPT_ID# and DEL_FLAG=0
+		]]>
+	</select>
+	
+	<!-- 查询导出数据 -->	
+	<select id="qryExp" parameterClass="map" resultClass="java.util.HashMap">
+			<![CDATA[
+					select c.DISTRIBUTOR_SALE_RPT_ID,
+					       c.DISTRIBUTOR_SALE_RPT_NO,
+					       c.CHANN_ID,
+					       c.CHANN_NO,
+					       c.CHANN_NAME,
+					       c.MONTH,
+					       c.YEAR,
+					       c.STATE,
+					       c.CREATOR,
+					       c.CRE_NAME,
+					       to_char(c.CRE_TIME, 'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+					       c.UPDATOR,
+					       c.UPD_NAME,
+					       to_char(c.UPD_TIME, 'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+					       c.DEPT_ID,
+					       c.DEPT_NAME,
+					       c.ORG_ID,
+					       c.ORG_NAME,
+					       c.LEDGER_ID,
+					       c.LEDGER_NAME,
+					       d.DISTRIBUTOR_ID,
+					       d.DISTRIBUTOR_NO,
+					       d.DISTRIBUTOR_NAME,
+					       d.DISTRIBUTOR_TYPE,
+					       d.PRD_ID,
+					       d.PRD_NO,
+					       d.PRD_NAME,
+					       d.PRD_SPEC,
+					       d.STOREOUT_NUM,
+					       d.STOREOUT_AMOUNT
+					  from ERP_DISTRIBUTOR_SALE_RPT c
+					  left join ERP_DISTRIBUTOR_SALE_RPT_DTL d on d.del_flag = 0
+					                                          and d.distributor_sale_rpt_id =
+					                                              c.distributor_sale_rpt_id
+					]]>
+			<dynamic prepend="where">
+				<include refid="queryDynSql" />
+			</dynamic>
+			<dynamic prepend="order by ">
+				<include refid="orderSql"/>
+			</dynamic>
+	</select>
+	
+</sqlMap>

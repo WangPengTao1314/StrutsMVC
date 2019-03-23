@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+	<!--
+		/** * @module 系统管理 * @func 行政区划 * @version 1.1 * @author 张涛 */
+	-->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="ZONE">
+
+	<typeAlias type="com.hoperun.base.zone.model.ZoneModel" alias="ZoneModel" />
+
+	<!-- 使用Zone装载结果集 -->
+	<resultMap id="ZONEModel" class="ZONEModel">
+		<result column="ZONE_ID" property="ZONE_ID" />
+	</resultMap>
+
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="TRNOID">
+			(u.NATION = #TRNOID# OR u.PROV = #TRNOID# OR u.CITY = #TRNOID# OR u.COUNTY = #TRNOID#)			
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="NATION">
+			u.NATION = #NATION#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="PROV">
+			u.PROV = #PROV#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CITY">
+			u.CITY = #CITY#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="COUNTY">
+			u.COUNTY = #COUNTY#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CRE_TIME_FROM">
+			<![CDATA[u.CRE_TIME >= to_date(#CRE_TIME_FROM#,'yyyy-MM-DD HH24:MI:SS') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CRE_TIME_TO">
+			<![CDATA[u.CRE_TIME <= to_date(#CRE_TIME_TO#,'yyyy-MM-DD HH24:MI:SS') ]]>
+		</isNotEmpty>		
+		<isNotEmpty prepend="and" property="STATE">
+			u.STATE = #STATE#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="DELFLAG">
+			u.DEL_FLAG = #DELFLAG#
+		</isNotEmpty>
+	</sql>
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField">
+			$orderField$,
+		</isNotEmpty>
+		u.CRE_TIME DESC
+	</sql>
+
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[  SELECT u.ZONE_ID,u.NATION,u.PROV,u.CITY,u.COUNTY,u.STATE,
+			u.CREATOR,u.CRE_NAME,to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS')  CRE_TIME,
+			u.UPDATOR,u.UPD_NAME,to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+			u.DEPT_ID,u.DEPT_NAME,u.ORG_ID,u.ORG_NAME 
+			 FROM ${SYSSCHEMA}.BASE_ZONE u]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql" />
+		</dynamic>
+	</sql>
+
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(1) cnt FROM ${SYSSCHEMA}.BASE_ZONE u]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+
+	<!-- 查询 -->
+	<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+
+	<select id="queryTree" parameterClass="String"
+		resultClass="com.hoperun.base.zone.model.ZoneTree">
+  		<![CDATA[
+			SELECT DISTINCT u.NATION id ,u.NATION name,'' pid FROM ${SYSSCHEMA}.BASE_ZONE u WHERE DEL_FLAG = 0 and STATE IN ('启用','停用','制定')
+			UNION ALL
+			SELECT DISTINCT u.PROV id ,u.PROV name,u.NATION pid FROM ${SYSSCHEMA}.BASE_ZONE u WHERE DEL_FLAG = 0 and STATE IN ('启用','停用','制定')
+			UNION ALL
+			SELECT DISTINCT u.CITY id ,u.CITY name, u.PROV pid FROM ${SYSSCHEMA}.BASE_ZONE u WHERE DEL_FLAG = 0 and STATE IN ('启用','停用','制定')
+			UNION ALL
+			SELECT DISTINCT u.COUNTY id ,u.COUNTY name ,u.CITY pid FROM ${SYSSCHEMA}.BASE_ZONE u WHERE DEL_FLAG = 0 and STATE IN ('启用','停用','制定')
+			]]>
+	</select>
+	<select id="loadById" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[  SELECT u.ZONE_ID,u.NATION,u.PROV,u.CITY,u.COUNTY,u.CRE_NAME,to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.DEPT_NAME,u.ORG_NAME,u.UPD_NAME,to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS')  UPD_TIME,u.STATE 
+		FROM ${SYSSCHEMA}.BASE_ZONE u
+					WHERE u.ZONE_ID = #ZONE_ID#]]>
+	</select>
+	<update id="stopById" parameterClass="map">	
+		<![CDATA[ UPDATE ${SYSSCHEMA}.BASE_ZONE ]]>
+		<dynamic prepend="set">
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ WHERE ZONE_ID = #ZONE_ID# ]]>	
+	</update>
+	<update id="startById" parameterClass="map">	
+		<![CDATA[ UPDATE ${SYSSCHEMA}.BASE_ZONE ]]>
+		<dynamic prepend="set">
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ WHERE ZONE_ID = #ZONE_ID# ]]>	
+	</update>
+	<!--软删除 -->
+	<delete id="delete" parameterClass="map">
+	<![CDATA[ UPDATE ${SYSSCHEMA}.BASE_ZONE ]]>
+		<dynamic prepend="set">
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = 1]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ WHERE ZONE_ID = #ZONE_ID# ]]>		
+	</delete>
+	<!--修改 -->
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ UPDATE ${SYSSCHEMA}.BASE_ZONE ]]>
+		<!-- CHANAME, CHADES,CHADATE,CHASTU -->
+		<dynamic prepend="set">
+			<!--<isNotNull property="ZONE_ID" prepend=","><![CDATA[ZONE_ID = #ZONE_ID#]]></isNotNull>-->
+			<isNotNull property="NATION" prepend=","><![CDATA[NATION = #NATION#]]></isNotNull>
+			<isNotNull property="PROV" prepend=","><![CDATA[PROV = #PROV#]]></isNotNull>
+			<isNotNull property="CITY" prepend=","><![CDATA[CITY = #CITY#]]></isNotNull>
+			<isNotNull property="COUNTY" prepend=","><![CDATA[COUNTY = #COUNTY#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>							
+		</dynamic>
+		<![CDATA[ WHERE ZONE_ID = #ZONE_ID# ]]>
+	</update>
+	<!--新增-->
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 INSERT INTO BASE_ZONE(ZONE_ID,NATION,PROV,CITY,COUNTY,STATE,CREATOR,CRE_NAME,CRE_TIME,UPDATOR,UPD_NAME,UPD_TIME,DEPT_ID,DEPT_NAME,ORG_ID,ORG_NAME,DEL_FLAG) 
+			VALUES(#ZONE_ID:VARCHAR:NULL#,#NATION:VARCHAR:NULL#,#PROV:VARCHAR:NULL#,#CITY:VARCHAR:NULL#,#COUNTY:VARCHAR:NULL#,#STATE:VARCHAR:NULL#,#CREATOR:VARCHAR:NULL#,#CRE_NAME:VARCHAR:NULL#,
+			sysdate,#UPDATOR:VARCHAR:NULL#,#UPD_NAME:VARCHAR:NULL#,sysdate,#DEPT_ID:VARCHAR:NULL#,#DEPT_NAME:VARCHAR:NULL#,#ORG_ID:VARCHAR:NULL#,#ORG_NAME:VARCHAR:NULL#,0)
+		]]>
+	</insert>
+</sqlMap>
+

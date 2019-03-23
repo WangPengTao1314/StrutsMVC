@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="AREA_DSCT">
+
+	<!-- 
+		*@module 总部->销售管理->价格管理
+		*@func 区域折扣信息
+		*@version 1.0
+		*@author 王志格
+		*  -->
+	<typeAlias type="com.hoperun.erp.sale.dsct.model.AreaDsctModel" alias="AreaDsctModel" />
+		
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="DECT_TYPE">
+			DECT_TYPE = #DECT_TYPE#
+		</isNotEmpty>	
+	</sql>
+
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[  SELECT  u.AREA_DSCT_ID,
+	    u.AREA_ID,
+	    u.AREA_NO,
+	    u.AREA_NAME,
+	    u.PRD_ID,
+	    u.PRD_NO,
+	    u.PRD_NAME,
+	    u.PRD_SPEC,
+	    u.DECT_TYPE,
+	    u.DECT_RATE,
+	    u.BASE_PRICE,
+	    u.DECT_PRICE
+		FROM ${SYSSCHEMA}.BASE_AREA_DSCT u
+             ]]>
+		<dynamic prepend="WHERE">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+	
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(1) cnt FROM ${SYSSCHEMA}.BASE_AREA_DSCT ]]>
+		<dynamic prepend="WHERE">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.AREA_DSCT_ID,
+	    u.AREA_ID,
+	    u.AREA_NO,
+	    u.AREA_NAME,
+	    u.PRD_ID,
+	    u.PRD_NO,
+	    u.PRD_NAME,
+	    u.PRD_SPEC,
+	    u.DECT_TYPE,
+	    u.DECT_RATE,
+	    u.BASE_PRICE,
+	    u.DECT_PRICE
+	  from
+       BASE_AREA_DSCT u 
+	  where 
+		u.AREA_DSCT_ID = #AREA_DSCT_ID#
+	]]>
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into BASE_AREA_DSCT(
+	    AREA_DSCT_ID,
+	    AREA_ID,
+	    AREA_NO,
+	    AREA_NAME,
+	    PRD_ID,
+	    PRD_NO,
+	    PRD_NAME,
+	    PRD_SPEC,
+	    DECT_TYPE,
+	    DECT_RATE,
+	    BASE_PRICE,
+	    DECT_PRICE
+	   )values(
+        #AREA_DSCT_ID#,
+	    #AREA_ID#,
+	    #AREA_NO#,
+	    #AREA_NAME#,
+	    #PRD_ID#,
+	    #PRD_NO#,
+	    #PRD_NAME#,
+	    #PRD_SPEC#,
+	    #DECT_TYPE#,
+	    #DECT_RATE#,
+	    #BASE_PRICE#,
+	    #DECT_PRICE#
+	  )
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update BASE_AREA_DSCT ]]>
+	<dynamic prepend="set">
+    <isNotNull property="AREA_ID" prepend=","><![CDATA[AREA_ID = #AREA_ID# ]]></isNotNull>
+    <isNotNull property="AREA_NO" prepend=","><![CDATA[AREA_NO = #AREA_NO# ]]></isNotNull>
+    <isNotNull property="AREA_NAME" prepend=","><![CDATA[AREA_NAME = #AREA_NAME# ]]></isNotNull>
+    <isNotNull property="PRD_ID" prepend=","><![CDATA[PRD_ID = #PRD_ID# ]]></isNotNull>
+    <isNotNull property="PRD_NO" prepend=","><![CDATA[PRD_NO = #PRD_NO# ]]></isNotNull>
+    <isNotNull property="PRD_NAME" prepend=","><![CDATA[PRD_NAME = #PRD_NAME# ]]></isNotNull>
+    <isNotNull property="PRD_SPEC" prepend=","><![CDATA[PRD_SPEC = #PRD_SPEC# ]]></isNotNull>
+    <isNotNull property="DECT_TYPE" prepend=","><![CDATA[DECT_TYPE = #DECT_TYPE# ]]></isNotNull>
+    <isNotNull property="DECT_RATE" prepend=","><![CDATA[DECT_RATE = #DECT_RATE# ]]></isNotNull>
+    <isNotNull property="BASE_PRICE" prepend=","><![CDATA[BASE_PRICE = #BASE_PRICE# ]]></isNotNull>
+    <isNotNull property="DECT_PRICE" prepend=","><![CDATA[DECT_PRICE = #DECT_PRICE# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where AREA_DSCT_ID = #AREA_DSCT_ID#]]>
+</update>
+<delete id="deleteById">
+     <![CDATA[ 
+    delete from BASE_AREA_DSCT
+    where  AREA_DSCT_ID = #AREA_DSCT_ID#
+   ]]>
+</delete>
+<!-- 根据区域ID 删除 区域折扣  扁平表 -->
+<delete id="delFlatByAreaId">
+   <![CDATA[ 
+    delete from BASE_AREA_DSCT_FLAT
+    where AREA_ID in (select AREA_ID
+                     from BASE_AREA
+                    start with AREA_ID = #AREA_ID#
+                   connect by prior AREA_ID = AREA_ID_P and STATE=#STATE#)
+   and PRD_ID in
+       (select b.PRD_ID from BASE_AREA_DSCT b where b.AREA_ID = #AREA_ID#)
+   ]]>
+</delete>
+
+<insert id="insertFlatByAreaId">
+ <![CDATA[
+  insert into BASE_AREA_DSCT_FLAT (AREA_DSCT_FLAT_ID,AREA_ID,AREA_NO,AREA_NAME,
+                        PRD_ID,PRD_NO,PRD_NAME,PRD_SPEC,DECT_TYPE,BASE_PRICE,DECT_RATE,DECT_PRICE)
+  select BASE_PRODUCT_NO.NEXTVAL, a.AREA_ID,a.AREA_NO,a.AREA_NAME, 
+         d.PRD_ID,d.PRD_NO,d.PRD_NAME,d.PRD_SPEC,d.DECT_TYPE,d.BASE_PRICE,d.DECT_RATE,d.DECT_PRICE
+   from BASE_AREA a ,BASE_AREA_DSCT d 
+   where a.AREA_ID in(select AREA_ID from BASE_AREA  start with AREA_ID = #AREA_ID# connect by prior AREA_ID = AREA_ID_P)
+   and a.STATE=#STATE#
+   and d.AREA_ID = #AREA_ID#
+  
+ ]]>
+</insert>
+
+</sqlMap>

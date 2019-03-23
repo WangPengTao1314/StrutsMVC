@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://struts.apache.org/dtds/struts-config_1_2.dtd">
+<struts-config>
+
+	<global-exceptions>
+		<exception key="BusinessException"
+			type="com.hoperun.commons.exception.ServiceException" scope="request"
+			handler="com.hoperun.commons.exception.ServiceExceptionHandler"
+			path="/commons/exception.jsp" >
+		</exception>
+		<exception key="errors.deleteFileException"
+			type="com.yum.dmis.web.exception.DeleteFileException" scope="request"
+			handler="org.apache.struts.action.ExceptionHandler"
+			path="/pages/common/errpage.jsp" />	
+				
+		<exception key="errors.fileOrDirectoryIsNotCreateException"
+			type="com.yum.dmis.web.exception.FileOrDirectoryIsNotCreateException" scope="request"
+			handler="org.apache.struts.action.ExceptionHandler"
+			path="/pages/common/errpage.jsp" />	
+				
+		<exception key="errors.project.isopen"
+			type="com.yum.dmis.web.exception.ProjectIsOpenException" scope="request"
+			handler="org.apache.struts.action.ExceptionHandler"
+			path="/pages/common/errpage.jsp" />	
+				
+		<exception key="errors.login.ie.only.one"
+			type="com.yum.dmis.web.exception.IeIsOnlyOneException" scope="request"
+			handler="org.apache.struts.action.ExceptionHandler"
+			path="/pages/common/errpage.jsp" />	
+				
+		<exception key="exception.attatchId.isNotExist"
+			type="com.yum.dmis.web.exception.AttatchIdIsNotExistException" scope="request"
+			handler="org.apache.struts.action.ExceptionHandler"
+			path="/pages/common/errpage.jsp" />
+		
+		<exception key="exception.FileNotFoundException"
+			type="com.yum.dmis2.web.exception.FileNotFoundException" scope="request"
+			handler="org.apache.struts.action.ExceptionHandler"
+			path="/pages/common/errpage.jsp" />
+		
+		<exception key="exception.excelModel.isNotExist"
+			type="com.yum.dmis.web.exception.ExcelModelIsNotExistException" scope="request"
+			handler="org.apache.struts.action.ExceptionHandler"
+			path="/pages/common/errpage.jsp" />
+						
+		<exception key="exception.UpdateOrDelete.failure"
+			type="com.fws.exception.UpdateOrDeleteFailueException" scope="request"
+			handler="org.apache.struts.action.ExceptionHandler"
+			path="/pages/common/errpage.jsp" />
+				
+		<exception key="exception.upfile"
+			type="com.yum.dmis.web.exception.UpFileException" scope="request"
+			handler="org.apache.struts.action.ExceptionHandler"
+			path="/pages/common/errpage.jsp" />
+
+		<exception key="exception.download"
+			type="com.yum.dmis.web.exception.DownLoadFileNotFoundException"
+			scope="request" handler="org.apache.struts.action.ExceptionHandler"
+			path="/pages/common/errpage.jsp" />
+			
+		<exception key="exception.mail.overmaxviewcount"
+			type="com.yum.dmis.web.exception.MailOverMaxViewCountException"
+			scope="request" handler="org.apache.struts.action.ExceptionHandler"
+			path="/pages/common/errpage.jsp" />			
+	
+		<exception key="exception.session"
+			type="com.fws.exception.SessionException" scope="request"
+			handler="org.apache.struts.action.ExceptionHandler"
+			path="/pages/common/errpage.jsp" />
+
+		<exception key="error.recordisnotfound"
+			type="com.fws.exception.RecordNotExistException" scope="request"
+			handler="org.apache.struts.action.ExceptionHandler"
+			path="/pages/common/errpage.jsp" />
+
+		<exception key="exception.fileformat"
+			type="com.fws.exception.FileFormatException" scope="request"
+			handler="org.apache.struts.action.ExceptionHandler"
+			path="/pages/common/errpage.jsp" />
+
+		<exception key="exception.database"
+			type="com.fws.exception.DataBaseException" scope="request"
+			handler="org.apache.struts.action.ExceptionHandler"
+			path="/pages/common/errpage.jsp" />
+
+		<exception key="exception.database"
+			type="java.sql.SQLException" scope="request"
+			handler="org.apache.struts.action.ExceptionHandler"
+			path="/pages/common/errpage.jsp" />
+			
+		<exception key="exception.system"
+			type="com.fws.exception.SystemException" scope="request"
+			handler="org.apache.struts.action.ExceptionHandler"
+			path="/pages/common/errpage.jsp" />
+			
+		<exception key="exception.webserver"
+			type="javax.servlet.ServletException" scope="request"
+			handler="org.apache.struts.action.ExceptionHandler"
+			path="/pages/common/errpage.jsp" />	
+			
+		<exception key="exception.database"
+			type="com.microsoft.sqlserver.jdbc.SQLServerException" scope="request"
+			handler="org.apache.struts.action.ExceptionHandler"
+			path="/pages/common/errpage.jsp" />	
+			
+		<exception key="error.recordisnotfound"
+			type="com.yum.dmis2.web.exception.ValidateSynMemberException" scope="request"
+			handler="org.apache.struts.action.ExceptionHandler"
+			path="/pages/common/errpage.jsp" />		
+	</global-exceptions>
+	
+	<global-forwards>
+		<!-- 空页面 -->
+		<forward name="blank" path="/pages/index/blank.html" />
+		<!-- 正在建设中 -->
+		<forward name="inprogress" path="/commons/inprogress.jsp" />
+		<!-- 失败页面 -->
+		<forward name="failure" path="/commons/failure.jsp" />
+		<!-- 成功页面 -->
+		<forward name="success" path="/commons/success.jsp" />
+		<!-- 失败页面扩展 -->
+		<forward name="failext" path="/commons/failext.jsp" />
+		<!-- 成功页面扩展-->
+		<forward name="succext" path="/commons/succext.jsp" />
+		<!-- 直接打印报表 -->
+		<forward name="smReportPrint" path="/commons/sm_print.jsp" />
+		<!-- flash打印报表 -->
+		<forward name="flashReportPrint" path="/commons/flashPrint.jsp" />
+		<!-- 填报报表 -->
+		<forward name="fillReportShow" path="/commons/showReport.jsp" />
+		 
+		
+	</global-forwards>
+	
+	<plug-in
+		className="org.springframework.web.struts.ContextLoaderPlugIn">
+		<set-property property="contextConfigLocation"
+			value="classpath:/spring/applicationContext*.xml;/WEB-INF/conf-service/service-*.xml;/WEB-INF/conf-action/action-*.xml" />
+	</plug-in>
+</struts-config>
+

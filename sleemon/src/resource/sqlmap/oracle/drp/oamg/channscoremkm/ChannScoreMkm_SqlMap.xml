@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zcx
+@function 
+@version 2014-11-06 10:49:05
+-->
+<sqlMap  namespace="channScoreMkm">
+<typeAlias type="com.hoperun.drp.oamg.channscoremkm.model.ChannScoreMkmModel" alias="ChannScoreMkmModel"/>
+<!-- 使用Promoreim装载结果集 -->
+<resultMap id="ChannScoreMkmModel" class="ChannScoreMkmModel">
+    <result column="CHANN_SCORE_MKM_ID" property="CHANN_SCORE_MKM_ID" />
+</resultMap>
+<!-- 动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  u.DEL_FLAG = 0 
+  <isNotEmpty prepend="" property="CHANN_SCORE_MKM_NO">
+       <![CDATA[ and u.CHANN_SCORE_MKM_NO like '%'||#CHANN_SCORE_MKM_NO#||'%' ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="MKM_NAME">
+       <![CDATA[ and u.MKM_NAME = #MKM_NAME# ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="SCORE_NAME">
+       <![CDATA[ and u.SCORE_NAME = #SCORE_NAME# ]]>
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="" property="SCORE_DATE_BEG">
+       <![CDATA[ and u.SCORE_DATE >=to_date(#SCORE_DATE_BEG#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="SCORE_DATE_END">
+       <![CDATA[ and u.SCORE_DATE <=to_date(#SCORE_DATE_END#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty  prepend="" property="STATE">
+    and  u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="QXJBCON">
+	  and   $QXJBCON$  
+  </isNotEmpty>
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+	   u.CHANN_SCORE_MKM_ID,
+       u.CHANN_SCORE_MKM_NO,
+       u.MKM_ID,
+       u.MKM_NAME,
+       u.SCORE_ID,
+       u.SCORE_NAME,
+       to_char(u.SCORE_DATE,'yyyy-MM-DD') SCORE_DATE,
+       u.SCORE_TOTAL,
+       u.STATE
+       from DRP_CHANN_SCORE_MKM u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+<!-- 分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+</select>
+ 
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt 
+              from DRP_CHANN_SCORE_MKM u
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+ 
+<!-- 查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_CHANN_SCORE_MKM(
+					 CHANN_SCORE_MKM_ID,
+					 CHANN_SCORE_MKM_NO,
+					 MKM_ID,
+					 MKM_NAME,
+					 SCORE_ID,
+					 SCORE_NAME,
+					 SCORE_DATE,
+					 SCORE_TOTAL,
+					 CRE_NAME,
+				     CREATOR,
+				     CRE_TIME,
+				     DEPT_ID,
+				     DEPT_NAME,
+				     ORG_ID,
+				     ORG_NAME,
+				     LEDGER_ID,
+				     LEDGER_NAME,
+				     STATE,
+				     DEL_FLAG
+				   )values(
+				     #CHANN_SCORE_MKM_ID#,
+					 #CHANN_SCORE_MKM_NO#,
+					 #MKM_ID#,
+					 #MKM_NAME#,
+					 #SCORE_ID#,
+					 #SCORE_NAME#,
+					 to_date(#SCORE_DATE#,'yyyy-MM-DD'),
+					 #SCORE_TOTAL#,
+					 #CRE_NAME#,
+					 #CREATOR#,
+					 to_date(#CRE_TIME#,'yyyy-MM-DD HH24:MI:SS'),
+					 #DEPT_ID#,
+					 #DEPT_NAME#,
+					 #ORG_ID#,
+					 #ORG_NAME#,
+					 #LEDGER_ID#,
+					 #LEDGER_NAME#,
+					 #STATE#,
+					 #DEL_FLAG#
+					)
+   ]]>
+</insert> 
+
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update DRP_CHANN_SCORE_MKM ]]>
+	<dynamic prepend="set">
+    <isNotNull property="MKM_ID"        prepend=","><![CDATA[MKM_ID = #MKM_ID# ]]></isNotNull>
+    <isNotNull property="MKM_NAME"      prepend=","><![CDATA[MKM_NAME   = #MKM_NAME# ]]></isNotNull>
+    <isNotNull property="SCORE_ID"      prepend=","><![CDATA[SCORE_ID = #SCORE_ID# ]]></isNotNull>
+    <isNotNull property="SCORE_NAME"    prepend=","><![CDATA[SCORE_NAME   = #SCORE_NAME# ]]></isNotNull>
+    <isNotNull property="SCORE_DATE"    prepend=","><![CDATA[SCORE_DATE = to_date(#SCORE_DATE#,'yyyy-MM-DD')]]></isNotNull>
+    <isNotNull property="SCORE_TOTAL"   prepend=","><![CDATA[SCORE_TOTAL = #SCORE_TOTAL# ]]></isNotNull>
+    <isNotNull property="UPD_NAME"        prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPDATOR"     prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+    <isNotNull property="UPD_TIME"    prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where CHANN_SCORE_MKM_ID = #CHANN_SCORE_MKM_ID#]]>
+</update>
+
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	   select 
+	   u.CHANN_SCORE_MKM_ID,
+       u.CHANN_SCORE_MKM_NO,
+       u.MKM_ID,
+       u.MKM_NAME,
+       u.SCORE_ID,
+       u.SCORE_NAME,
+       to_char(u.SCORE_DATE,'yyyy-MM-DD') SCORE_DATE,
+       u.SCORE_TOTAL,
+       u.STATE
+       from DRP_CHANN_SCORE_MKM u
+       where 
+	   u.CHANN_SCORE_MKM_ID = #CHANN_SCORE_MKM_ID#
+	]]>
+</select>
+
+<select id="qeryMkm" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  SELECT c.AREA_MANAGE_ID,c.AREA_MANAGE_NAME  FROM BASE_CHANN c where c.CHANN_ID = #CHANN_ID#
+	]]>
+</select>
+
+<!-- 删除 -->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update DRP_CHANN_SCORE_MKM ]]>
+	<dynamic prepend="set">
+		<isNotNull property="DEL_FLAG"><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+	</dynamic>
+	<![CDATA[ where CHANN_SCORE_MKM_ID = #CHANN_SCORE_MKM_ID# ]]>
+</delete>
+
+</sqlMap>

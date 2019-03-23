@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zcx
+@function  渠道参数设置
+@version 2014-05-20 11:13:12
+-->
+<sqlMap  namespace="Decorationallo">
+<typeAlias type="com.hoperun.drp.oamg.decorationallo.model.DecorationalloModel" alias="DecorationalloModel"/>
+<!-- 使用Resvstore装载结果集 -->
+<resultMap id="DecorationalloModel" class="DecorationalloModel">
+    <result column="RNVTN_SUBST_STD_ID" property="RNVTN_SUBST_STD_ID" />
+</resultMap>
+<!-- 动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  u.DEL_FLAG = 0
+  <isNotEmpty  property="RNVTN_SUBST_STD_NO">
+    and  u.RNVTN_SUBST_STD_NO like '%'||#RNVTN_SUBST_STD_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty  property="BRAND">
+    and  u.BRAND like '%'||#BRAND#||'%'
+  </isNotEmpty>
+  <isNotEmpty  property="RNVTN_SUBST_STD_VSION">
+    and  u.RNVTN_SUBST_STD_VSION like '%'||#RNVTN_SUBST_STD_VSION#||'%'
+  </isNotEmpty>
+  
+  <isNotEmpty  property="STATE">
+    and  u.STATE  in  ('$STATE$')
+  </isNotEmpty>
+  
+  <isNotEmpty  property="LEDGER_ID">
+    and  u.LEDGER_ID = #LEDGER_ID#
+  </isNotEmpty>
+  
+ <isNotEmpty  property="QXJBCON">
+	and     $QXJBCON$
+ </isNotEmpty> 
+</sql>
+
+
+<sql id="queryDynSqlT">
+  u.DEL_FLAG = 0
+  <isNotEmpty  property="RNVTN_SUBST_STD_NO">
+    and  u.RNVTN_SUBST_STD_NO like '%'||#RNVTN_SUBST_STD_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty  property="BRAND">
+    and  u.BRAND like '%'||#BRAND#||'%'
+  </isNotEmpty>
+  <isNotEmpty  property="RNVTN_SUBST_STD_VSION">
+    and  u.RNVTN_SUBST_STD_VSION like '%'||#RNVTN_SUBST_STD_VSION#||'%'
+  </isNotEmpty>
+  
+  <isNotEmpty  property="STATE">
+    and  u.STATE  in  ('$STATE$')
+  </isNotEmpty>
+  
+  <isNotEmpty  property="LEDGER_ID">
+    and  u.LEDGER_ID = #LEDGER_ID#
+  </isNotEmpty>
+  
+ <isNotEmpty  property="QXJBCON">
+	and     $QXJBCON$
+ </isNotEmpty> 
+
+</sql>
+
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select u.RNVTN_SUBST_STD_ID,
+       u.RNVTN_SUBST_STD_NO,
+       t.DATA_DTL_NAME BRAND,
+       u.MIN_AREA,
+       u.STD_AREA,
+       u.STATE,
+       u.BUILD_COST,
+       u.DECORATE_COST,
+       u.RNVTN_SUBST_STD_VSION,
+       u.REMARK,
+       (case when length(u.REMARK)>20 then substr(u.REMARK, 0, 20)||'...' else u.REMARK end )SHORT_REMARK,
+       u.DEL_FLAG
+       from DRP_RNVTN_SUBST_STD u left join PROJECT_DATA_DICTIONARY_DTL  t on u.brand = t.data_dtl_code 
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+<sql id="coreSqlT">
+  <![CDATA[ 
+	select u.RNVTN_SUBST_STD_ID,
+       u.RNVTN_SUBST_STD_NO,
+       t.DATA_DTL_NAME BRAND,
+       u.MIN_AREA,
+       u.STD_AREA,
+       u.STATE,
+       u.BUILD_COST,
+       u.DECORATE_COST,
+       u.RNVTN_SUBST_STD_VSION,
+       u.REMARK,
+       (case when length(u.REMARK)>20 then substr(u.REMARK, 0, 20)||'...' else u.REMARK end )SHORT_REMARK,
+       u.DEL_FLAG
+       from DRP_RNVTN_SUBST_STD u left join PROJECT_DATA_DICTIONARY_DTL  t on u.brand = t.data_dtl_code 
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSqlT" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+<!-- 分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+	
+<select id="pageQueryT" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSqlT" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt 
+            from DRP_RNVTN_SUBST_STD u 
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+
+<select id="pageCountT" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt 
+            from DRP_RNVTN_SUBST_STD u 
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSqlT"/>
+	</dynamic>
+</select>
+ <!-- 查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_RNVTN_SUBST_STD(
+		 RNVTN_SUBST_STD_ID,
+		 RNVTN_SUBST_STD_NO,
+		 BRAND,
+		 MIN_AREA,
+		 STD_AREA,
+		 BUILD_COST,
+		 DECORATE_COST,
+		 RNVTN_SUBST_STD_VSION,
+		 STATE,
+		 CREATOR,
+		 CRE_NAME,
+		 CRE_TIME,
+		 REMARK,
+		 DEPT_ID,
+		 DEPT_NAME,
+		 ORG_ID,
+		 ORG_NAME,
+		 DEL_FLAG,
+		 LEDGER_ID,
+		 LEDGER_NAME
+	   )values(
+		#RNVTN_SUBST_STD_ID#,
+		#RNVTN_SUBST_STD_NO#,
+		#BRAND#,
+		#MIN_AREA#,
+		#STD_AREA#,
+		#BUILD_COST#,
+		#DECORATE_COST#,
+		#RNVTN_SUBST_STD_VSION#,
+		#STATE#,
+		#CREATOR#,
+		#CRE_NAME#,
+		sysdate,
+		#REMARK#,
+		#DEPT_ID#,
+		#DEPT_NAME#,
+		#ORG_ID#,
+		#ORG_NAME#,
+		#DEL_FLAG#,
+		#LEDGER_ID#,
+		#LEDGER_NAME#
+		)
+   ]]>
+</insert>
+
+<insert id="insertChild" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_RNVTN_SUBST_STD_DTL(
+	     RNVTN_SUBST_STD_DTL_ID,
+		 RNVTN_SUBST_STD_ID,
+		 LOCAL_TYPE,
+		 SUBST_AMOUNT,
+		 REMARK,
+		 DEL_FLAG
+	   )values(
+	    #RNVTN_SUBST_STD_DTL_ID#,
+		#RNVTN_SUBST_STD_ID#,
+		#LOCAL_TYPE#,
+		#SUBST_AMOUNT#,
+		#REMARK#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+
+<update id="updateChild" parameterClass="map">
+	<![CDATA[ update DRP_RNVTN_SUBST_STD_DTL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="RNVTN_SUBST_STD_ID" prepend=","><![CDATA[RNVTN_SUBST_STD_ID = #RNVTN_SUBST_STD_ID# ]]></isNotNull>
+    <isNotNull property="LOCAL_TYPE" prepend=","><![CDATA[LOCAL_TYPE = #LOCAL_TYPE# ]]></isNotNull>
+    <isNotNull property="SUBST_AMOUNT" prepend=","><![CDATA[SUBST_AMOUNT = #SUBST_AMOUNT# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    <isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where RNVTN_SUBST_STD_DTL_ID = #RNVTN_SUBST_STD_DTL_ID#]]>
+</update>
+
+
+<!-- 查看控制明细中同一商场位置类型是否只有一条记录 -->
+<select id="countLocalType" parameterClass="map" resultClass="int">
+	select count(0) from  DRP_RNVTN_SUBST_STD_DTL where DEL_FLAG=0 and LOCAL_TYPE=#LOCAL_TYPE# and RNVTN_SUBST_STD_ID = #RNVTN_SUBST_STD_ID#
+</select>
+
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update DRP_RNVTN_SUBST_STD ]]>
+	<dynamic prepend="set">
+    <isNotNull property="RNVTN_SUBST_STD_NO" prepend=","><![CDATA[RNVTN_SUBST_STD_NO = #RNVTN_SUBST_STD_NO# ]]></isNotNull>
+    <isNotNull property="BRAND" prepend=","><![CDATA[BRAND = #BRAND# ]]></isNotNull>
+    <isNotNull property="MIN_AREA" prepend=","><![CDATA[MIN_AREA = #MIN_AREA# ]]></isNotNull>
+    <isNotNull property="STD_AREA" prepend=","><![CDATA[STD_AREA = #STD_AREA# ]]></isNotNull>
+    <isNotNull property="BUILD_COST" prepend=","><![CDATA[BUILD_COST = #BUILD_COST# ]]></isNotNull>
+    <isNotNull property="DECORATE_COST" prepend=","><![CDATA[DECORATE_COST = #DECORATE_COST# ]]></isNotNull>
+    <isNotNull property="RNVTN_SUBST_STD_VSION" prepend=","><![CDATA[RNVTN_SUBST_STD_VSION = #RNVTN_SUBST_STD_VSION# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where RNVTN_SUBST_STD_ID = #RNVTN_SUBST_STD_ID#]]>
+</update>
+
+
+<select id="queryChildById" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[ 
+       SELECT d.RNVTN_SUBST_STD_DTL_ID,d.LOCAL_TYPE,  d.subst_amount, d.remark ,d.RNVTN_SUBST_STD_ID 
+       FROM DRP_RNVTN_SUBST_STD_DTL d where  d.DEL_FLAG=0  and d.RNVTN_SUBST_STD_ID = #RNVTN_SUBST_STD_ID#
+	]]>
+</select>
+
+<select id="queryChildByIdT" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[ 
+       SELECT d.RNVTN_SUBST_STD_DTL_ID,t.DATA_DTL_NAME LOCAL_TYPE,  d.subst_amount, d.remark ,d.RNVTN_SUBST_STD_ID 
+       FROM DRP_RNVTN_SUBST_STD_DTL d left join PROJECT_DATA_DICTIONARY_DTL  t on d.LOCAL_TYPE = t.data_dtl_code  where  d.DEL_FLAG=0  and d.RNVTN_SUBST_STD_ID = #RNVTN_SUBST_STD_ID#
+	]]>
+</select>
+ 
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		 u.RNVTN_SUBST_STD_ID,
+		 u.RNVTN_SUBST_STD_NO,
+		 t.DATA_DTL_NAME BRAND,
+		 u.MIN_AREA,
+		 u.STD_AREA,
+		 u.BUILD_COST,
+		 u.DECORATE_COST,
+		 u.RNVTN_SUBST_STD_VSION,
+		 u.STATE,
+		 u.REMARK,
+		 u.CREATOR,
+		 u.CRE_NAME,
+		 to_char(u.CRE_TIME,'yyyy-MM-DD') CRE_TIME,
+		 u.DEPT_ID,
+		 u.DEPT_NAME,
+		 u.ORG_ID,
+		 u.ORG_NAME,
+		 u.LEDGER_ID,
+		 u.LEDGER_NAME,
+		 u.REMARK
+         from DRP_RNVTN_SUBST_STD u  left join PROJECT_DATA_DICTIONARY_DTL  t on u.brand = t.data_dtl_code 
+	  where 
+	    u.DEL_FLAG = 0 AND 
+		u.RNVTN_SUBST_STD_ID = #RNVTN_SUBST_STD_ID#
+	]]>
+</select>
+
+<select id="loadByConfId" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		 u.RNVTN_SUBST_STD_ID,
+		 u.RNVTN_SUBST_STD_NO,
+		 u.BRAND,
+		 u.MIN_AREA,
+		 u.STD_AREA,
+		 u.BUILD_COST,
+		 u.DECORATE_COST,
+		 u.RNVTN_SUBST_STD_VSION,
+		 u.STATE,
+		 u.REMARK,
+		 u.CREATOR,
+		 u.CRE_NAME,
+		 to_char(u.CRE_TIME,'yyyy-MM-DD') CRE_TIME,
+		 u.DEPT_ID,
+		 u.DEPT_NAME,
+		 u.ORG_ID,
+		 u.ORG_NAME,
+		 u.LEDGER_ID,
+		 u.LEDGER_NAME,
+		 u.REMARK
+         from DRP_RNVTN_SUBST_STD u 
+	     where 
+	     u.DEL_FLAG=0 AND
+		 u.RNVTN_SUBST_STD_ID = #RNVTN_SUBST_STD_ID# 
+	]]>
+</select>
+
+
+<select id="loadByConfIdT" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		 u.RNVTN_SUBST_STD_ID,
+		 u.RNVTN_SUBST_STD_NO,
+		 t.DATA_DTL_NAME BRAND,
+		 u.MIN_AREA,
+		 u.STD_AREA,
+		 u.BUILD_COST,
+		 u.DECORATE_COST,
+		 u.RNVTN_SUBST_STD_VSION,
+		 u.STATE,
+		 u.REMARK,
+		 u.CREATOR,
+		 u.CRE_NAME,
+		 to_char(u.CRE_TIME,'yyyy-MM-DD') CRE_TIME,
+		 u.DEPT_ID,
+		 u.DEPT_NAME,
+		 u.ORG_ID,
+		 u.ORG_NAME,
+		 u.LEDGER_ID,
+		 u.LEDGER_NAME,
+		 u.REMARK
+         from DRP_RNVTN_SUBST_STD u  
+         left join PROJECT_DATA_DICTIONARY_DTL  t on u.brand = t.data_dtl_code 
+	     where 
+	     u.DEL_FLAG=0 AND
+		 u.RNVTN_SUBST_STD_ID = #RNVTN_SUBST_STD_ID# 
+	]]>
+</select>
+
+<!--启用/停用-->
+<update id="updStusById" parameterClass="map">	
+     <![CDATA[ 
+	  update DRP_CHANN_RNVTN
+	         set CHANN_RNVTN_ID = #CHANN_RNVTN_ID#
+ 	  where 
+	     CHANN_RNVTN_ID = #CHANN_RNVTN_ID:VARCHAR# 
+    ]]>
+</update>
+
+<!-- 修改状态 -->
+<update id="updState" parameterClass="map">	
+     <![CDATA[ 
+	  update DRP_CHANN_RNVTN
+	         set STATE = #STATE#
+ 	  where 
+	     CHANN_RNVTN_ID = #CHANN_RNVTN_ID:VARCHAR# 
+    ]]>
+</update>
+
+<delete id="deleteByIds" parameterClass="String">
+		<![CDATA[ delete from DRP_RNVTN_SUBST_STD_DTL where RNVTN_SUBST_STD_DTL_ID in ($RNVTN_SUBST_STD_DTL_ID$) ]]>
+</delete>
+
+
+<delete id="deleteByIds1" parameterClass="String">
+		<![CDATA[ delete from DRP_RNVTN_SUBST_STD_DTL where RNVTN_SUBST_STD_DTL_ID in ('$RNVTN_SUBST_STD_DTL_ID$') ]]>
+</delete>
+
+<select id="loadByIds" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[  
+	 	select 
+	     d.RNVTN_SUBST_STD_DTL_ID,
+	     u.RNVTN_SUBST_STD_ID,
+         d.LOCAL_TYPE,
+         d.subst_amount,
+         d.remark
+         from DRP_RNVTN_SUBST_STD u  left join  DRP_RNVTN_SUBST_STD_DTL d on u.RNVTN_SUBST_STD_ID = d.RNVTN_SUBST_STD_ID
+	     where u.DEL_FLAG=0 AND  u.RNVTN_SUBST_STD_ID in ($RNVTN_SUBST_STD_ID$)]]>
+</select>
+
+<select id="loadByIds1" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[  
+	 	  select * from DRP_RNVTN_SUBST_STD_DTL d where  d.rnvtn_subst_std_id in (select u.rnvtn_subst_std_id from DRP_RNVTN_SUBST_STD u) and  d.rnvtn_subst_std_id in ('$RNVTN_SUBST_STD_ID$')]]>
+</select>
+
+<!-- 根据品牌获取 -->
+<select id="queryByBussScope" parameterClass="map" resultClass="DecorationalloModel">
+	<![CDATA[  
+	 	  select s.brand,s.min_area,s.std_area,d.local_type,d.subst_amount,s.ledger_id from DRP_RNVTN_SUBST_STD s left join DRP_RNVTN_SUBST_STD_DTL d on d.rnvtn_subst_std_id = s.rnvtn_subst_std_id where s.DEL_FLAG = 0 AND s.BRAND =  #BRAND# AND d.local_type=#LOCAL_TYPE# 
+	 	         AND s.STATE=#STATE# AND s.LEDGER_ID=#LEDGER_ID#
+	]]>
+</select>
+
+<select id="queryPro" parameterClass="String"
+		resultClass="String">
+		<![CDATA[ 
+	      select DATA_DTL_NAME from project_data_dictionary_dtl t where t.delflag=0 and  t.DATA_DTL_ID = #DATA_DTL_ID#
+	]]>
+</select>
+
+<select id="queryProT" parameterClass="String"
+		resultClass="String">
+		<![CDATA[ 
+	      select DATA_DTL_ID from project_data_dictionary_dtl t where t.delflag=0 and  t.DATA_DTL_NAME = #DATA_DTL_NAME#
+	]]>
+</select>
+
+ <!-- 根据一场多店信息获取 -->
+ 
+ <select id="queryTermWhichNum" parameterClass="map" resultClass="string">
+	<![CDATA[  
+	 	 select d.DATA_DTL_DES_1  from PROJECT_DATA_DICTIONARY p left join PROJECT_DATA_DICTIONARY_DTL d on p.DATA_ID = d.DATA_ID  where p.DELFLAG = 0 and p.data_name= #DATA_NAME# and d.data_dtl_name=#DATA_DTL_NAME#
+	]]>
+ </select> 
+
+<select id="countFrom" parameterClass="map" resultClass="int">
+	select count(0) from  DRP_RNVTN_SUBST_STD where BRAND=#BRAND# and STATE=#STATE# and DEL_FLAG=#DEL_FLAG# and LEDGER_ID=#LEDGER_ID#
+</select>
+
+<!-- 查询重复 -->
+<select id="queryBhForInt" parameterClass="map" resultClass="int">
+   select count(u.CHANN_RNVTN_ID) from DRP_CHANN_RNVTN u 
+     where u.CHANN_RNVTN_ID=#CHANN_RNVTN_ID#
+     <isNotEmpty prepend="and" property="CHANN_NAME">
+        u.CHANN_NAME != #CHANN_NAME#
+     </isNotEmpty>
+</select>
+
+<!-- 删除 -->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update DRP_RNVTN_SUBST_STD ]]>
+	<dynamic prepend="set">
+		<isNotNull property="DEL_FLAG"><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+	</dynamic>
+	<![CDATA[ where RNVTN_SUBST_STD_ID = #RNVTN_SUBST_STD_ID# ]]>
+</delete>
+</sqlMap>

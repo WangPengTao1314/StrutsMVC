@@ -1,0 +1,213 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zzb
+@function 
+@version 2013-09-15 10:35:10
+-->
+<sqlMap  namespace="AllotChannCard">
+<!-- 定义  -->
+<typeAlias type="com.hoperun.erp.sale.marketing.model.MarketCardModel" alias="MarketCardModel" />
+<!-- 使用MarketCardModel装载结果集 -->
+<resultMap id="MarketCardModel" class="MarketCardModel">
+    <result column="MARKETING_CARD_ID" property="MARKETING_CARD_ID" />
+</resultMap>
+ 
+
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="MARKETING_ACT_NO">
+    b.MARKETING_ACT_NO like '%'||#MARKETING_ACT_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="MARKETING_ACT_ID">
+    u.MARKETING_ACT_ID =#MARKETING_ACT_ID#
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and" property="MARKETING_ACT_NAME">
+    b.MARKETING_ACT_NAME like '%'||#MARKETING_ACT_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="MARKETING_CARD_NO">
+    u.MARKETING_CARD_NO like '%'||#MARKETING_CARD_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="SPONSOR_NAME">
+    b.SPONSOR_NAME like '%'||#SPONSOR_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="START_DATE">
+	  <![CDATA[  b.START_DATE >= to_date(#START_DATE#,'yyyy-MM-DD')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="END_DATE">
+	  <![CDATA[  b.END_DATE <= to_date(#END_DATE#,'yyyy-MM-DD')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="CRE_TIME_BEGIN">
+	  <![CDATA[  b.CRE_TIME >= to_date(#CRE_TIME_BEGIN#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+	  <![CDATA[  b.CRE_TIME <= to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>  
+  
+  <isNotEmpty prepend="and" property="CARD_SEQ_NO_BEGIN">
+	  <![CDATA[u.CARD_SEQ_NO >= #CARD_SEQ_NO_BEGIN#]]>
+  </isNotEmpty>  
+  <isNotEmpty prepend="and" property="CARD_SEQ_NO_END">
+	  <![CDATA[u.CARD_SEQ_NO <= #CARD_SEQ_NO_END#]]>
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="DEL_FLAG">
+    u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="QXJBCON">
+        $QXJBCON$
+  </isNotEmpty>
+  <!-- 显示未分配 -->
+ <isNotEmpty prepend="and" property="notallot">
+      u.CHANN_ID is  null 
+ </isNotEmpty>
+ <!-- 显示已分配 -->
+ <isNotEmpty prepend="and" property="haveallot">
+      u.CHANN_ID = #CHANN_ID# 
+ </isNotEmpty>
+	
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	  select 
+		u.MARKETING_CARD_ID,
+		u.MARKETING_CARD_NO,
+		u.CARD_TYPE,
+		u.CARD_VALUE,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.CARD_SEQ_NO,
+		u.STATE,
+		u.DEL_FLAG,
+		u.CHANN_ID,
+		u.CHANN_NO,
+		u.CHANN_NAME,
+		u.MARKETING_ACT_ID
+       from ERP_MARKETING_CARD u
+        left join ERP_MARKETING_ACT b on u.MARKETING_ACT_ID=b.MARKETING_ACT_ID
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM ERP_MARKETING_CARD u 
+      left join ERP_MARKETING_ACT b on u.MARKETING_ACT_ID=b.MARKETING_ACT_ID 
+      ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+
+ 
+
+
+<!-- ==========================================================MarketCard明细操作开始================-->
+ 
+  
+<!--明细表更新 -->
+<update id="updateMarketCardByIds" parameterClass="map">
+	<![CDATA[ update ERP_MARKETING_CARD ]]>
+	<dynamic prepend="set">
+    <isNotNull property="CHANN_ID" prepend=","><![CDATA[CHANN_ID = #CHANN_ID# ]]></isNotNull>
+    <isNotNull property="CHANN_NO" prepend=","><![CDATA[CHANN_NO = #CHANN_NO# ]]></isNotNull>
+    <isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME# ]]></isNotNull>
+    
+    <isNotNull property="ASSIGNER_ID" prepend=","><![CDATA[ASSIGNER_ID = #ASSIGNER_ID# ]]></isNotNull>
+    <isNotNull property="ASSIGNER_NAME" prepend=","><![CDATA[ASSIGNER_NAME = #ASSIGNER_NAME# ]]></isNotNull>
+    <isNotNull property="ASSIGNE_TIME" prepend=","><![CDATA[ASSIGNE_TIME = sysdate]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where MARKETING_CARD_ID in($MARKETING_CARD_IDS$) ]]>
+</update>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+<!-- 主表查询SQL -->
+<sql id="coreNoSaleSql">
+  <![CDATA[ 
+	  select 
+		u.MARKETING_CARD_ID,
+		u.MARKETING_CARD_NO,
+		u.CARD_TYPE,
+		u.CARD_VALUE,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.CARD_SEQ_NO,
+		u.STATE,
+		u.DEL_FLAG,
+		u.CHANN_ID,
+		u.CHANN_NO,
+		u.CHANN_NAME,
+		u.MARKETING_ACT_ID
+       from ERP_MARKETING_CARD u
+        left join ERP_MARKETING_ACT b on u.MARKETING_ACT_ID=b.MARKETING_ACT_ID
+         where 1=1
+         and u.CHANN_ID = #CHANN_ID#
+         and 1=1
+   ]]>
+    <dynamic prepend="and">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	
+	 <![CDATA[ 
+	   and not exists (select 1
+          from ERP_CARD_SALE_ORDER_DTL b
+         where b.MARKETING_CARD_ID = u.MARKETING_CARD_ID
+           and b.DEL_FLAG = 0)
+	 ]]>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageNoSaleQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreNoSaleSql" />
+		<include refid="public.pageEnd" />
+</select>
+<!-- 分页计数 -->
+<select id="pageNoSaleCount" parameterClass="map" resultClass="int">
+ <![CDATA[select count(0) cnt FROM ERP_MARKETING_CARD u 
+         left join ERP_MARKETING_ACT b on u.MARKETING_ACT_ID=b.MARKETING_ACT_ID 
+          where 1=1
+       and u.CHANN_ID = #CHANN_ID#
+       and 1=1
+ ]]>
+<dynamic prepend="and">
+	 <include refid="queryDynSql"/>
+</dynamic>
+<![CDATA[ 
+and not exists (select 1
+      from ERP_CARD_SALE_ORDER_DTL b
+     where b.MARKETING_CARD_ID = u.MARKETING_CARD_ID
+       and b.DEL_FLAG = 0)
+]]>
+</select>
+
+ 
+</sqlMap>

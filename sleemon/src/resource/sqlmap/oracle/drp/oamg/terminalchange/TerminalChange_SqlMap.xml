@@ -1,0 +1,666 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zcx
+@function 
+@version 2014-11-06 10:49:05
+-->
+<sqlMap  namespace="terminalChange">
+<typeAlias type="com.hoperun.drp.oamg.terminalchange.model.TerminalChangeModel" alias="TerminalChangeModel"/>
+<!-- 使用Promoreim装载结果集 -->
+<resultMap id="TerminalChangeModel" class="TerminalChangeModel">
+    <result column="TERMINAL_CHANGE_ID" property="TERMINAL_CHANGE_ID" />
+</resultMap>
+<!-- 动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  u.DEL_FLAG = 0 
+  <isNotEmpty  property="CHANNS_CHARG">
+    and  u.CHANN_ID_P in $CHANNS_CHARG$
+  </isNotEmpty> 
+  <isNotEmpty prepend="" property="TERM_NO">
+      and  u.TERM_NO  like '%'||#TERM_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="TERM_NAME">
+      and  u.TERM_NAME like '%'||#TERM_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="TERM_TYPE">
+      and  u.TERM_TYPE = #TERM_TYPE#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="TERM_LVL">
+      and  u.TERM_LVL = #TERM_LVL#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CHANN_NO_P">
+      and  u.CHANN_NO_P = #CHANN_NO_P#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CHANN_NAME_P">
+      and  u.CHANN_NAME_P like '%'||#CHANN_NAME_P#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="AREA_NO">
+      and  u.AREA_NO = #AREA_NO#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="AREA_NAME">
+      and  u.AREA_NAME like '%'||#AREA_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="STATE">
+      and  u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CRE_TIME_FROM">
+       <![CDATA[ and u.CRE_TIME >=to_date(#CRE_TIME_FROM#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CRE_TIME_TO">
+       <![CDATA[ and u.CRE_TIME <=to_date(#CRE_TIME_TO#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="QXJBCON">
+	  and   $QXJBCON$  
+  </isNotEmpty>
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+
+<sql id="coreSqlByHistory">
+  <![CDATA[ 
+	select 
+       u.TERMINAL_CHANGE_ID,
+       u.TERM_ID,
+       u.TERM_NO,
+       u.TERM_NAME,
+       u.TERM_ABBR,
+       u.TERM_TYPE,
+       u.TERM_LVL,
+       u.CHANN_ID_P,
+       u.CHANN_NO_P,
+       u.CHANN_NAME_P,
+       u.BUSS_NATRUE,
+       u.LOGIC_TYPE,
+       u.AREA_ID,
+       u.AREA_NO,
+       u.AREA_NAME,
+       u.ZONE_ID,
+       u.NATION,
+       u.PROV,
+       u.CITY,
+       u.COUNTY,
+       u.CITY_TYPE,
+       u.PERSON_CON,
+       u.TEL,
+       u.ADDRESS,
+       u.BUSS_LIC,
+       u.AX_BURDEN,
+       u.ORG_CODE_CERT,
+       u.BUSS_SCOPE,
+       u.BUSS_AREA,
+       u.LAST_DECOR_TIME,
+       u.SALE_STORE_ID,
+       u.SALE_STORE_NAME,
+       u.LOCAL_TYPE,
+       u.BEG_SBUSS_DATE,
+       u.BUSS_STATE,
+       u.BEG_BUSS_TYPE,
+       u.STATE,
+       u.REMARK
+       from BASE_TERMINAL_CHANGE u
+       where u.TERM_NO = #TERM_NO#
+   ]]>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+
+<!-- 查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+	   DISTINCT
+       u.TERMINAL_CHANGE_ID,
+       u.TERM_ID,
+       u.TERM_NO,
+       u.TERM_NAME,
+       u.TERM_ABBR,
+       u.TERM_TYPE,
+       u.TERM_LVL,
+       u.CHANN_ID_P,
+       u.CHANN_NO_P,
+       u.CHANN_NAME_P,
+       u.BUSS_NATRUE,
+       u.LOGIC_TYPE,
+       u.AREA_ID,
+       u.AREA_NO,
+       u.AREA_NAME,
+       u.ZONE_ID,
+       u.NATION,
+       u.PROV,
+       u.CITY,
+       u.COUNTY,
+       u.CITY_TYPE,
+       u.PERSON_CON,
+       u.TEL,
+       u.ADDRESS,
+       u.BUSS_LIC,
+       u.AX_BURDEN,
+       u.ORG_CODE_CERT,
+       u.BUSS_SCOPE,
+       u.BUSS_AREA,
+       u.LAST_DECOR_TIME,
+       u.SALE_STORE_ID,
+       u.SALE_STORE_NAME,
+       u.LOCAL_TYPE,
+       u.BEG_SBUSS_DATE,
+       u.BUSS_STATE,
+       u.BEG_BUSS_TYPE,
+       u.STATE,
+       u.REMARK
+       from BASE_TERMINAL_CHANGE u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+<!-- 分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+</select>
+ 
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt 
+              from BASE_TERMINAL_CHANGE u
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+ 
+<!-- 查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+
+<select id="queryChildById" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<![CDATA[ 
+	       SELECT    t.CHANN_VISIT_DTL_ID,
+					 t.CHANN_VISIT_ID,
+					 t.VISIT_DATE,
+			         t.PRO_NAME,
+			         t.MAIN_TYPE,
+			         t.SUB_TYPE,
+			         t.SIT_ANALYSIS,
+			         t.ACTION_PLAN,
+			         t.COMPLETE_TIME,
+			         t.OTHER_INFO
+                     FROM ERP_CHANN_VISIT_DTL t  
+                     where 
+		             t.DEL_FLAG='0' AND t.CHANN_VISIT_ID = #CHANN_VISIT_ID#  
+	]]>
+</select>
+
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into BASE_TERMINAL_CHANGE(
+					 TERMINAL_CHANGE_ID,
+					 TERM_ID,
+					 TERM_NO,
+					 TERM_NAME,
+					 TERM_ABBR,
+					 TERM_TYPE,
+					 TERM_LVL,
+					 CHANN_ID_P,
+					 CHANN_NO_P,
+					 CHANN_NAME_P,
+					 BUSS_NATRUE,
+					 LOGIC_TYPE,
+					 AREA_ID,
+					 AREA_NO,
+					 AREA_NAME,
+					 ZONE_ID,
+					 NATION,
+					 PROV,
+					 CITY,
+					 COUNTY,
+					 CITY_TYPE,
+					 PERSON_CON,
+					 TEL,
+					 MOBILE,
+					 TAX,
+					 POST,
+					 ADDRESS,
+					 EMAIL,
+					 WEB,
+					 LEGAL_REPRE,
+					 BUSS_LIC,
+					 AX_BURDEN,
+					 ORG_CODE_CERT,
+					 BUSS_SCOPE,
+					 FI_CMP_NO,
+					 BUSS_AREA,
+					 STOR_NO,
+					 LAST_DECOR_TIME,
+					 SALE_STORE_ID,
+					 SALE_STORE_NAME,
+					 LOCAL_TYPE,
+					 BEG_SBUSS_DATE,
+					 PLAY_BANK_NAME,
+					 PLAY_BANK_ACCT,
+					 BUSS_STATE,
+					 BEG_BUSS_TYPE,
+					 STATE,
+					 REMARK,
+					 CREATOR,
+					 CRE_NAME,
+					 CRE_TIME,
+					 DEPT_ID,
+					 DEPT_NAME,
+					 ORG_ID,
+					 ORG_NAME,
+					 LEDGER_ID,
+					 LEDGER_NAME,
+					 DEL_FLAG
+				   )values(
+				     #TERMINAL_CHANGE_ID#,
+					 #TERM_ID#,
+					 #TERM_NO#,
+					 #TERM_NAME#,
+					 #TERM_ABBR#,
+					 #TERM_TYPE#,
+					 #TERM_LVL#,
+					 #CHANN_ID_P#,
+					 #CHANN_NO_P#,
+					 #CHANN_NAME_P#,
+					 #BUSS_NATRUE#,
+					 #LOGIC_TYPE#,
+					 #AREA_ID#,
+					 #AREA_NO#,
+					 #AREA_NAME#,
+					 #ZONE_ID#,
+					 #NATION#,
+					 #PROV#,
+					 #CITY#,
+					 #COUNTY#,
+					 #CITY_TYPE#,
+					 #PERSON_CON#,
+					 #TEL#,
+					 #MOBILE#,
+					 #TAX#,
+					 #POST#,
+					 #ADDRESS#,
+					 #EMAIL#,
+					 #WEB#,
+					 #LEGAL_REPRE#,
+					 #BUSS_LIC#,
+					 #AX_BURDEN#,
+					 #ORG_CODE_CERT#,
+					 #BUSS_SCOPE#,
+					 #FI_CMP_NO#,
+					 #BUSS_AREA#,
+					 #STOR_NO#,
+					 to_date(#LAST_DECOR_TIME#,'yyyy-MM-DD HH24:MI:SS'),
+					 #SALE_STORE_ID#,
+					 #SALE_STORE_NAME#,
+					 #LOCAL_TYPE#,
+					 to_date(#BEG_SBUSS_DATE#,'yyyy-MM-DD'),
+					 #PLAY_BANK_NAME#,
+					 #PLAY_BANK_ACCT#,
+					 #BUSS_STATE#,
+					 #BEG_BUSS_TYPE#,
+					 #STATE#,
+					 #REMARK#,
+					 #CREATOR#,
+					 #CRE_NAME#,
+					 sysdate,
+					 #DEPT_ID#,
+					 #DEPT_NAME#,
+					 #ORG_ID#,
+					 #ORG_NAME#,
+					 #LEDGER_ID#,
+					 #LEDGER_NAME#,
+					 #DEL_FLAG#
+					)
+   ]]>
+</insert> 
+
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update BASE_TERMINAL_CHANGE ]]>
+	<dynamic prepend="set">
+	<isNotNull property="TERM_ID"    prepend=","><![CDATA[TERM_ID = #TERM_ID# ]]></isNotNull>
+    <isNotNull property="TERM_NO"    prepend=","><![CDATA[TERM_NO = #TERM_NO# ]]></isNotNull>
+    <isNotNull property="TERM_NAME"  prepend=","><![CDATA[TERM_NAME = #TERM_NAME# ]]></isNotNull>
+    <isNotNull property="TERM_ABBR"  prepend=","><![CDATA[TERM_ABBR = #TERM_ABBR# ]]></isNotNull>
+    <isNotNull property="TERM_TYPE"  prepend=","><![CDATA[TERM_TYPE = #TERM_TYPE# ]]></isNotNull>
+    <isNotNull property="TERM_LVL"   prepend=","><![CDATA[TERM_LVL  = #TERM_LVL# ]]></isNotNull>
+    <isNotNull property="CHANN_ID_P" prepend=","><![CDATA[CHANN_ID_P = #CHANN_ID_P# ]]></isNotNull>
+    <isNotNull property="CHANN_NO_P" prepend=","><![CDATA[CHANN_NO_P = #CHANN_NO_P# ]]></isNotNull>
+    <isNotNull property="CHANN_NAME_P" prepend=","><![CDATA[CHANN_NAME_P = #CHANN_NAME_P# ]]></isNotNull>
+    <isNotNull property="BUSS_NATRUE" prepend=","><![CDATA[BUSS_NATRUE = #BUSS_NATRUE# ]]></isNotNull>
+    <isNotNull property="LOGIC_TYPE" prepend=","><![CDATA[LOGIC_TYPE = #LOGIC_TYPE# ]]></isNotNull>
+    <isNotNull property="AREA_ID" prepend=","><![CDATA[AREA_ID = #AREA_ID# ]]></isNotNull>
+    <isNotNull property="AREA_NO" prepend=","><![CDATA[AREA_NO = #AREA_NO# ]]></isNotNull>
+    <isNotNull property="AREA_NAME" prepend=","><![CDATA[AREA_NAME = #AREA_NAME# ]]></isNotNull>
+    <isNotNull property="ZONE_ID" prepend=","><![CDATA[ZONE_ID = #ZONE_ID# ]]></isNotNull>
+    <isNotNull property="NATION" prepend=","><![CDATA[NATION = #NATION# ]]></isNotNull>
+    <isNotNull property="PROV" prepend=","><![CDATA[PROV = #PROV# ]]></isNotNull>
+    <isNotNull property="CITY" prepend=","><![CDATA[CITY = #CITY# ]]></isNotNull>
+    <isNotNull property="COUNTY" prepend=","><![CDATA[COUNTY = #COUNTY# ]]></isNotNull>
+    <isNotNull property="CITY_TYPE" prepend=","><![CDATA[CITY_TYPE = #CITY_TYPE# ]]></isNotNull>
+    <isNotNull property="PERSON_CON" prepend=","><![CDATA[PERSON_CON = #PERSON_CON# ]]></isNotNull>
+    <isNotNull property="TEL" prepend=","><![CDATA[TEL = #TEL# ]]></isNotNull>
+    <isNotNull property="MOBILE" prepend=","><![CDATA[MOBILE = #MOBILE# ]]></isNotNull>
+    <isNotNull property="TAX" prepend=","><![CDATA[TAX = #TAX# ]]></isNotNull>
+    <isNotNull property="POST" prepend=","><![CDATA[POST = #POST# ]]></isNotNull>
+    
+    <isNotNull property="ADDRESS" prepend=","><![CDATA[ADDRESS = #ADDRESS# ]]></isNotNull>
+    <isNotNull property="EMAIL" prepend=","><![CDATA[EMAIL = #EMAIL# ]]></isNotNull>
+    <isNotNull property="WEB" prepend=","><![CDATA[WEB = #WEB# ]]></isNotNull>
+    <isNotNull property="LEGAL_REPRE" prepend=","><![CDATA[LEGAL_REPRE = #LEGAL_REPRE# ]]></isNotNull>
+    <isNotNull property="BUSS_LIC" prepend=","><![CDATA[BUSS_LIC = #BUSS_LIC# ]]></isNotNull>
+    <isNotNull property="AX_BURDEN" prepend=","><![CDATA[AX_BURDEN = #AX_BURDEN# ]]></isNotNull>
+    
+    <isNotNull property="ORG_CODE_CERT" prepend=","><![CDATA[ORG_CODE_CERT = #ORG_CODE_CERT# ]]></isNotNull>
+    <isNotNull property="BUSS_SCOPE" prepend=","><![CDATA[BUSS_SCOPE = #BUSS_SCOPE# ]]></isNotNull>
+    <isNotNull property="FI_CMP_NO" prepend=","><![CDATA[FI_CMP_NO = #FI_CMP_NO# ]]></isNotNull>
+    <isNotNull property="BUSS_AREA" prepend=","><![CDATA[BUSS_AREA = #BUSS_AREA# ]]></isNotNull>
+    <isNotNull property="STOR_NO" prepend=","><![CDATA[STOR_NO = #STOR_NO# ]]></isNotNull>
+    <isNotNull property="LAST_DECOR_TIME" prepend=","><![CDATA[LAST_DECOR_TIME = to_date(#LAST_DECOR_TIME#,'yyyy-MM-DD HH24:MI:SS') ]]></isNotNull>
+    <isNotNull property="SALE_STORE_ID" prepend=","><![CDATA[SALE_STORE_ID = #SALE_STORE_ID# ]]></isNotNull>
+    <isNotNull property="SALE_STORE_NAME" prepend=","><![CDATA[SALE_STORE_NAME = #SALE_STORE_NAME# ]]></isNotNull>
+    
+    <isNotNull property="LOCAL_TYPE" prepend=","><![CDATA[LOCAL_TYPE = #LOCAL_TYPE# ]]></isNotNull>
+    <isNotNull property="BEG_SBUSS_DATE" prepend=","><![CDATA[BEG_SBUSS_DATE = to_date(#BEG_SBUSS_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+    <isNotNull property="PLAY_BANK_NAME" prepend=","><![CDATA[PLAY_BANK_NAME = #PLAY_BANK_NAME# ]]></isNotNull>
+    <isNotNull property="PLAY_BANK_ACCT" prepend=","><![CDATA[PLAY_BANK_ACCT = #PLAY_BANK_ACCT# ]]></isNotNull>
+    <isNotNull property="BUSS_STATE" prepend=","><![CDATA[BUSS_STATE = #BUSS_STATE# ]]></isNotNull>
+    <isNotNull property="BEG_BUSS_TYPE" prepend=","><![CDATA[BEG_BUSS_TYPE = #BEG_BUSS_TYPE# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    <isNotNull property="LEDGER_ID" prepend=","><![CDATA[LEDGER_ID = #LEDGER_ID# ]]></isNotNull>
+    <isNotNull property="LEDGER_NAME" prepend=","><![CDATA[LEDGER_NAME = #LEDGER_NAME# ]]></isNotNull>
+    
+    <isNotNull property="UPD_NAME"        prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPDATOR"   prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+    <isNotNull property="UPD_TIME"  prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where TERMINAL_CHANGE_ID = #TERMINAL_CHANGE_ID#]]>
+</update>
+
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	   select 
+             u.TERMINAL_CHANGE_ID,
+             u.TERM_ID,
+			 u.TERM_NO,
+			 u.TERM_NAME,
+			 u.TERM_ABBR,
+			 u.TERM_TYPE,
+			 u.TERM_LVL,
+			 u.CHANN_ID_P,
+			 u.CHANN_NO_P,
+			 u.CHANN_NAME_P,
+			 u.BUSS_NATRUE,
+			 u.LOGIC_TYPE,
+			 u.AREA_ID,
+			 u.AREA_NO,
+			 u.AREA_NAME,
+			 u.ZONE_ID,
+			 u.NATION,
+			 u.PROV,
+			 u.CITY,
+			 u.COUNTY,
+			 u.CITY_TYPE,
+			 u.PERSON_CON,
+			 u.TEL,
+			 u.MOBILE,
+			 u.TAX,
+			 u.POST,
+			 u.ADDRESS,
+			 u.EMAIL,
+			 u.WEB,
+			 u.LEGAL_REPRE,
+			 u.BUSS_LIC,
+			 u.AX_BURDEN,
+			 u.ORG_CODE_CERT,
+			 u.BUSS_SCOPE,
+			 u.FI_CMP_NO,
+			 u.BUSS_AREA,
+			 u.STOR_NO,
+			 to_char(u.LAST_DECOR_TIME,'yyyy-MM-DD HH24:MI:SS') LAST_DECOR_TIME,
+			 u.SALE_STORE_ID,
+			 u.SALE_STORE_NAME,
+			 t.DATA_DTL_NAME LOCAL_TYPE,
+			 to_char(u.BEG_SBUSS_DATE,'yyyy-MM-DD') BEG_SBUSS_DATE,
+			 u.PLAY_BANK_NAME,
+			 u.PLAY_BANK_ACCT,
+			 u.BUSS_STATE,
+			 u.BEG_BUSS_TYPE,
+			 u.STATE,
+			 u.REMARK,
+			 u.CREATOR,
+			 u.CRE_NAME,
+			 to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+			 u.DEPT_ID,
+			 u.DEPT_NAME,
+			 u.ORG_ID,
+			 u.ORG_NAME,
+			 u.LEDGER_ID,
+			 u.LEDGER_NAME,
+			 u.DEL_FLAG
+             from BASE_TERMINAL_CHANGE u 
+             left join PROJECT_DATA_DICTIONARY_DTL t on u.local_type = t.data_dtl_code
+	         where 
+		     u.TERMINAL_CHANGE_ID = #TERMINAL_CHANGE_ID#
+	]]>
+</select>
+
+
+<select id="loadByIdT" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	   select 
+             u.TERMINAL_CHANGE_ID,
+             u.TERM_ID,
+			 u.TERM_NO,
+			 u.TERM_NAME,
+			 u.TERM_ABBR,
+			 u.TERM_TYPE,
+			 u.TERM_LVL,
+			 u.CHANN_ID_P,
+			 u.CHANN_NO_P,
+			 u.CHANN_NAME_P,
+			 u.BUSS_NATRUE,
+			 u.LOGIC_TYPE,
+			 u.AREA_ID,
+			 u.AREA_NO,
+			 u.AREA_NAME,
+			 u.ZONE_ID,
+			 u.NATION,
+			 u.PROV,
+			 u.CITY,
+			 u.COUNTY,
+			 u.CITY_TYPE,
+			 u.PERSON_CON,
+			 u.TEL,
+			 u.MOBILE,
+			 u.TAX,
+			 u.POST,
+			 u.ADDRESS,
+			 u.EMAIL,
+			 u.WEB,
+			 u.LEGAL_REPRE,
+			 u.BUSS_LIC,
+			 u.AX_BURDEN,
+			 u.ORG_CODE_CERT,
+			 u.BUSS_SCOPE,
+			 u.FI_CMP_NO,
+			 u.BUSS_AREA,
+			 u.STOR_NO,
+			 to_char(u.LAST_DECOR_TIME,'yyyy-MM-DD HH24:MI:SS') LAST_DECOR_TIME,
+			 u.SALE_STORE_ID,
+			 u.SALE_STORE_NAME,
+			 u.LOCAL_TYPE,
+			 to_char(u.BEG_SBUSS_DATE,'yyyy-MM-DD') BEG_SBUSS_DATE,
+			 u.PLAY_BANK_NAME,
+			 u.PLAY_BANK_ACCT,
+			 u.BUSS_STATE,
+			 u.BEG_BUSS_TYPE,
+			 u.STATE,
+			 u.REMARK,
+			 u.CREATOR,
+			 u.CRE_NAME,
+			 to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+			 u.DEPT_ID,
+			 u.DEPT_NAME,
+			 u.ORG_ID,
+			 u.ORG_NAME,
+			 u.LEDGER_ID,
+			 u.LEDGER_NAME,
+			 u.DEL_FLAG
+             from BASE_TERMINAL_CHANGE u 
+	         where 
+		     u.TERMINAL_CHANGE_ID = #TERMINAL_CHANGE_ID#
+	]]>
+</select>
+
+<select id="loadByTerm" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	   select 
+             u.TERM_ID,
+			 u.TERM_NO,
+			 u.TERM_NAME,
+			 u.TERM_ABBR,
+			 u.TERM_TYPE,
+			 u.TERM_LVL,
+			 u.CHANN_ID_P,
+			 u.CHANN_NO_P,
+			 u.CHANN_NAME_P,
+			 u.BUSS_NATRUE,
+			 u.LOGIC_TYPE,
+			 u.AREA_ID,
+			 u.AREA_NO,
+			 u.AREA_NAME,
+			 u.ZONE_ID,
+			 u.NATION,
+			 u.PROV,
+			 u.CITY,
+			 u.COUNTY,
+			 u.CITY_TYPE,
+			 u.PERSON_CON,
+			 u.TEL,
+			 u.MOBILE,
+			 u.TAX,
+			 u.POST,
+			 u.ADDRESS,
+			 u.EMAIL,
+			 u.WEB,
+			 u.LEGAL_REPRE,
+			 u.BUSS_LIC,
+			 u.AX_BURDEN,
+			 u.ORG_CODE_CERT,
+			 u.BUSS_SCOPE,
+			 u.FI_CMP_NO,
+			 u.BUSS_AREA,
+			 u.STOR_NO,
+			 to_char(u.LAST_DECOR_TIME,'yyyy-MM-DD HH24:MI:SS') LAST_DECOR_TIME,
+			 u.SALE_STORE_ID,
+			 u.SALE_STORE_NAME,
+			 u.LOCAL_TYPE,
+			 to_char(u.BEG_SBUSS_DATE,'yyyy-MM-DD') BEG_SBUSS_DATE,
+			 u.PLAY_BANK_NAME,
+			 u.PLAY_BANK_ACCT,
+			 u.BUSS_STATE,
+			 u.BEG_BUSS_TYPE,
+			 u.STATE,
+			 u.REMARK,
+			 u.CREATOR,
+			 u.CRE_NAME,
+			 to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+			 u.DEPT_ID,
+			 u.DEPT_NAME,
+			 u.ORG_ID,
+			 u.ORG_NAME,
+			 u.LEDGER_ID,
+			 u.LEDGER_NAME,
+			 u.DEL_FLAG
+             from BASE_TERMINAL_CHANGE u 
+	         where 
+		     u.TERM_NO = #TERM_NO# AND u.STATE IS NULL
+		     order by u.CRE_TIME ASC 
+	]]>
+</select>
+
+<select id="queryTerminalState" parameterClass="String" resultClass="int">
+    select  count(*) from BASE_TERMINAL_CHANGE  r 
+    where r.del_flag=0 and r.state='审核通过'
+    and  r.TERMINAL_CHANGE_ID=#TERMINAL_CHANGE_ID#
+</select>
+
+
+<select id="queryTerminal" parameterClass="map" resultClass="TerminalChangeModel">
+	<![CDATA[  
+          select  
+			     t.TERM_ID,
+			     t.TERM_NO,
+			     t.TERM_NAME,
+			     t.TERM_ABBR,
+				 t.TERM_TYPE,
+				 t.TERM_LVL,
+				 t.CHANN_ID_P,
+				 t.CHANN_NO_P,
+				 t.CHANN_NAME_P,
+				 t.BUSS_NATRUE,
+				 t.LOGIC_TYPE,
+				 t.AREA_ID,
+				 t.AREA_NO,
+				 t.AREA_NAME,
+				 t.ZONE_ID,
+				 t.NATION,
+				 t.PROV,
+				 t.CITY,
+				 t.COUNTY,
+				 t.CITY_TYPE,
+				 t.PERSON_CON,
+				 t.TEL,
+				 t.MOBILE,
+				 t.TAX,
+				 t.POST,
+				 t.ADDRESS,
+				 t.EMAIL,
+				 t.WEB,
+				 t.LEGAL_REPRE,
+				 t.BUSS_LIC,
+				 t.AX_BURDEN,
+				 t.ORG_CODE_CERT,
+				 t.BUSS_SCOPE,
+				 t.FI_CMP_NO,
+				 t.BUSS_AREA,
+				 t.STOR_NO,
+				 to_char(t.LAST_DECOR_TIME,'yyyy-MM-DD HH24:MI:SS') LAST_DECOR_TIME,
+				 t.SALE_STORE_ID,
+				 t.SALE_STORE_NAME,
+				 t.LOCAL_TYPE,
+				 to_char(t.BEG_SBUSS_DATE,'yyyy-MM-DD') BEG_SBUSS_DATE,
+				 t.PLAY_BANK_NAME,
+				 t.PLAY_BANK_ACCT,
+				 t.BUSS_STATE,
+				 t.BEG_BUSS_TYPE,
+				 t.STATE,
+				 t.REMARK
+                 from BASE_TERMINAL_CHANGE t 
+                 where t.del_flag=0 and t.TERMINAL_CHANGE_ID = #TERMINAL_CHANGE_ID#
+    ]]>
+</select>
+
+<!-- 删除 -->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update BASE_TERMINAL_CHANGE ]]>
+	<dynamic prepend="set">
+		<isNotNull property="DEL_FLAG"><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+	</dynamic>
+	<![CDATA[ where TERMINAL_CHANGE_ID = #TERMINAL_CHANGE_ID# ]]>
+</delete>
+</sqlMap>

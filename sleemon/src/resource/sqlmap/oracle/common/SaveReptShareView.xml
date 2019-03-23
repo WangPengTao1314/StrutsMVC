@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="SaveReptShareView">
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+			insert into BASE_RPT_SCHE_SHAR(
+				RPT_SCHE_SHAR_ID,
+				RPT_SCHE_SHAR_NO,
+				SHAR_NAME,
+				RPT_NAME,
+				SCHE_PARAMS,
+				SCHE_URL,
+				SHAR_PSON_ID,
+				SHAR_PSON_NAME,
+				SHAR_TIME,
+				SHARED_PSON_ID,
+				SHARED_PSON_NAME,
+				STATE,
+				DEL_FLAG
+			)
+			values( 
+				#RPT_SCHE_SHAR_ID#,
+				#RPT_SCHE_SHAR_NO#,
+				#SHAR_NAME#,
+				#RPT_NAME#,
+				#SCHE_PARAMS#,
+				#SCHE_URL#,
+				#SHAR_PSON_ID#,
+				#SHAR_PSON_NAME#,
+				sysdate,
+				#SHARED_PSON_ID#,
+				#SHARED_PSON_NAME#,
+				#STATE#,
+				#DEL_FLAG#
+			)
+		]]>
+	</insert>
+	<select id="getRptInfoById" parameterClass="string" resultClass="java.util.HashMap">
+		select SCHE_PARAMS,SCHE_URL from BASE_RPT_SCHE_SHAR where RPT_SCHE_SHAR_ID=#RPT_SCHE_SHAR_ID#
+	</select>
+	<select id="getUserInfo" parameterClass="string" resultClass="java.util.HashMap">
+		select a.RYXXID,a.XM
+		from T_SYS_RYXX a
+		left join T_SYS_XTYH b on a.RYXXID=b.RYXXID 
+		where b.XTYHID=#XTYHID#
+	</select>
+</sqlMap>
+

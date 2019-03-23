@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zcx
+@function 
+@version 2014-11-06 10:49:05
+-->
+<sqlMap  namespace="scoreStand">
+<typeAlias type="com.hoperun.drp.oamg.channscoremkm.model.ScoreStandModel" alias="ScoreStandModel"/>
+<!-- 使用Promoreim装载结果集 -->
+<resultMap id="ScoreStandModel" class="ScoreStandModel">
+    <result column="SCORE_STAND_ID" property="SCORE_STAND_ID" />
+</resultMap>
+<!-- 动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  u.DEL_FLAG = 0 
+  <isNotEmpty prepend="" property="MKM_DAY_RPT_NO">
+       <![CDATA[ and u.MKM_DAY_RPT_NO = #MKM_DAY_RPT_NO#]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CRE_TIME_FROM">
+       <![CDATA[ and u.CRE_TIME >=to_date(#CRE_TIME_FROM#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CRE_TIME_TO">
+       <![CDATA[ and u.CRE_TIME <=to_date(#CRE_TIME_TO#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="" property="LAST_DECOR_TIME_BEG">
+       <![CDATA[ and u.LAST_DECOR_TIME >=to_date(#LAST_DECOR_TIME_BEG#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="LAST_DECOR_TIME_END">
+       <![CDATA[ and u.LAST_DECOR_TIME <=to_date(#LAST_DECOR_TIME_END#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="QXJBCON">
+	  and   $QXJBCON$  
+  </isNotEmpty>
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+	   u.SCORE_STAND_ID,
+       u.SCORE_STAND_NO,
+       u.SCORE_OPTION,
+       u.OPTION_DESC1,
+       u.OPTION_DESC2,
+       u.OPTION_DESC3,
+       u.OPTION_DESC4,
+       u.SCORE_VAL,
+       u.SCORE_TYPE,
+       u.SORT_NO
+       from DRP_SCORE_STAND u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+<!-- 分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+</select>
+ 
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt 
+              from DRP_SCORE_STAND u
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+ 
+<!-- 查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_SCORE_STAND(
+					 SCORE_STAND_ID,
+					 SCORE_STAND_NO,
+					 SCORE_OPTION,
+					 OPTION_DESC1,
+					 OPTION_DESC2,
+					 OPTION_DESC3,
+					 OPTION_DESC4,
+					 SCORE_VAL,
+					 SCORE_TYPE,
+				     SORT_NO
+				   )values(
+				     #SCORE_STAND_ID#,
+					 #SCORE_STAND_NO#,
+					 #SCORE_OPTION#,
+					 #OPTION_DESC1#,
+					 #OPTION_DESC2#,
+					 #OPTION_DESC3#,
+					 #OPTION_DESC4#,
+					 #SCORE_VAL#,
+					 #SCORE_TYPE#,
+				     #SORT_NO#
+					)
+   ]]>
+</insert> 
+
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update DRP_SCORE_STAND ]]>
+	<dynamic prepend="set">
+    <isNotNull property="SCORE_OPTION"    prepend=","><![CDATA[SCORE_OPTION = #SCORE_OPTION# ]]></isNotNull>
+    <isNotNull property="OPTION_DESC1"    prepend=","><![CDATA[OPTION_DESC1 = #OPTION_DESC1# ]]></isNotNull>
+    <isNotNull property="OPTION_DESC2"    prepend=","><![CDATA[OPTION_DESC2 = #OPTION_DESC2# ]]></isNotNull>
+    <isNotNull property="OPTION_DESC3"    prepend=","><![CDATA[OPTION_DESC3 = #OPTION_DESC3# ]]></isNotNull>
+    <isNotNull property="OPTION_DESC4"    prepend=","><![CDATA[OPTION_DESC4 = #OPTION_DESC4#]]></isNotNull>
+    <isNotNull property="SCORE_VAL"       prepend=","><![CDATA[SCORE_VAL= #SCORE_VAL# ]]></isNotNull>
+    <isNotNull property="SCORE_TYPE"      prepend=","><![CDATA[SCORE_TYPE = #SCORE_TYPE# ]]></isNotNull>
+    <isNotNull property="SORT_NO"         prepend=","><![CDATA[SORT_NO = #SORT_NO# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where SCORE_STAND_ID = #SCORE_STAND_ID#]]>
+</update>
+
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	   select 
+	   u.SCORE_STAND_ID,
+       u.SCORE_STAND_NO,
+       u.SCORE_OPTION,
+       u.OPTION_DESC1,
+       u.OPTION_DESC2,
+       u.OPTION_DESC3,
+       u.OPTION_DESC4,
+       u.SCORE_VAL,
+       u.SCORE_TYPE,
+       u.SORT_NO
+       from DRP_SCORE_STAND u
+	   where 
+	   u.SCORE_STAND_ID = #SCORE_STAND_ID#
+	]]>
+</select>
+
+<!-- 删除 -->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update DRP_SCORE_STAND ]]>
+	<dynamic prepend="set">
+		<isNotNull property="DEL_FLAG"><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+	</dynamic>
+	<![CDATA[ where SCORE_STAND_ID = #SCORE_STAND_ID# ]]>
+</delete>
+
+</sqlMap>

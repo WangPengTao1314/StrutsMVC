@@ -1,0 +1,451 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author wzg
+@function 
+@version 2013-08-19 15:33:31
+-->
+<sqlMap  namespace="Prdreturnfin">
+<!-- 定义PrdreturnModel,PrdreturnModelChld -->
+<typeAlias type="com.hoperun.erp.sale.prdreturnfin.model.PrdreturnfinModel" alias="PrdreturnfinModel"/>
+<typeAlias type="com.hoperun.erp.sale.prdreturnfin.model.PrdreturnfinModelChld" alias="PrdreturnfinModelChld" />
+<!-- 使用PrdreturnfinModel装载结果集 -->
+<resultMap id="PrdreturnfinModel" class="PrdreturnfinModel">
+    <result column="PRD_RETURN_ID" property="PRD_RETURN_ID" />
+</resultMap>
+<!-- 使用PrdreturnfinModelChld装载结果集 -->
+<resultMap id="PrdreturnfinModelChld" class="PrdreturnfinModelChld">
+    <result column="PRD_RETURN_DTL_ID" property="PRD_RETURN_DTL_ID" />
+</resultMap>
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="PRD_RETURN_NO">
+    u.PRD_RETURN_NO like '%'||#PRD_RETURN_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="BILL_TYPE">
+    u.BILL_TYPE = #BILL_TYPE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="FROM_BILL_NO">
+    u.FROM_BILL_NO like '%'||#FROM_BILL_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="EXPECT_RETURNDATE_BEG">
+     <![CDATA[u.EXPECT_RETURNDATE>=to_date(#EXPECT_RETURNDATE_BEG#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="EXPECT_RETURNDATE_END">
+     <![CDATA[u.EXPECT_RETURNDATE<=to_date(#EXPECT_RETURNDATE_END#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="RETURN_CHANN_NO">
+    u.RETURN_CHANN_NO like '%'||#RETURN_CHANN_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="RETURN_CHANN_NAME">
+    u.RETURN_CHANN_NAME like '%'||#RETURN_CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="RECV_CHANN_NO">
+    u.RECV_CHANN_NO like '%'||#RECV_CHANN_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="RECV_CHANN_NAME">
+    u.RECV_CHANN_NAME like '%'||#RECV_CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_BEG">
+     <![CDATA[u.CRE_TIME >=to_date(#CRE_TIME_BEG#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+     <![CDATA[u.CRE_TIME <=  to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  
+  
+    <isNotEmpty prepend="and" property="PRD_NO">
+    u.PRD_RETURN_ID in (select a.PRD_RETURN_ID from ERP_PRD_RETURN_DTL a where upper(a.PRD_NO) like upper('%'||#PRD_NO#||'%') and a.DEL_FLAG=0)
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="PRD_NAME">
+    u.PRD_RETURN_ID in (select a.PRD_RETURN_ID from ERP_PRD_RETURN_DTL a where upper(a.PRD_NAME) like upper('%'||#PRD_NAME#||'%') and a.DEL_FLAG=0)
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="PRD_SPEC">
+    u.PRD_RETURN_ID in (select a.PRD_RETURN_ID from ERP_PRD_RETURN_DTL a where upper(a.PRD_SPEC) like upper('%'||#PRD_SPEC#||'%') and a.DEL_FLAG=0)
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="LEDGER_ID">
+    u.LEDGER_ID = #LEDGER_ID#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="searchSTATE">
+  	u.STATE in ($searchSTATE$)
+  </isNotEmpty>
+	<isNotEmpty prepend="and " property="DEL_FLAG">
+	        u.DEL_FLAG=#DEL_FLAG#
+	</isNotEmpty>
+    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	</isNotEmpty>
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.PRD_RETURN_ID,
+		u.PRD_RETURN_NO,
+		u.BILL_TYPE,
+		u.FROM_BILL_ID,
+		u.FROM_BILL_NO,
+		u.RETURN_CHANN_ID,
+		u.RETURN_CHANN_NO,
+		u.RETURN_CHANN_NAME,
+		u.RECV_CHANN_ID,
+		u.RECV_CHANN_NO,
+		u.RECV_CHANN_NAME,
+		to_char(u.EXPECT_RETURNDATE,'yyyy-MM-DD') EXPECT_RETURNDATE,
+		u.REMARK,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG
+      from ERP_PRD_RETURN u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM ERP_PRD_RETURN u ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_PRD_RETURN(
+		 PRD_RETURN_ID,
+         RECV_CHANN_ID,
+         RETURN_CHANN_ID,
+         FROM_BILL_ID,
+         PRD_RETURN_NO,
+         BILL_TYPE,
+         FROM_BILL_NO,
+         EXPECT_RETURNDATE,
+         RETURN_CHANN_NO,
+         RETURN_CHANN_NAME,
+         RECV_CHANN_NO,
+         RECV_CHANN_NAME,
+         REMARK,
+         CRE_NAME,
+         CREATOR,
+         CRE_TIME,
+         UPD_NAME,
+         UPDATOR,
+         UPD_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         STATE,
+         DEL_FLAG
+	   )values(
+		#PRD_RETURN_ID#,
+        #RECV_CHANN_ID#,
+        #RETURN_CHANN_ID#,
+        #FROM_BILL_ID#,
+        #PRD_RETURN_NO#,
+        #BILL_TYPE#,
+        #FROM_BILL_NO#,
+		to_date(#EXPECT_RETURNDATE#,'yyyy-MM-DD'),
+        #RETURN_CHANN_NO#,
+        #RETURN_CHANN_NAME#,
+        #RECV_CHANN_NO#,
+        #RECV_CHANN_NAME#,
+        #REMARK#,
+        #CRE_NAME#,
+        #CREATOR#,
+	    sysdate, 
+        #UPD_NAME#,
+        #UPDATOR#,
+		sysdate, 
+        #DEPT_ID#,
+        #DEPT_NAME#,
+        #ORG_ID#,
+        #ORG_NAME#,
+        #LEDGER_ID#,
+        #LEDGER_NAME#,
+        #STATE#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update ERP_PRD_RETURN ]]>
+	<dynamic prepend="set">
+    <isNotNull property="RECV_CHANN_ID" prepend=","><![CDATA[RECV_CHANN_ID = #RECV_CHANN_ID# ]]></isNotNull>
+    <isNotNull property="AUDIT_ID" prepend=","><![CDATA[AUDIT_ID = #AUDIT_ID# ]]></isNotNull>
+     <isNotNull property="AUDIT_TIME" prepend=","><![CDATA[AUDIT_TIME =sysdate]]></isNotNull>
+    <isNotNull property="RETURN_CHANN_ID" prepend=","><![CDATA[RETURN_CHANN_ID = #RETURN_CHANN_ID# ]]></isNotNull>
+    <isNotNull property="AUDIT_NAME" prepend=","><![CDATA[AUDIT_NAME = #AUDIT_NAME# ]]></isNotNull>
+    <isNotNull property="FROM_BILL_ID" prepend=","><![CDATA[FROM_BILL_ID = #FROM_BILL_ID# ]]></isNotNull>
+    <isNotNull property="PRD_RETURN_ID" prepend=","><![CDATA[PRD_RETURN_ID = #PRD_RETURN_ID# ]]></isNotNull>
+    <isNotNull property="PRD_RETURN_NO" prepend=","><![CDATA[PRD_RETURN_NO = #PRD_RETURN_NO# ]]></isNotNull>
+    <isNotNull property="BILL_TYPE" prepend=","><![CDATA[BILL_TYPE = #BILL_TYPE# ]]></isNotNull>
+    <isNotNull property="FROM_BILL_NO" prepend=","><![CDATA[FROM_BILL_NO = #FROM_BILL_NO# ]]></isNotNull>
+     <isNotNull property="EXPECT_RETURNDATE" prepend=","><![CDATA[EXPECT_RETURNDATE =to_date(#EXPECT_RETURNDATE#,'yyyy-MM-DD') ]]></isNotNull>
+    <isNotNull property="RETURN_CHANN_NO" prepend=","><![CDATA[RETURN_CHANN_NO = #RETURN_CHANN_NO# ]]></isNotNull>
+    <isNotNull property="RETURN_CHANN_NAME" prepend=","><![CDATA[RETURN_CHANN_NAME = #RETURN_CHANN_NAME# ]]></isNotNull>
+    <isNotNull property="RECV_CHANN_NO" prepend=","><![CDATA[RECV_CHANN_NO = #RECV_CHANN_NO# ]]></isNotNull>
+    <isNotNull property="RECV_CHANN_NAME" prepend=","><![CDATA[RECV_CHANN_NAME = #RECV_CHANN_NAME# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+     <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where PRD_RETURN_ID = #PRD_RETURN_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update ERP_PRD_RETURN 
+	               set DEL_FLAG = #DEL_FLAG#
+                      ,UPD_NAME=#UPD_NAME#
+                     ,UPDATOR=#UPDATOR#
+                      ,UPD_TIME=sysdate
+ 	  where 
+	     PRD_RETURN_ID = #PRD_RETURN_ID:VARCHAR# 
+    ]]>
+</delete>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.PRD_RETURN_ID,
+		u.PRD_RETURN_NO,
+		u.BILL_TYPE,
+		u.FROM_BILL_ID,
+		u.FROM_BILL_NO,
+		u.RETURN_CHANN_ID,
+		u.RETURN_CHANN_NO,
+		u.RETURN_CHANN_NAME,
+		u.RECV_CHANN_ID,
+		u.RECV_CHANN_NO,
+		u.RECV_CHANN_NAME,
+		to_char(u.EXPECT_RETURNDATE,'yyyy-MM-DD') EXPECT_RETURNDATE,
+		u.REMARK,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG
+	  from
+       ERP_PRD_RETURN u 
+	  where 
+		u.PRD_RETURN_ID = #PRD_RETURN_ID#
+	]]>
+</select>
+<!-- 明细操作开始-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+     select 
+		u.PRD_RETURN_DTL_ID,
+		u.PRD_RETURN_ID,
+		u.FROM_BILL_DTL_ID,
+		u.PRD_ID,
+		u.PRD_NO,
+		u.PRD_NAME,
+		u.PRD_SPEC,
+		u.PRD_COLOR,
+		u.BRAND,
+		u.STD_UNIT,
+		u.RETURN_PRICE,
+		u.RETURN_NUM,
+		u.RETURN_AMOUNT,
+		u.RETURN_RSON_TYPE,
+		u.RETURN_RSON,
+		u.RETURN_ATT,
+		u.DUTY_DECIDE,
+		u.PRICE_DECIDE,
+		u.REAL_RETURN_AMOUNT,
+		u.REMARK_DECIDE,
+		u.DEAL_FACTORY_ID,
+		u.DEAL_FACTORY_NAME,
+		u.DECIDE_PSON_ID,
+		u.DECIDE_PSON_NAME,
+		to_char(u.DECIDE_TIME,'yyyy-MM-DD HH24:MI:SS') DECIDE_TIME,
+		u.DECIDE_FLAG,
+		u.DEL_FLAG,
+		u.SN,
+		u.SPCL_TECH_ID,
+		a.SPCL_TECH_FLAG
+       from ERP_PRD_RETURN_DTL u
+       left join DRP_SPCL_TECH a on u.SPCL_TECH_ID=a.SPCL_TECH_ID and a.USE_FLAG=1
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.PRD_RETURN_ID=#PRD_RETURN_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+	        u.PRD_RETURN_DTL_ID in ($PRD_RETURN_DTL_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+<!--明细表插入 -->
+<insert id="insertChld" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_PRD_RETURN_DTL(
+		 PRD_RETURN_DTL_ID,
+		 PRD_RETURN_ID,
+         DECIDE_TIME,
+         PRD_ID,
+         PRICE_DECIDE,
+         DECIDE_PSON_NAME,
+         DEAL_FACTORY_ID,
+         DECIDE_FLAG,
+         DUTY_DECIDE,
+         REMARK_DECIDE,
+         DEAL_FACTORY_NAME,
+         REAL_RETURN_AMOUNT,
+         FROM_BILL_DTL_ID,
+         DECIDE_PSON_ID,
+         PRD_NO,
+         PRD_NAME,
+         PRD_SPEC,
+         PRD_COLOR,
+         BRAND,
+         STD_UNIT,
+         RETURN_PRICE,
+         RETURN_NUM,
+         RETURN_AMOUNT,
+         RETURN_RSON_TYPE,
+         RETURN_RSON,
+         RETURN_ATT,
+         DEL_FLAG
+	   )values(
+		#PRD_RETURN_DTL_ID#,
+		#PRD_RETURN_ID#,
+		to_date(#DECIDE_TIME#,'yyyy-MM-DD HH24:MI:SS'),
+        #PRD_ID#,
+        #PRICE_DECIDE#,
+        #DECIDE_PSON_NAME#,
+        #DEAL_FACTORY_ID#,
+        #DECIDE_FLAG#,
+        #DUTY_DECIDE#,
+        #REMARK_DECIDE#,
+        #DEAL_FACTORY_NAME#,
+        #REAL_RETURN_AMOUNT#,
+        #FROM_BILL_DTL_ID#,
+        #DECIDE_PSON_ID#,
+        #PRD_NO#,
+        #PRD_NAME#,
+        #PRD_SPEC#,
+        #PRD_COLOR#,
+        #BRAND#,
+        #STD_UNIT#,
+        #RETURN_PRICE#,
+        #RETURN_NUM#,
+        #RETURN_AMOUNT#,
+        #RETURN_RSON_TYPE#,
+        #RETURN_RSON#,
+        #RETURN_ATT#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+<!--明细表更新 -->
+<update id="updateChldById" parameterClass="map">
+	<![CDATA[ update ERP_PRD_RETURN_DTL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="RETURN_AMOUNT" prepend=","><![CDATA[RETURN_AMOUNT = #RETURN_AMOUNT# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where PRD_RETURN_DTL_ID = #PRD_RETURN_DTL_ID#]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteChldByIds" parameterClass="map">
+	<![CDATA[ update ERP_PRD_RETURN_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      PRD_RETURN_DTL_ID in ($PRD_RETURN_DTL_IDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细 -->
+<delete id="delChldByFkId" parameterClass="map">
+	<![CDATA[ update ERP_PRD_RETURN_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      PRD_RETURN_ID = #PRD_RETURN_ID:VARCHAR#
+    ]]>
+</delete>
+<!--明细表更新 -->
+<update id="updateReturnById" parameterClass="map">
+	<![CDATA[ update ERP_PRD_RETURN 
+	               set STATE = #STATE#	 
+ 	  where 
+	      PRD_RETURN_ID = #PRD_RETURN_ID#
+    ]]>
+</update>
+</sqlMap>

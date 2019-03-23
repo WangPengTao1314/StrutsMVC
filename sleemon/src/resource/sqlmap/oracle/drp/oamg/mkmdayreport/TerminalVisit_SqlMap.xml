@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zcx
+@function 
+@version 2014-11-06 10:49:05
+-->
+<sqlMap  namespace="terminalVisit">
+<typeAlias type="com.hoperun.drp.oamg.mkmdayreport.model.TerminalVisitModel" alias="TerminalVisitModel"/>
+<!-- 使用Promoreim装载结果集 -->
+<resultMap id="TerminalVisitModel" class="TerminalVisitModel">
+    <result column="TERMINAL_VISIT_ID" property="TERMINAL_VISIT_ID" />
+</resultMap>
+<!-- 动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  u.DEL_FLAG = 0 
+  <isNotEmpty prepend="" property="MKM_DAY_RPT_NO">
+       <![CDATA[ and u.MKM_DAY_RPT_NO = #MKM_DAY_RPT_NO#]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CRE_TIME_FROM">
+       <![CDATA[ and u.CRE_TIME >=to_date(#CRE_TIME_FROM#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CRE_TIME_TO">
+       <![CDATA[ and u.CRE_TIME <=to_date(#CRE_TIME_TO#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="" property="LAST_DECOR_TIME_BEG">
+       <![CDATA[ and u.LAST_DECOR_TIME >=to_date(#LAST_DECOR_TIME_BEG#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="LAST_DECOR_TIME_END">
+       <![CDATA[ and u.LAST_DECOR_TIME <=to_date(#LAST_DECOR_TIME_END#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="QXJBCON">
+	  and   $QXJBCON$  
+  </isNotEmpty>
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+	   u.TERMINAL_VISIT_ID,
+       u.MKM_DAY_RPT_ID,
+       u.TERM_ID,
+       u.TERM_NO,
+       u.TERM_NAME,
+       u.CHANN_ID,
+       u.CHANN_NO,
+       u.CHANN_NAME,
+       u.HARD_DECORATE,
+       u.SOFT_DECORATE,
+       u.SHOPP_GUIDE,
+       u.MAIN_PROBLEM,
+       u.SOLUTION
+       from DRP_TERMINAL_VISIT u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+<!-- 分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+</select>
+ 
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt 
+              from DRP_TERMINAL_VISIT u
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+ 
+<!-- 查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_TERMINAL_VISIT(
+					 TERMINAL_VISIT_ID,
+					 MKM_DAY_RPT_ID,
+					 TERM_ID,
+					 TERM_NO,
+					 TERM_NAME,
+					 CHANN_ID,
+					 CHANN_NO,
+					 CHANN_NAME,
+					 HARD_DECORATE,
+					 SOFT_DECORATE,
+					 SHOPP_GUIDE,
+					 MAIN_PROBLEM,
+					 SOLUTION,
+					 DEL_FLAG
+				   )values(
+				     #TERMINAL_VISIT_ID#,
+					 #MKM_DAY_RPT_ID#,
+					 #TERM_ID#,
+					 #TERM_NO#,
+					 #TERM_NAME#,
+					 #CHANN_ID#,
+					 #CHANN_NO#,
+					 #CHANN_NAME#,
+					 #HARD_DECORATE#,
+					 #SOFT_DECORATE#,
+					 #SHOPP_GUIDE#,
+					 #MAIN_PROBLEM#,
+					 #SOLUTION#,
+					 #DEL_FLAG#
+					)
+   ]]>
+</insert> 
+
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update DRP_TERMINAL_VISIT ]]>
+	<dynamic prepend="set">
+    <isNotNull property="MKM_DAY_RPT_ID"       prepend=","><![CDATA[MKM_DAY_RPT_ID   = #MKM_DAY_RPT_ID# ]]></isNotNull>
+    <isNotNull property="TERM_ID"          prepend=","><![CDATA[TERM_ID     = #TERM_ID# ]]></isNotNull>
+    <isNotNull property="TERM_NO"          prepend=","><![CDATA[TERM_NO     = #TERM_NO# ]]></isNotNull>
+    <isNotNull property="TERM_NAME"        prepend=","><![CDATA[TERM_NAME   = #TERM_NAME# ]]></isNotNull>
+    <isNotNull property="CHANN_ID"         prepend=","><![CDATA[CHANN_ID    = #CHANN_ID# ]]></isNotNull>
+    <isNotNull property="CHANN_NO"         prepend=","><![CDATA[CHANN_NO    = #CHANN_NO# ]]></isNotNull>
+    <isNotNull property="CHANN_NAME"       prepend=","><![CDATA[CHANN_NAME  = #CHANN_NAME# ]]></isNotNull>
+    <isNotNull property="HARD_DECORATE"    prepend=","><![CDATA[HARD_DECORATE = #HARD_DECORATE# ]]></isNotNull>
+    <isNotNull property="SOFT_DECORATE"    prepend=","><![CDATA[SOFT_DECORATE   = #SOFT_DECORATE# ]]></isNotNull>
+    <isNotNull property="SHOPP_GUIDE"      prepend=","><![CDATA[SHOPP_GUIDE    = #SHOPP_GUIDE# ]]></isNotNull>
+    <isNotNull property="MAIN_PROBLEM"     prepend=","><![CDATA[MAIN_PROBLEM   = #MAIN_PROBLEM# ]]></isNotNull>
+    <isNotNull property="SOLUTION"         prepend=","><![CDATA[SOLUTION   = #SOLUTION# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where TERMINAL_VISIT_ID = #TERMINAL_VISIT_ID#]]>
+</update>
+
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+	   u.TERMINAL_VISIT_ID,
+       u.MKM_DAY_RPT_ID,
+       u.TERM_ID,
+       u.TERM_NO,
+       u.TERM_NAME,
+       u.CHANN_ID,
+       u.CHANN_NO,
+       u.CHANN_NAME,
+       u.HARD_DECORATE,
+       u.SOFT_DECORATE,
+       u.SHOPP_GUIDE,
+       u.MAIN_PROBLEM,
+       u.SOLUTION
+       from DRP_TERMINAL_VISIT u
+       WHERE
+       u.MKM_DAY_RPT_ID = #MKM_DAY_RPT_ID#
+       and u.DEL_FLAG = 0
+	]]>
+</select>
+
+<select id="queryTermId" parameterClass="map" resultClass="String">
+	<![CDATA[ 
+	    select u.TERMINAL_VISIT_ID
+	    from DRP_TERMINAL_VISIT u
+	    where u.MKM_DAY_RPT_ID = #MKM_DAY_RPT_ID#
+	]]>
+</select>
+
+<!-- 删除 -->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update DRP_TERMINAL_VISIT ]]>
+	<dynamic prepend="set">
+		<isNotNull property="DEL_FLAG"><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+	</dynamic>
+	<![CDATA[ where TERMINAL_VISIT_ID = #TERMINAL_VISIT_ID# ]]>
+</delete>
+
+</sqlMap>

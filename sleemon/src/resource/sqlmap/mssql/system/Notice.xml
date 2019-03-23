@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<!--
+@author zhuxw
+@function 
+@version 2011年11月16日 11时23分14秒
+-->
+
+<sqlMap namespace="Notice">
+
+	<typeAlias type="com.hoperun.sys.model.NoticeModel" alias="NoticeModel" />
+
+	<!-- 使用Notice装载结果集 -->
+	<resultMap id="NoticeModel" class="NoticeModel">
+		<result column="NOTICEID" property="NOTICEID" />
+	</resultMap>
+
+	<!-- 动态查询 and 列表分页 -->
+     <sql id="queryDynSql">
+        <isNotEmpty prepend="and" property="NOTICE">
+            u.NOTICE like '%'+#NOTICE#+'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="DELFLAG">
+            u.DELFLAG=#DELFLAG#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="STATE">
+            u.STATE like '%$STATE$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="STATIME">
+            <![CDATA[u.STATIME >=  '$STATIME$']]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="ENDTIME">
+            <![CDATA[u.ENDTIME <= '$ENDTIME$']]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="conditionString">
+            ${conditionString}
+        </isNotEmpty>
+     </sql>
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField"> $orderField$,</isNotEmpty>CRETIME DESC,STATIME DESC
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[  select u.NOTICEID,(case when DATAlength(u.NOTICE)>40 then substring(u.NOTICE, 0, 40)+'...' else u.NOTICE end ) NOTICE,
+		u.STATIME,
+		u.ENDTIME,
+		u.ZTXXID,u.STATE,u.CREATER,
+			u.CRETIME,u.UPDTIME,u.UPDATER,u.DELFLAG,row_number() over(order by ]]>
+			<isNotEmpty prepend=" " property="orderField">
+			 $orderField$
+		</isNotEmpty>
+		<isEmpty prepend=" " property="orderField">
+			CRETIME DESC
+		</isEmpty>
+	<![CDATA[ )rownum_ from ${SYSSCHEMA}.T_SYS_NOTICE u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(0) cnt FROM ${SYSSCHEMA}.T_SYS_NOTICE u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+
+   <!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.T_SYS_NOTICE(NOTICEID,NOTICE,STATIME,ENDTIME,ZTXXID,STATE,CREATER,CRETIME,UPDATER,UPDTIME,DELFLAG
+		 )values(#NOTICEID#,#NOTICE#,CONVERT(varchar(100), #STATIME#, 20)
+		 ,CONVERT(varchar(100), #ENDTIME#, 20),#ZTXXID#,#STATE#,#CREATER#,CONVERT(varchar(100), GETDATE(), 20),#UPDATER#,CONVERT(varchar(100), GETDATE(), 20),0)
+		]]>
+	</insert>
+
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_NOTICE ]]>
+		<dynamic prepend="set">
+			<isNotNull property="NOTICE" prepend=","><![CDATA[NOTICE = #NOTICE#]]></isNotNull>
+			<isNotNull property="STATIME" prepend=","><![CDATA[STATIME = CONVERT(varchar(100), #STATIME#, 20)]]></isNotNull>
+			<isNotNull property="ENDTIME" prepend=","><![CDATA[ENDTIME =CONVERT(varchar(100), #ENDTIME#, 20)]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="UPDTIME" prepend=","><![CDATA[UPDTIME = convert(varchar, getdate(), 20)]]></isNotNull>
+			<isNotNull property="UPDATER" prepend=","><![CDATA[UPDATER = #UPDATER#]]></isNotNull>
+			<isNotNull property="DELFLAG" prepend=","><![CDATA[DELFLAG = #DELFLAG#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where NOTICEID = #NOTICEID# ]]>
+	</update>
+	<!-- 逻辑删除 只是更新状态-->
+	<delete id="delete" parameterClass="String">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_NOTICE set DELFLAG = 1 where NOTICEID = #NOTICEID:VARCHAR# ]]>
+	</delete>
+	<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[  select u.NOTICEID,u.NOTICE,
+				u.STATIME,
+				u.ENDTIME,
+				u.ZTXXID,u.STATE,u.CREATER,
+					u.CRETIME
+				   ,u.UPDTIME,u.UPDATER,u.DELFLAG
+				 from ${SYSSCHEMA}.T_SYS_NOTICE u where u.NOTICEID = #NOTICEID#
+			]]>
+	</select>
+</sqlMap>
+

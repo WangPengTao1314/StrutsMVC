@@ -1,0 +1,199 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author chenj
+@function 
+@version 2013-10-20 18:57:47
+-->
+<sqlMap  namespace="ProfiiLoss">
+<!-- 定义ProfiiLossModel,ProfiiLossModelChld -->
+<typeAlias type="com.hoperun.drp.finance.profiiloss.model.ProfiiLossModel" alias="ProfiiLossModel"/>
+<typeAlias type="com.hoperun.drp.finance.profiiloss.model.ProfiiLossModelChld" alias="ProfiiLossModelChld" />
+<!-- 使用AdvpaymentModel装载结果集 -->
+<resultMap id="ProfiiLossModel" class="ProfiiLossModel">
+    <result column="PROFIT_LOSS_ID" property="PROFIT_LOSS_ID" />
+</resultMap>
+<!-- 使用AdvpaymentModelChld装载结果集 -->
+<resultMap id="ProfiiLossModelChld" class="ProfiiLossModelChld">
+    <result column="PROFIT_LOSS_DTL_ID" property="PROFIT_LOSS_DTL_ID" />
+</resultMap>
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="PROFIT_LOSS_NO">
+    u.PROFIT_LOSS_NO like '%'||#PROFIT_LOSS_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="PRD_INV_NO">
+    u.PRD_INV_NO like '%'||#PRD_INV_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STORE_NO">
+    u.STORE_NO like '%'||#STORE_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STORE_NAME">
+    u.STORE_NAME like '%'||#STORE_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_BEG">
+     <![CDATA[u.CRE_TIME>=to_date(#CRE_TIME_BEG#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+     <![CDATA[u.CRE_TIME<=to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="LEDGER_ID">
+	u.LEDGER_ID=#LEDGER_ID#
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="DEL_FLAG">
+	u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="QXJBCON">
+    $QXJBCON$
+  </isNotEmpty>
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select PROFIT_LOSS_ID,
+       u.PROFIT_LOSS_NO,
+       u.PRD_INV_ID,
+       u.PRD_INV_NO,
+       u.STORE_ID,
+       u.STORE_NO,
+       u.STORE_NAME,
+       u.INV_PSON_ID,
+       u.INV_PSON_NO,
+       u.INV_PSON_NAME,
+       u.STATE,
+       u.REMARK,
+       u.CREATOR,
+       u.CRE_NAME,
+       to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS')CRE_TIME,
+       u.UPDATOR,
+       u.UPD_NAME,
+       to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS')UPD_TIME,
+       u.AUDIT_ID,
+       u.AUDIT_NAME,
+       to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS')AUDIT_TIME,
+       u.DEPT_ID,
+       u.DEPT_NAME,
+       u.ORG_ID,
+       u.ORG_NAME,
+       u.LEDGER_ID,
+       u.LEDGER_NAME,
+       u.DEL_FLAG,
+       u.BILL_TYPE
+  from DRP_PROFIT_LOSS u
+
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM DRP_PROFIT_LOSS u ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select PROFIT_LOSS_ID,
+       u.PROFIT_LOSS_NO,
+       u.PRD_INV_ID,
+       u.PRD_INV_NO,
+       u.STORE_ID,
+       u.STORE_NO,
+       u.STORE_NAME,
+       u.INV_PSON_ID,
+       u.INV_PSON_NO,
+       u.INV_PSON_NAME,
+       u.STATE,
+       u.REMARK,
+       u.CREATOR,
+       u.CRE_NAME,
+       to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS')CRE_TIME,
+       u.UPDATOR,
+       u.UPD_NAME,
+       to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS')UPD_TIME,
+       u.AUDIT_ID,
+       u.AUDIT_NAME,
+       to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS')AUDIT_TIME,
+       u.DEPT_ID,
+       u.DEPT_NAME,
+       u.ORG_ID,
+       u.ORG_NAME,
+       u.LEDGER_ID,
+       u.LEDGER_NAME,
+       u.DEL_FLAG,
+       u.BILL_TYPE
+  from DRP_PROFIT_LOSS u
+	  where 
+		u.PROFIT_LOSS_ID = #PROFIT_LOSS_ID#
+	]]>
+</select>
+<!-- 明细操作开始-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+     select 
+		u.PROFIT_LOSS_DTL_ID,
+		u.PROFIT_LOSS_ID,
+		u.PRD_ID,
+		u.PRD_NO,
+		u.PRD_NAME,
+		u.PRD_SPEC,
+		u.PRD_COLOR,
+		u.BRAND,
+		u.STD_UNIT,
+		u.PROFIT_LOSS_NUM,
+		u.DEL_FLAG,
+		u.SPCL_TECH_ID,
+		u.PROFIT_LOSS_PRICE,
+		u.PROFIT_LOSS_AMOUNT,
+		a.SPCL_TECH_FLAG,
+		a.SPCL_SPEC_REMARK,
+		a.DM_SPCL_TECH_NO
+       from DRP_PROFIT_LOSS_DTL u 
+       left join DRP_SPCL_TECH a on a.SPCL_TECH_ID=u.SPCL_TECH_ID and USE_FLAG=1
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.PROFIT_LOSS_ID=#PROFIT_LOSS_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+  <select id="getBillType" parameterClass="string" resultClass="string">
+  	select BILL_TYPE from DRP_PROFIT_LOSS where PROFIT_LOSS_ID=#PROFIT_LOSS_ID#
+  </select>
+</sqlMap>

@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ *@module 基础资料
+ *@func 货品分类
+ *@version 1.1
+ *@author 刘曰刚
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Pdtmenu">
+	<typeAlias type="com.hoperun.base.pdtmenu.model.PdtmenuModel"
+		alias="PdtmenuModel" />
+
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="PdtmenuModel" class="PdtmenuModel">
+		<result column="PRD_ID" property="PRD_ID" />
+	</resultMap>
+	<!-- 动态查询 and 列表排序 -->
+	<sql id="queryDynSql"> 
+		<isNotEmpty prepend="and" property="productid">
+			(BRAND = #productid# OR PRD_NO=#productid# OR PRD_TYPE = #productid# OR PRD_NAME = #productid#)			
+		</isNotEmpty>
+		<isNotEmpty prepend="and " property="PRD_NO">PRD_NO like '%'||#PRD_NO#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="PRD_NAME">PRD_NAME like '%'||#PRD_NAME#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="PAR_PRD_NO">PAR_PRD_NO like '%'||#PAR_PRD_NO#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="PAR_PRD_NAME">PAR_PRD_NAME like '%'||#PAR_PRD_NAME#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="BEGIN_CRE_TIME">CRE_TIME&gt;= to_date(#BEGIN_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')</isNotEmpty>
+		<isNotEmpty prepend="and " property="END_CRE_TIME">CRE_TIME&lt;= to_date(#END_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')</isNotEmpty>
+		<isNotEmpty prepend="and " property="STATE">STATE =#STATE#</isNotEmpty>
+		<isNotEmpty prepend="and " property="DEL_FLAG"><![CDATA[DEL_FLAG=#DEL_FLAG#]]></isNotEmpty>
+		<isNotEmpty prepend="and " property="FINAL_NODE_FLAG"><![CDATA[FINAL_NODE_FLAG=#FINAL_NODE_FLAG#]]></isNotEmpty>
+		<isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+		</isNotEmpty>
+	</sql>
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField"> $orderField$,</isNotEmpty> CRE_TIME desc
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[select 
+					PRD_ID,
+					PRD_NO,
+					PRD_NAME,
+					PAR_PRD_NO,
+					PAR_PRD_NAME,
+					BRAND,
+					STATE,
+					CRE_NAME,
+					to_char(CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+					DEPT_NAME,
+					DEAFULT_ADVC_SEND_DATE
+				from BASE_PRODUCT u
+				]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(PRD_ID) cnt FROM ${SYSSCHEMA}.BASE_PRODUCT p ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+	<!-- 修改状态 -->
+	<update id="updateStateById" parameterClass="map">	
+		<![CDATA[ update ${SYSSCHEMA}.BASE_PRODUCT ]]>
+		<dynamic prepend="set">
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME=sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where PRD_ID in(select PRD_ID from ${SYSSCHEMA}.BASE_PRODUCT
+                           start with PRD_ID = #PRD_ID#
+                          connect by prior PRD_ID = PAR_PRD_ID) ]]>	
+	</update>
+	<!-- 软删除 -->
+	<update id="delete" parameterClass="map">	
+		<![CDATA[ update ${SYSSCHEMA}.BASE_PRODUCT set DEL_FLAG=#DEL_FLAG#
+		where PRD_ID in(select PRD_ID from ${SYSSCHEMA}.BASE_PRODUCT
+                           start with PRD_ID = #PRD_ID#
+                          connect by prior PRD_ID = PAR_PRD_ID) ]]>	
+	</update>
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+			insert into BASE_PRODUCT(
+				PRD_ID,
+				PRD_NO,
+				PRD_NAME,
+				PAR_PRD_ID,
+				PAR_PRD_NO,
+				PAR_PRD_NAME,
+				BRAND,
+				STATE,
+				REMARK,
+				FINAL_NODE_FLAG,
+				DEL_FLAG,
+				PRD_CLASS_TYPE,
+				DEAFULT_ADVC_SEND_DATE,
+				CREATOR,
+				CRE_NAME,
+				CRE_TIME,
+				DEPT_ID,
+				DEPT_NAME,
+				ORG_ID,
+				ORG_NAME
+			)values(
+				#PRD_ID#,
+				#PRD_NO#,
+				#PRD_NAME#,
+				#PAR_PRD_ID#,
+				#PAR_PRD_NO#,
+				#PAR_PRD_NAME#,
+				#BRAND#,
+				#STATE#,
+				#REMARK#,
+				#FINAL_NODE_FLAG#,
+				#DEL_FLAG#,
+				#PRD_CLASS_TYPE#,
+				#DEAFULT_ADVC_SEND_DATE#,
+				#CREATOR#,
+				#CRE_NAME#,
+				sysdate,
+				#DEPT_ID#,
+				#DEPT_NAME#,
+				#ORG_ID#,
+				#ORG_NAME#
+			)
+		]]>
+	</insert>
+	<update id="updateById" parameterClass="map">
+		 <![CDATA[ update ${SYSSCHEMA}.BASE_PRODUCT ]]>
+		<dynamic prepend="set">
+			<isNotNull property="PRD_NAME" prepend=","><![CDATA[PRD_NAME = #PRD_NAME#]]></isNotNull>
+			<isNotNull property="PAR_PRD_ID" prepend=","><![CDATA[PAR_PRD_ID = #PAR_PRD_ID#]]></isNotNull>
+			<isNotNull property="PAR_PRD_NO" prepend=","><![CDATA[PAR_PRD_NO = #PAR_PRD_NO#]]></isNotNull>
+			<isNotNull property="PAR_PRD_NAME" prepend=","><![CDATA[PAR_PRD_NAME = #PAR_PRD_NAME#]]></isNotNull>
+			<isNotNull property="DEAFULT_ADVC_SEND_DATE" prepend=","><![CDATA[DEAFULT_ADVC_SEND_DATE = #DEAFULT_ADVC_SEND_DATE#]]></isNotNull>
+			<isNotNull property="BRAND" prepend=","><![CDATA[BRAND = #BRAND#]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME=sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where PRD_ID = #PRD_ID# ]]>
+	</update>
+	<!-- 根据ID查找 -->
+	<select id="loadById" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT
+			PRD_NO,
+			PRD_NAME,
+			BRAND,
+			PAR_PRD_NO,
+			PAR_PRD_NAME,
+			STATE,
+			REMARK,
+			CREATOR,
+			CRE_NAME,
+			to_char(CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+			UPDATOR,
+			UPD_NAME,
+			to_char(UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+			DEPT_ID,
+			DEPT_NAME,
+			ORG_ID,
+			ORG_NAME,
+			DEAFULT_ADVC_SEND_DATE
+			 FROM ${SYSSCHEMA}.BASE_PRODUCT p WHERE PRD_ID = #PRD_ID# and DEL_FLAG=0]]>
+	</select>
+	<!-- 查询树 -->
+	<select id="queryTree" parameterClass="String"
+		resultClass="com.hoperun.base.pdtmenu.model.PdtmenuTree">
+  		<![CDATA[
+		SELECT DISTINCT p.PRD_NO id ,'【' || p.PRD_NO  || '】' || p.PRD_NAME name
+       FROM BASE_PRODUCT p WHERE DEL_FLAG = 0 and STATE IN ('启用','停用','制定') and FINAL_NODE_FLAG=0
+       order  by p.PRD_NO			]]>
+	</select>
+	<select id="getBrand" parameterClass="map" resultClass="string">
+		select distinct BRAND from BASE_BRAND where DEL_FLAG=#DEL_FLAG# and STATE=#STATE#
+	</select>
+	<!-- 查询主表是否存在重复编号 -->
+	<select id="getCountPRD_NO" parameterClass="String" resultClass="int">
+	    select count(PRD_NO) from ${SYSSCHEMA}.BASE_PRODUCT where PRD_NO=#PRD_NO# 
+	</select>
+</sqlMap>

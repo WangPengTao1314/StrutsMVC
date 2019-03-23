@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="XTYH">
+
+	<typeAlias type="com.hoperun.commons.model.sysutil.XTYHBean"
+		alias="XTYHBean" />
+
+	<!-- 使用UserInfo装载结果集 -->
+	<resultMap id="XTYHBean" class="XTYHBean">
+		<result column="XTYHID" property="XTYHID" />
+	</resultMap>
+
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		
+		<isNotEmpty prepend="and" property="XTYHID">
+			u.XTYHID = #XTYHID#
+		</isNotEmpty>
+		
+	</sql>
+
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[  select  u.*, ROW_NUMBER() OVER(ORDER BY XTYHID) AS rn from ${SYSSCHEMA}.V_XTYH_JGXX_BMXX_RYXX u  ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</sql>
+
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(XTYHID) cnt FROM ${SYSSCHEMA}.T_SYS_XTYH u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+
+   <!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+
+</sqlMap>
+

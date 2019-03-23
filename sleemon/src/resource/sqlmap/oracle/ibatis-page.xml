@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+  *@module 系统模块 
+  *@fuc 系统模块 
+  *@version 1.1
+  *@author 朱晓文
+ -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="public">
+
+	<!-- ibatis oracle 分页实现 -->
+	<!-- select * from (select row_.*, rownum rownum_ from ( select * from table ) row_ where rownum <= #endRow# ) where rownum_ > #startRow# -->
+	
+	<!-- 分页前面包装部分 -->
+	<sql id="pageBegin">
+		<dynamic>
+			<isNotEmpty property="startRow">
+				<isNotEmpty property="endRow">
+					<isLessEqual property="startRow"
+						compareValue="0">
+						<![CDATA[ select row_.*, rownum rownum_ from ( ]]>
+					</isLessEqual>
+					<isGreaterThan property="startRow"
+						compareValue="0">
+						<![CDATA[ select * from (select row_.*, rownum rownum_ from ( ]]>
+					</isGreaterThan>
+				</isNotEmpty>
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+
+	<!-- 分页后面包装部分 -->
+	<sql id="pageEnd">
+		<dynamic>
+			<isNotEmpty property="startRow">
+				<isNotEmpty property="endRow">
+					<isLessEqual property="startRow" compareValue="0">
+						<![CDATA[ ) row_ where rownum <=#endRow#]]>
+					</isLessEqual>
+					<isGreaterThan property="startRow" compareValue="0">
+						<![CDATA[ ) row_  where rownum <= #endRow# ) where rownum_ > #startRow# ]]>
+					</isGreaterThan>
+				</isNotEmpty>
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	
+	<select id="query" parameterClass="String" resultClass="java.util.HashMap"> 
+		<![CDATA[ $sql$ ]]>
+	</select>
+	<insert id="insert" parameterClass="String">
+		<![CDATA[ $sql$ ]]>
+	</insert>
+	<update id="update" parameterClass="String">
+		<![CDATA[ $sql$ ]]>
+	</update>
+	<delete id="delete" parameterClass="String">
+		<![CDATA[ $sql$ ]]>
+	</delete>
+
+</sqlMap>
+

@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Sotoadvorder">
+	<typeAlias type="com.hoperun.drp.areaser.sotoadvorder.model.SotoadvorderGoodModel" alias="sotoadvorderGoodModel" />
+	<typeAlias type="com.hoperun.drp.areaser.sotoadvorder.model.SotoadvorderGoodModelChld" alias="sotoadvorderGoodModelChld" />
+	<typeAlias type="com.hoperun.drp.areaser.sotoadvorder.model.SotoadvorderModel" alias="sotoadvorderModel" />
+	<typeAlias type="com.hoperun.drp.areaser.sotoadvorder.model.SotoadvorderModelChld" alias="sotoadvorderModelChld" />
+
+	<!-- 使用sotoadvorderGoodModel装载结果集 -->
+	<resultMap id="sotoadvorderGoodModel" class="sotoadvorderGoodModel">
+		<result column="GOODS_ORDER_ID" property="GOODS_ORDER_ID" />
+	</resultMap>
+	<!-- 使用sotoadvorderGoodModelChld装载结果集 -->
+	<resultMap id="sotoadvorderGoodModelChld" class="sotoadvorderGoodModelChld">
+		<result column="GOODS_ORDER_DTL_ID" property="GOODS_ORDER_DTL_ID" />
+	</resultMap>
+	<!-- 使用sotoadvorderModel装载结果集 -->
+	<resultMap id="sotoadvorderModel" class="sotoadvorderModel">
+		<result column="SALE_ORDER_ID" property="SALE_ORDER_ID" />
+	</resultMap>
+	<!-- 使用sotoadvorderModelChld装载结果集 -->
+	<resultMap id="sotoadvorderModelChld" class="sotoadvorderModelChld">
+		<result column="SALE_ORDER_DTL_ID" property="SALE_ORDER_DTL_ID" />
+	</resultMap>
+	<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="ORDER_CHANN_NO">
+    u.ORDER_CHANN_NO like '%'||#ORDER_CHANN_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="SALE_ORDER_NO">
+    u.SALE_ORDER_NO like '%'||#SALE_ORDER_NO#||'%'
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and" property="ORDER_CHANN_NAME">
+    u.ORDER_CHANN_NAME like '%'||#ORDER_CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="GOODS_ORDER_NO">
+    u.GOODS_ORDER_NO like '%'||#GOODS_ORDER_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="AREA_NO">
+    u.AREA_NO  like '%'||#AREA_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="AREA_NAME">
+    u.AREA_NAME like '%'||#AREA_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_BEGIN">
+	  <![CDATA[  u.CRE_TIME >= to_date(#CRE_TIME_BEGIN#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+	  <![CDATA[  u.CRE_TIME <= to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="BILL_TYPE">
+    u.BILL_TYPE = #BILL_TYPE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="DEL_FLAG">
+	 u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="SQL">
+	 $SQL$
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="CHANNSQL">
+	 $CHANNSQL$
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="QXJBCON">
+	$QXJBCON$
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="PRDNOS"></isNotEmpty>
+	 
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.SALE_ORDER_ID,
+		u.SALE_ORDER_NO,
+		u.BILL_TYPE,
+		u.FROM_BILL_ID,
+		u.FROM_BILL_NO,
+		u.ORDER_CHANN_ID,
+		u.ORDER_CHANN_NO,
+		u.ORDER_CHANN_NAME,
+		to_char(u.ORDER_DATE,'yyyy-mm-dd') ORDER_DATE,
+		u.SEND_CHANN_ID,
+		u.SEND_CHANN_NO,
+		u.SEND_CHANN_NAME,
+		u.IS_USE_REBATE,
+		u.RECV_CHANN_ID,
+		u.RECV_CHANN_NO,
+		u.RECV_CHANN_NAME,
+		u.PERSON_CON,
+		u.TEL,
+		u.RECV_ADDR,
+		u.SHIP_POINT_ID,
+		u.SHIP_POINT_NAME,
+		u.STATE,
+		u.REMARK,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.ORG_NAME,
+		u.AREA_ID,
+		u.AREA_NO,
+		u.AREA_NAME,
+		u.RECV_ADDR_NO,
+		(select sum(a.ORDER_AMOUNT) from DRP_SALE_ORDER_DTL a where a.DEL_FLAG=0 and a.SALE_ORDER_ID=u.SALE_ORDER_ID) TOTL_AMOUNT
+      from DRP_SALE_ORDER u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSqlDate">
+  <![CDATA[ 
+	select u.SALE_ORDER_ID,
+       u.SALE_ORDER_NO,
+       u.BILL_TYPE,
+       u.FROM_BILL_ID,
+       u.FROM_BILL_NO,
+       u.ORDER_CHANN_ID,
+       u.ORDER_CHANN_NO,
+       u.ORDER_CHANN_NAME,
+       to_char(u.ORDER_DATE, 'yyyy-mm-dd') ORDER_DATE,
+       u.SEND_CHANN_ID,
+       u.SEND_CHANN_NO,
+       u.SEND_CHANN_NAME,
+       u.IS_USE_REBATE,
+       u.RECV_CHANN_ID,
+       u.RECV_CHANN_NO,
+       u.RECV_CHANN_NAME,
+       u.PERSON_CON,
+       u.TEL,
+       u.RECV_ADDR,
+       u.SHIP_POINT_ID,
+       u.SHIP_POINT_NAME,
+       u.STATE,
+       u.REMARK,
+       u.CREATOR,
+       to_char(u.CRE_TIME, 'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+       u.ORG_NAME,
+       u.AREA_ID,
+       u.AREA_NO,
+       u.AREA_NAME,
+       u.RECV_ADDR_NO,
+       (select MAX(ADVC_SEND_DATE) from DRP_SALE_ORDER_DTL a where a.SALE_ORDER_ID =u.SALE_ORDER_ID and DEL_FLAG=#DEL_FLAG#) ADVC_SEND_DATE,
+       (select sum(a.ORDER_AMOUNT) from DRP_SALE_ORDER_DTL a where a.DEL_FLAG=0 and a.SALE_ORDER_ID=u.SALE_ORDER_ID) TOTL_AMOUNT
+  from DRP_SALE_ORDER u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM DRP_SALE_ORDER u  ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表分页查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSqlDate" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="count" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM DRP_SALE_ORDER u  ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+	<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.SALE_ORDER_ID,
+		u.SALE_ORDER_NO,
+		u.BILL_TYPE,
+		u.FROM_BILL_NO,
+		u.ORDER_CHANN_NO,
+		u.ORDER_CHANN_NAME,
+		to_char(u.ORDER_DATE,'yyyy-mm-dd') ORDER_DATE,
+		u.SEND_CHANN_ID,
+		u.SEND_CHANN_NO,
+		u.SEND_CHANN_NAME,
+		u.IS_USE_REBATE,
+		u.RECV_CHANN_NO,
+		u.RECV_CHANN_NAME,
+		u.PERSON_CON,
+		u.TEL,
+		u.RECV_ADDR,
+		u.SHIP_POINT_NAME,
+		u.STATE,
+		u.REMARK,
+		u.CREATOR,
+		u.CRE_NAME,
+		to_char(u.CRE_TIME,'yyyy-mm-dd') CRE_TIME,
+		u.UPDATOR,
+		u.UPD_NAME,
+		to_char(u.UPD_TIME,'yyyy-mm-dd') UPD_TIME,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-mm-dd') AUDIT_TIME,
+		u.DEPT_NAME,
+		u.ORG_NAME,
+		u.LEDGER_NAME,
+		u.AREA_NO,
+		u.AREA_NAME,
+		u.RECV_ADDR_NO
+      from DRP_SALE_ORDER u
+      where 
+		u.SALE_ORDER_ID = #SALE_ORDER_ID#
+	]]>
+</select>
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG# and NvL(u.ORDER_NUM,0)>NVL(u.CHANGE_NUM,0)
+  </isNotEmpty>
+</sql>
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+     select 
+		u.SALE_ORDER_DTL_ID,
+		u.SALE_ORDER_ID,
+		u.PRD_ID,
+		u.PRD_NO,
+		u.PRD_NAME,
+		u.PRD_SPEC,
+		u.PRD_COLOR,
+		u.BRAND,
+		u.STD_UNIT,
+		u.PRICE,
+		u.DECT_RATE,
+		u.DECT_PRICE,
+		u.ORDER_NUM,
+		u.ORDER_AMOUNT,
+		to_char(u.ADVC_SEND_DATE,'yyyy-MM-DD') ADVC_SEND_DATE,
+		u.REMARK,
+		u.SESSION_ID,
+		u.TECH_PRICE_MULT,
+		u.FROM_BILL_DTL_ID,
+		u.CANCEL_FLAG,
+		u.DEL_FLAG,
+		NVL(u.CHANGE_NUM,0) CHANGE_NUM,
+		u.SPCL_TECH_ID,
+		a.SPCL_TECH_FLAG
+	    from DRP_SALE_ORDER_DTL u 
+	    left join DRP_SPCL_TECH a on u.SPCL_TECH_ID = a.SPCL_TECH_ID and a.USE_FLAG = 1
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.SALE_ORDER_ID=#SALE_ORDER_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+  <select id="findGroInfo" parameterClass="map" resultClass="java.util.HashMap">
+	  	select a.PRD_ID,
+	      a.PRD_NO,
+	      a.PRD_NAME,
+	      a.PRD_SPEC,
+	      a.PRD_COLOR,
+	      a.BRAND,
+	      a.STD_UNIT,
+	      a.PRICE,
+		  a.DECT_RATE,
+		  a.DECT_PRICE,
+	      a.ORDER_AMOUNT,
+	      a.ORDER_NUM,
+	      a.ADVC_SEND_DATE,
+	      a.REMARK,
+	      a.STORED_NUM,
+	      a.SENDED_NUM,
+	      a.SPCL_TECH_ID,
+	      b.SPCL_TECH_FLAG,
+	      (case when NVL(b.SPCL_TECH_FLAG,0)>0 then 0 else 
+	      	NVL((select sum(NVL(STORE_NUM,0)-NVL(FREEZE_NUM,0)) from DRP_STORE_ACCT where LEDGER_ID=#LEDGER_ID# and PRD_ID=a.PRD_ID  and SPCL_TECH_ID is null),0) 
+	      end) num,
+	      a.CHANGE_NUM,
+	      a.IS_NO_STAND_FLAG,
+	      a.VOLUME,
+	      a.SALE_ORDER_DTL_ID
+	  from DRP_SALE_ORDER_DTL a
+	  left join DRP_SPCL_TECH b on a.SPCL_TECH_ID=b.SPCL_TECH_ID and b.USE_FLAG=#USE_FLAG#
+	  left join BASE_PRODUCT c on a.PRD_ID=c.PRD_ID 
+	  where a.SALE_ORDER_ID in ($SALE_ORDER_IDS$) and a.DEL_FLAG=#DEL_FLAG#
+	  		and NVL(a.ORDER_NUM,0)>NVL(a.CHANGE_NUM,0) $sql$
+  </select>
+  <!-- 根据货品id和当前登录帐套查找库存信息 -->
+<select id="loadProduct" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	 select
+	 	a.PRD_ID,
+	 	b.PRD_NO,
+		a.STD_UNIT,
+		a.MEAS_UNIT,
+		a.STORE_NUM,
+		a.FREEZE_NUM,
+		a.MEAS_STORE_NUM
+	 from  DRP_STORE_ACCT a left join BASE_PRODUCT b on a.PRD_ID=b.PRD_ID where a.LEDGER_ID=#LEDGER_ID#  and  a.PRD_ID in ($PRD_IDS$)
+	]]>
+</select>
+
+
+<select id="loadProduct_StORENUM" parameterClass="map" resultClass="java.util.HashMap">
+<![CDATA[ 
+ select aa.PRD_ID,
+	 aa.PRD_NO,
+	 aa.PRD_NAME,
+	 aa.PRD_SPEC,
+	 aa.BRAND,
+     NVL(temp.STORE_NUM,0)STORE_NUM,
+     NVL(temp.STORE_NO,'无')STORE_NO,
+     NVL(temp.STORE_NAME,'无')STORE_NAME
+ from  (select  b.PRD_ID,b.PRD_NO,b.PRD_NAME,b.PRD_SPEC,b.BRAND, NVL(b.SPCL_TECH_ID,'null')SPCL_TECH_ID 
+		 from  DRP_SALE_ORDER_DTL b  where  b.SALE_ORDER_DTL_ID in ($SALE_ORDER_DTL_IDS$)) aa 
+	 left join
+	   ( select a.PRD_ID,
+	     a.STORE_ID,
+	     NVL(a.SPCL_TECH_ID,'null')SPCL_TECH_ID, 
+	     sum(NVL(a.STORE_NUM,0)-NVL(a.FREEZE_NUM,0))STORE_NUM,
+	     s.STORE_NO,
+	     s.STORE_NAME 
+	    from DRP_STORE_ACCT a ,DRP_STORE s  
+	    where a.STORE_ID = s.STORE_ID and a.LEDGER_ID = #LEDGER_ID#
+	    group by  a.PRD_ID,a.STORE_ID ,a.SPCL_TECH_ID,s.STORE_NO,s.STORE_NAME
+	  ) temp on aa.PRD_ID=temp.PRD_ID and aa.SPCL_TECH_ID=temp.SPCL_TECH_ID
+	 
+]]>
+</select>
+
+
+
+<update id="upCHANGE_NUM" parameterClass="map">
+	update DRP_SALE_ORDER_DTL set CHANGE_NUM=NVL(CHANGE_NUM,0)+NVL(#ORDER_NUM#,0) , STORED_NUM=NVL(STORED_NUM,0)+NVL(#STORED_NUM#,0) where SALE_ORDER_DTL_ID=#FROM_BILL_DTL_ID#
+</update>
+<select id="getChannInfo" parameterClass="string" resultClass="java.util.HashMap">
+	select PERSON_CON,TEL,AREA_ID,AREA_NO,AREA_NAME from BASE_CHANN where CHANN_ID=#CHANN_ID#
+</select>
+<select id="getChannInfoLv" resultClass="java.util.HashMap" parameterClass="string">
+	select CHANN_ID,CHANN_NO,CHANN_NAME,AREA_SER_ID,CHANN_TYPE from BASE_CHANN where CHANN_ID=#CHANN_ID#
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_GOODS_ORDER(
+		 GOODS_ORDER_ID,
+		 GOODS_ORDER_NO,
+		 BILL_TYPE,
+		 ORDER_CHANN_ID,
+		 ORDER_CHANN_NO,
+		 ORDER_CHANN_NAME,
+		 RECV_CHANN_ID,
+		 RECV_CHANN_NO,
+		 RECV_CHANN_NAME,
+		 PERSON_CON,
+		 TEL,
+		 RECV_ADDR,
+		 SEND_CHANN_ID,
+		 SEND_CHANN_NO,
+		 SEND_CHANN_NAME,
+		 IS_USE_REBATE,
+         CRE_NAME,
+         CREATOR,
+         CRE_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         STATE,
+         DEL_FLAG,
+         AREA_ID,
+		 AREA_NO,
+		 AREA_NAME,
+		 STORE_ID,
+		 STORE_NO,
+		 STORE_NAME,
+		 RECV_ADDR_NO,
+		 ORDER_RECV_DATE,
+		 SHIP_POINT_ID,
+		 SHIP_POINT_NAME
+		 
+	   )values(
+		#GOODS_ORDER_ID#,
+		#GOODS_ORDER_NO#,
+		#BILL_TYPE#,
+		#ORDER_CHANN_ID#,
+		#ORDER_CHANN_NO#,
+		#ORDER_CHANN_NAME#,
+		#RECV_CHANN_ID#,
+		#RECV_CHANN_NO#,
+		#RECV_CHANN_NAME#,
+		#PERSON_CON#,
+		#TEL#,
+		#RECV_ADDR#,
+		#SEND_CHANN_ID#,
+		#SEND_CHANN_NO#,
+		#SEND_CHANN_NAME#,
+		#IS_USE_REBATE#,
+        #CRE_NAME#,
+        #CREATOR#,
+	    sysdate, 
+        #DEPT_ID#,
+        #DEPT_NAME#,
+        #ORG_ID#,
+        #ORG_NAME#,
+        #LEDGER_ID#,
+        #LEDGER_NAME#,
+        #STATE#,
+		#DEL_FLAG#,
+		#AREA_ID#,
+		#AREA_NO#,
+		#AREA_NAME#,
+		#STORE_ID#,
+		#STORE_NO#,
+		#STORE_NAME#,
+		#RECV_ADDR_NO#,
+		to_date(#ORDER_RECV_DATE#,'yyyy-MM-DD'),
+		#SHIP_POINT_ID#,
+		#SHIP_POINT_NAME#
+		)
+   ]]>
+</insert>
+<select id="getSaleChld" parameterClass="map" resultClass="java.util.HashMap">
+	select 
+		u.PRD_ID,
+		u.PRD_NO,
+		u.PRD_NAME,
+		u.PRD_SPEC,
+		u.PRD_COLOR,
+		u.BRAND,
+		u.STD_UNIT,
+		u.IS_NO_STAND_FLAG,
+		u.PRICE,
+		u.DECT_RATE,
+		u.DECT_PRICE,
+		sum(NVL(u.ORDER_NUM,0)) ORDER_NUM,
+		sum(NVL(u.ORDER_AMOUNT,0)) ORDER_AMOUNT,
+		u.ADVC_SEND_DATE,
+		u.REMARK,
+		sum(NVL(u.CHANGE_NUM,0)) CHANGE_NUM,
+		sum(NVL(u.SENDED_NUM,0)) SENDED_NUM,
+		sum(NVL(u.STORED_NUM,0)) STORED_NUM,
+		u.VOLUME,
+		u.SPCL_TECH_ID
+	from DRP_SALE_ORDER_DTL u
+	where u.SALE_ORDER_DTL_ID in ($SALE_ORDER_DTL_IDS$) and u.SPCL_TECH_ID is null and u.DEL_FLAG=#DEL_FLAG#
+	group by 
+		u.PRD_ID,
+		u.PRD_NO,
+		u.PRD_NAME,
+		u.PRD_SPEC,
+		u.PRD_COLOR,
+		u.BRAND,
+		u.STD_UNIT,
+		u.IS_NO_STAND_FLAG,
+		u.PRICE,
+		u.DECT_RATE,
+		u.DECT_PRICE,
+		u.ADVC_SEND_DATE,
+		u.REMARK,
+		u.VOLUME,
+		u.SPCL_TECH_ID
+	union 
+	select 
+		u.PRD_ID,
+		u.PRD_NO,
+		u.PRD_NAME,
+		u.PRD_SPEC,
+		u.PRD_COLOR,
+		u.BRAND,
+		u.STD_UNIT,
+		u.IS_NO_STAND_FLAG,
+		NVL(u.PRICE,0),
+		NVL(u.DECT_RATE,0),
+		NVL(u.DECT_PRICE,0),
+		NVL(u.ORDER_NUM,0),
+		NVL(u.ORDER_AMOUNT,0),
+		u.ADVC_SEND_DATE,
+		u.REMARK,
+		NVL(u.CHANGE_NUM,0),
+		NVL(u.SENDED_NUM,0),
+		NVL(u.STORED_NUM,0),
+		NVL(u.VOLUME,0),
+		u.SPCL_TECH_ID
+	from DRP_SALE_ORDER_DTL u
+	where u.SALE_ORDER_DTL_ID in ($SALE_ORDER_DTL_IDS$) and u.SPCL_TECH_ID is not null and u.DEL_FLAG=#DEL_FLAG#
+</select>
+</sqlMap>
+

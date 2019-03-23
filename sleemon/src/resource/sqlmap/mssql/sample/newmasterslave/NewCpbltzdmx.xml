@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<!--
+	@module 质检管理
+	@fuc 成品不良通知单明细
+	@version 1.1
+	@author zhuxw
+-->
+
+<sqlMap namespace="NewCpbltzdmx">
+
+	<typeAlias type="com.hoperun.sample.masterslave.model.MasterSlavemxModel" alias="CpbltzdmxModel" />
+
+	<!-- 使用Cpbltzdmx装载结果集 -->
+	<resultMap id="CpbltzdmxModel" class="CpbltzdmxModel">
+		<result column="CPBLTZDMXID" property="CPBLTZDMXID" />
+	</resultMap>
+
+	<!-- 动态查询 and 列表分页 -->
+     <sql id="queryDynSql">
+        <isNotEmpty prepend="and" property="CPZJXMBH">
+            u.CPZJXMBH like '%$CPZJXMBH$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="CPZJXMID">
+            u.CPZJXMID like '%$CPZJXMID$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="CPZJXMMC">
+            u.CPZJXMMC like '%$CPZJXMMC$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="DELFLAG">
+            u.DELFLAG=#DELFLAG#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="HGBZ">
+            u.HGBZ like '%$HGBZ$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="JYCS">
+            u.JYCS like '%$JYCS$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="JYZ">
+            u.JYZ like '%$JYZ$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="RBJSSL">
+            u.RBJSSL=#RBJSSL#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="REMARK">
+            u.REMARK like '%$REMARK$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="THSL">
+            u.THSL=#THSL#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="XSSL">
+            u.XSSL=#XSSL#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="YYBZ">
+            u.YYBZ like '%$YYBZ$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="ZJXMLB">
+            u.ZJXMLB like '%$ZJXMLB$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="BFSL">
+            u.BFSL=#BFSL#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="CPBLTZDID">
+            u.CPBLTZDID like '%$CPBLTZDID$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="CPBLTZDMXID">
+            u.CPBLTZDMXID like '%$CPBLTZDMXID$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="conditionString">
+            ${conditionString}
+        </isNotEmpty>
+     </sql>
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField"> $orderField$,</isNotEmpty>
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[  select u.CPBLTZDMXID,u.CPBLTZDID,u.CPZJXMID,u.CPZJXMBH,u.CPZJXMMC,u.ZJXMLB,u.YYBZ,u.JYCS,u.HGBZ,u.JYZ,u.RBJSSL,u.BFSL,u.THSL,u.XSSL,u.REMARK,u.DELFLAG
+		 from ${SYSSCHEMA}.t_erp_zj_cpbltzdmx u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(0) cnt FROM ${SYSSCHEMA}.t_erp_zj_cpbltzdmx u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+
+   <!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.t_erp_zj_cpbltzdmx(CPBLTZDMXID,CPBLTZDID,CPZJXMID,CPZJXMBH,CPZJXMMC,ZJXMLB,YYBZ,JYCS,HGBZ,JYZ,RBJSSL,BFSL,THSL,XSSL,REMARK,DELFLAG
+		 )values(#CPBLTZDMXID#,#CPBLTZDID#,#CPZJXMID#,#CPZJXMBH#,#CPZJXMMC#,#ZJXMLB#,#YYBZ#,#JYCS#,#HGBZ#,#JYZ#,#RBJSSL#,#BFSL#,#THSL#,#XSSL#,#REMARK#,#DELFLAG#)
+		]]>
+	</insert>
+
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.t_erp_zj_cpbltzdmx ]]>
+		<dynamic prepend="set">
+			<isNotNull property="CPBLTZDMXID" prepend=","><![CDATA[CPBLTZDMXID = #CPBLTZDMXID#]]></isNotNull>
+			<isNotNull property="CPBLTZDID" prepend=","><![CDATA[CPBLTZDID = #CPBLTZDID#]]></isNotNull>
+			<isNotNull property="CPZJXMID" prepend=","><![CDATA[CPZJXMID = #CPZJXMID#]]></isNotNull>
+			<isNotNull property="CPZJXMBH" prepend=","><![CDATA[CPZJXMBH = #CPZJXMBH#]]></isNotNull>
+			<isNotNull property="CPZJXMMC" prepend=","><![CDATA[CPZJXMMC = #CPZJXMMC#]]></isNotNull>
+			<isNotNull property="ZJXMLB" prepend=","><![CDATA[ZJXMLB = #ZJXMLB#]]></isNotNull>
+			<isNotNull property="YYBZ" prepend=","><![CDATA[YYBZ = #YYBZ#]]></isNotNull>
+			<isNotNull property="JYCS" prepend=","><![CDATA[JYCS = #JYCS#]]></isNotNull>
+			<isNotNull property="HGBZ" prepend=","><![CDATA[HGBZ = #HGBZ#]]></isNotNull>
+			<isNotNull property="JYZ" prepend=","><![CDATA[JYZ = #JYZ#]]></isNotNull>
+			<isNotNull property="RBJSSL" prepend=","><![CDATA[RBJSSL = #RBJSSL#]]></isNotNull>
+			<isNotNull property="BFSL" prepend=","><![CDATA[BFSL = #BFSL#]]></isNotNull>
+			<isNotNull property="THSL" prepend=","><![CDATA[THSL = #THSL#]]></isNotNull>
+			<isNotNull property="XSSL" prepend=","><![CDATA[XSSL = #XSSL#]]></isNotNull>
+			<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK#]]></isNotNull>
+			<isNotNull property="DELFLAG" prepend=","><![CDATA[DELFLAG = #DELFLAG#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where CPBLTZDMXID = #CPBLTZDMXID# ]]>
+	</update>
+	<!-- 根据主表Id软删除 只是更新状态 -->
+	<delete id="deleteByFkId" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.t_erp_zj_cpbltzdmx set DELFLAG = 1 where CPBLTZDID = #CPBLTZDID:VARCHAR# ]]>
+	</delete>
+	<!-- 逻辑删除 只是更新状态-->
+	<delete id="deleteByIds" parameterClass="String">
+		<![CDATA[ update ${SYSSCHEMA}.t_erp_zj_cpbltzdmx set DELFLAG = 1 where CPBLTZDMXID in ($CPBLTZDMXIDS$) ]]>
+	</delete>
+	<select id="loadByIds" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[  select u.CPBLTZDMXID,u.CPBLTZDID,u.CPZJXMID,u.CPZJXMBH,u.CPZJXMMC,u.ZJXMLB,u.YYBZ,u.JYCS,u.HGBZ,u.JYZ,u.RBJSSL,u.BFSL,u.THSL,u.XSSL,u.REMARK,u.DELFLAG
+		 from ${SYSSCHEMA}.t_erp_zj_cpbltzdmx u where u.CPBLTZDMXID in ($CPBLTZDMXIDS$) ]]>
+	</select>
+	<select id="selByFkId" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[  select CPZJXMID,CPZJXMBH,CPZJXMMC,ZJXMLB,YYBZ,JYCS,HGBZ,JYZ from T_ERP_ZJ_CPZJTZDMX where CPZJTZDID=#CPZJTZDID# and delflag = 0 ]]>
+	</select>
+	<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[  select u.CPBLTZDMXID,u.CPBLTZDID,u.CPZJXMID,u.CPZJXMBH,u.CPZJXMMC,u.ZJXMLB,u.YYBZ,u.JYCS,u.HGBZ,u.JYZ,u.RBJSSL,u.BFSL,u.THSL,u.XSSL,u.REMARK,u.DELFLAG
+		 from ${SYSSCHEMA}.t_erp_zj_cpbltzdmx u where u.CPBLTZDMXID = #CPBLTZDMXID#]]>
+	</select>
+</sqlMap>
+

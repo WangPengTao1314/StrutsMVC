@@ -1,0 +1,1132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ *@module 基础资料
+ *@func 渠道信息
+ *@version 1.1
+ *@author 刘曰刚
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="chann">
+
+	<typeAlias type="com.hoperun.base.chann.model.ChannModel" alias="ChannModel" />
+	<typeAlias type="com.hoperun.base.chann.model.DeliveraddrModelChld" alias="DeliveraddrModelChld" />
+
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="ChannModel" class="ChannModel">
+		<result column="CHANN_ID" property="CHANN_ID" />
+	</resultMap>
+	
+	<resultMap id="DeliveraddrModelChld" class="DeliveraddrModelChld">
+		<result column="DELIVER_ADDR_ID" property="DELIVER_ADDR_ID" />
+	</resultMap>
+	
+	<!-- 动态查询 and 列表排序 -->
+	<sql id="queryDynSql"> 
+		
+		<isNotEmpty prepend="and " property="CHANN_TYPE">c.CHANN_TYPE=#CHANN_TYPE#</isNotEmpty>
+		
+		
+		<isNotEmpty prepend="and " property="AREA_ID">c.AREA_ID like '%'||#AREA_ID#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="AREA_NO">c.AREA_NO like '%'||#AREA_NO#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="AREA_NAME">c.AREA_NAME like '%'||#AREA_NAME#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="STATE">c.STATE=#STATE#</isNotEmpty>
+		<isNotEmpty prepend="and " property="CHAA_LVL">c.CHAA_LVL=#CHAA_LVL#</isNotEmpty>
+		<isNotEmpty prepend="and " property="BEGIN_CRE_TIME">c.CRE_TIME &gt;= to_date(#BEGIN_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')</isNotEmpty>
+		<isNotEmpty prepend="and " property="END_CRE_TIME">c.CRE_TIME &lt;= to_date(#END_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')</isNotEmpty>
+		
+		<isNotEmpty prepend="and " property="BEGIN_JOIN_DATE">c.JOIN_DATE &gt;= to_date(#BEGIN_JOIN_DATE#,'yyyy-MM-DD')</isNotEmpty>
+		<isNotEmpty prepend="and " property="END_JOIN_DATE">c.JOIN_DATE &lt;= to_date(#END_JOIN_DATE#,'yyyy-MM-DD')</isNotEmpty>
+		
+		<isNotEmpty prepend="and " property="DEL_FLAG"><![CDATA[c.DEL_FLAG=#DEL_FLAG#]]></isNotEmpty>
+		<isNotEmpty prepend="and " property="IS_BASE_FLAG"><![CDATA[c.IS_BASE_FLAG=#IS_BASE_FLAG#]]></isNotEmpty>
+		
+	    <isNotEmpty prepend="and " property="AREA_MANAGE_NAME"><![CDATA[c.AREA_MANAGE_NAME=#AREA_MANAGE_NAME#]]></isNotEmpty>
+		
+		<isNotEmpty prepend="  " property="CHANN_NOQuery">$CHANN_NOQuery$</isNotEmpty>
+		<isNotEmpty prepend="  " property="CHANN_NAMEQuery">$CHANN_NAMEQuery$</isNotEmpty>
+		<isNotEmpty prepend="  " property="CHANN_NO_PQuery">$CHANN_NO_PQuery$</isNotEmpty>
+		<isNotEmpty prepend="  " property="CHANN_NAME_PQuery">$CHANN_NAME_PQuery$</isNotEmpty>
+		<isNotEmpty prepend="  " property="PROVQuery">$PROVQuery$</isNotEmpty>
+		<isNotEmpty prepend="and " property="AREA_NAME_PQuery"><![CDATA[c.AREA_ID in (select AREA_ID from BASE_AREA where 1=1 $AREA_NAME_PQuery$)]]></isNotEmpty>
+		<isNotEmpty prepend="and " property="CITY"><![CDATA[c.CITY like '%'||#CITY#||'%']]></isNotEmpty>
+		<isNotEmpty prepend="and " property="COUNTY"><![CDATA[c.COUNTY like '%'||#COUNTY#||'%']]></isNotEmpty>
+	    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	   </isNotEmpty>
+	</sql>
+    <sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField"> $orderField$</isNotEmpty>
+	</sql>
+	
+	<sql id="batchSql">
+  <![CDATA[ 
+		  select 
+		   u.CHANN_ID,
+	       u.CHANN_NO,
+	       u.CHANN_NAME,
+	       u.CHANN_TYPE,
+	       u.CHAA_LVL,
+	       u.CHANN_NAME_P,
+	       u.AREA_NO,
+	       u.AREA_NAME,
+	       u.CRE_NAME,
+	       u.CRE_TIME,
+	       u.DEPT_NAME,
+	       u.STATE
+		   FROM BASE_CHANN u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryBatchSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[
+				select c.CHANN_ID,
+			       c.CHANN_NO,
+			       c.CHANN_NAME,
+			       c.CHANN_TYPE,
+			       c.CHANN_NAME_P,
+			       c.AREA_NO,
+			       c.CHAA_LVL,
+			       c.AREA_NAME,
+			       c.CREATOR,
+			       c.CRE_NAME,
+			       to_char(c.CRE_TIME, 'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+			       c.DEPT_ID,
+			       c.DEPT_NAME,
+			       c.STATE,
+			       NVL(c.REBATE_TOTAL, 0) REBATE_TOTAL,
+			       NVL(c.REBATE_CURRT, 0) REBATE_CURRT,
+			       NVL(c.REBATE_USED, 0) REBATE_USED
+			       from BASE_CHANN c
+				]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+	
+	<sql id="queryBatchSql">
+	  <!-- 渠道分管 -->
+	     u.STATE='启用' and u.DEL_FLAG=0 
+	  <isNotEmpty prepend="" property="PLAN_YEAR">
+		  <![CDATA[ and s.PLAN_YEAR = #PLAN_YEAR# ]]>
+	  </isNotEmpty> 
+	    <isNotEmpty prepend="" property="AREA_NOQuery">
+		  <![CDATA[ $AREA_NOQuery$ ]]>
+	  </isNotEmpty> 
+	    <isNotEmpty prepend="" property="AREA_NAMEQuery">
+		  <![CDATA[ $AREA_NAMEQuery$ ]]>
+	  </isNotEmpty> 
+	    <isNotEmpty prepend="" property="CHANN_NOQuery">
+		  <![CDATA[ $CHANN_NOQuery$ ]]>
+	  </isNotEmpty> 
+	    <isNotEmpty prepend="" property="CHANN_NAMEQuery">
+		  <![CDATA[ $CHANN_NAMEQuery$ ]]>
+	  </isNotEmpty> 
+	</sql>
+
+	<select id="pageBatch" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="batchSql" />
+		<include refid="public.pageEnd" />
+    </select>
+    
+    <select id="pageBatchCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt  from BASE_CHANN u
+      ]]>
+	<dynamic prepend="where">
+			<include refid="queryBatchSql"/>
+	</dynamic>
+    </select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(CHANN_ID) cnt FROM ${SYSSCHEMA}.BASE_CHANN c ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+
+   <!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	<!-- 根据ID查找 -->
+	<!-- //0156117 Start 刘曰刚  2014/06/16// -->
+	<!-- 新加查询区域经理信息 -->
+	<select id="loadById" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+				select 
+					CHANN_ID,
+					CHANN_NO,
+					CHANN_NAME,
+					CHANN_ABBR,
+					CHANN_TYPE,
+					CHAA_LVL,
+					CHANN_ID_P,
+					CHANN_NO_P,
+					CHANN_NAME_P,
+					AREA_ID,
+		 			AREA_NO,
+		 			AREA_NAME,
+		 			ZONE_ID,
+		 			NATION,
+		 			PROV,
+		 			CITY,
+		 			COUNTY,
+		 			CITY_TYPE,
+		 			PERSON_CON,
+		 			TEL,
+		 			MOBILE,
+		 			TAX,
+		 			POST,
+		 			ADDRESS,
+		 			EMAIL,
+				 	WEB,
+				 	LEGAL_REPRE,
+				 	BUSS_LIC,
+				 	AX_BURDEN,
+				 	ORG_CODE_CERT,
+				 	BUSS_NATRUE,
+				 	BUSS_SCOPE,
+				 	VAT_NO,
+				 	INVOICE_TI,
+				 	INVOICE_ADDR,
+				 	BANK_NAME,
+				 	BANK_ACCT,
+				 	FI_CMP_NO,
+				 	DEPOSIT,
+				 	DEBT_DEF,
+				 	PRICE_CLAUSE,
+				 	BUSS_LIC_ATT,
+				 	TAX_BURDEN_ATT,
+				 	ORG_CERT_ATT,
+				 	STATE,
+				 	REMARK,
+				 	CREATOR,
+				 	CRE_NAME, 
+				 	to_char(CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+				 	UPDATOR,
+				 	UPD_NAME,
+				 	to_char(UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+				 	DEPT_ID,
+				 	DEPT_NAME,
+				 	ORG_ID,
+				 	ORG_NAME,
+				 	LEDGER_ID,
+				 	LEDGER_NAME,
+				 	REBATE_TOTAL,
+				 	REBATE_YEAR,
+				 	NVL(REBATE_CURRT,0) REBATE_CURRT,
+				 	REBATE_USED,
+				 	REBATE_FREEZE,
+				 	NVL(CREDIT_CURRT,0) CREDIT_CURRT,
+				 	CREDIT_USED,
+				 	NVL(TEMP_CREDIT,0) TEMP_CREDIT,
+				 	TEMP_CREDIT_VALDT,
+				 	DEL_FLAG,
+				 	PAY_RATE,
+				 	SHIP_POINT_ID,
+				 	SHIP_POINT_NO,
+				 	SHIP_POINT_NAME,
+		 			AREA_SER_ID,
+		 			AREA_SER_NO,
+		 			AREA_SER_NAME,
+		 			TERM_DECT_CTR_FLAG,
+		 			NVL(PAYMENT_CREDIT,0)PAYMENT_CREDIT,
+		 			to_char(JOIN_DATE,'yyyy-MM-DD') JOIN_DATE,
+		 			AREA_MANAGE_ID,
+					AREA_MANAGE_NAME,
+					AREA_MANAGE_TEL,
+					CHAA_SALE_LVL,
+					INI_CREDIT,
+					TAX_RATE,
+					COST_TYPE,
+					INIT_YEAR,
+					INIT_MONTH,
+					TAX_RATE,
+					COST_TYPE,
+					IS_UPDATE_STOREIN_FLAG
+				    from ${SYSSCHEMA}.BASE_CHANN c where c.CHANN_ID = #CHANN_ID# and DEL_FLAG=0
+		]]>
+	</select>
+	<!-- //0156117 End 刘曰刚 2014/06/16// -->
+	<select id="getCountCHANN_NO" parameterClass="String" resultClass="int">
+	    select count(CHANN_NO) from ${SYSSCHEMA}.BASE_CHANN where CHANN_NO=#CHANN_NO#
+	</select>
+
+	<select id="loadSTATE" parameterClass="String" resultClass="String">
+		<![CDATA[ select STATE from ${SYSSCHEMA}.BASE_CHANN c WHERE c.CHANN_ID = #CHANN_ID# and DEL_FLAG=0]]>
+	</select>
+	
+	<!-- // 0156117 Start 刘曰刚 2014/06/16// -->
+	<!-- 修改描述：增加新增区域经理信息 -->
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.BASE_CHANN(
+		 	CHANN_ID,CHANN_NO,CHANN_NAME,CHANN_ABBR,CHANN_TYPE,CHAA_LVL,CHANN_ID_P,CHANN_NO_P,CHANN_NAME_P,AREA_ID,
+		 	AREA_NO,AREA_NAME,ZONE_ID,NATION,PROV,CITY,COUNTY,CITY_TYPE,PERSON_CON,TEL,MOBILE,TAX,POST,ADDRESS,EMAIL,
+		 	WEB,LEGAL_REPRE,BUSS_LIC,AX_BURDEN,ORG_CODE_CERT,BUSS_NATRUE,BUSS_SCOPE,VAT_NO,INVOICE_TI,INVOICE_ADDR,
+		 	BANK_NAME,BANK_ACCT,FI_CMP_NO,DEPOSIT,DEBT_DEF,PRICE_CLAUSE,BUSS_LIC_ATT,TAX_BURDEN_ATT,ORG_CERT_ATT,STATE,
+		 	REMARK,CREATOR,CRE_NAME,CRE_TIME,DEPT_ID,DEPT_NAME,ORG_ID,ORG_NAME,LEDGER_ID,
+		 	LEDGER_NAME,DEL_FLAG,PAY_RATE,SHIP_POINT_ID,SHIP_POINT_NO,SHIP_POINT_NAME,AREA_SER_ID,AREA_SER_NO,AREA_SER_NAME,
+		 	TERM_DECT_CTR_FLAG,PUNISH_FLAG,JOIN_DATE,IS_BASE_FLAG,AREA_MANAGE_ID,AREA_MANAGE_NAME,AREA_MANAGE_TEL,CHAA_SALE_LVL,INIT_YEAR,INIT_MONTH,
+		 	TAX_RATE,COST_TYPE
+		 	)
+		 values(
+			#CHANN_ID#,#CHANN_NO#,#CHANN_NAME#,#CHANN_ABBR#,#CHANN_TYPE#,#CHAA_LVL#,#CHANN_ID_P#,#CHANN_NO_P#,#CHANN_NAME_P#,#AREA_ID#,
+		 	#AREA_NO#,#AREA_NAME#,#ZONE_ID#,#NATION#,#PROV#,#CITY#,#COUNTY#,#CITY_TYPE#,#PERSON_CON#,#TEL#,#MOBILE#,#TAX#,#POST#,#ADDRESS#,#EMAIL#,
+		 	#WEB#,#LEGAL_REPRE#,#BUSS_LIC#,#AX_BURDEN#,#ORG_CODE_CERT#,#BUSS_NATRUE#,#BUSS_SCOPE#,#VAT_NO#,#INVOICE_TI#,#INVOICE_ADDR#,
+		 	#BANK_NAME#,#BANK_ACCT#,#FI_CMP_NO#,#DEPOSIT#,#DEBT_DEF#,#PRICE_CLAUSE#,#BUSS_LIC_ATT#,#TAX_BURDEN_ATT#,#ORG_CERT_ATT#,#STATE#,
+		 	#REMARK#,#CREATOR#,#CRE_NAME#,sysdate,#DEPT_ID#,#DEPT_NAME#,#ORG_ID#,#ORG_NAME#,#LEDGER_ID#,
+		 	#LEDGER_NAME#,#DEL_FLAG#,#PAY_RATE#,#SHIP_POINT_ID#,#SHIP_POINT_NO#,#SHIP_POINT_NAME#,#AREA_SER_ID#,#AREA_SER_NO#,#AREA_SER_NAME#,
+		 	#TERM_DECT_CTR_FLAG#,#PUNISH_FLAG#,to_date(#JOIN_DATE#,'yyyy-MM-DD'),#IS_BASE_FLAG#,#AREA_MANAGE_ID#,#AREA_MANAGE_NAME#,#AREA_MANAGE_TEL#,
+		 	#CHAA_SALE_LVL#,#INIT_YEAR#,#INIT_MONTH#,#TAX_RATE#,#COST_TYPE#
+		 )
+		]]>
+	</insert>
+	<!-- // 0156117 End 刘曰刚 2014/06/16// -->
+	<update id="updateById" parameterClass="map">
+		 <![CDATA[ update ${SYSSCHEMA}.BASE_CHANN ]]>
+		<dynamic prepend="set">
+			<isNotNull property="CHANN_NO" prepend=","><![CDATA[CHANN_NO = #CHANN_NO#]]></isNotNull>
+			<isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME#]]></isNotNull>
+			<isNotNull property="CHANN_ABBR" prepend=","><![CDATA[CHANN_ABBR = #CHANN_ABBR#]]></isNotNull>
+			<isNotNull property="CHANN_TYPE" prepend=","><![CDATA[CHANN_TYPE = #CHANN_TYPE#]]></isNotNull>
+			<isNotNull property="CHAA_LVL" prepend=","><![CDATA[CHAA_LVL = #CHAA_LVL#]]></isNotNull>
+			<isNotNull property="CHANN_ID_P" prepend=","><![CDATA[CHANN_ID_P = #CHANN_ID_P#]]></isNotNull>
+			<isNotNull property="CHANN_NO_P" prepend=","><![CDATA[CHANN_NO_P = #CHANN_NO_P#]]></isNotNull>
+			<isNotNull property="CHANN_NAME_P" prepend=","><![CDATA[CHANN_NAME_P = #CHANN_NAME_P#]]></isNotNull>
+			<isNotNull property="AREA_ID" prepend=","><![CDATA[AREA_ID = #AREA_ID#]]></isNotNull>
+			<isNotNull property="AREA_NO" prepend=","><![CDATA[AREA_NO = #AREA_NO#]]></isNotNull>
+			<isNotNull property="AREA_NAME" prepend=","><![CDATA[AREA_NAME = #AREA_NAME#]]></isNotNull>
+			<isNotNull property="ZONE_ID" prepend=","><![CDATA[ZONE_ID = #ZONE_ID#]]></isNotNull>
+			<isNotNull property="NATION" prepend=","><![CDATA[NATION = #NATION#]]></isNotNull>
+			<isNotNull property="PROV" prepend=","><![CDATA[PROV = #PROV#]]></isNotNull>
+			<isNotNull property="CITY" prepend=","><![CDATA[CITY = #CITY#]]></isNotNull>
+			<isNotNull property="COUNTY" prepend=","><![CDATA[COUNTY = #COUNTY#]]></isNotNull>
+			<isNotNull property="CITY_TYPE" prepend=","><![CDATA[CITY_TYPE = #CITY_TYPE#]]></isNotNull>
+			<isNotNull property="PERSON_CON" prepend=","><![CDATA[PERSON_CON = #PERSON_CON#]]></isNotNull>
+			<isNotNull property="TEL" prepend=","><![CDATA[TEL = #TEL#]]></isNotNull>
+			<isNotNull property="MOBILE" prepend=","><![CDATA[MOBILE = #MOBILE#]]></isNotNull>
+			<isNotNull property="TAX" prepend=","><![CDATA[TAX = #TAX#]]></isNotNull>
+			<isNotNull property="POST" prepend=","><![CDATA[POST = #POST#]]></isNotNull>
+			<isNotNull property="ADDRESS" prepend=","><![CDATA[ADDRESS = #ADDRESS#]]></isNotNull>
+			<isNotNull property="EMAIL" prepend=","><![CDATA[EMAIL = #EMAIL#]]></isNotNull>
+			<isNotNull property="WEB" prepend=","><![CDATA[WEB = #WEB#]]></isNotNull>
+			<isNotNull property="LEGAL_REPRE" prepend=","><![CDATA[LEGAL_REPRE = #LEGAL_REPRE#]]></isNotNull>
+			<isNotNull property="BUSS_LIC" prepend=","><![CDATA[BUSS_LIC = #BUSS_LIC#]]></isNotNull>
+			<isNotNull property="AX_BURDEN" prepend=","><![CDATA[AX_BURDEN = #AX_BURDEN#]]></isNotNull>
+			<isNotNull property="ORG_CODE_CERT" prepend=","><![CDATA[ORG_CODE_CERT = #ORG_CODE_CERT#]]></isNotNull>
+			<isNotNull property="BUSS_NATRUE" prepend=","><![CDATA[BUSS_NATRUE = #BUSS_NATRUE#]]></isNotNull>
+			<isNotNull property="BUSS_SCOPE" prepend=","><![CDATA[BUSS_SCOPE = #BUSS_SCOPE#]]></isNotNull>
+			<isNotNull property="VAT_NO" prepend=","><![CDATA[VAT_NO = #VAT_NO#]]></isNotNull>
+			<isNotNull property="LEDGER_ID" prepend=","><![CDATA[LEDGER_ID = #LEDGER_ID#]]></isNotNull>
+			<isNotNull property="LEDGER_NAME" prepend=","><![CDATA[LEDGER_NAME = #LEDGER_NAME#]]></isNotNull>
+			<isNotNull property="INVOICE_TI" prepend=","><![CDATA[INVOICE_TI = #INVOICE_TI#]]></isNotNull>
+			<isNotNull property="INVOICE_ADDR" prepend=","><![CDATA[INVOICE_ADDR = #INVOICE_ADDR#]]></isNotNull>
+			<isNotNull property="BANK_NAME" prepend=","><![CDATA[BANK_NAME = #BANK_NAME#]]></isNotNull>
+			<isNotNull property="BANK_ACCT" prepend=","><![CDATA[BANK_ACCT = #BANK_ACCT#]]></isNotNull>
+			<isNotNull property="FI_CMP_NO" prepend=","><![CDATA[FI_CMP_NO = #FI_CMP_NO#]]></isNotNull>
+			<isNotNull property="DEPOSIT" prepend=","><![CDATA[DEPOSIT = #DEPOSIT#]]></isNotNull>
+			<isNotNull property="DEBT_DEF" prepend=","><![CDATA[DEBT_DEF = #DEBT_DEF#]]></isNotNull>
+			<isNotNull property="PRICE_CLAUSE" prepend=","><![CDATA[PRICE_CLAUSE = #PRICE_CLAUSE#]]></isNotNull>
+			<isNotNull property="BUSS_LIC_ATT" prepend=","><![CDATA[BUSS_LIC_ATT = #BUSS_LIC_ATT#]]></isNotNull>
+			<isNotNull property="TAX_BURDEN_ATT" prepend=","><![CDATA[TAX_BURDEN_ATT = #TAX_BURDEN_ATT#]]></isNotNull>
+			<isNotNull property="ORG_CERT_ATT" prepend=","><![CDATA[ORG_CERT_ATT = #ORG_CERT_ATT#]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+			<isNotNull property="PAY_RATE" prepend=","><![CDATA[PAY_RATE = #PAY_RATE#]]></isNotNull>
+			<isNotNull property="SHIP_POINT_ID" prepend=","><![CDATA[SHIP_POINT_ID = #SHIP_POINT_ID#]]></isNotNull>
+			<isNotNull property="SHIP_POINT_NO" prepend=","><![CDATA[SHIP_POINT_NO = #SHIP_POINT_NO#]]></isNotNull>
+			<isNotNull property="SHIP_POINT_NAME" prepend=","><![CDATA[SHIP_POINT_NAME = #SHIP_POINT_NAME#]]></isNotNull>
+			<isNotNull property="AREA_SER_ID" prepend=","><![CDATA[AREA_SER_ID = #AREA_SER_ID#]]></isNotNull>
+			<isNotNull property="AREA_SER_NO" prepend=","><![CDATA[AREA_SER_NO = #AREA_SER_NO#]]></isNotNull>
+			<isNotNull property="AREA_SER_NAME" prepend=","><![CDATA[AREA_SER_NAME = #AREA_SER_NAME#]]></isNotNull>
+			<isNotNull property="TERM_DECT_CTR_FLAG" prepend=","><![CDATA[TERM_DECT_CTR_FLAG = #TERM_DECT_CTR_FLAG#]]></isNotNull>
+			<isNotNull property="JOIN_DATE" prepend=","><![CDATA[JOIN_DATE = to_date(#JOIN_DATE#,'yyyy-MM-DD')]]></isNotNull>
+			<isNotNull property="INIT_YEAR" prepend=","><![CDATA[INIT_YEAR = #INIT_YEAR#]]></isNotNull>
+			<isNotNull property="INIT_MONTH" prepend=","><![CDATA[INIT_MONTH = #INIT_MONTH#]]></isNotNull>
+			
+			<isNotNull property="TAX_RATE" prepend=","><![CDATA[TAX_RATE = #TAX_RATE#]]></isNotNull>
+			<isNotNull property="COST_TYPE" prepend=","><![CDATA[COST_TYPE = #COST_TYPE#]]></isNotNull>
+			
+			<!-- add by 张忠斌  start-->
+			<isNotNull property="REBATE_TOTAL" prepend=","><![CDATA[REBATE_TOTAL = #REBATE_TOTAL#]]></isNotNull>
+			<isNotNull property="REBATE_CURRT" prepend=","><![CDATA[REBATE_CURRT = #REBATE_CURRT#]]></isNotNull>
+			<isNotNull property="REBATE_USED" prepend=","><![CDATA[REBATE_USED = #REBATE_USED#]]></isNotNull>
+			<isNotNull property="REBATE_UPD_NAME" prepend=","><![CDATA[REBATE_UPD_NAME = #REBATE_UPD_NAME#]]></isNotNull>
+			<isNotNull property="REBATE_UPD_TIME" prepend=","><![CDATA[REBATE_UPD_TIME = sysdate]]></isNotNull>
+			<isNotNull property="CHAA_SALE_LVL" prepend=","><![CDATA[CHAA_SALE_LVL = #CHAA_SALE_LVL#]]></isNotNull>
+			<!-- add by 张忠斌  end -->
+			
+			<!-- // 0156117 Start 刘曰刚 2014-06-16// -->
+			<!-- 修改描述：增加修改区域经理信息 -->
+			<isNotNull property="AREA_MANAGE_ID" prepend=","><![CDATA[AREA_MANAGE_ID = #AREA_MANAGE_ID#]]></isNotNull>
+			<isNotNull property="AREA_MANAGE_NAME" prepend=","><![CDATA[AREA_MANAGE_NAME = #AREA_MANAGE_NAME#]]></isNotNull>
+			<isNotNull property="AREA_MANAGE_TEL" prepend=","><![CDATA[AREA_MANAGE_TEL = #AREA_MANAGE_TEL#]]></isNotNull>
+			<isNotNull property="IS_UPDATE_STOREIN_FLAG" prepend=","><![CDATA[IS_UPDATE_STOREIN_FLAG = #IS_UPDATE_STOREIN_FLAG#]]></isNotNull>
+			
+			<!-- // 0156117 End 刘曰刚 2014-06-16// -->
+		</dynamic>
+		<![CDATA[ where CHANN_ID = #CHANN_ID# ]]>
+	</update>
+	<update id="delete" parameterClass="map">
+	<![CDATA[ update ${SYSSCHEMA}.BASE_CHANN ]]>
+		<dynamic prepend="set">
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where CHANN_ID in(select CHANN_ID from ${SYSSCHEMA}.BASE_CHANN
+                           start with CHANN_ID = #CHANN_ID#
+                          connect by prior CHANN_ID = CHANN_ID_P) ]]>		
+	</update>
+	<select id="getWtyXJ" parameterClass="map" resultClass="int">
+		<![CDATA[select count(0) from (  SELECT * FROM ${SYSSCHEMA}.BASE_CHANN T start with CHANN_ID=#CHANN_ID# connect by prior CHANN_ID = CHANN_ID_P) u where u.STATE='启用' and CHANN_ID <>#CHANN_ID# and DEL_FLAG=0]]>
+	</select>
+	<update id="updateStateById" parameterClass="map">	
+		<![CDATA[ update ${SYSSCHEMA}.BASE_CHANN ]]>
+		<dynamic prepend="set">
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME =sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where CHANN_ID in(select CHANN_ID from ${SYSSCHEMA}.BASE_CHANN
+                           start with CHANN_ID = #CHANN_ID#
+                          connect by prior CHANN_ID = CHANN_ID_P) ]]>	
+	</update>
+	<!-- 审核后修改临时信用和时间 -->
+	<update id="updateTempCredit" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.BASE_CHANN ]]>
+		<dynamic prepend="set">
+			<isNotNull property="TEMP_CREDIT" prepend=","><![CDATA[TEMP_CREDIT = #TEMP_CREDIT#]]></isNotNull>
+			<isNotNull property="TEMP_CREDIT_VALDT" prepend=","><![CDATA[TEMP_CREDIT_VALDT =#TEMP_CREDIT_VALDT#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where CHANN_ID =#CHANN_ID# ]]>	
+	</update>
+	
+	<select id="isHaveRebate" parameterClass="map" resultClass="ChannModel">
+		<![CDATA[select  u.CHANN_NAME from ${SYSSCHEMA}.BASE_CHANN u where  NVL(u.REBATE_FREEZE,0)>0  and u.STATE =#STATE#]]>
+	</select>
+	
+	<!-- 返利登记 清空返利后执行的操作 -->
+	<update id="updateRebateByState" parameterClass="map">
+		 <![CDATA[ update ${SYSSCHEMA}.BASE_CHANN ]]>
+		<dynamic prepend="set">
+			<isNotNull property="REBATE_TOTAL" prepend=","><![CDATA[REBATE_TOTAL = #REBATE_TOTAL#]]></isNotNull>
+			<isNotNull property="REBATE_CURRT" prepend=","><![CDATA[REBATE_CURRT = #REBATE_CURRT#]]></isNotNull>
+			<isNotNull property="REBATE_UPD_NAME" prepend=","><![CDATA[REBATE_UPD_NAME = #REBATE_UPD_NAME#]]></isNotNull>
+			<isNotNull property="REBATE_UPD_TIME" prepend=","><![CDATA[REBATE_UPD_TIME = sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where STATE = #STATE# ]]>
+	</update>
+	
+	<!-- 返利登记 清空返利后执行的操作  返利历史信息 -->
+	<insert id="insertRebateHis" parameterClass="map">
+		insert  into  ${SYSSCHEMA}.ERP_REBATE_HIS(REBATE_HIS_ID,CHANN_ID,REBATE_TOTAL,REBATE_CURRT,REBATE_FREEZE,
+		        CLEAN_PSON_ID,CLEAN_PSON_NAME,CLEAN_TIME)
+              Select CHANN_ID, CHANN_ID,REBATE_TOTAL,REBATE_CURRT, REBATE_FREEZE ,#CLEAN_PSON_ID#,#CLEAN_PSON_NAME#,sysdate
+               from  BASE_CHANN where STATE=#STATE#
+	</insert>
+	<select id="getSTATE" parameterClass="string" resultClass="string">
+		<![CDATA[
+			select STATE from BASE_CHANN where CHANN_ID=#CHANN_ID#
+		]]>
+	</select>
+	<!-- 插入帐套信息 -->
+	<insert id="insertT_SYS_ZTXX" parameterClass="map">
+		<![CDATA[
+			insert into T_SYS_ZTXX(
+				ZTXXID,
+				ZTBH,
+				ZTMC,
+				YJZBJ,
+				STATE,
+				ZTLB,
+				DELFLAG,
+				IS_DRP_LEDGER,
+				CRENAME,
+				CRETIME
+			)
+			select 
+				CHANN_ID,
+				CHANN_NO,
+				CHANN_NAME,
+				#YJZBJ#,
+				#STATE#,
+				#ZTLB#,
+				#DELFLAG#,
+				#IS_DRP_LEDGER#,
+				#CRENAME#,
+				sysdate
+			from BASE_CHANN  where CHANN_ID=#CHANN_ID#
+		]]>
+	</insert>
+	<!-- 插入机构信息 -->
+	<insert id="insertT_SYS_JGXX" parameterClass="map">
+		<![CDATA[
+			insert into T_SYS_JGXX(
+				JGXXID,
+				JGBH,
+				JGMC,
+				ZTXXID,
+				SJJG,
+				JGZT,
+				DELFLAG,
+				IS_DRP_LEDGER,
+				CRENAME,
+				CRETIME
+			)
+			select 
+				CHANN_ID,
+				CHANN_NO,
+				CHANN_NAME,
+				CHANN_ID,
+				'',
+				#STATE#,
+				#DELFLAG#,
+				#IS_DRP_LEDGER#,
+				#CRENAME#,
+				sysdate
+			from BASE_CHANN where CHANN_ID=#CHANN_ID#
+		]]>
+	</insert>
+	<insert id="insertT_SYS_BMXX" parameterClass="map">
+		insert into T_SYS_BMXX(
+			BMXXID,
+			BMBH,
+			BMMC,
+			BMZT,
+			JGXXID,
+			ZTXXID,
+			DELFLAG,
+			IS_DRP_LEDGER
+		)
+		select 
+			CHANN_ID,
+			CHANN_NO,
+			CHANN_NAME,
+			#STATE#,
+			CHANN_ID,
+			CHANN_ID,
+			#DELFLAG#,
+			#IS_DRP_LEDGER#
+		from BASE_CHANN where CHANN_ID=#CHANN_ID#
+	</insert>
+	<insert id="insertT_SYS_RYXX" parameterClass="map">
+		 insert into T_SYS_RYXX(
+		 	RYXXID,
+		 	RYBH,
+		 	XM,
+		 	XB,
+		 	RYZT,
+		 	RYJB,
+		 	JGXXID,
+		 	BMXXID,
+		 	DELFLAG,
+		 	IS_DRP_LEDGER,
+		 	CRENAME,
+		 	CRETIME,
+		 	RYLB
+		 )
+		select 
+			CHANN_ID,
+			CHANN_NO,
+			#XM#,
+			#XB#,
+			#STATE#,
+			#RYJB#,
+			CHANN_ID,
+			CHANN_ID,
+			#DELFLAG#,
+			#IS_DRP_LEDGER#,
+			#CRENAME#,
+			sysdate,
+			#RYLB#
+		from BASE_CHANN where CHANN_ID=#CHANN_ID#
+	</insert>
+	<insert id="insertT_SYS_XTYH" parameterClass="map">
+		insert into T_SYS_XTYH(
+			XTYHID,
+			ZTXXID,
+			JGXXID,
+			BMXXID,
+			RYXXID,
+			YHBH,
+			YHM,
+			YHKL,
+			YHZT,
+			YHLB,
+			DELFLAG,
+			IS_DRP_LEDGER
+		)
+		select 
+			CHANN_ID,
+			CHANN_ID,
+			CHANN_ID,
+			CHANN_ID,
+			CHANN_ID,
+			CHANN_NO,
+			CHANN_NO,
+			#YHKL#,
+			#STATE#,
+			#YHLB#,
+			#DELFLAG#,
+			#IS_DRP_LEDGER#
+		from BASE_CHANN where CHANN_ID=#CHANN_ID#
+	</insert>
+	<insert id="insertT_SYS_XTYHZTDZ" parameterClass="map">
+		insert into T_SYS_XTYHZTDZ(
+			XTYHZTDZID,
+			ZTXXID,
+			XTYHID
+		)
+		select 
+			CHANN_ID,
+			CHANN_ID,
+			CHANN_ID
+		from BASE_CHANN where CHANN_ID=#CHANN_ID#
+	</insert>
+	<insert id="insertT_SYS_XTYHJS" parameterClass="map">
+		insert into T_SYS_XTYHJS(
+			XTYHJSID,
+			XTJSID,
+			XTYHID,
+			STATE,
+			DELFLAG
+		)
+		select 
+			CHANN_ID,
+			#XTJSID#,
+			CHANN_ID,
+			#STATE#,
+			#DELFLAG#
+		from BASE_CHANN  where CHANN_ID=#CHANN_ID#
+	</insert>
+	<select id="getSHIP_POINTInfo" parameterClass="map" resultClass="java.util.HashMap">
+		select SHIP_POINT_ID,SHIP_POINT_NO,SHIP_POINT_NAME  from BASE_SHIP_POINT 
+		where SHIP_POINT_NO=#SHIP_POINT_NO# and STATE=#STATE# and DEL_FLAG=#DEL_FLAG#
+	</select>
+	
+	
+	
+	
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+     select 
+         u.DELIVER_ADDR_ID,
+		 u.CHANN_ID,
+		 u.DELIVER_ADDR_NO,
+         u.DELIVER_DTL_ADDR,
+         u.STATE,
+         u.DEL_FLAG 
+         from BASE_DELIVER_ADDR u
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="DeliveraddrModelChld">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.CHANN_ID=#CHANN_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+	        u.DELIVER_ADDR_ID in ($DELIVER_ADDR_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+  
+	<!--明细表插入 -->
+<insert id="insertChld" parameterClass="map">
+  <![CDATA[
+	  insert into BASE_DELIVER_ADDR(
+		 DELIVER_ADDR_ID,
+		 CHANN_ID,
+		 DELIVER_ADDR_NO,
+         DELIVER_DTL_ADDR,
+         STATE,
+         DEL_FLAG 
+	   )values(
+		 #DELIVER_ADDR_ID#,
+		 #CHANN_ID#,
+		 #DELIVER_ADDR_NO#,
+         #DELIVER_DTL_ADDR#,
+         #STATE#,
+         #DEL_FLAG#
+		)
+   ]]>
+</insert>
+<!--明细表更新 -->
+<update id="updateChldById" parameterClass="map">
+	<![CDATA[ update BASE_DELIVER_ADDR ]]>
+	<dynamic prepend="set">
+    <isNotNull property="DELIVER_ADDR_NO" prepend=","><![CDATA[DELIVER_ADDR_NO = #DELIVER_ADDR_NO# ]]></isNotNull>
+    <isNotNull property="DELIVER_DTL_ADDR" prepend=","><![CDATA[DELIVER_DTL_ADDR = #DELIVER_DTL_ADDR# ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    <isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where DELIVER_ADDR_ID = #DELIVER_ADDR_ID#]]>
+</update>
+
+<!--根据明细IDs删除明细 -->
+<delete id="deleteChldByIds" parameterClass="map">
+	<![CDATA[ update BASE_DELIVER_ADDR 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      DELIVER_ADDR_ID in ($DELIVER_ADDR_IDS$)
+    ]]>
+</delete>
+
+<!--根据主键ID删除明细 -->
+<delete id="delChldByFkId" parameterClass="map">
+	<![CDATA[ update BASE_DELIVER_ADDR 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      CHANN_ID = #CHANN_ID:VARCHAR#
+    ]]>
+</delete>
+
+<delete id="stopChild" parameterClass="map">
+	<![CDATA[ update BASE_DELIVER_ADDR 
+	               set STATE = #STATE#	 
+ 	  where 
+	      DELIVER_ADDR_ID in ($DELIVER_ADDR_IDS$)
+    ]]>
+</delete>
+
+<select id="countAddrNo" parameterClass="map" resultClass="int">
+	<![CDATA[
+	  select count(0) from BASE_DELIVER_ADDR where CHANN_ID=#CHANN_ID# 
+	  and DELIVER_ADDR_NO in ($DELIVER_ADDR_NOS$) and DEL_FLAG=0
+	]]>
+	<isNotEmpty prepend=" and " property="DELIVER_ADDR_IDS">
+	  DELIVER_ADDR_ID not in($DELIVER_ADDR_IDS$)
+    </isNotEmpty>
+</select>
+
+
+<!-- 根据渠道id获取渠道折扣 -->
+<select id="getChannDsct" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+		select b.DECT_RATE
+		  from BASE_CHANN a
+		  left join BASE_CHANN_DSCT b on a.CHANN_ID = b.CHANN_ID
+		 where (case when NVL(a.PUNISH_FLAG, 0) != 1 then #nrlDsct# else #punDsct# end) = b.DECT_TYPE
+		   and a.CHANN_ID = #CHANN_ID#
+	]]>
+</select>
+
+
+
+<select id="getChannRebateDsct" resultClass="java.util.HashMap" parameterClass="map">
+	<![CDATA[
+		select NVL(b.DECT_RATE,0) DECT_RATE,
+			NVL(a.REBATE_TOTAL,0) REBATE_TOTAL,
+			NVL(a.REBATE_CURRT,0) REBATE_CURRT,
+			NVL(a.REBATE_USED,0) REBATE_USED,
+			NVL(a.REBATE_FREEZE,0) REBATE_FREEZE
+		  from BASE_CHANN a
+		  left join BASE_CHANN_DSCT b on a.CHANN_ID = b.CHANN_ID
+		 where #DSCTTYPE# = b.DECT_TYPE
+		   and a.CHANN_ID = #CHANN_ID#
+	]]>
+</select>
+	<update id="updateRebateByIds" parameterClass="map">
+		 <![CDATA[ UPDATE BASE_CHANN b
+   set b.REBATE_TOTAL = NVL(b.REBATE_TOTAL, 0) + NVL(#SET_REBATE#, 0) * #DESCON#,
+       b.REBATE_CURRT = NVL(b.REBATE_CURRT, 0) + NVL(#SET_REBATE#, 0) * #DESCON#
+   WHERE b.CHANN_ID in ($CHANN_NOS$) ]]>
+	</update>
+
+<update id="upZTXX" parameterClass="map">
+	<![CDATA[ update T_SYS_ZTXX ]]>
+	<dynamic prepend="set">
+			<isNotNull property="CHANN_NAME" prepend=","><![CDATA[ZTMC = #CHANN_NAME#]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+	</dynamic>
+	<![CDATA[ where ZTXXID=#CHANN_ID# and DELFLAG=0 ]]>
+</update>
+
+<update id="upJGXX" parameterClass="map">
+	<![CDATA[ update T_SYS_JGXX ]]>
+	<dynamic prepend="set">
+			<isNotNull property="CHANN_NAME" prepend=","><![CDATA[JGMC = #CHANN_NAME#]]></isNotNull>
+			<isNotNull property="CHANN_NAME" prepend=","><![CDATA[JGJC = #CHANN_NAME#]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[JGZT = #STATE#]]></isNotNull>
+	</dynamic>
+	 <![CDATA[ where JGXXID=#CHANN_ID# and DELFLAG=0 ]]>
+</update>
+
+<update id="upBMXX" parameterClass="map">
+	<![CDATA[ update T_SYS_BMXX  ]]>
+	<dynamic prepend="set">
+			<isNotNull property="CHANN_NAME" prepend=","><![CDATA[BMMC = #CHANN_NAME#]]></isNotNull>
+			<isNotNull property="CHANN_NAME" prepend=","><![CDATA[BMJC = #CHANN_NAME#]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[BMZT = #STATE#]]></isNotNull>
+	</dynamic>
+	<![CDATA[ where BMXXID=#CHANN_ID# and DELFLAG=0 ]]>
+</update>
+
+<update id="upTerminal" parameterClass="map">
+	<![CDATA[ update BASE_TERMINAL  ]]>
+	<dynamic prepend="set">
+			<isNotNull property="AREA_ID" prepend=","><![CDATA[AREA_ID = #AREA_ID#]]></isNotNull>
+			<isNotNull property="AREA_NO" prepend=","><![CDATA[AREA_NO = #AREA_NO#]]></isNotNull>
+			<isNotNull property="AREA_NAME" prepend=","><![CDATA[AREA_NAME = #AREA_NAME#]]></isNotNull>
+			<isNotNull property="ZONE_ID" prepend=","><![CDATA[ZONE_ID = #ZONE_ID#]]></isNotNull>
+			<isNotNull property="NATION" prepend=","><![CDATA[NATION = #NATION#]]></isNotNull>
+			<isNotNull property="PROV" prepend=","><![CDATA[PROV = #PROV#]]></isNotNull>
+			<isNotNull property="CITY" prepend=","><![CDATA[CITY = #CITY#]]></isNotNull>
+			<isNotNull property="COUNTY" prepend=","><![CDATA[COUNTY = #COUNTY#]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+	</dynamic>
+	<![CDATA[ where CHANN_ID_P=#CHANN_ID# and DEL_FLAG=0 ]]>
+</update>
+<update id="upTerminalByChannIds" parameterClass="map">
+	<![CDATA[ update BASE_TERMINAL  ]]>
+	<dynamic prepend="set">
+			<isNotNull property="AREA_ID" prepend=","><![CDATA[AREA_ID = #AREA_ID#]]></isNotNull>
+			<isNotNull property="AREA_NO" prepend=","><![CDATA[AREA_NO = #AREA_NO#]]></isNotNull>
+			<isNotNull property="AREA_NAME" prepend=","><![CDATA[AREA_NAME = #AREA_NAME#]]></isNotNull>
+	</dynamic>
+	<![CDATA[ where CHANN_ID_P in ($CHANN_IDS$) and DEL_FLAG=0 ]]>
+</update>
+<!-- 报表销售订单出货明细用 -->
+<select id="queryChannInfo" resultClass="java.util.HashMap" parameterClass="string">
+	select a.CHANN_ID,a.CHANN_NO,a.CHANN_NAME,a.SHIP_POINT_NAME,a.SHIP_POINT_ID,a.SHIP_POINT_NO,b.AREA_NO_P,b.AREA_NAME_P,b.AREA_ID_P 
+	from BASE_CHANN a 
+	left join BASE_AREA b on a.AREA_ID=b.AREA_ID and b.DEL_FLAG=0
+	where a.CHANN_ID=#CHANN_ID# and a.DEL_FLAG=0
+</select>
+<select id="chargQuery" parameterClass="string" resultClass="java.util.HashMap">
+	select c.RYBH,c.XM
+	from BASE_USER_CHANN_CHRG a
+	left join T_SYS_XTYH b on a.USER_ID=b.XTYHID
+	left join T_SYS_RYXX c on b.RYXXID=c.RYXXID
+	where CHANN_ID=#CHANN_ID#
+	group by c.RYBH,c.XM
+</select>
+<select id="qryChannExp" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[
+				select CHANN_ID,
+			       CHANN_NO,
+			       CHANN_NAME,
+			       CHANN_ABBR,
+			       CHANN_TYPE,
+			       CHAA_LVL,
+			       CHANN_ID_P,
+			       CHANN_NO_P,
+			       CHANN_NAME_P,
+			       AREA_ID,
+			       AREA_NO,
+			       AREA_NAME,
+			       ZONE_ID,
+			       NATION,
+			       PROV,
+			       CITY,
+			       COUNTY,
+			       CITY_TYPE,
+			       PERSON_CON,
+			       TEL,
+			       MOBILE,
+			       TAX,
+			       POST,
+			       ADDRESS,
+			       EMAIL,
+			       WEB,
+			       LEGAL_REPRE,
+			       BUSS_LIC,
+			       AX_BURDEN,
+			       ORG_CODE_CERT,
+			       BUSS_NATRUE,
+			       BUSS_SCOPE,
+			       VAT_NO,
+			       INVOICE_TI,
+			       INVOICE_ADDR,
+			       BANK_NAME,
+			       BANK_ACCT,
+			       FI_CMP_NO,
+			       DEPOSIT,
+			       DEBT_DEF,
+			       PRICE_CLAUSE,
+			       BUSS_LIC_ATT,
+			       TAX_BURDEN_ATT,
+			       ORG_CERT_ATT,
+			       REMARK,
+			       CREATOR,
+				   CRE_NAME,
+				   to_char(CRE_TIME,'yyyy-MM-DD HH24:MI:SS')CRE_TIME,
+				   UPDATOR,
+				   UPD_NAME,
+				   to_char(UPD_TIME,'yyyy-MM-DD HH24:MI:SS')UPD_TIME,
+				   DEPT_ID,
+				   DEPT_NAME,
+				   ORG_ID,
+				   ORG_NAME,
+			       REBATE_TOTAL,
+			       REBATE_YEAR,
+			       REBATE_CURRT,
+			       REBATE_USED,
+			       REBATE_FREEZE,
+			       CREDIT_CURRT,
+			       CREDIT_USED,
+			       TEMP_CREDIT,
+			       TEMP_CREDIT_VALDT,
+			       PAY_RATE,
+			       CREDIT_CRE_NAME,
+			       to_char(CREDIT_CRE_TIME,'yyyy-MM-DD HH24:MI:SS')CREDIT_CRE_TIME,
+			       REBATE_UPD_NAME,
+			       to_char(REBATE_UPD_TIME,'yyyy-MM-DD HH24:MI:SS')REBATE_UPD_TIME,
+			       IS_BASE_FLAG,
+			       SHIP_POINT_NO,
+			       SHIP_POINT_ID,
+			       SHIP_POINT_NAME,
+			       AREA_SER_ID,
+			       AREA_SER_NO,
+			       AREA_SER_NAME,
+			       (case when NVL(PUNISH_FLAG,0)>0 then '是' else '否' end)PUNISH_FLAG,
+			       PUNISH_REMARK,
+			       DEAL_PSON_ID,
+			       DEAL_PSON_NAME,
+			       DEAL_TIME,
+			       TERM_DECT_CTR_FLAG,
+			       INI_CREDIT,
+			       FREEZE_CREDIT,
+			       PAYMENT_CREDIT,
+			       JOIN_DATE,
+			       MAX_FREEZE_DAYS,
+			       OLD_CHANN_NO,
+			       AREA_MANAGE_ID,
+			       AREA_MANAGE_NAME,
+			       AREA_MANAGE_TEL,
+			       CHAA_SALE_LVL,
+			       TAX_RATE,
+			       COST_TYPE,
+			       INIT_YEAR,
+			       INIT_MONTH,
+			       STATE
+			  from BASE_CHANN c
+				]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+</select>
+
+<select id="queryChannByparams" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+	     select 
+	       u.CHANN_ID,
+	       u.CHANN_NO,
+	       u.CHANN_NAME,
+	       u.CHANN_TYPE,
+	       u.CHAA_LVL,
+	       u.CHANN_NAME_P,
+	       u.AREA_NO,
+	       u.AREA_NAME,
+	       u.CRE_NAME,
+	       u.CRE_TIME,
+	       u.DEPT_NAME,
+	       u.STATE,
+	       u.AREA_MANAGE_NAME,
+	       u.SHIP_POINT_NAME,
+	       u.SHIP_POINT_NO,
+	       u.SHIP_POINT_ID,
+	       u.AREA_SER_NAME,
+	       u.AREA_SER_NO,
+	       u.AREA_SER_ID,
+	       u.AREA_ID,
+	       u.AREA_NO,
+	       u.AREA_NAME
+		   FROM BASE_CHANN u
+	]]> 
+	<![CDATA[  where 1=1   ]]>
+	<isNotEmpty prepend="and" property="AREA_NO">
+		<![CDATA[u.AREA_NO = #AREA_NO# ]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="AREA_NAME">
+		<![CDATA[u.AREA_NAME like '%'|| #AREA_NAME# ||'%']]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="CHANN_NO">
+		<![CDATA[u.CHANN_NO like '%'|| #CHANN_NO# ||'%' ]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="CHANN_NAME">
+		<![CDATA[u.CHANN_NAME like '%'|| #CHANN_NAME#||'%' ]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="searchFlag">
+		<![CDATA[$searchFlag$]]>
+	</isNotEmpty>
+	<isNotEmpty prepend=" " property="sql">
+		<![CDATA[$sql$]]>
+	</isNotEmpty>
+	
+ </select>
+ 
+<update id="batchUpdateStoreIn" parameterClass="map">
+	<![CDATA[ update BASE_CHANN ]]>
+	<dynamic prepend="set">
+    <isNotEmpty property="IS_UPDATE_STOREIN_FLAG" prepend=","><![CDATA[IS_UPDATE_STOREIN_FLAG = #IS_UPDATE_STOREIN_FLAG# ]]></isNotEmpty>
+    </dynamic>
+	<![CDATA[ where CHANN_ID in ($CHANN_IDS$)]]>
+</update>
+ 
+<update id="batchUpdate" parameterClass="map">
+	<![CDATA[ update BASE_CHANN 
+	   set AREA_MANAGE_ID = #AREA_MANAGE_ID#,
+	       AREA_MANAGE_NAME=#AREA_MANAGE_NAME#,
+	       AREA_MANAGE_TEL=#AREA_MANAGE_TEL#
+	       where CHANN_ID = #CHANN_ID#
+	]]>
+</update>
+
+<update id="batchUpdateChann_1" parameterClass="map">
+	<![CDATA[ update BASE_CHANN ]]>
+	<dynamic prepend="set">
+    <isNotEmpty property="AREA_MANAGE_ID" prepend=","><![CDATA[AREA_MANAGE_ID = #AREA_MANAGE_ID# ]]></isNotEmpty>
+    <isNotEmpty property="AREA_MANAGE_NAME" prepend=","><![CDATA[AREA_MANAGE_NAME = #AREA_MANAGE_NAME# ]]></isNotEmpty>
+    <isNotEmpty property="AREA_MANAGE_TEL" prepend=","><![CDATA[AREA_MANAGE_TEL = #AREA_MANAGE_TEL# ]]></isNotEmpty>
+    </dynamic>
+	<![CDATA[ where CHANN_ID in ($CHANN_IDS$)]]>
+</update>
+
+<update id="batchUpdateChann_2" parameterClass="map">
+	<![CDATA[ update BASE_CHANN ]]>
+	<dynamic prepend="set">
+    <isNotEmpty property="AREA_ID" prepend=","><![CDATA[AREA_ID = #AREA_ID# ]]></isNotEmpty>
+    <isNotEmpty property="AREA_NO" prepend=","><![CDATA[AREA_NO = #AREA_NO# ]]></isNotEmpty>
+    <isNotEmpty property="AREA_NAME" prepend=","><![CDATA[AREA_NAME = #AREA_NAME# ]]></isNotEmpty>
+    </dynamic>
+	<![CDATA[ where CHANN_ID in ($CHANN_IDS$)]]>
+</update>
+
+<update id="batchUpdateChann_3" parameterClass="map">
+	<![CDATA[ update BASE_CHANN ]]>
+	<dynamic prepend="set">
+    <isNotEmpty property="SHIP_POINT_NO" prepend=","><![CDATA[SHIP_POINT_NO = #SHIP_POINT_NO# ]]></isNotEmpty>
+    <isNotEmpty property="SHIP_POINT_ID" prepend=","><![CDATA[SHIP_POINT_ID = #SHIP_POINT_ID# ]]></isNotEmpty>
+    <isNotEmpty property="SHIP_POINT_NAME" prepend=","><![CDATA[SHIP_POINT_NAME = #SHIP_POINT_NAME# ]]></isNotEmpty>
+    </dynamic>
+	<![CDATA[ where CHANN_ID in ($CHANN_IDS$)]]>
+</update>
+<update id="batchUpdateChann_4" parameterClass="map">
+	<![CDATA[ update BASE_CHANN ]]>
+	<dynamic prepend="set">
+    <isNotEmpty property="AREA_SER_ID" prepend=","><![CDATA[AREA_SER_ID = #AREA_SER_ID# ]]></isNotEmpty>
+    <isNotEmpty property="AREA_SER_NO" prepend=","><![CDATA[AREA_SER_NO = #AREA_SER_NO# ]]></isNotEmpty>
+    <isNotEmpty property="AREA_SER_NAME" prepend=","><![CDATA[AREA_SER_NAME = #AREA_SER_NAME# ]]></isNotEmpty>
+    </dynamic>
+	<![CDATA[ where CHANN_ID in ($CHANN_IDS$)]]>
+</update>
+<select id="checkAddrCount" resultClass="string">
+	select a.DELIVER_ADDR_NO from BASE_DELIVER_ADDR a where a.DEL_FLAG=0
+	group by a.DELIVER_ADDR_NO
+	having count(a.DELIVER_ADDR_NO)>1
+</select>
+
+<select id="getStoreInCount" parameterClass="map"  resultClass="string">
+	select a.IS_UPDATE_STOREIN_FLAG 
+	       from BASE_CHANN a 
+	       where a.DEL_FLAG=0
+	       and a.CHANN_NO = #CHANN_NO#
+</select>
+
+<select id="getChannInfo" parameterClass="map" resultClass="ChannModel">
+	select c.CHANN_ID,
+           c.CHANN_NO,
+           c.CHANN_NAME,
+           c.AREA_ID,
+           c.AREA_NO,
+           c.AREA_NAME,
+           c.PERSON_CON,
+           c.MOBILE,
+           c.TEL,
+           c.ADDRESS,
+           c.ZONE_ID,
+           c.PROV,
+           c.CITY,
+           c.COUNTY,
+           c.AREA_MANAGE_ID,
+           c.AREA_MANAGE_NAME,
+           c.AREA_MANAGE_TEL,
+           c.DEL_FLAG,
+           c.STATE,
+           to_char(c.JOIN_DATE, 'yyyy-MM-DD') JOIN_DATE,
+           c.CHANN_TYPE,
+           a.AREA_ID_P,
+           a.AREA_NO_P,
+           a.AREA_NAME_P,
+           (select to_char(wmsys.wm_concat(u.TERM_NAME))
+           from BASE_TERMINAL u
+           where u.CHANN_ID_P = c.chann_id) TERM_NAMES
+	       from base_chann c
+	       left join BASE_AREA a on a.AREA_ID = c.AREA_ID
+           and a.del_flag = 0
+           where  c.STATE in( '启用') and c.DEL_FLAG='0' 
+           and c.CHANN_ID = #CHANN_ID#
+</select>
+
+<select id="getMkmCount" parameterClass="string" resultClass="int">
+  SELECT count(*)　from base_chann c where c.AREA_MANAGE_ID = #RYXXID#
+</select>
+	<select id="checkChannInfoIntact" parameterClass="string" resultClass="int">
+			select count(1)cnt
+			  from base_chann a
+			 where (a.AREA_MANAGE_NAME is null
+			    or a.AREA_MANAGE_TEL is null
+			    or a.AREA_NO is null
+			    or a.AREA_NAME is null)
+			    and a.CHANN_ID=#CHANN_ID#
+	</select>
+	<select id="getChannId" parameterClass="string" resultClass="string">
+		select CHANN_ID from BASE_CHANN where CHANN_NO=#CHANN_NO#
+	</select>
+</sqlMap>

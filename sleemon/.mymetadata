@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="sleemon"
+  id="myeclipse.1202968712015"
+  context-root="/sleemon"
+  j2ee-spec="1.4"
+  archive="sleemon.war">
+  <attributes>
+    <attribute name="webrootdir" value="/WebRoot" />
+  </attributes>
+</project-module>
+

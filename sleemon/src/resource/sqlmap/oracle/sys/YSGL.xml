@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Ysgl">
+	<!-- 
+	*@module 系统管理
+	*@func 样式管理
+	*@version 1.1
+	*@author wu_yalin
+	*  -->
+	
+	<typeAlias type="com.hoperun.sys.model.YsglModel"
+		alias="YsglModel" />
+
+	<!-- 使用ClwzcbtzdModel装载结果集 -->
+	<resultMap id="YsglModel" class="YsglModel">
+		<result column="SYSCSSID" property="SYSCSSID" />
+	</resultMap>
+	
+	<!-- 动态查询 and 列表分页 -->
+     <sql id="queryDynSql">
+        <isNotEmpty prepend="and" property="SYSCSSID">
+            u.SYSCSSID like '%$SYSCSSID$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="CSSMC">
+            u.CSSMC=#CSSMC#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="CSSKEY">
+            u.CSSKEY=#CSSKEY#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="CSSPATH">
+            u.CSSPATH like '%$CSSPATH$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="MRBJ">
+            u.MRBJ like '%$MRBJ$%'
+        </isNotEmpty>
+     </sql>
+	
+	<sql id="coreSql">
+		<![CDATA[ select u.* from T_SYS_SYSCSS u ]]>
+			<dynamic prepend="where">
+				<include refid="queryDynSql" />
+			</dynamic>
+	</sql>
+	
+	<!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="YsglModel">
+		<include refid="coreSql" />
+	</select>
+	
+	<!-- 查询是否有存在的记录 -->
+	<select id="queryOne" parameterClass="String"
+		resultClass="int">
+		<![CDATA[
+			select count(*) from T_SYS_XTYHCSS where XTYHID = #XTYHID#
+		]]>
+	</select>
+	
+	<!-- 查询csskey -->
+	<select id="loadString" parameterClass="String"
+		resultClass="String">
+		<![CDATA[
+			select b.csskey from T_SYS_XTYHCSS a left join T_SYS_SYSCSS b on a.syscssid = b.syscssid where XTYHID = #XTYHID#
+		]]>
+	</select>
+	
+	<!-- 新增 -->
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		insert into T_SYS_XTYHCSS (xtyhcssid,xtyhid,syscssid) values(#XTYHCSSID#,#XTYHID#,#SYSCSSID#)
+		]]>
+	</insert>
+	
+	
+	<!-- 修改 -->
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update T_SYS_XTYHCSS set SYSCSSID = #SYSCSSID# where XTYHID=#XTYHID#]]>
+		
+	</update>
+</sqlMap>
+

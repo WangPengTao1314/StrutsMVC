@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+  *@module 系统模块 
+  *@func 系统模块 
+  *@version 1.1
+  *@author zhuxw  
+ -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Sample">
+
+	<typeAlias type="com.hoperun.commons.sample.model.SampleTree" alias="sampleTree" />
+	
+<select id="queryTree" parameterClass="String" resultClass="com.hoperun.commons.sample.model.SampleTree">
+  <![CDATA[
+	select jgxxid id,jgbh||'('||jgmc||')' name ,sjjg pid from T_SYS_JGXX
+
+	]]>
+</select>
+
+<select id="queryTreeAsyncInit" parameterClass="String" resultClass="com.hoperun.commons.sample.model.SampleTree">
+  <![CDATA[
+	 select jgxxid id,jgbh||'('||jgmc||')' name ,sjjg pid,(select 'true' from T_SYS_JGXX where sjjg = t.jgxxid and rownum < 2)  isParent    
+ 	 from T_SYS_JGXX t where sjjg is null or sjjg = ''
+	]]>
+</select>
+
+<select id="queryTreeAsync" parameterClass="String" resultClass="com.hoperun.commons.sample.model.SampleTree">
+  <![CDATA[
+		 select jgxxid id,jgbh||'('||jgmc||')' name ,sjjg pid,(select 'true' from T_SYS_JGXX where sjjg = t.jgxxid and rownum < 2)  isParent    
+	 	 from T_SYS_JGXX t where sjjg = #sjjg#
+	]]>
+</select>
+<!-- 
+	start with (sjjg is null or sjjg = '')
+	connect by prior jgxxid=sjjg
+ -->
+</sqlMap>
+

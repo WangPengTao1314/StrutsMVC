@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ * @module 渠道管理-分销商管理
+ * @function 加盟商终止合作申请
+ * @version 1.0
+ * @author gu_hongxiu
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="distributerEndReq">
+
+	<typeAlias type="com.hoperun.drp.distributer.distributerendreq.model.DistributerEndReqModel" alias="DistributerEndReqModel" />
+
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="DistributerEndReqModel" class="DistributerEndReqModel">
+		<result column="CHANN_END_REQ_ID" property="CHANN_END_REQ_ID" />
+	</resultMap>
+	
+	<!-- 动态查询 and 列表排序 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and " property="CHANN_END_REQ_NO">c.CHANN_END_REQ_NO like '%'||#CHANN_END_REQ_NO#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="CHANN_NO">c.CHANN_NO like '%'||#CHANN_NO#||'%'</isNotEmpty>
+    	<isNotEmpty prepend="and " property="CHANN_NAME">c.CHANN_NAME like '%'||#CHANN_NAME#||'%'</isNotEmpty>
+    	<isNotEmpty prepend="and " property="WAREA_NAME">c.WAREA_NAME=#WAREA_NAME#</isNotEmpty>
+    	<isNotEmpty prepend="and " property="AREA_MANAGE_NAME">c.AREA_MANAGE_NAME like '%'||#AREA_MANAGE_NAME#||'%'</isNotEmpty>
+    	<isNotEmpty prepend="and " property="PERSON_CON">c.PERSON_CON like '%'||#PERSON_CON#||'%'</isNotEmpty>
+    	<isNotEmpty prepend="and " property="BEGIN_CRE_TIME">c.CRE_TIME &gt;= to_date(#BEGIN_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')</isNotEmpty>
+		<isNotEmpty prepend="and " property="END_CRE_TIME">c.CRE_TIME &lt;= to_date(#END_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')</isNotEmpty>
+    	<isNotEmpty prepend="and " property="STATE">c.STATE=#STATE#</isNotEmpty>
+		<isNotEmpty prepend="and " property="DEL_FLAG"><![CDATA[c.DEL_FLAG=#DEL_FLAG#]]></isNotEmpty>
+	    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	   </isNotEmpty>
+	   <isNotEmpty prepend="" property="CHANNS_CHARG">
+          and   c.CHANN_ID in $CHANNS_CHARG$
+        </isNotEmpty>
+	</sql>
+    <sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField"> $orderField$</isNotEmpty>
+	</sql>
+	
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[
+				select CHANN_END_REQ_ID,
+					CHANN_END_REQ_NO,
+					to_char(REQ_DATE, 'yyyy-MM-DD HH24:MI:SS') REQ_DATE,
+					CHANN_ID,
+					CHANN_NO,
+					CHANN_NAME,
+					CHANN_TYPE,
+					to_char(JOIN_DATE, 'yyyy-MM-DD') JOIN_DATE,
+					CHANN_PERSON_CON,
+					CHANN_MOBILE,
+					PERSON_CON,
+					TEL,
+					MOBILE,
+					WAREA_ID ,
+					WAREA_NO,
+					WAREA_NAME ,
+					AREA_MANAGE_ID ,
+					AREA_MANAGE_NAME ,
+					AREA_MANAGE_TEL ,
+					TERM_NAMES,
+					DEPOSIT,
+					DEPOSIT_CONFIRM,
+					LEFT_ACCT_AMOUNT,
+					LEFT_ACCT_AMOUNT_CONFIRM,
+					RETURN_AMOUNT,
+					RETURN_AMOUNT_CONFIRM,
+					RETURN_ATT,
+					END_RESON,
+					REMARK,    
+					STATE,
+					CREATOR,
+					CRE_NAME,
+					to_char(CRE_TIME, 'yyyy-MM-DD HH24:MI:SS') CRE_TIME,					
+					TAX
+			       from ERP_DISTRIBUTOR_END_REQ c			       			       	       
+				]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>	
+	
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(CHANN_END_REQ_ID) cnt FROM ${SYSSCHEMA}.ERP_DISTRIBUTOR_END_REQ c ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+
+   <!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	<!-- 根据ID查找 -->	
+	<select id="loadById" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+				select 
+				    CHANN_END_REQ_ID,
+					CHANN_END_REQ_NO,
+					to_char(REQ_DATE, 'yyyy-MM-DD HH24:MI:SS') REQ_DATE,
+					CHANN_ID,
+					CHANN_NO,
+					CHANN_NAME,
+					CHANN_TYPE,
+					to_char(JOIN_DATE, 'yyyy-MM-DD') JOIN_DATE,
+					CHANN_PERSON_CON,
+					CHANN_MOBILE,
+					PERSON_CON,
+					TEL,
+					MOBILE,
+					WAREA_ID ,
+					WAREA_NO,
+					WAREA_NAME ,
+					AREA_MANAGE_ID ,
+					AREA_MANAGE_NAME ,
+					AREA_MANAGE_TEL ,
+					TERM_NAMES,
+					DEPOSIT,
+					DEPOSIT_CONFIRM,
+					LEFT_ACCT_AMOUNT,
+					LEFT_ACCT_AMOUNT_CONFIRM,
+					RETURN_AMOUNT,
+					RETURN_AMOUNT_CONFIRM,
+					RETURN_ATT,
+					END_RESON,
+					REMARK,    
+					STATE,
+					CREATOR,
+					CRE_NAME,
+					to_char(CRE_TIME, 'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+					UPDATOR,
+					UPD_NAME,
+					to_char(UPD_TIME, 'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+					DEPT_ID,
+					DEPT_NAME,
+					ORG_ID,
+					ORG_NAME,
+					LEDGER_ID,
+					LEDGER_NAME,
+					TAX
+				from ${SYSSCHEMA}.ERP_DISTRIBUTOR_END_REQ c where c.CHANN_END_REQ_ID = #CHANN_END_REQ_ID# and DEL_FLAG=0
+		]]>
+	</select>
+		
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.ERP_DISTRIBUTOR_END_REQ(
+		 	CHANN_END_REQ_ID,CHANN_END_REQ_NO,REQ_DATE,CHANN_ID,CHANN_NO,CHANN_NAME,CHANN_TYPE,JOIN_DATE,CHANN_PERSON_CON,CHANN_MOBILE,
+			PERSON_CON,TEL,MOBILE,WAREA_ID,WAREA_NO,WAREA_NAME,AREA_MANAGE_ID,AREA_MANAGE_NAME,AREA_MANAGE_TEL,TERM_NAMES,
+			DEPOSIT,DEPOSIT_CONFIRM,LEFT_ACCT_AMOUNT,LEFT_ACCT_AMOUNT_CONFIRM,RETURN_AMOUNT,RETURN_AMOUNT_CONFIRM,RETURN_ATT,END_RESON,
+			REMARK,STATE,CREATOR,CRE_NAME,CRE_TIME,DEPT_ID,DEPT_NAME,ORG_ID,ORG_NAME,LEDGER_ID,LEDGER_NAME,DEL_FLAG
+		 	)
+		 values(		 	
+			#CHANN_END_REQ_ID#,#CHANN_END_REQ_NO#,sysdate,#CHANN_ID#,#CHANN_NO#,#CHANN_NAME#,#CHANN_TYPE#,to_date(#JOIN_DATE#,'yyyy-MM-DD'),#CHANN_PERSON_CON#,#CHANN_MOBILE#,
+			#PERSON_CON#,#TEL#,#MOBILE#,#WAREA_ID#,#WAREA_NO#,#WAREA_NAME#,#AREA_MANAGE_ID#,#AREA_MANAGE_NAME#,#AREA_MANAGE_TEL#,#TERM_NAMES#,
+			#DEPOSIT#,#DEPOSIT_CONFIRM#,#LEFT_ACCT_AMOUNT#,#LEFT_ACCT_AMOUNT_CONFIRM#,#RETURN_AMOUNT#,#RETURN_AMOUNT_CONFIRM#,#RETURN_ATT#,#END_RESON#,
+			#REMARK#,#STATE#,#CREATOR#,#CRE_NAME#,sysdate,#DEPT_ID#,#DEPT_NAME#,#ORG_ID#,#ORG_NAME#,#LEDGER_ID#,#LEDGER_NAME#,#DEL_FLAG#			
+		 )
+		]]>
+	</insert>
+	
+	<update id="updateById" parameterClass="map">
+		 <![CDATA[ update ${SYSSCHEMA}.ERP_DISTRIBUTOR_END_REQ ]]>
+		<dynamic prepend="set">
+			<isNotNull property="CHANN_ID" prepend=","><![CDATA[CHANN_ID = #CHANN_ID#]]></isNotNull>
+			<isNotNull property="CHANN_NO" prepend=","><![CDATA[CHANN_NO = #CHANN_NO#]]></isNotNull>
+			<isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME#]]></isNotNull>
+			<isNotNull property="CHANN_TYPE" prepend=","><![CDATA[CHANN_TYPE = #CHANN_TYPE#]]></isNotNull>
+			<isNotNull property="JOIN_DATE" prepend=","><![CDATA[JOIN_DATE = to_date(#JOIN_DATE#,'yyyy-MM-DD')]]></isNotNull>
+			<isNotNull property="CHANN_PERSON_CON" prepend=","><![CDATA[CHANN_PERSON_CON = #CHANN_PERSON_CON#]]></isNotNull>
+			<isNotNull property="CHANN_MOBILE" prepend=","><![CDATA[CHANN_MOBILE = #CHANN_MOBILE#]]></isNotNull>
+			<isNotNull property="PERSON_CON" prepend=","><![CDATA[PERSON_CON = #PERSON_CON#]]></isNotNull>
+			<isNotNull property="TEL" prepend=","><![CDATA[TEL = #TEL#]]></isNotNull>
+			<isNotNull property="MOBILE" prepend=","><![CDATA[MOBILE = #MOBILE#]]></isNotNull>
+			<isNotNull property="WAREA_ID" prepend=","><![CDATA[WAREA_ID = #WAREA_ID#]]></isNotNull>
+			<isNotNull property="WAREA_NO" prepend=","><![CDATA[WAREA_NO = #WAREA_NO#]]></isNotNull>
+			<isNotNull property="WAREA_NAME" prepend=","><![CDATA[WAREA_NAME = #WAREA_NAME#]]></isNotNull>
+			<isNotNull property="AREA_MANAGE_ID" prepend=","><![CDATA[AREA_MANAGE_ID = #AREA_MANAGE_ID#]]></isNotNull>
+			<isNotNull property="AREA_MANAGE_NAME" prepend=","><![CDATA[AREA_MANAGE_NAME = #AREA_MANAGE_NAME#]]></isNotNull>
+			<isNotNull property="AREA_MANAGE_TEL" prepend=","><![CDATA[AREA_MANAGE_TEL = #AREA_MANAGE_TEL#]]></isNotNull>
+			<isNotNull property="TERM_NAMES" prepend=","><![CDATA[TERM_NAMES = #TERM_NAMES#]]></isNotNull>
+			<isNotNull property="DEPOSIT" prepend=","><![CDATA[DEPOSIT = #DEPOSIT#]]></isNotNull>
+			<isNotNull property="DEPOSIT_CONFIRM" prepend=","><![CDATA[DEPOSIT_CONFIRM = #DEPOSIT_CONFIRM#]]></isNotNull>
+			<isNotNull property="LEFT_ACCT_AMOUNT" prepend=","><![CDATA[LEFT_ACCT_AMOUNT = #LEFT_ACCT_AMOUNT#]]></isNotNull>
+			<isNotNull property="LEFT_ACCT_AMOUNT_CONFIRM" prepend=","><![CDATA[LEFT_ACCT_AMOUNT_CONFIRM = #LEFT_ACCT_AMOUNT_CONFIRM#]]></isNotNull>
+			<isNotNull property="RETURN_AMOUNT_CONFIRM" prepend=","><![CDATA[RETURN_AMOUNT_CONFIRM = #RETURN_AMOUNT_CONFIRM#]]></isNotNull>
+			<isNotNull property="RETURN_ATT" prepend=","><![CDATA[RETURN_ATT = #RETURN_ATT#]]></isNotNull>
+			<isNotNull property="END_RESON" prepend=","><![CDATA[END_RESON = #END_RESON#]]></isNotNull>
+						
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where CHANN_END_REQ_ID = #CHANN_END_REQ_ID# ]]>
+	</update>
+	
+	<update id="delete" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.ERP_DISTRIBUTOR_END_REQ ]]>
+		<dynamic prepend="set">
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where CHANN_END_REQ_ID = #CHANN_END_REQ_ID# ]]>
+	</update>
+	
+	<!-- 停用渠道的分销商 -->	
+	<update id="upDISTRIBUTOR" parameterClass="map">	
+		<![CDATA[ update ${SYSSCHEMA}.BASE_DISTRIBUTOR ]]>
+		<dynamic prepend="set">
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME =sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where CHANN_ID = #CHANN_ID# ]]>	
+	</update>
+	
+	<update id="upRYXX" parameterClass="map">
+		<![CDATA[ update T_SYS_RYXX  ]]>
+		<dynamic prepend="set">
+				<isNotNull property="STATE" prepend=","><![CDATA[RYZT = #STATE#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where JGXXID=#CHANN_ID# and DELFLAG=0 ]]>
+	</update>
+	<update id="upXTYH" parameterClass="map">
+		<![CDATA[ update T_SYS_XTYH  ]]>
+		<dynamic prepend="set">
+				<isNotNull property="STATE" prepend=","><![CDATA[YHZT = #STATE#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where JGXXID=#CHANN_ID# and DELFLAG=0 ]]>
+	</update>
+	<update id="upXTYHJS" parameterClass="map">
+		<![CDATA[ update T_SYS_XTYHJS j ]]>
+		<dynamic prepend="set">
+				<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where j.XTYHID in (select u.XTYHID from T_SYS_XTYH u where u.JGXXID=#CHANN_ID#) ]]>
+	</update>
+	
+		
+	<select id="queryZW" parameterClass="map" resultClass="int">
+		      SELECT  count(*)
+                  FROM T_SYS_GZZCY U
+                  LEFT JOIN T_SYS_XTYH T
+                  ON U.XTYHID = T.XTYHID
+                  left join T_SYS_RYXX a
+                  on a.RYXXID = t.RYXXID
+                  and a.DELFLAG = 0
+                  where u.DELFLAG = 0
+                  and u.GZZXXID =  #GZZXXID#
+		          and t.RYXXID = #RYXXID#
+    </select>
+    
+    <select id="queryGZZXXID" parameterClass="map" resultClass="String">
+    <![CDATA[ 
+	   select distinct u.GZZXXID
+			  from T_SYS_GZZXX u
+			  left join (select a.Gzzxxid, b.YHBH, b.YHM
+              from T_SYS_GZZCY a
+              left join T_SYS_XTYH b
+              on a.xtyhid = b.xtyhid
+              and b.delflag = 0
+              where a.delflag = 0
+              order by a.xtyhid) c
+              on u.Gzzxxid = c.Gzzxxid
+              WHERE u.GZZMC LIKE '%财务%'
+	]]>
+   </select>
+
+</sqlMap>

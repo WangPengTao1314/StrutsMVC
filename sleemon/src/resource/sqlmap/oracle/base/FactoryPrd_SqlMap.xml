@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="FACTORY_PRD">
+
+	<!-- 
+		*@module 系统管理
+		*@func 生产基地维护
+		*@version 1.0
+		*@author 王志格
+		*  -->
+	<typeAlias type="com.hoperun.base.factory.model.FactoryProductModel" alias="FactoryProductModel" />
+	
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="FACTORY_PRD_ID">
+			FACTORY_PRD_ID = #FACTORY_PRD_ID#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="FACTORY_ID">
+			FACTORY_ID = #FACTORY_ID#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="PRD_ID">
+			PRD_ID = #PRD_ID#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="PRD_NO">
+			PRD_NO = #PRD_NO#
+		</isNotEmpty>	
+		<isNotEmpty prepend="and" property="DEL_FLAG">
+			DEL_FLAG = #DEL_FLAG#
+		</isNotEmpty>	
+		<isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+		</isNotEmpty>	
+	</sql>
+	
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField">
+			$orderField$,
+		</isNotEmpty>
+		PRD_ID
+	</sql>
+	
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[  SELECT  FACTORY_PRD_ID,FACTORY_ID,PRD_ID,PRD_NO,PRD_NAME,BRAND
+  					FROM ${SYSSCHEMA}.BASE_FACTORY_PRD 
+		                ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+	
+	<!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="FactoryProductModel">
+		<include refid="coreSql" />
+	</select>
+	
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(1) cnt FROM ${SYSSCHEMA}.BASE_FACTORY_PRD ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+	
+	<!-- 新增 -->
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into  ${SYSSCHEMA}.BASE_FACTORY_PRD( FACTORY_PRD_ID,FACTORY_ID,PRD_ID,PRD_NO,PRD_NAME,BRAND,DEL_FLAG )
+		 values(#FACTORY_PRD_ID#,#FACTORY_ID#,#PRD_ID#,#PRD_NO#,#PRD_NAME#,#BRAND#,0 )
+		]]>
+	</insert>
+	
+	<!-- 根据ID修改 -->
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.BASE_FACTORY_PRD ]]>
+		<dynamic prepend="set">
+			<isNotNull property="FACTORY_ID" prepend=","><![CDATA[FACTORY_ID = #FACTORY_ID#]]></isNotNull>
+			<isNotNull property="PRD_ID" prepend=","><![CDATA[PRD_ID = #PRD_ID#]]></isNotNull>
+			<isNotNull property="PRD_NO" prepend=","><![CDATA[PRD_NO = #PRD_NO#]]></isNotNull>
+			<isNotNull property="PRD_NAME" prepend=","><![CDATA[PRD_NAME = #PRD_NAME#]]></isNotNull>
+			<isNotNull property="BRAND" prepend=","><![CDATA[BRAND = #BRAND#]]></isNotNull>
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where FACTORY_PRD_ID = #FACTORY_PRD_ID# ]]>
+	</update>
+		
+	<select id="getExits" parameterClass="String" resultClass="int">
+		<![CDATA[ SELECT COUNT(1) FROM ${SYSSCHEMA}.BASE_FACTORY_PRD  where FACTORY_PRD_ID = #FACTORY_PRD_ID# ]]>
+	</select>
+	
+	<select id="loadByIds" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[  
+		 	SELECT  FACTORY_PRD_ID,FACTORY_ID,PRD_ID,PRD_NO,PRD_NAME,BRAND
+  			FROM ${SYSSCHEMA}.BASE_FACTORY_PRD 
+		    where FACTORY_PRD_ID in ($FACTORY_PRD_IDS$)]]>
+	</select>
+	
+	<update id="deleteByIds" parameterClass="String">
+		<![CDATA[ update ${SYSSCHEMA}.BASE_FACTORY_PRD ]]>
+		<!-- CHANAME, CHADES,CHADATE,CHASTU     -->
+		<dynamic prepend="set">
+			<isNotNull property="DEL_FLAG" prepend=",">
+				<![CDATA[DEL_FLAG = 1]]>
+			</isNotNull>
+		</dynamic>
+		<![CDATA[ where FACTORY_PRD_ID  in ($FACTORY_PRD_IDS$) ]]>
+	</update>
+	
+</sqlMap>

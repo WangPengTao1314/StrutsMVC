@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMapConfig      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+<sqlMapConfig>
+	<properties resource="conf.properties" />
+	<!--定义iBATIS自身应用信息-->
+	<settings cacheModelsEnabled="true" enhancementEnabled="true"
+		lazyLoadingEnabled="true" maxRequests="300" maxSessions="200"
+		maxTransactions="30" useStatementNamespaces="true" />
+	<!-- page 公共提取-->
+	<sqlMap resource="sqlmap/oracle/ibatis-page.xml" />
+	
+	<!-- 通用组件 仅做示例用，版本正式发布时删除 begin-->
+	<sqlMap resource="sqlmap/oracle/common/sample.xml" />
+	<sqlMap resource="sqlmap/oracle/sample/newmasterslave/NewCpbltzd.xml" />
+	<sqlMap resource="sqlmap/oracle/sample/newmasterslave/NewCpbltzdmx.xml" />
+	<sqlMap resource="sqlmap/oracle/sample/newsingtable/newsingtable.xml" />
+	<sqlMap resource="sqlmap/oracle/sample/grant/Grant_SqlMap.xml" />
+	<!-- 通用组件 仅做示例用，版本正式发布时删除 end-->
+
+	<!-- 系统管理相关-->
+    <sqlMap resource="sqlmap/oracle/sys/CUST_QUERY.xml" />
+	<sqlMap resource="sqlmap/oracle/common/sqlCom.xml" />
+	<sqlMap resource="sqlmap/oracle/sys/MenuInfo.xml" />
+	<sqlMap resource="sqlmap/oracle/sys/GZZCY.xml" />
+	<sqlMap resource="sqlmap/oracle/sys/XTYHJS.xml" />
+	<sqlMap resource="sqlmap/oracle/sys/XTYH.xml" />
+	<sqlMap resource="sqlmap/oracle/sys/XTJS.xml" />
+	<sqlMap resource="sqlmap/oracle/sys/GZZXX.xml" />
+	<sqlMap resource="sqlmap/oracle/sys/JGXX.xml" />	
+	<sqlMap resource="sqlmap/oracle/sys/BMXX.xml" />
+	<sqlMap resource="sqlmap/oracle/sys/ZTXX.xml" />
+	<sqlMap resource="sqlmap/oracle/sys/RYXX.xml" />
+	<sqlMap resource="sqlmap/oracle/sys/YSGL.xml" />
+	<sqlMap resource="sqlmap/oracle/sys/FLOW.xml" />
+	<sqlMap resource="sqlmap/oracle/sys/SJZD.xml" />
+	<sqlMap resource="sqlmap/oracle/sys/SJZDMX.xml" /> 
+    <sqlMap resource="sqlmap/oracle/sys/XTSQ.xml" />
+    <sqlMap resource="sqlmap/oracle/sys/XMSJZDWH_SqlMap.xml" />
+    
+	
+	
+	<!-- 个人工作计划 -->
+	<sqlMap resource="sqlmap/oracle/base/Grgzjh_SqlMap.xml" />
+	
+	<!-- 附件信息 -->
+	<sqlMap resource="sqlmap/oracle/base/Att_SqlMap.xml" />
+	
+	<!-- 品牌信息 -->
+	<sqlMap resource="sqlmap/oracle/base/Brand_SqlMap.xml" />
+    <!-- 生产基地维护 -->
+    <sqlMap resource="sqlmap/oracle/base/Factory_SqlMap.xml" />
+    <sqlMap resource="sqlmap/oracle/base/FactoryPrd_SqlMap.xml" />
+    <sqlMap resource="sqlmap/oracle/base/FactoryShip_SqlMap.xml" />
+    
+    <!-- 发货点维护 -->
+    <sqlMap resource="sqlmap/oracle/base/ShipPoint_SqlMap.xml" />
+    
+    <!-- 区域折扣信息 -->
+    <sqlMap resource="sqlmap/oracle/erp/sale/dsct/AreaDsct_SqlMap.xml" />
+    
+    <!--退货申请单维护-->
+	<sqlMap resource="sqlmap/oracle/drp/sale/prdreturnreq/Prdreturnreq_SqlMap.xml" />
+	
+	<!-- 退货单维护 -->
+	<sqlMap resource="sqlmap/oracle/erp/sale/prdreturn/Prdreturn_SqlMap.xml" />
+	
+	<!-- 我的退货单 -->
+	<sqlMap resource="sqlmap/oracle/drp/sale/myretrun/Myretrun_SqlMap.xml" />
+	
+	<!--入库差异确认-->
+	<sqlMap resource="sqlmap/oracle/drp/store/storediff/Storediff_SqlMap.xml" />
+    
+    <!-- 行政区划维护 -->
+    <sqlMap resource="sqlmap/oracle/base/zone.xml" />
+    <!-- 供应商信息 -->
+	<sqlMap resource="sqlmap/oracle/base/provider.xml" />
+    <!-- 单位维护 -->
+    <sqlMap resource="sqlmap/oracle/base/Unit_SqlMap.xml"/>
+    
+    <sqlMap resource="sqlmap/oracle/sys/Numformat.xml" />
+    <!-- 渠道信息 -->
+    <sqlMap resource="sqlmap/oracle/base/Chann_SqlMap.xml" />
+    <!-- 基础数据 规则维护-->
+	<sqlMap resource="sqlmap/oracle/sys/BMGZ.xml" />
+	<sqlMap resource="sqlmap/oracle/sys/BMGZMX.xml" />
+    <!-- 编码规则共通 -->
+	<sqlMap resource="sqlmap/oracle/common/sqlCommon.xml" />
+    <!--首页-短消息-->
+	<sqlMap resource="sqlmap/oracle/sys/Message.xml" />
+    <!-- 公告信息 -->
+	<sqlMap resource="sqlmap/oracle/sys/Notice.xml" />
+	<!-- Job控制器 -->
+	<sqlMap resource="sqlmap/oracle/sys/JOB.xml" />
+	<!-- 区域信息 -->
+	<sqlMap resource="sqlmap/oracle/base/Area_SqlMap.xml" />
+    <!-- 区域分管信息 -->
+	<sqlMap resource="sqlmap/oracle/base/AreaChrg_SqlMap.xml" />
+	<!-- 货品信息 -->
+	<sqlMap resource="sqlmap/oracle/base/Product_SqlMap.xml" />
+	<!-- 货品组信息 -->
+	<sqlMap resource="sqlmap/oracle/base/PrdGroup_SqlMap.xml" />
+	<!-- 路线信息 -->
+	<sqlMap resource="sqlmap/oracle/base/Haulway_SqlMap.xml" />
+	<!-- 终端信息 -->
+	<sqlMap resource="sqlmap/oracle/base/Terminal_SqlMap.xml" />
+	<!-- 物流供应商 -->
+	<sqlMap resource="sqlmap/oracle/base/Logicprvd_SqlMap.xml" />
+	<!-- 信用额度变更申请 -->
+	<sqlMap resource="sqlmap/oracle/erp/sale/creditreq/CreditReq_SqlMap.xml" />
+	<!-- 信用额度设定 -->
+    <sqlMap resource="sqlmap/oracle/erp/sale/credit/Credit_SqlMap.xml" />
+ 	<!-- 临时信用额度设定 -->
+    <sqlMap resource="sqlmap/oracle/erp/sale/tempcreditreq/TempCreditReq_SqlMap.xml" />
+    <!-- 预订单录入  lyg-->
+    <sqlMap resource="sqlmap/oracle/drp/sale/advcorder/Advcorder_SqlMap.xml" />
+    <!-- 分发指令接收 -->
+    <sqlMap resource="sqlmap/oracle/drp/sale/dstrorder/Dstrorder_SqlMap.xml" />
+    <!-- 库房库位信息 wdb -->
+    <sqlMap resource="sqlmap/oracle/drp/base/store/Store_SqlMap.xml" />
+    <!-- 客户付款单 -->
+    <sqlMap resource="sqlmap/oracle/erp/sale/payment/Payment_SqlMap.xml" />
+	<!-- 投诉与建议查询 -->
+	<sqlMap resource="sqlmap/oracle/drp/sale/advise/Advise_SqlMap.xml" />
+	<!-- 入库通知单维护 -->
+	<sqlMap resource="sqlmap/oracle/drp/store/storeinnotice/Storeinnotice_SqlMap.xml" />
+	<!-- 终端退货录入 -->
+	<sqlMap resource="sqlmap/oracle/drp/sale/termreturn/Termreturn_SqlMap.xml" />
+	<!-- 投诉与建议 -->
+	<sqlMap resource="sqlmap/oracle/drp/sale/adviseinit/Adviseinit_SqlMap.xml" />
+	<!-- 付款凭证上传 -->
+	<sqlMap resource="sqlmap/oracle/drp/sale/paymentup/Paymentup_SqlMap.xml" />
+	<!-- 投诉与建议处理 -->
+	<sqlMap resource="sqlmap/oracle/erp/sale/advisehd/Advisehd_SqlMap.xml" />
+	<!--推广促销方案-->
+    <sqlMap resource="sqlmap/oracle/erp/sale/prmtplan/Prmtplan_SqlMap.xml" />
+	<!--促销品发放-->
+    <sqlMap resource="sqlmap/oracle/erp/sale/prmtexit/Prmtexit_SqlMap.xml" />
+	<!-- 付款凭证确认 -->
+	<sqlMap resource="sqlmap/oracle/erp/sale/paymentcmt/Paymentcmt_SqlMap.xml" />
+	<!-- 分销业务一》人员信息 -->
+	<sqlMap resource="sqlmap/oracle/drp/base/employee/Employee_SqlMap.xml" />
+	<!--入库单处理-->
+	<sqlMap resource="sqlmap/oracle/drp/store/storein/Storein_SqlMap.xml" />
+	<!-- 预订单转订货  lyg-->
+    <sqlMap resource="sqlmap/oracle/drp/sale/advctoorder/Advctoorder_SqlMap.xml" />
+    <!-- 订货订单处理 -->
+	<sqlMap resource="sqlmap/oracle/erp/sale/goodsorder/Goodsorder_SqlMap.xml" />
+	<!-- 转储-->
+	<sqlMap resource="sqlmap/oracle/drp/store/dump/Dump_SqlMap.xml" />
+    <!--调拨申请维护/审核  -->
+    <sqlMap resource="sqlmap/oracle/drp/store/allocate/Allocate_SqlMap.xml" />
+    <!--盘点单维护/审核  -->
+    <sqlMap resource="sqlmap/oracle/drp/store/inventory/Inventory_SqlMap.xml" />
+    <!--库存储备  -->
+    <sqlMap resource="sqlmap/oracle/drp/base/resvstore/Resvstore_SqlMap.xml" />
+    <!-- 出库差异确认 -->
+    <sqlMap resource="sqlmap/oracle/erp/sale/storediffaff/Storediffaff_SqlMap.xml" />
+    <!--库存储备  -->
+    <sqlMap resource="sqlmap/oracle/drp/main/firpage/DrpFirpage_SqlMap.xml" />
+    <!--我要订货  -->
+    <sqlMap resource="sqlmap/oracle/drp/main/myorder/Myorder_SqlMap.xml" />
+    <!-- 订货订单维护 -->
+    <sqlMap resource="sqlmap/oracle/drp/sale/goodsorderhd/Goodsorderhd_SqlMap.xml" />
+    <!--销售出库处理  -->
+    <sqlMap resource="sqlmap/oracle/drp/store/storeout/Storeout_SqlMap.xml" />
+    <!--购物车  -->
+    <sqlMap resource="sqlmap/oracle/drp/main/shopcar/Shopcar_SqlMap.xml" />
+    
+    <!-- 整车计算  -->
+    <sqlMap resource="sqlmap/oracle/drp/main/carcalculate/Carcalculate_SqlMap.xml" />
+    <!-- 预订单发货  lyg-->
+    <sqlMap resource="sqlmap/oracle/drp/sale/advctoout/Advctoout_SqlMap.xml" />
+    <!-- 客户收款单 -->
+    <sqlMap resource="sqlmap/oracle/drp/finance/advpayment/Advpayment_SqlMap.xml" />
+    <!-- 客户退款单 -->
+    <sqlMap resource="sqlmap/oracle/drp/finance/custrefundments/CustRefundment_SqlMap.xml" />
+    
+    <!-- 预定单结算 -->
+    <sqlMap resource="sqlmap/oracle/drp/finance/preorderpayment/Preorderpayment_SqlMap.xml" />
+    <!-- 预订单退货 -->
+	<sqlMap resource="sqlmap/oracle/drp/sale/advcreturn/Advcreturn_SqlMap.xml" />
+	<!--标准订单-->
+    <sqlMap resource="sqlmap/oracle/erp/sale/saleorder/Saleorder_SqlMap.xml" />
+    
+    <!--非标订单-->
+    <sqlMap resource="sqlmap/oracle/erp/sale/saleordersp/Saleordersp_SqlMap.xml" />
+	
+	<!-- 客户退货结算 -->
+	<sqlMap resource="sqlmap/oracle/drp/finance/restatements/Restatements_SqlMap.xml" />
+	
+	<!--工艺单审核-->
+	<sqlMap resource="sqlmap/oracle/erp/sale/techorder/Techorder_SqlMap.xml" />
+	<!--工艺单核价-->
+	<sqlMap resource="sqlmap/oracle/erp/sale/techorderprice/TechorderPrice_SqlMap.xml" />
+	
+	<!--销售订单 审核-->
+    <sqlMap resource="sqlmap/oracle/erp/sale/saleorderrls/Saleorderrls_SqlMap.xml" />
+	<!-- 货品分类 -->
+	<sqlMap resource="sqlmap/oracle/base/Pdtmenu_SqlMap.xml" />
+	
+	<!-- 预订单核销 -->
+	<sqlMap resource="sqlmap/oracle/drp/finance/advcverify/Advcverify_SqlMap.xml" />
+	<!--工艺单维护-->
+	<sqlMap resource="sqlmap/oracle/erp/sale/techordershow/TechorderShow_SqlMap.xml" />
+	<!--制定交付计划-->
+	<sqlMap resource="sqlmap/oracle/erp/sale/turnoverplan/Turnoverplan_SqlMap.xml" />
+	
+	<!--渠道惩罚设定-->
+	<sqlMap resource="sqlmap/oracle/erp/sale/channpunish/Channpunish_SqlMap.xml" />
+	
+	 <!-- 预订单录入  lyg-->
+    <sqlMap resource="sqlmap/oracle/drp/sale/advccheckprice/Advccheckprice_SqlMap.xml" />
+
+    <!-- 退货单财务核价  lyg-->
+    <sqlMap resource="sqlmap/oracle/erp/sale/prdreturnfin/Prdreturnfin_SqlMap.xml" />
+
+    <!--交付计划维护-->
+	<sqlMap resource="sqlmap/oracle/erp/sale/turnoverhd/Turnoverhd_SqlMap.xml" />
+    <!--预订单发货申请-->
+	<sqlMap resource="sqlmap/oracle/drp/sale//advcgoodsapp/Advcgoodsapp_SqlMap.xml" />
+	<!-- 返修单申请审核 -->
+	<sqlMap resource="sqlmap/oracle/drp/sale/repairapp/Repairapp_SqlMap.xml" />
+	<!-- 返修单出库 -->
+	<sqlMap resource="sqlmap/oracle/drp/sale/repairstoreout/Repairstoreout_SqlMap.xml" />
+	<!-- 返修收货确认 -->
+	<sqlMap resource="sqlmap/oracle/drp/sale/repairrecv/Repairrecv_SqlMap.xml" />
+	<!-- 返修发货 -->
+	<sqlMap resource="sqlmap/oracle/drp/sale/repairsend/Repairsend_SqlMap.xml" />
+	<!-- 货品发运 -->
+	<sqlMap resource="sqlmap/oracle/erp/sale/pdtdeliver/Pdtdeliver_SqlMap.xml" />
+	
+	<!--入库差异确认-->
+	<sqlMap resource="sqlmap/oracle/drp/store/storeoutconfirm/Storeoutconfirm_SqlMap.xml" />
+	
+	<!--销售补单查询-->
+    <sqlMap resource="sqlmap/oracle/erp/sale/saleorderque/Saleorderque_SqlMap.xml" />
+	
+	<!--订单特殊工艺 lyg-->
+	<sqlMap resource="sqlmap/oracle/common/TechorderManager_SqlMap.xml" />
+	<!--系统日志-->
+    <sqlMap resource="sqlmap/oracle/base/Syslog_SqlMap.xml" />
+    <!-- 渠道参数配置 -->
+    <sqlMap resource="sqlmap/oracle/drp/base/paramset/Paramset_SqlMap.xml" />
+    <!--预订单发货取消-->
+    <sqlMap resource="sqlmap/oracle/drp/sale/advccancelsapp/Advccancelsapp_SqlMap.xml" />
+    <!--预订单变更-->
+    <sqlMap resource="sqlmap/oracle/drp/sale/changeadvcorder/Changeadvcorder_SqlMap.xml" />
+    <!--分销-区域服务中心-订货订单处理-->
+    <sqlMap resource="sqlmap/oracle/drp/sale/sergoodsorder/Sergoodsorder_SqlMap.xml" />
+ 
+    <!-- 装修申请单维护 -->
+    <sqlMap resource="sqlmap/oracle/drp/oamg/decorationapp/DecorationApp_SqlMap.xml" />
+    <!-- 装修补贴标准维护 -->
+    <sqlMap resource="sqlmap/oracle/drp/oamg/decorationallo/Decorationallo_SqlMap.xml" />
+    <sqlMap resource="sqlmap/oracle/drp/oamg/decorationallo/DecorationalloMX_SqlMap.xml" />
+    
+    <sqlMap resource="sqlmap/oracle/drp/oamg/rnvtncheck/Rnvtncheck_SqlMap.xml" />
+    <sqlMap resource="sqlmap/oracle/drp/oamg/rnvtncheck/RnvtncheckMX_SqlMap.xml" />
+    <!-- 装修整改单维护 -->
+    <sqlMap resource="sqlmap/oracle/drp/oamg/rnvtnreform/Rnvtnreform_SqlMap.xml" />
+    <sqlMap resource="sqlmap/oracle/drp/oamg/rnvtnreform/RnvtnreformMX_SqlMap.xml" />
+    <!-- 装修整改验收单维护 -->
+    <sqlMap resource="sqlmap/oracle/drp/oamg/rnvtnreformcheck/Rnvtnreformcheck_SqlMap.xml" />
+     <!--分销-区域服务中心-销售订单处理-->
+    <sqlMap resource="sqlmap/oracle/drp/sale/sersaleorder/Sersaleorder_SqlMap.xml" />
+     <!--分销-区域服务中心-销售订单转订货-->
+    <sqlMap resource="sqlmap/oracle/drp/areaser/sotoadvorder/Sotoadvorder_SqlMap.xml" />
+    
+    <!--渠道管理-转撤店管理-专卖店转分销店申请单维护-->
+    <sqlMap resource="sqlmap/oracle/drp/oamg/storetoretail/Storetoretail_SqlMap.xml" />
+
+     <!--分销-区域服务中心-出库通知管理-销售出库通知单维护-->
+    <sqlMap resource="sqlmap/oracle/drp/areaser/storeoutnotice/Storeoutnotice_SqlMap.xml" />
+
+    <!--分销-区域服务中心-退货单审核-->
+    <sqlMap resource="sqlmap/oracle/drp/areaser/returnpdtrls/Returnpdtrls_SqlMap.xml" />
+    <!--分销-渠道管理-装修管理-装修报销申请单维护-->
+    <sqlMap resource="sqlmap/oracle/drp/oamg/decorationreit/Decorationreit_SqlMap.xml" />
+ 	<!-- 专卖店撤店及终止申请单 -->
+    <sqlMap resource="sqlmap/oracle/erp/oamg/storeclose/Storeclose_SqlMap.xml" />
+    <!-- 开业大礼包申请单维护 -->
+    <sqlMap resource="sqlmap/oracle/drp/oamg/openbusspkg/Openbusspkg_SqlMap.xml" />
+	<!-- 推广费用申请单维护 -->
+    <sqlMap resource="sqlmap/oracle/drp/oamg/promoexpen/Promoexpen_SqlMap.xml" />
+    <!-- 推广费用报销单维护 -->
+    <sqlMap resource="sqlmap/oracle/drp/oamg/promoreim/Promoreim_SqlMap.xml" />
+    <!-- 门店精致化检查结果 -->
+    <sqlMap resource="sqlmap/oracle/drp/oamg/termrefinecheck/Termrefinecheck_SqlMap.xml" />
+    
+    <!--检查结果维护 -->
+    <sqlMap resource="sqlmap/oracle/drp/oamg/plancheck/Plancheck_SqlMap.xml" />
+    <!-- 总部直发通知单 -->
+    <sqlMap resource="sqlmap/oracle/drp/areaser/senddirectnotice/Senddirectnotice_SqlMap.xml" />
+
+    
+    <!-- 渠道折扣 -->
+    <sqlMap resource="sqlmap/oracle/erp/sale/channdiscount/Channdiscount_SqlMap.xml" />
+
+    
+    <!-- 渠道分管 -->
+    <sqlMap resource="sqlmap/oracle/base/Channchrg_SqlMap.xml" />
+    
+    <!-- 我的销售订单 -->                                   
+    <sqlMap resource="sqlmap/oracle/drp/sale/saleorderview/Saleorderview_SqlMap.xml" />
+
+	<!-- 报表抄送 -->                                   
+    <sqlMap resource="sqlmap/oracle/erp/report/reptshareview/ReptShareView_SqlMap.xml" />
+    
+    <!-- 培训课程维护 -->
+    <sqlMap resource="sqlmap/oracle/erp/oamg/traincourse/Traincourse_SqlMap.xml" />
+    
+    <!--渠道培训申请单维护-->
+	<sqlMap resource="sqlmap/oracle/drp/oamg/trainreq/Trainreq_SqlMap.xml" />
+    
+	
+    <!-- 拓展拜访表维护 -->
+    <sqlMap resource="sqlmap/oracle/drp/visit/expandvisit/Expandvisit_SqlMap.xml" />
+    <sqlMap resource="sqlmap/oracle/drp/visit/expandvisit/ExpandvisitMX_SqlMap.xml" />
+    
+    <!-- 加盟商拜访表维护 -->
+    <sqlMap resource="sqlmap/oracle/drp/visit/channvisit/Channvisit_SqlMap.xml" />
+    <sqlMap resource="sqlmap/oracle/drp/visit/channvisit/ChannvisitMX_SqlMap.xml" />
+    
+    <!-- 门店拜访表维护 -->
+    <sqlMap resource="sqlmap/oracle/drp/visit/storevisit/Storevisit_SqlMap.xml" />
+    <sqlMap resource="sqlmap/oracle/drp/visit/storevisit/StorevisitMX_SqlMap.xml" />
+ 
+    <!-- 广告投放报销申请单维护 -->
+    <sqlMap resource="sqlmap/oracle/drp/oamg/advreit/Advreit_SqlMap.xml" />
+    
+	<!--广告投放申请单-->
+	<sqlMap resource="sqlmap/oracle/drp/adv/advreq/Advreq_SqlMap.xml" />
+     
+     <!--待发货预订单-->
+	<sqlMap resource="sqlmap/oracle/drp/sale/advcgoodslook/Advcgoodslook_SqlMap.xml" />
+ 	
+ 	 <!--待确认预订单-->
+	<sqlMap resource="sqlmap/oracle/drp/sale/uncomm/Uncomm_SqlMap.xml" />
+	
+	<!--活动-->
+	<sqlMap resource="sqlmap/oracle/drp/base/promote/Promote_SqlMap.xml" />
+	
+	<!--分销查看发运单-->
+	<sqlMap resource="/sqlmap/oracle/drp/delivershow/Delivershow_SqlMap.xml" />
+	
+	<!--月结-->
+	<sqlMap resource="/sqlmap/oracle/drp/finance/account/Account.xml" />
+	<!--总部出库单-->
+	<sqlMap resource="/sqlmap/oracle/erp/sale/storeout/ErpStoreout_SqlMap.xml" />
+	<!--销售订单处理-->
+	<sqlMap resource="/sqlmap/oracle/erp/sale/saleordermge/Saleordermge_SqlMap.xml" />
+	<!-- 销售计划 -->
+	<sqlMap resource="/sqlmap/oracle/erp/sale/saleplan/Saleplan_SqlMap.xml" />
+	<!--出货计划维护-->
+	<sqlMap resource="/sqlmap/oracle/erp/sale/deliveryhd/Deliveryhd_SqlMap.xml" />
+	<!--货品零售价设置-->
+	<sqlMap resource="/sqlmap/oracle/drp/base/retalprice/Retalprice_SqlMap.xml" />
+	<!--形态转换-->
+	<sqlMap resource="sqlmap/oracle/drp/store/statechange/StateChange_SqlMap.xml" />
+	<!-- 新开门店申请单维护 -->
+	<sqlMap resource="sqlmap/oracle/drp/oamg/openterminal/OpenTerminal_SqlMap.xml" />
+	
+	<!-- 成本调整申请单维护 -->
+	<sqlMap resource="sqlmap/oracle/drp/sale/costadjust/CostAdjust_SqlMap.xml" />
+
+	<!-- 门店变更申请单维护 -->
+	<sqlMap resource="sqlmap/oracle/drp/oamg/terminalchange/TerminalChange_SqlMap.xml" />
+	 
+	<!-- 区域销售指标设定 -->
+	<sqlMap resource="/sqlmap/oracle/erp/sale/areasaleplan/Areasaleplan_SqlMap.xml" />
+	
+	<!-- 销售数据上报 -->
+	<sqlMap resource="sqlmap/oracle/drp/oamg/saledateup/SaledateUp_SqlMap.xml" />
+	
+	<!-- 预订单开票维护 -->
+	<sqlMap resource="sqlmap/oracle/drp/finance/advcInvoice/AdvcInvoice_SqlMap.xml" />
+	
+	<!-- 工作计划维护 -->
+	<sqlMap resource="sqlmap/oracle/drp/oamg/workplanmage/Workplanmage_SqlMap.xml" />
+	<sqlMap resource="sqlmap/oracle/drp/oamg/workplanmage/WorkplanmageMX_SqlMap.xml" />
+	
+	<!-- 月度拜访计划维护 -->
+	<sqlMap resource="sqlmap/oracle/erp/oamg/monthVisit/Monthvisit_SqlMap.xml" />
+	<sqlMap resource="sqlmap/oracle/erp/oamg/monthVisit/MonthvisitMX_SqlMap.xml" />
+	<!-- 总部促销价格设置 -->
+	<sqlMap resource="sqlmap/oracle/erp/sale/erpprmtprice/Erpprmtprice_SqlMap.xml" />
+	<!-- 月度拜访工作计划达成率 -->
+	<sqlMap resource="sqlmap/oracle/erp/oamg/monthvisitreport/Monthvisitreport_SqlMap.xml" />
+	
+	<!-- 营销活动 -->
+	<sqlMap resource="sqlmap/oracle/erp/sale/marketing/MarketActivitiy_SqlMap.xml" />
+ 
+	<!-- 盈亏单查询 -->
+	<sqlMap resource="sqlmap/oracle/drp/finance/profiiLoss/ProfiiLoss_SqlMap.xml" />	
+    <!-- 会员信息 -->
+	<sqlMap resource="sqlmap/oracle/erp/sale/member/Member_SqlMap.xml" />
+ 
+	<!-- 给加盟商分配卡券 -->
+	<sqlMap resource="sqlmap/oracle/erp/sale/allotchanncard/AllotChannCard_SqlMap.xml" />
+ 
+	<!--零星出库通知单维护 -->
+	<sqlMap resource="sqlmap/oracle/drp/store/storeoutfewnotice/Storeoutfewnotice_SqlMap.xml" />
+    <!--预算科目 -->
+	<sqlMap resource="sqlmap/oracle/erp/sale/budgetitem/Budgetitem_SqlMap.xml" />
+	<!--预算额度设置 -->
+	<sqlMap resource="sqlmap/oracle/erp/sale/budgetquota/Budgetquota_SqlMap.xml" />
+	<!--费用报销单 -->
+	<sqlMap resource="sqlmap/oracle/erp/sale/expenseorder/Expenseorder_SqlMap.xml" />
+	<!--返利额度变更申请单 -->
+	<sqlMap resource="sqlmap/oracle/erp/sale/erprebatechangereq/Erprebatechangereq_SqlMap.xml" />
+	<!--总部预订单-->
+	<sqlMap resource="sqlmap/oracle/erp/sale/erpadvcorder/Erpadvcorder_SqlMap.xml" />
+	<!--活动价格设置-->
+	<sqlMap resource="sqlmap/oracle/drp/base/drppromoteprice/Drppromoteprice_SqlMap.xml" />
+	<!--总部结算单-->
+	<sqlMap resource="sqlmap/oracle/erp/sale/erpadvcorderstatements/Erpadvcorderstatements_SqlMap.xml" />
+	<!--卡券销售-->
+	<sqlMap resource="sqlmap/oracle/erp/sale/marketcardsale/MarketcardSale_SqlMap.xml" />
+	<!-- 加盟商门店指标 -->
+	<sqlMap resource="sqlmap/oracle/drp/oamg/channTermianl/ChannTerminal_SqlMap.xml" />
+	<!-- 渠道合同上传 -->
+	<sqlMap resource="sqlmap/oracle/drp/oamg/channcontractup/Channcontractup_SqlMap.xml" />
+	
+	<!-- 顾客现场签到  -->
+	<sqlMap resource="sqlmap/oracle/erp/sale/cusregist/Cusregist_SqlMap.xml" />
+	<!--二套帐月结-->
+	<sqlMap resource="/sqlmap/oracle/drp/finance/acctengi/AcctEngi.xml" />
+	<!-- 渠道销售价格设置  -->
+	<sqlMap resource="sqlmap/oracle/drp/base/drpsaleprice/Drpsaleprice_SqlMap.xml" />
+	<!-- 直营办-销售订单  -->
+	<sqlMap resource="sqlmap/oracle/drp/sale/saleordera/Saleordera_SqlMap.xml" />
+	<!-- 直营办-下级销售出库单  -->
+	<sqlMap resource="sqlmap/oracle/drp/store/storeouta/Storeouta_SqlMap.xml" />
+	<!--门店－销售出库单-->
+	<sqlMap resource="sqlmap/oracle/drp/sale/termstoreouta/Termstoreouta_SqlMap.xml" />
+	<!--直营办-下级退货单-->
+	<sqlMap resource="sqlmap/oracle/drp/sale//drpreturna/Drpreturna_SqlMap.xml" />
+	<!--直营办-下级退货入库单-->
+	<sqlMap resource="sqlmap/oracle/drp/sale//drpreturnstorein/Drpreturnstorein_SqlMap.xml" />
+	<!--门店-退货入库单-->
+	<sqlMap resource="sqlmap/oracle/drp/sale//termreturnstorein/Termreturnstorein_SqlMap.xml" />
+	<!--门店-退货出库单-->
+	<sqlMap resource="sqlmap/oracle/drp/sale//termreturnstoreout/Termreturnstoreout_SqlMap.xml" />
+	<!--年度返利 结算-->
+	<sqlMap resource="sqlmap/oracle/erp/sale/annualClosing/AnnualClosing_SqlMap.xml" />
+	<!--意向客户拜访-->
+	<sqlMap resource="sqlmap/oracle/erp/visit/intentionvisit/Intentionvisit_SqlMap.xml" />
+	<!--预计量上报 货品设置-->
+	<sqlMap resource="sqlmap/oracle/erp/sale/forecastprd/ForecastPrd_SqlMap.xml" />
+	<!--预计量上报 渠道设置-->
+	<sqlMap resource="sqlmap/oracle/erp/sale/forecastchann/ForecastChann_SqlMap.xml" />
+	<!--预计量上报 上报任务发布-->
+	<sqlMap resource="sqlmap/oracle/erp/sale/forecasttask/ForecastTask_SqlMap.xml" />
+	<!--预计量上报 上报任务填报-->
+	<sqlMap resource="sqlmap/oracle/drp/sale/forecasttaskup/ForecastTaskup_SqlMap.xml" />
+	<!--分销渠道信息-->
+	<sqlMap resource="sqlmap/oracle/base/Distributor_SqlMap.xml" />
+	<!--分销渠道信息登记-->
+	<sqlMap resource="sqlmap/oracle/drp/distributer/distributerreq/DistributerReq_SqlMap.xml" />
+	<!--分销商购货月报-->
+	<sqlMap resource="sqlmap/oracle/drp/distributer/distributersalerpt/DistributerSalerpt_SqlMap.xml" />
+	<!--加盟商终止合作申请-->
+	<sqlMap resource="sqlmap/oracle/drp/distributer/distributerEndReq/DistributerEndReq_SqlMap.xml" />
+	
+	<!--预计量上报 上报任务填报审核-->
+	<sqlMap resource="sqlmap/oracle/erp/sale/forecasttaskup/ForecastTaskupAudit_SqlMap.xml" />
+	<!--营销经理日报  -->
+	<sqlMap resource="sqlmap/oracle/drp/oamg/mkmdayreport/Mkmdayreport_SqlMap.xml" />
+	<sqlMap resource="sqlmap/oracle/drp/oamg/mkmdayreport/Channvisitday_SqlMap.xml" />
+	<sqlMap resource="sqlmap/oracle/drp/oamg/mkmdayreport/Promotionactv_SqlMap.xml" />
+	<sqlMap resource="sqlmap/oracle/drp/oamg/mkmdayreport/DistributorVisit_SqlMap.xml" />
+    <sqlMap resource="sqlmap/oracle/drp/oamg/mkmdayreport/CooperativeVisit_SqlMap.xml" />
+    <sqlMap resource="sqlmap/oracle/drp/oamg/mkmdayreport/ShoppGuideTran_SqlMap.xml" />
+    <sqlMap resource="sqlmap/oracle/drp/oamg/mkmdayreport/TerminalVisit_SqlMap.xml" />
+     
+	<!-- 加盟商营销经理评价 -->
+	<sqlMap resource="sqlmap/oracle/drp/oamg/channscoremkm/ChannScoreMkm_SqlMap.xml" />
+	<sqlMap resource="sqlmap/oracle/drp/oamg/channscoremkm/ChannScoreMkmDtl_SqlMap.xml" />
+	<sqlMap resource="sqlmap/oracle/drp/oamg/channscoremkm/ScoreStand_SqlMap.xml" />
+	
+	<sqlMap resource="sqlmap/oracle/drp/sale/progressadvc/Progressadvc_SqlMap.xml" />
+	<sqlMap resource="sqlmap/oracle/common/SaveReptShareView.xml" />
+	
+	<!-- 系统业务表 -->
+	<sqlMap resource="sqlmap/oracle/base/Table_SqlMap.xml" />
+	<!-- 
+	<sqlMap resource="sqlmap/oracle/base/TableCol_SqlMap.xml" />
+	-->
+	<!-- 预订单出库维护 -->
+	<sqlMap resource="sqlmap/oracle/drp/store/dststoreout/Dststoreout_SqlMap.xml" />
+</sqlMapConfig>

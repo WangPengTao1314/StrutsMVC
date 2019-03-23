@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ *@module 基础资料
+ *@func 维护编码规则
+ *@version 1.1
+ *@author 孙炜
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="BMGZ">
+
+	<typeAlias type="com.hoperun.sys.model.BmgzModel"
+		alias="BmgzModel" />
+
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="BmgzModel" class="BmgzModel">
+		<result column="BMGZID" property="BMGZID" />
+	</resultMap>
+
+	<!-- 动态查询 and 列表排序 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and " property="BMBH">u.BMBH like '%'+#BMBH#+'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="BMDX">u.BMDX like '%'+#BMDX#+'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="CREATER">u.CREATER like '%'+#CREATER#+'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="fromCRETIME">
+		u.CRETIME >= #fromCRETIME#
+		</isNotEmpty>
+		<isNotEmpty prepend="and " property="toCRETIME">
+		u.CRETIME <![CDATA[ <= ]]> #toCRETIME#
+		</isNotEmpty>
+		
+		<isNotEmpty prepend="and " property="STATE">u.STATE like '%'+#STATE#+'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="GZMC">u.GZMC like '%'+#GZMC#+'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="UPDTIME">u.UPDTIME like '%'+#UPDTIME#+'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="REMARK">u.REMARK like '%'+#REMARK#+'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="ZCD">u.ZCD like '%'+#ZCD#+'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="DELFLAG">u.DELFLAG = #DELFLAG#</isNotEmpty>
+		<isNotEmpty prepend="and " property="QXJBCON">$QXJBCON$</isNotEmpty>
+	</sql>
+    <sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField"> $orderField$,</isNotEmpty>CRETIME_1 DESC
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[select u.BMGZID,u.BMBH,u.GZMC,u.CREATER,u.CRENAME,u.CRETIME,u.UPDATER,
+		        u.REMARK,u.DELFLAG,u.UPDTIME,u.STATE,u.ZCD,u.BMDX,u.SEQUENCEMC,u.CRETIME as CRETIME_1,
+				row_number() over(order by 
+				]]>
+		<isNotEmpty prepend=" " property="orderField">
+			 $orderField$
+		</isNotEmpty>
+		<isEmpty prepend=" " property="orderField">
+			u.BMBH DESC
+		</isEmpty>
+		<![CDATA[)rownum_ from T_SYS_BMGZ u]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(BMGZID) cnt FROM ${SYSSCHEMA}.T_SYS_BMGZ u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+
+   <!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.T_SYS_BMGZ(BMGZID,BMBH,GZMC,CREATER,CRENAME,CRETIME,STATE,REMARK,DELFLAG,ZCD,BMDX,DS,SEQUENCEMC)
+		 values(#BMGZID#,#BMBH#,#GZMC#,#CREATER#,#CRENAME#,CONVERT(varchar(100), GETDATE(), 20),#STATE#,#REMARK#,0,#ZCD#,#BMDX#,#DS#,#SEQUENCEMC#)
+		]]>
+	</insert>
+
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_BMGZ set UPDTIME = convert(varchar, getdate(), 20) ]]>
+		<!-- CHANAME, CHADES,CHADATE,CHASTU -->
+		<dynamic prepend="">
+			<isNotNull property="BMBH" prepend=","><![CDATA[BMBH = #BMBH#]]></isNotNull>
+			<isNotNull property="BMDX" prepend=","><![CDATA[BMDX = #BMDX#]]></isNotNull>
+			<isNotNull property="GZMC" prepend=","><![CDATA[GZMC = #GZMC#]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="UPDATER" prepend=","><![CDATA[UPDATER = #UPDATER#]]></isNotNull>
+			<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK#]]></isNotNull>
+			<isNotNull property="DELFLAG" prepend=","><![CDATA[DELFLAG = #DELFLAG#]]></isNotNull>
+			<isNotNull property="ZCD" prepend=","><![CDATA[ZCD = #ZCD#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where BMGZID = #BMGZID# ]]>
+	</update>
+		<!-- 删除菜单 -->
+	<delete id="delete" parameterClass="String">
+		<!--  delete from ${SYSSCHEMA}.T_SYS_BMGZ where BMGZID = #BMGZID:VARCHAR#  -->
+		<![CDATA[ delete from  ${SYSSCHEMA}.T_SYS_BMGZ where BMGZID = #bmgzid:VARCHAR# and STATE!='启用' ]]>
+	</delete>
+	<delete id="deletemx" parameterClass="String">
+	     delete from  ${SYSSCHEMA}.T_SYS_BMGZMX where BMGZID = #bmgzid:VARCHAR#
+	</delete>
+	<insert id="insertBMGZ" parameterClass="map">
+	   insert into ${SYSSCHEMA}.t_sys_datarecycle(DATARECYCLEID,DELETOR,DELTIME,BUSINESSTYPE,DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10,DF11,DF12,DF13,DF14,DF15)
+	    select #DATARECYCLEID#,#DELETOR#,CONVERT(varchar(100), GETDATE(), 20),'编码规则信息维护',BMGZID,BMDX,GZMC,BMBH,SEQUENCEMC,DS,ZCD,CREATER,CRETIME,STATE,DELFLAG,UPDTIME,REMARK,UPDATER,CRENAME
+        from ${SYSSCHEMA}.T_SYS_BMGZ  where  BMGZID = #BMGZID:VARCHAR#
+	</insert>
+	<insert id="insertBMGZMX" parameterClass="map">
+	   insert into ${SYSSCHEMA}.t_sys_datarecycle(DATARECYCLEID,DELETOR,DELTIME,BUSINESSTYPE,DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10,DF11,DF12,DF13,DF14)
+	    select #DATARECYCLEID#+convert(varchar,row_number() over(order by BMGZMXID)),#DELETOR#,CONVERT(varchar(100), GETDATE(), 20),'编码规则信息维护',BMGZMXID,BMGZID,DLX,DCD,DT,NYS,BC,CSZ,DELFLAG,CREATER,CRETIME,UPDATER,UPDTIME,STATE
+        from ${SYSSCHEMA}.T_SYS_BMGZMX  where  BMGZID = #BMGZID:VARCHAR#
+	</insert>
+	<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[  
+			select u.BMGZID,u.BMBH,u.GZMC,u.CREATER,u.CRENAME,u.CRETIME,u.UPDATER,
+		        u.REMARK,u.DELFLAG,u.UPDTIME,u.STATE,u.ZCD,u.BMDX,u.SEQUENCEMC
+			from T_SYS_BMGZ u
+			WHERE U.BMGZID = #BMGZID#
+			]]>
+	</select>
+	
+	<!-- 单位编号是否已经存在 -->
+	<select id="getCountByBH" parameterClass="String" resultClass="int">
+		SELECT count(BMBH) FROM ${SYSSCHEMA}.T_SYS_BMGZ where BMBH=#BMBH:VARCHAR# and DELFLAG = 0
+	</select>
+	<!-- 删除主表之前,首先检查子表是否有数据 -->
+	<select id="getCountFromChildTable" parameterClass="String" resultClass="int">
+		SELECT count(BMGZMXID) FROM ${SYSSCHEMA}.T_SYS_BMGZMX where BMGZID=#BMGZID:VARCHAR# and DELFLAG = 0
+	</select>
+	<!-- 取得seq -->
+	<select id="getSeq" resultClass="java.util.HashMap">
+		select * from sys.all_objects WHERE TYPE LIKE ''
+	</select>
+	
+	<select id="getChildId" parameterClass="String" resultClass="java.util.HashMap">
+		SELECT u.BMGZMXID FROM ${SYSSCHEMA}.T_SYS_BMGZMX u where BMGZID=#BMGZID:VARCHAR# and DELFLAG = 0
+	</select>
+	<select id="getAll" resultClass="BmgzModel">
+	    SELECT * FROM ${SYSSCHEMA}.T_SYS_BMGZ
+	</select>
+	
+	<!-- 获得当天最大的编码编号 -->
+	<select id="getBMBH" resultClass="String">
+	    <![CDATA[ select MAX(t.BMBH) from T_SYS_BMGZ t 
+	              where substring(t.cretime,0,12) = CONVERT(varchar(100), GETDATE(), 23) 
+                  and len(t.BMBH)= 16 ]]>
+    </select>
+</sqlMap>
+

@@ -1,0 +1,43 @@
+body{background: #EDF7FE;}
+body,table,td{font-size: 12px;}
+body {
+	margin:5px;
+    background-color:#EDF7FE;font-size:12px;}
+ 
+
+img {/* border style for all images */
+  border: 0;
+}
+
+.msg-mb-top-l{background:transparent url(../images/plus/form1.gif) no-repeat;}
+.msg-mb-top-c{background:transparent url(../images/plus/formbg2.gif);}
+.msg-mb-top-r{background:transparent url(../images/plus/form2.gif) no-repeat;}
+
+.msg-mb-l{background:transparent url(../images/plus/formbg1.gif);}
+.msg-mb-c{background:transparent url(../images/plus/formbg5.gif);}
+.msg-mb-r{background:transparent url(../images/plus/formbg4.gif);}
+
+.msg-mb-bot-l{background:transparent url(../images/plus/form3.gif) no-repeat;}
+.msg-mb-bot-c{background:transparent url(../images/plus/formbg3.gif);}
+.msg-mb-bot-r{background:transparent url(../images/plus/form4.gif) no-repeat;}
+
+input.btn {
+	background-image: url(../images/main/button_bg.gif);
+	border: 1px solid #6daee2;
+	background-color: #FFFFFF;
+	padding: 2px;
+	height:22px;
+}
+
+input.btn1 {
+	border: 0px solid #6daee2;
+	width:54px;
+	padding: 2px;
+	height:22px;
+}
+
+.fontRed				{	color:#FF0000;	}
+.fontGreen				{	color:#009900;	}
+.fontBlue				{	color:blue;	}
+.fontBold				{	font-weight: bold;}
+.redBold                {	color:#FF0000;	font-weight: bold;}

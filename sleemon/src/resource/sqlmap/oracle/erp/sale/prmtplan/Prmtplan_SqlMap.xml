@@ -1,0 +1,405 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zzb
+@function 
+@version 2013-08-23 16:04:28
+-->
+<sqlMap  namespace="Prmtplan">
+<!-- 定义PrmtplanModel,PrmtplanModelChld -->
+<typeAlias type="com.hoperun.erp.sale.prmtplan.model.PrmtplanModel" alias="PrmtplanModel"/>
+<typeAlias type="com.hoperun.erp.sale.prmtplan.model.PrmtplanModelChld" alias="PrmtplanModelChld" />
+<typeAlias type="com.hoperun.erp.sale.prmtplan.model.PrmtplaAreaModel" alias="PrmtplaAreaModel" />
+
+<!-- 使用PrmtplanModel装载结果集 -->
+<resultMap id="PrmtplanModel" class="PrmtplanModel">
+    <result column="PRMT_PLAN_ID" property="PRMT_PLAN_ID" />
+</resultMap>
+<!-- 使用PrmtplanModelChld装载结果集 -->
+<resultMap id="PrmtplanModelChld" class="PrmtplanModelChld">
+    <result column="PRMT_PRD_GROUP_ID" property="PRMT_PRD_GROUP_ID" />
+</resultMap>
+
+<!-- 使用PrmtplaAreaModel装载结果集 -->
+<resultMap id="PrmtplaAreaModel" class="PrmtplaAreaModel">
+    <result column="PRMT_EFFCT_AREA_ID" property="PRMT_EFFCT_AREA_ID" />
+</resultMap>
+
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+    <isNotEmpty prepend="and" property="PRMT_PLAN_NO">
+          u.PRMT_PLAN_NO like '%'||#PRMT_PLAN_NO#||'%'
+    </isNotEmpty>
+    <isNotEmpty prepend="and" property="PRMT_PLAN_NAME">
+          u.PRMT_PLAN_NAME like '%'||#PRMT_PLAN_NAME#||'%'
+    </isNotEmpty>
+    <isNotEmpty prepend="and" property="PRMT_TYPE">
+          u.PRMT_TYPE = #PRMT_TYPE#
+    </isNotEmpty>
+    <isNotEmpty prepend="and" property="EFFCT_DATE_BEG">
+         <![CDATA[ u.EFFCT_DATE_BEG >= to_date(#EFFCT_DATE_BEG#,'yyyy-MM-DD')]]>
+    </isNotEmpty>
+     <isNotEmpty prepend="and" property="EFFCT_DATE_END">
+          <![CDATA[u.EFFCT_DATE_END <= to_date(#EFFCT_DATE_END#,'yyyy-MM-DD')]]>
+    </isNotEmpty>
+     <isNotEmpty prepend="and" property="CRE_TIME_BEGIN">
+          <![CDATA[u.CRE_TIME >= to_date(#CRE_TIME_BEGIN#,'yyyy-MM-DD HH24:MI:SS')]]>
+    </isNotEmpty>
+     <isNotEmpty prepend="and" property="CRE_TIME_END">
+          <![CDATA[u.CRE_TIME <= to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+    </isNotEmpty>
+    <isNotEmpty prepend="and" property="STATE">
+          u.STATE = #STATE#
+    </isNotEmpty>
+    
+	<isNotEmpty prepend="and " property="DEL_FLAG">
+	        u.DEL_FLAG=#DEL_FLAG#
+	</isNotEmpty>
+    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	</isNotEmpty>
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.PRMT_PLAN_ID,
+		u.PRMT_PLAN_NO,
+		u.PRMT_PLAN_NAME,
+		u.PRMT_TYPE,
+		to_char(u.EFFCT_DATE_BEG,'yyyy-MM-DD') EFFCT_DATE_BEG,
+		to_char(u.EFFCT_DATE_END,'yyyy-MM-DD') EFFCT_DATE_END,
+		u.REMARK,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		u.AUDIT_TIME
+      from ERP_PRMT_PLAN u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM ERP_PRMT_PLAN u ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_PRMT_PLAN(
+		 PRMT_PLAN_ID,
+         PRMT_PLAN_NAME,
+         EFFCT_DATE_END,
+         PRMT_PLAN_NO,
+         EFFCT_DATE_BEG,
+         PRMT_TYPE,
+         REMARK,
+         CRE_NAME,
+         CREATOR,
+         CRE_TIME,
+         UPD_NAME,
+         UPDATOR,
+         UPD_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         STATE,
+         DEL_FLAG
+	   )values(
+		#PRMT_PLAN_ID#,
+        #PRMT_PLAN_NAME#,
+		to_date(#EFFCT_DATE_END#,'yyyy-MM-DD'),
+        #PRMT_PLAN_NO#,
+		to_date(#EFFCT_DATE_BEG#,'yyyy-MM-DD'),
+        #PRMT_TYPE#,
+        #REMARK#,
+        #CRE_NAME#,
+        #CREATOR#,
+	    sysdate, 
+        #UPD_NAME#,
+        #UPDATOR#,
+		sysdate, 
+        #DEPT_ID#,
+        #DEPT_NAME#,
+        #ORG_ID#,
+        #ORG_NAME#,
+        #LEDGER_ID#,
+        #LEDGER_NAME#,
+        #STATE#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update ERP_PRMT_PLAN ]]>
+	<dynamic prepend="set">
+    <isNotNull property="PRMT_PLAN_NAME" prepend=","><![CDATA[PRMT_PLAN_NAME = #PRMT_PLAN_NAME# ]]></isNotNull>
+    <isNotNull property="EFFCT_DATE_END" prepend=","><![CDATA[EFFCT_DATE_END =to_date(#EFFCT_DATE_END#,'yyyy-MM-DD') ]]></isNotNull>
+    <isNotNull property="PRMT_PLAN_NO" prepend=","><![CDATA[PRMT_PLAN_NO = #PRMT_PLAN_NO# ]]></isNotNull>
+    <isNotNull property="EFFCT_DATE_BEG" prepend=","><![CDATA[EFFCT_DATE_BEG =to_date(#EFFCT_DATE_BEG#,'yyyy-MM-DD') ]]></isNotNull>
+    <isNotNull property="PRMT_TYPE" prepend=","><![CDATA[PRMT_TYPE = #PRMT_TYPE# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+    <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where PRMT_PLAN_ID = #PRMT_PLAN_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update ERP_PRMT_PLAN 
+	               set DEL_FLAG = #DEL_FLAG#
+                      ,UPD_NAME=#UPD_NAME#
+                     ,UPDATOR=#UPDATOR#
+                      ,UPD_TIME=sysdate
+ 	  where 
+	     PRMT_PLAN_ID = #PRMT_PLAN_ID:VARCHAR# 
+    ]]>
+</delete>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.PRMT_PLAN_ID,
+		u.PRMT_PLAN_NO,
+		u.PRMT_PLAN_NAME,
+		u.PRMT_TYPE,
+		to_char(u.EFFCT_DATE_BEG,'yyyy-MM-DD') EFFCT_DATE_BEG,
+		to_char(u.EFFCT_DATE_END,'yyyy-MM-DD') EFFCT_DATE_END,
+		u.REMARK,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		u.AUDIT_TIME
+	  from
+       ERP_PRMT_PLAN u 
+	  where 
+		u.PRMT_PLAN_ID = #PRMT_PLAN_ID#
+	]]>
+</select>
+<!-- 明细操作开始-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+     select 
+		u.PRMT_PRD_GROUP_ID,
+		u.PRMT_PLAN_ID,
+		u.PRD_GROUP_ID,
+		u.PRD_GROUP_NO,
+		u.PRD_GROUP_NAME,
+		u.DEL_FLAG
+       from ERP_PRMT_PRD_GROUP u 
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.PRMT_PLAN_ID=#PRMT_PLAN_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+	        u.PRMT_PRD_GROUP_ID in ($PRMT_PRD_GROUP_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+<!--明细表插入 -->
+<insert id="insertChld" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_PRMT_PRD_GROUP(
+		 PRMT_PRD_GROUP_ID,
+		 PRMT_PLAN_ID,
+		 PRD_GROUP_ID,
+		 PRD_GROUP_NO,
+		 PRD_GROUP_NAME,
+         DEL_FLAG
+	   )values(
+		#PRMT_PRD_GROUP_ID#,
+		#PRMT_PLAN_ID#,
+		#PRD_GROUP_ID#,
+		#PRD_GROUP_NO#,
+		#PRD_GROUP_NAME#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+<!--明细表更新 -->
+<update id="updateChldById" parameterClass="map">
+	<![CDATA[ update ERP_PRMT_PRD_GROUP ]]>
+	<dynamic prepend="set">
+	  <isNotNull property="PRMT_PLAN_ID" prepend=","><![CDATA[PRMT_PLAN_ID = #PRMT_PLAN_ID# ]]></isNotNull>
+	  <isNotNull property="PRD_GROUP_NO" prepend=","><![CDATA[PRD_GROUP_NO = #PRD_GROUP_NO# ]]></isNotNull>
+	  <isNotNull property="PRD_GROUP_NAME" prepend=","><![CDATA[PRD_GROUP_NAME = #PRD_GROUP_NAME# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where PRMT_PRD_GROUP_ID = #PRMT_PRD_GROUP_ID#]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteChldByIds" parameterClass="map">
+	<![CDATA[ update ERP_PRMT_PRD_GROUP 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      PRMT_PRD_GROUP_ID in ($PRMT_PRD_GROUP_IDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细 -->
+<delete id="delChldByFkId" parameterClass="map">
+	<![CDATA[ update ERP_PRMT_PRD_GROUP 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      PRMT_PLAN_ID = #PRMT_PLAN_ID:VARCHAR#
+    ]]>
+</delete>
+
+<!--  ============================================促销生效区域==========================================================  -->
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryAreaByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	   select t.PRMT_EFFCT_AREA_ID,t.PRMT_PLAN_ID,t.AREA_ID,t.AREA_NO,t.AREA_NAME,t.DEL_FLAG
+	   from ERP_PRMT_EFFCT_AREA t
+	   where t.PRMT_PLAN_ID = #PRMT_PLAN_ID#
+	<isNotEmpty prepend="and" property="DEL_FLAG">
+          t.DEL_FLAG = #DEL_FLAG#
+    </isNotEmpty>
+  </select>
+  
+   <!--根据明细表IDS查询明细 -->
+ <select id="loadAreaByIds" parameterClass="map" resultClass="java.util.HashMap">
+	   select t.PRMT_EFFCT_AREA_ID,t.PRMT_PLAN_ID,t.AREA_ID,t.AREA_NO,t.AREA_NAME,t.DEL_FLAG
+	   from ERP_PRMT_EFFCT_AREA t
+	   where t.PRMT_EFFCT_AREA_ID in ($PRMT_EFFCT_AREA_IDS$)
+  </select>
+ <!--明细表插入 -->
+ <insert id="insertArea" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_PRMT_EFFCT_AREA(
+		 PRMT_EFFCT_AREA_ID,
+		 PRMT_PLAN_ID,
+		 AREA_ID,
+		 AREA_NO,
+		 AREA_NAME,
+         DEL_FLAG
+	   )values(
+		#PRMT_EFFCT_AREA_ID#,
+		#PRMT_PLAN_ID#,
+		#AREA_ID#,
+		#AREA_NO#,
+		#AREA_NAME#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+
+
+<!--明细表更新 -->
+<update id="updateAreaById" parameterClass="map">
+	<![CDATA[ update ERP_PRMT_EFFCT_AREA ]]>
+	<dynamic prepend="set">
+	  <isNotNull property="AREA_ID" prepend=","><![CDATA[AREA_ID = #AREA_ID# ]]></isNotNull>
+	  <isNotNull property="AREA_NO" prepend=","><![CDATA[AREA_NO = #AREA_NO# ]]></isNotNull>
+	  <isNotNull property="AREA_NAME" prepend=","><![CDATA[AREA_NAME = #AREA_NAME# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where PRMT_EFFCT_AREA_ID = #PRMT_EFFCT_AREA_ID#]]>
+</update>
+
+<!--根据明细IDs删除明细 -->
+<delete id="deleteAreaByIds" parameterClass="map">
+	<![CDATA[ update ERP_PRMT_EFFCT_AREA 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      PRMT_EFFCT_AREA_ID in ($PRMT_EFFCT_AREA_IDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细 -->
+<delete id="delAreaByFkId" parameterClass="map">
+	<![CDATA[ update ERP_PRMT_EFFCT_AREA 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      PRMT_PLAN_ID = #PRMT_PLAN_ID:VARCHAR#
+    ]]>
+</delete>
+
+   <!--根据明细表IDS,主表ID 查重  -->
+ <select id="findAreaByPid" parameterClass="map" resultClass="PrmtplaAreaModel">
+	   select t.PRMT_EFFCT_AREA_ID,t.PRMT_PLAN_ID,t.AREA_ID,t.AREA_NO,t.AREA_NAME,t.DEL_FLAG
+	   from ERP_PRMT_EFFCT_AREA t
+	   where t.PRMT_PLAN_ID = #PRMT_PLAN_ID#
+	   and t.DEL_FLAG=#DEL_FLAG#
+	   and t.AREA_NO in ($CHRGNOS$)
+	   <isNotEmpty prepend="and" property="MIXIDS">
+          t.PRMT_EFFCT_AREA_ID not in($MIXIDS$)
+       </isNotEmpty>
+	     
+  </select>
+
+  
+</sqlMap>

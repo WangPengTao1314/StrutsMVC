@@ -1,0 +1,656 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!-- 
+  *@module 订单特殊工艺
+  *@func 订单特殊工艺
+  *@version 1.1
+  *@author lyg
+ -->
+ <sqlMap  namespace="TechorderManager">
+ 	<!-- 定义TechorderManagerModel,TechorderManagerModelChld,TechorderManagerPrdSpclModel -->
+	<typeAlias type="com.hoperun.commons.techorder.model.TechorderManagerModel" alias="TechorderManagerModel"/>
+	<typeAlias type="com.hoperun.commons.techorder.model.TechorderManagerModelChld" alias="TechorderManagerModelChld"/>
+	<typeAlias type="com.hoperun.commons.techorder.model.TechorderManagerPrdSpclModel" alias="TechorderManagerPrdSpclModel"/>
+	<!-- 使用TechorderManagerModel装载结果集 -->
+	<resultMap id="TechorderManagerModel" class="TechorderManagerModel">
+	    <result column="SPCL_TECH_ID" property="SPCL_TECH_ID" />
+	</resultMap>
+	<!-- 使用TechorderManagerModelChld装载结果集 -->
+	<resultMap id="TechorderManagerModelChld" class="TechorderManagerModelChld">
+	    <result column="SPCL_TECH_DTL_ID" property="SPCL_TECH_DTL_ID" />
+	</resultMap>
+	<!-- 使用TechorderManagerPrdSpclModel装载结果集 -->
+	<resultMap id="TechorderManagerPrdSpclModel" class="TechorderManagerPrdSpclModel">
+	    <result column="PRD_SPCL_TECH_ID" property="PRD_SPCL_TECH_ID" />
+	</resultMap>
+	<!--// 0156143 Start 刘曰刚 2014-06-17// -->
+	<!-- 按特殊工艺主表查询货品信息 -->
+	<!-- 修改特殊工艺价格获取方式-->
+ 	<select id="getSpclInfoById" resultClass="java.util.HashMap" parameterClass="map">
+ 		<![CDATA[
+ 			 select 
+ 				a.SPCL_TECH_ID,
+				a.PRD_NO,
+				a.PRD_NAME,
+				a.PRD_SPEC,
+				a.PRD_COLOR,
+				a.BRAND,
+				a.STD_UNIT,
+				a.RATIO,
+				a.PRD_TYPE,
+				a.PRD_MATL,
+				(case when NVL(#ADDFLAG#,0)!=1 and NVL(#PRICE#,0)!=0
+					then 
+						(case when NVL(a.SPCL_TECH_FLAG,0)!=1 
+							then 
+								NVL(#PRICE#,0)*1
+							else 
+								(case when NVL(a.TECH_MULT,0)!=0 
+									then round((NVL(#PRICE#,0)-a.TECH_AMOUNT)/(1+a.TECH_MULT),2) 
+									else (NVL(#PRICE#,0)-a.TECH_AMOUNT) 
+								end) 
+						end) 
+					else b.PRVD_PRICE 
+				end ) PRICE,
+				a.TECH_MULT,
+				a.TECH_AMOUNT,
+				a.TECH_CHECK_PRICE,
+				a.SPCL_TECH_FLAG,
+				a.TECH_NO_EDIT_FLAG,
+				a.DM_SPCL_TECH_NO
+ 			from DRP_SPCL_TECH a 
+ 			left join BASE_PRODUCT b on a.PRD_NO=b.PRD_NO
+ 			where SPCL_TECH_ID=#SPCL_TECH_ID# 
+ 		]]>
+ 	</select>
+ 	<!-- 按货品id查询货品信息 -->
+ 	<select id="getPrdInfoById" resultClass="java.util.HashMap" parameterClass="map">
+ 		<![CDATA[
+ 			  select 
+ 				PRD_NO,
+				PRD_NAME,
+				PRD_SPEC,
+				PRD_COLOR,
+				BRAND,
+				STD_UNIT,
+				RATIO,
+				PRD_TYPE,
+				PRD_MATL,
+		         (case  
+		             when NVL(#PRICE#,0)=0  then PRVD_PRICE||''
+			         else
+			          NVL(#PRICE#,0)
+			        end)
+		        PRICE,
+		        PRVD_PRICE
+ 			from BASE_PRODUCT 
+ 			where PRD_ID=#PRD_ID# 
+ 		]]>
+ 	</select>
+ 	<!--//  0156143 End 刘曰刚 2014-06-17//-->
+ 	<!-- 特殊工艺主表id和货品id查询特殊工艺明细，如特殊工艺明细为空则显示货品特殊工艺的 明细 -->
+ 	<select id="getSpclById" resultClass="java.util.HashMap" parameterClass="map">
+ 		<![CDATA[
+ 			 select 
+			       b.SPCL_TECH_DTL_ID,
+			       b.SPCL_TECH_ID,
+			       (case when b.PRD_SPCL_TECH_ID is null then a.PRD_SPCL_TECH_ID else b.PRD_SPCL_TECH_ID end) PRD_SPCL_TECH_ID,
+			       (case when b.SPCL_TECH_NAME is null then a.SPCL_TECH_NAME else b.SPCL_TECH_NAME end) SPCL_TECH_NAME,
+			       (case when b.SPCL_TECH_TYPE is null then a.SPCL_TECH_TYPE else b.SPCL_TECH_TYPE end) SPCL_TECH_TYPE,
+			       (case when b.CURRT_VAL is null then a.CURRT_VAL else b.CURRT_VAL end) CURRT_VAL,
+			       (case when b.CURRT_VAL_TURN_BEG is null then a.CURRT_VAL_TURN_BEG else b.CURRT_VAL_TURN_BEG end) CURRT_VAL_TURN_BEG,
+			       (case when b.CURRT_VAL_TURN_END is null then a.CURRT_VAL_TURN_END else b.CURRT_VAL_TURN_END end) CURRT_VAL_TURN_END,
+			       (case when b.PRICE_TURN_TYPE is null then a.PRICE_TURN_TYPE else b.PRICE_TURN_TYPE end) PRICE_TURN_TYPE,
+			       (case when b.PRICE_TURN_VAL is null then a.PRICE_TURN_VAL else b.PRICE_TURN_VAL end) PRICE_TURN_VAL,
+			       (case when b.TUENED_VALS is null then a.TUENED_VALS else b.TUENED_VALS end) TUENED_VALS,
+			        b.CUST_TURN_VAL,
+			        a.REMARK explain,
+			        b.REMARK 
+			from PRD_SPCL_TECH a 
+			left join (
+				select 
+		      		a.SPCL_TECH_DTL_ID,
+					a.SPCL_TECH_ID,
+					a.PRD_SPCL_TECH_ID,
+					a.SPCL_TECH_NAME,
+					a.SPCL_TECH_TYPE,
+					a.CURRT_VAL,
+					a.CURRT_VAL_TURN_BEG,
+					a.CURRT_VAL_TURN_END,
+					a.PRICE_TURN_TYPE,
+					a.PRICE_TURN_VAL,
+					a.TUENED_VALS,
+					a.CUST_TURN_VAL,
+					a.REMARK,
+		      		b.PRD_NO
+				from DRP_SPCL_TECH_DTL a 
+				left join DRP_SPCL_TECH b
+				on a.SPCL_TECH_ID=b.SPCL_TECH_ID 
+				where  a.SPCL_TECH_ID=#SPCL_TECH_ID# and b.USE_FLAG=1
+			) b
+			on a.PRD_SPCL_TECH_ID=b.PRD_SPCL_TECH_ID
+			where a.DEL_FLAG = 0 and a.PRD_ID=#PRD_ID#
+			union 
+			 select a.SPCL_TECH_DTL_ID,
+			      a.SPCL_TECH_ID,
+			      a.PRD_SPCL_TECH_ID,
+			      a.SPCL_TECH_NAME,
+			      a.SPCL_TECH_TYPE,
+			      a.CURRT_VAL,
+			      a.CURRT_VAL_TURN_BEG,
+			      a.CURRT_VAL_TURN_END,
+			      a.PRICE_TURN_TYPE,
+			      a.PRICE_TURN_VAL,
+			      a.TUENED_VALS,
+			      a.CUST_TURN_VAL,
+			      '' explain,
+			      a.REMARK
+			 from DRP_SPCL_TECH_DTL a
+			 left join DRP_SPCL_TECH b on a.SPCL_TECH_ID = b.SPCL_TECH_ID 
+			where a.SPCL_TECH_ID =#SPCL_TECH_ID# and b.USE_FLAG=1 
+			 and  a.DEL_FLAG = 0 and b.DEL_FLAG = 0 
+			 order by PRD_SPCL_TECH_ID
+ 		]]>
+ 	</select>
+ 	<!-- 按特殊工艺主表id查询特殊工艺明细，如特殊工艺明细为空则显示货品特殊工艺的 明细  不过滤是否使用标记-->
+ 	<select id="getSpclByIdNotUSE_FLAG" resultClass="java.util.HashMap" parameterClass="map">
+ 		<![CDATA[
+ 			 select 
+			       b.SPCL_TECH_DTL_ID,
+			       b.SPCL_TECH_ID,
+			       (case when b.PRD_SPCL_TECH_ID is null then a.PRD_SPCL_TECH_ID else b.PRD_SPCL_TECH_ID end) PRD_SPCL_TECH_ID,
+			       (case when b.SPCL_TECH_NAME is null then a.SPCL_TECH_NAME else b.SPCL_TECH_NAME end) SPCL_TECH_NAME,
+			       (case when b.SPCL_TECH_TYPE is null then a.SPCL_TECH_TYPE else b.SPCL_TECH_TYPE end) SPCL_TECH_TYPE,
+			       (case when b.CURRT_VAL is null then a.CURRT_VAL else b.CURRT_VAL end) CURRT_VAL,
+			       (case when b.CURRT_VAL_TURN_BEG is null then a.CURRT_VAL_TURN_BEG else b.CURRT_VAL_TURN_BEG end) CURRT_VAL_TURN_BEG,
+			       (case when b.CURRT_VAL_TURN_END is null then a.CURRT_VAL_TURN_END else b.CURRT_VAL_TURN_END end) CURRT_VAL_TURN_END,
+			       (case when b.PRICE_TURN_TYPE is null then a.PRICE_TURN_TYPE else b.PRICE_TURN_TYPE end) PRICE_TURN_TYPE,
+			       (case when b.PRICE_TURN_VAL is null then a.PRICE_TURN_VAL else b.PRICE_TURN_VAL end) PRICE_TURN_VAL,
+			       (case when b.TUENED_VALS is null then a.TUENED_VALS else b.TUENED_VALS end) TUENED_VALS,
+			        b.CUST_TURN_VAL,
+			        a.REMARK explain,
+			        b.REMARK 
+			from PRD_SPCL_TECH a 
+			left join (
+				select 
+		      		a.SPCL_TECH_DTL_ID,
+					a.SPCL_TECH_ID,
+					a.PRD_SPCL_TECH_ID,
+					a.SPCL_TECH_NAME,
+					a.SPCL_TECH_TYPE,
+					a.CURRT_VAL,
+					a.CURRT_VAL_TURN_BEG,
+					a.CURRT_VAL_TURN_END,
+					a.PRICE_TURN_TYPE,
+					a.PRICE_TURN_VAL,
+					a.TUENED_VALS,
+					a.CUST_TURN_VAL,
+					a.REMARK,
+		      		b.PRD_NO
+				from DRP_SPCL_TECH_DTL a 
+				left join DRP_SPCL_TECH b
+				on a.SPCL_TECH_ID=b.SPCL_TECH_ID 
+				where a.DEL_FLAG=0 and b.DEL_FLAG=0 and  a.SPCL_TECH_ID=#SPCL_TECH_ID# 
+			) b
+			on a.PRD_SPCL_TECH_ID=b.PRD_SPCL_TECH_ID
+			where a.DEL_FLAG=0 and   a.PRD_ID=#PRD_ID#
+			union
+			 select a.SPCL_TECH_DTL_ID,
+			      a.SPCL_TECH_ID,
+			      a.PRD_SPCL_TECH_ID,
+			      a.SPCL_TECH_NAME,
+			      a.SPCL_TECH_TYPE,
+			      a.CURRT_VAL,
+			      a.CURRT_VAL_TURN_BEG,
+			      a.CURRT_VAL_TURN_END,
+			      a.PRICE_TURN_TYPE,
+			      a.PRICE_TURN_VAL,
+			      a.TUENED_VALS,
+			      a.CUST_TURN_VAL,
+			      '' explain,
+			      a.REMARK
+			      
+			 from DRP_SPCL_TECH_DTL a
+			 left join DRP_SPCL_TECH b on a.SPCL_TECH_ID = b.SPCL_TECH_ID 
+			where a.DEL_FLAG=0 and b.DEL_FLAG=0 and  a.SPCL_TECH_ID =#SPCL_TECH_ID# 
+			 order by PRD_SPCL_TECH_ID
+ 		]]>
+ 	</select>
+ 	<!-- 新增特殊工艺主表 -->
+ 	<insert id="insert" parameterClass="map">
+ 		insert into DRP_SPCL_TECH(
+ 			SPCL_TECH_ID,
+			PRD_NO,
+			PRD_NAME,
+			PRD_SPEC,
+			PRD_COLOR,
+			BRAND,
+			STD_UNIT,
+			RATIO,
+			PRD_TYPE,
+			PRD_MATL,
+			USE_FLAG,
+			DEL_FLAG,
+			PRICE,
+			DECT_RATE,
+			DECT_PRICE,
+			TECH_MULT,
+			TECH_AMOUNT,
+			TECH_CHECK_PRICE,
+			SPCL_TECH_FLAG,
+			SPCL_SPEC_REMARK,
+			SPCL_DTL_REMARK,
+			LEDGER_ID,
+			DM_SPCL_TECH_NO,
+			TECH_NO_EDIT_FLAG,
+			CRE_TIME,
+			SPCL_DTL_REMARK_CHK
+ 		)
+ 		select
+ 			#SPCL_TECH_ID#,
+ 			PRD_NO,
+			PRD_NAME,
+			PRD_SPEC,
+			PRD_COLOR,
+			BRAND,
+			STD_UNIT,
+			RATIO,
+			PRD_TYPE,
+			PRD_MATL,
+			#USE_FLAG#,
+			#DEL_FLAG#,
+			#PRICE#,
+			#DECT_RATE#,
+			#DECT_PRICE#,
+			#TECH_MULT#,
+			#TECH_AMOUNT#,
+			#TECH_CHECK_PRICE#,
+			#SPCL_TECH_FLAG#,
+			#SPCL_SPEC_REMARK#,
+			#SPCL_DTL_REMARK#,
+			#LEDGER_ID#,
+			#DM_SPCL_TECH_NO#,
+			#TECH_NO_EDIT_FLAG#,
+			sysdate,
+			#SPCL_DTL_REMARK_CHK#
+		from BASE_PRODUCT where PRD_ID=#PRD_ID#
+ 	</insert>
+ 	<!-- 新增特殊工艺明细 -->
+ 	<insert id="insertChld" parameterClass="map">
+ 		insert into DRP_SPCL_TECH_DTL(
+	 		SPCL_TECH_DTL_ID,
+			SPCL_TECH_ID,
+			PRD_SPCL_TECH_ID,
+			SPCL_TECH_NAME,
+			SPCL_TECH_TYPE,
+			CURRT_VAL,
+			CURRT_VAL_TURN_BEG,
+			CURRT_VAL_TURN_END,
+			PRICE_TURN_TYPE,
+			PRICE_TURN_VAL,
+			TUENED_VALS,
+			CUST_TURN_VAL,
+			REMARK,
+			DEL_FLAG
+		)values(
+			#SPCL_TECH_DTL_ID#,
+			#SPCL_TECH_ID#,
+			#PRD_SPCL_TECH_ID#,
+			#SPCL_TECH_NAME#,
+			#SPCL_TECH_TYPE#,
+			#CURRT_VAL#,
+			#CURRT_VAL_TURN_BEG#,
+			#CURRT_VAL_TURN_END#,
+			#PRICE_TURN_TYPE#,
+			#PRICE_TURN_VAL#,
+			#TUENED_VALS#,
+			#CUST_TURN_VAL#,
+			#REMARK#,
+			#DEL_FLAG#
+		)
+ 	</insert>
+ 	<!-- 修改特殊工艺明细  只修改备注和调整后值 -->
+ 	<update id="updateChld" parameterClass="map">
+ 		<![CDATA[ update DRP_SPCL_TECH_DTL ]]>
+		<dynamic prepend="set">
+			<isNotNull property="CUST_TURN_VAL" prepend=","><![CDATA[CUST_TURN_VAL = #CUST_TURN_VAL# ]]></isNotNull>
+			<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+		</dynamic>
+		<![CDATA[  where SPCL_TECH_DTL_ID = #SPCL_TECH_DTL_ID#]]>
+ 	</update>
+ 	<!-- 按工艺单id硬删明细 -->
+ 	<delete id="delete" parameterClass="string">
+ 		delete from DRP_SPCL_TECH_DTL where SPCL_TECH_ID=#SPCL_TECH_ID#
+ 	</delete>
+ 	<!-- 修改特殊工艺单级别 -->
+ 	<update id="update" parameterClass="map">
+ 		<![CDATA[ update DRP_SPCL_TECH ]]>
+ 			<dynamic prepend="set">
+ 				<isNotNull property="SPCL_TECH_FLAG" prepend=","><![CDATA[SPCL_TECH_FLAG = #SPCL_TECH_FLAG# ]]></isNotNull>
+ 				<isNotNull property="TECH_CHECK_PRICE" prepend=","><![CDATA[TECH_CHECK_PRICE = #TECH_CHECK_PRICE# ]]></isNotNull>
+ 				<isNotNull property="TECH_MULT" prepend=","><![CDATA[TECH_MULT = #TECH_MULT# ]]></isNotNull>
+ 				<isNotNull property="TECH_AMOUNT" prepend=","><![CDATA[TECH_AMOUNT = #TECH_AMOUNT# ]]></isNotNull>
+ 				<isNotNull property="USE_FLAG" prepend=","><![CDATA[USE_FLAG = #USE_FLAG# ]]></isNotNull>
+ 				<isNotNull property="PRICE" prepend=","><![CDATA[PRICE = #PRICE# ]]></isNotNull>
+ 				<isNotNull property="DECT_RATE" prepend=","><![CDATA[DECT_RATE = #DECT_RATE# ]]></isNotNull>
+ 				<isNotNull property="DECT_PRICE" prepend=","><![CDATA[DECT_PRICE = #DECT_PRICE# ]]></isNotNull>
+ 				<isNotNull property="SPCL_SPEC_REMARK" prepend=","><![CDATA[SPCL_SPEC_REMARK = #SPCL_SPEC_REMARK# ]]></isNotNull>
+ 				<isNotNull property="SPCL_DTL_REMARK" prepend=","><![CDATA[SPCL_DTL_REMARK = #SPCL_DTL_REMARK# ]]></isNotNull>
+ 				<isNotNull property="SPCL_DTL_REMARK_CHK" prepend=","><![CDATA[SPCL_DTL_REMARK_CHK = #SPCL_DTL_REMARK_CHK# ]]></isNotNull>
+ 			</dynamic>
+ 		<![CDATA[   where SPCL_TECH_ID=#SPCL_TECH_ID#]]>
+ 	</update>
+ 	<!-- // 0156143 Start 刘曰刚 2014/06/16// -->
+ 	<!-- 获取渠道折扣率方式改变，原来是获取渠道折扣扁平表里的折扣率，现在改为获取渠道的折扣率 -->
+<!-- 	<select id="getPriceInfo" parameterClass="map" resultClass="java.util.HashMap">-->
+<!-- 		<![CDATA[-->
+<!-- 			select -->
+<!-- 				a.BASE_PRICE,-->
+<!-- 				a.DECT_RATE -->
+<!-- 			from BASE_AREA_DSCT_FLAT a-->
+<!-- 			left join BASE_CHANN b-->
+<!-- 			on a.AREA_ID=b.AREA_ID-->
+<!-- 			where b.CHANN_ID=#CHANN_ID# and a.PRD_ID=#PRD_ID#-->
+<!-- 		]]>-->
+<!-- 	</select>-->
+	<select id="getChannDiscount" parameterClass="string" resultClass="string">
+		<![CDATA[
+			select DECT_RATE from BASE_CHANN_DSCT where CHANN_ID=#CHANN_ID#
+		]]>
+	</select>
+	<!-- // 0156143 End 刘曰刚 2014/06/16// -->
+ 	<select id="getSpclByPrdId" parameterClass="string" resultClass="java.util.HashMap">
+ 		<![CDATA[
+ 			select 
+ 				PRD_SPCL_TECH_ID,
+				PRD_ID,
+				SPCL_TECH_NAME,
+				SPCL_TECH_TYPE,
+				CURRT_VAL,
+				CURRT_VAL_TURN_BEG,
+				CURRT_VAL_TURN_END,
+				PRICE_TURN_TYPE,
+				PRICE_TURN_VAL,
+				TUENED_VALS,
+				REMARK EXPLAIN
+ 			from PRD_SPCL_TECH
+ 			where PRD_ID=#PRD_ID#
+ 		]]>
+ 	</select>
+ 	<select id="getPrdId" parameterClass="string" resultClass="string">
+ 		<![CDATA[
+ 			select 
+ 				a.PRD_ID 
+ 			from BASE_PRODUCT a
+ 			left join DRP_SPCL_TECH b
+ 			on a.PRD_NO=b.PRD_NO
+ 			where b.SPCL_TECH_ID=#SPCL_TECH_ID#
+ 		]]>
+ 	</select>
+ 	<!-- 删除特殊工艺主表 -->
+	<update id="delTech" parameterClass="string">
+		<![CDATA[
+			update DRP_SPCL_TECH set DEL_FLAG=1 where SPCL_TECH_ID=#SPCL_TECH_ID#
+		]]>
+	</update>
+	<!-- 反填数据 -->
+	<update id="backFill" parameterClass="string">
+		<![CDATA[
+			 $BACKFILLSQL$
+		]]>
+	</update>
+	<select id="selectSql" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[
+			 $SELECTSQL$
+		]]>
+	</select>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="DM_SPCL_TECH_NO">
+    <![CDATA[ a.DM_SPCL_TECH_NO like '%'||#DM_SPCL_TECH_NO#||'%' ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="SPCL_DTL_REMARK">
+    <![CDATA[ a.SPCL_DTL_REMARK like '%'||#SPCL_DTL_REMARK#||'%' ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="PRD_ID">
+     <![CDATA[ b.PRD_ID=#PRD_ID#]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="LEDGER_ID">
+     <![CDATA[ a.LEDGER_ID=#LEDGER_ID#]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="SPCL_TECH_FLAG">
+     <![CDATA[ $SPCL_TECH_FLAG$]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     <![CDATA[ 
+     	a.DEL_FLAG=#DEL_FLAG# 
+     ]]>
+  </isNotEmpty>
+   <isNotEmpty prepend="and" property="TECH_NO_EDIT_FLAG">
+     <![CDATA[ 
+     	a.TECH_NO_EDIT_FLAG=#TECH_NO_EDIT_FLAG# 
+     ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_BEGIN">
+     <![CDATA[a.CRE_TIME>=to_date(#CRE_TIME_BEGIN#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+     <![CDATA[a.CRE_TIME<=to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[
+	  	select a.PRD_NO,
+       a.PRD_NAME,
+       a.PRD_SPEC,
+       a.DM_SPCL_TECH_NO,
+       a.SPCL_DTL_REMARK,
+       a.SPCL_TECH_ID,
+       to_char(a.CRE_TIME, 'yyyy-MM-DD HH24:MI:SS') CRE_TIME
+  from DRP_SPCL_TECH a
+  left join BASE_PRODUCT b on a.PRD_NO = b.PRD_NO
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[
+      		select count(a.SPCL_TECH_ID) from DRP_SPCL_TECH a
+      		left join BASE_PRODUCT b on a.PRD_NO=b.PRD_NO
+		]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<select id="getViewSpclById" parameterClass="map" resultClass="java.util.HashMap">
+			 select a.SPCL_TECH_ID,
+		       a.PRD_NO,
+		       a.PRD_NAME,
+		       a.PRD_SPEC,
+		       a.PRD_COLOR,
+		       a.BRAND,
+		       a.STD_UNIT,
+		       a.RATIO,
+		       a.PRD_TYPE,
+		       a.PRD_MATL,
+		       (case
+		         when a.SPCL_TECH_FLAG = 1 then
+		          (case
+		         when NVL(a.TECH_MULT, 0) != 0 then
+		          round((NVL(#PRICE#, 0) - a.TECH_AMOUNT) / (1 + a.TECH_MULT), 2)
+		         else
+		          (NVL(#PRICE#, 0) - a.TECH_AMOUNT)
+		       end) else NVL(#PRICE#*1,0) end) PRICE,
+		       a.DECT_RATE,
+		       a.TECH_MULT,
+		       a.TECH_AMOUNT,
+		       a.TECH_CHECK_PRICE,
+		       a.SPCL_TECH_FLAG
+		  from DRP_SPCL_TECH a
+		 where SPCL_TECH_ID = #SPCL_TECH_ID#
+</select>
+<select id="getSpclContentById" resultClass="java.util.HashMap" parameterClass="string">
+	select SPCL_TECH_TYPE,SPCL_TECH_NAME,CUST_TURN_VAL,REMARK,CURRT_VAL from DRP_SPCL_TECH_DTL where SPCL_TECH_ID=#SPCL_TECH_ID#
+</select>
+<select id="getSpclNo" resultClass="string">
+	select  SPCL_TECH_NO_SEQ.NEXTVAL from dual
+</select>
+<update id="updateSpecTechNO" parameterClass="map">
+	update DRP_SPCL_TECH set SPCL_TECH_NO=#SPCL_TECH_NO# where SPCL_TECH_ID=#SPCL_TECH_ID#
+</update>
+<select id="getSpclDataById" resultClass="java.util.HashMap" parameterClass="string">
+	select SPCL_TECH_NO from DRP_SPCL_TECH where SPCL_TECH_ID=#SPCL_TECH_ID#
+</select>
+<select id="getSpclDataByPdtNo" resultClass="java.util.HashMap" parameterClass="string">
+select SPCL_TECH_NO
+  from DRP_SPCL_TECH
+ where rowid in (select *
+                   from (select t.rowid
+                           from DRP_SPCL_TECH t
+                          where t.spcl_tech_no is not null
+                            and t.PRD_NO = #PRD_NO#
+                          order by cast(t.SPCL_TECH_NO as int) desc)
+                  where rownum = 1)
+   for update
+</select>
+<select id="checkTchorderFlag" parameterClass="string" resultClass="string">
+	select NVL(TECH_NO_EDIT_FLAG,0)TECH_NO_EDIT_FLAG from DRP_SPCL_TECH where SPCL_TECH_ID=#SPCL_TECH_ID#
+</select>
+<select id="getColumnName" parameterClass="string" resultClass="string">
+	select a.COLUMN_NAME
+	  from all_cons_columns a, all_constraints b
+	 where a.table_name = #TABLE#
+	   and a.table_name = b.table_name
+	   and a.constraint_name = b.constraint_name
+	   and b.constraint_type = 'P'
+</select>
+<select id="checkSpclRemark" parameterClass="map" resultClass="java.util.HashMap">
+<![CDATA[
+	select 
+		max(a.SPCL_TECH_ID) SPCL_TECH_ID,DM_SPCL_TECH_NO,SPCL_SPEC_REMARK 
+	from DRP_SPCL_TECH a
+	left join BASE_PRODUCT b on a.PRD_NO=b.PRD_NO
+	where a.SPCL_DTL_REMARK_CHK=#SPCL_DTL_REMARK_CHK# and a.USE_FLAG=1 and b.PRD_ID=#PRD_ID# and a.DEL_FLAG=0 
+	and a.LEDGER_ID=#LEDGER_ID# and TECH_NO_EDIT_FLAG=1 and rownum<2
+	group by a.DM_SPCL_TECH_NO,a.SPCL_SPEC_REMARK
+]]>
+</select>
+<select id="getDM_SPCL_TECH_NO" resultClass="string" parameterClass="string">
+	select DM_SPCL_TECH_NO from DRP_SPCL_TECH where SPCL_TECH_ID=#SPCL_TECH_ID#
+</select>
+<update id="upOrderBySaleId" parameterClass="map">
+	update DRP_GOODS_ORDER_DTL set NEW_SPEC=#NEW_SPEC#,NEW_COLOR=#NEW_COLOR#,PRODUCT_REMARK=#PRODUCT_REMARK#
+	where GOODS_ORDER_DTL_ID =(select FROM_BILL_DTL_ID from ERP_SALE_ORDER_DTL where SALE_ORDER_DTL_ID=#ORDERID#)
+</update>
+<select id="getAllSpclId" resultClass="string">
+	select SPCL_TECH_ID from DRP_SPCL_TECH a where a.USE_FLAG=1 and a.DEL_FLAG=0
+</select>
+<select id="getSpclInfo" resultClass="java.util.HashMap" parameterClass="string">
+	select SPCL_TECH_TYPE,
+       SPCL_TECH_NAME,
+       CUST_TURN_VAL,
+       REMARK,
+       CURRT_VAL,
+       (case
+         when PRICE_TURN_TYPE is null then
+          '无'
+         else
+          PRICE_TURN_TYPE
+       end) PRICE_TURN_TYPE,
+       NVL(PRICE_TURN_VAL, 0) PRICE_TURN_VAL
+  from DRP_SPCL_TECH_DTL
+ where SPCL_TECH_ID = #SPCL_TECH_ID#
+</select>
+<update id="upSpclRemark" parameterClass="map">
+	update DRP_SPCL_TECH set SPCL_DTL_REMARK=#SPCL_DTL_REMARK#,SPCL_DTL_REMARK_CHK=#SPCL_DTL_REMARK_CHK# where SPCL_TECH_ID=#SPCL_TECH_ID#
+</update>
+<select id="getSpclIdByRemark" parameterClass="map" resultClass="string">
+	select SPCL_TECH_ID
+	  from DRP_SPCL_TECH
+	 where PRD_NO = #PRD_NO#
+	   and SPCL_DTL_REMARK_CHK = '一般特殊工艺描述:' || #SPCL_DTL_REMARK_CHK#
+	   and PRICE = #PRICE#
+	   and DECT_RATE = #DECT_RATE#
+	   and DECT_PRICE = #DECT_PRICE#
+	   and DEL_FLAG = 0
+	   and TECH_NO_EDIT_FLAG = 1
+	   and LEDGER_ID = #LEDGER_ID#
+	
+</select>
+<!-- 微信新增 -->
+<insert id="insertForWeChat" parameterClass="map">
+ 		insert into DRP_SPCL_TECH(
+ 			SPCL_TECH_ID,
+			PRD_NO,
+			PRD_NAME,
+			PRD_SPEC,
+			PRD_COLOR,
+			BRAND,
+			STD_UNIT,
+			RATIO,
+			PRD_TYPE,
+			PRD_MATL,
+			USE_FLAG,
+			DEL_FLAG,
+			PRICE,
+			DECT_RATE,
+			DECT_PRICE,
+			TECH_MULT,
+			TECH_AMOUNT,
+			TECH_CHECK_PRICE,
+			SPCL_TECH_FLAG,
+			SPCL_SPEC_REMARK,
+			SPCL_DTL_REMARK,
+			LEDGER_ID,
+			DM_SPCL_TECH_NO,
+			TECH_NO_EDIT_FLAG,
+			CRE_TIME,
+			SPCL_DTL_REMARK_CHK
+ 		)
+ 		select
+ 			#SPCL_TECH_ID#,
+ 			PRD_NO,
+			PRD_NAME,
+			PRD_SPEC,
+			PRD_COLOR,
+			BRAND,
+			STD_UNIT,
+			RATIO,
+			PRD_TYPE,
+			PRD_MATL,
+			#USE_FLAG#,
+			#DEL_FLAG#,
+			#PRICE#,
+			#DECT_RATE#,
+			#DECT_PRICE#,
+			#TECH_MULT#,
+			#TECH_AMOUNT#,
+			#TECH_CHECK_PRICE#,
+			#SPCL_TECH_FLAG#,
+			#SPCL_SPEC_REMARK#,
+			#SPCL_DTL_REMARK#,
+			#LEDGER_ID#,
+			#DM_SPCL_TECH_NO#,
+			#TECH_NO_EDIT_FLAG#,
+			sysdate,
+			#SPCL_DTL_REMARK_CHK#
+		from BASE_PRODUCT where PRD_NO=#PRD_NO# and DEL_FLAG=0
+ 	</insert>
+ </sqlMap>

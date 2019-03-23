@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<!--
+@author zhuxw
+@function 
+@version 2011年11月16日 11时23分14秒
+-->
+
+<sqlMap namespace="Notice">
+
+	<typeAlias type="com.hoperun.sys.model.NoticeModel" alias="NoticeModel" />
+	<!-- 使用Notice装载结果集 -->
+	<resultMap id="NoticeModel" class="NoticeModel">
+		<result column="NOTICE_ID" property="NOTICE_ID" />
+	</resultMap>
+	
+    <typeAlias type="com.hoperun.sys.model.NotcAreaModel" alias="NotcAreaModel" />
+	<!-- 使用Notice装载结果集 -->
+	<resultMap id="NotcAreaModel" class="NotcAreaModel">
+		<result column="NOTC_AREA_ID" property="NOTC_AREA_ID" />
+	</resultMap>
+	<typeAlias type="com.hoperun.sys.model.NotcDeptModel" alias="NotcDeptModel" />
+	<!-- 使用Notice装载结果集 -->
+	<resultMap id="NotcDeptModel" class="NotcDeptModel">
+		<result column="NOTC_DEPT_ID" property="NOTC_DEPT_ID" />
+	</resultMap>
+	
+	
+	
+
+	<!-- 动态查询 and 列表分页 -->
+     <sql id="queryDynSql">
+        <isNotEmpty prepend="and" property="NOTICE_TITLE">
+            u.NOTICE_TITLE like '%'||#NOTICE_TITLE#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="NOTICE_OBJ">
+            u.NOTICE_OBJ like '%'||#NOTICE_OBJ#||'%'
+        </isNotEmpty>
+        
+        <isNotEmpty prepend="and" property="NOTICE_TYPE">
+            u.NOTICE_TYPE = #NOTICE_TYPE#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="NOTICE">
+            u.NOTICE like '%'||#NOTICE#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="STATIME">
+            <![CDATA[u.STATIME >=  to_date(#STATIME#,'yyyy-MM-DD HH24:MI:SS')]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="ENDTIME">
+            <![CDATA[u.ENDTIME <= to_date(#ENDTIME#,'yyyy-MM-DD HH24:MI:SS')]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="CRETIME_START">
+            <![CDATA[u.CRETIME >= to_date(#CRETIME_START#,'yyyy-MM-DD HH24:MI:SS')]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="CRETIME_END">
+            <![CDATA[u.CRETIME <=  to_date(#CRETIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="DELFLAG">
+            u.DELFLAG = #DELFLAG#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="STATE">
+            u.STATE = #STATE#
+        </isNotEmpty>
+         <isNotEmpty prepend="and" property="ZTXXID">
+            u.ZTXXID= #ZTXXID#
+        </isNotEmpty>
+        <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	    </isNotEmpty>
+        <isNotEmpty prepend="and" property="conditionString">
+            ${conditionString}
+        </isNotEmpty>
+     </sql>
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField"> $orderField$,</isNotEmpty>CRETIME DESC,STATIME DESC
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[  select u.NOTICE_ID,(case when length(u.NOTICE)>300 then substr(u.NOTICE, 0, 300)||'...' else u.NOTICE end ) NOTICE,
+			NOTICE_TITLE,NOTICE_TYPE,NOTICE_OBJ,
+			to_char(u.STATIME,'yyyy-MM-DD HH24:MI:SS') STATIME,
+			to_char(u.ENDTIME,'yyyy-MM-DD HH24:MI:SS') ENDTIME,
+			u.ISSUER_ID,u.ISSUER_NAME,
+			u.ZTXXID,u.STATE,u.CREATER,u.CRENAME,u.UPDNAME,
+			to_char(u.CRETIME,'yyyy-MM-DD HH24:MI:SS')CRETIME,
+		    to_char(u.UPDTIME,'yyyy-MM-DD HH24:MI:SS')UPDTIME,
+		    u.UPDATER,u.DELFLAG,
+		    att.ATT_PATH,
+		    att.ATT_ID
+		 from ${SYSSCHEMA}.T_SYS_NOTICE u 
+		 left join  BASE_ATT att on att.FROM_BILL_ID = u.NOTICE_ID
+		 
+		 ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(0) cnt FROM ${SYSSCHEMA}.T_SYS_NOTICE u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+
+   <!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.T_SYS_NOTICE(NOTICE_ID,NOTICE_TYPE,NOTICE_OBJ,NOTICE_TITLE,NOTICE,STATIME,ENDTIME,
+		 ISSUER_ID,ISSUER_NAME,ZTXXID,CRENAME,UPDNAME,
+		 STATE,CREATER,CRETIME,DELFLAG
+		 )values(#NOTICE_ID#,#NOTICE_TYPE#,#NOTICE_OBJ#,#NOTICE_TITLE#,#NOTICE#,
+		 to_date(#STATIME#,'yyyy-MM-DD HH24:MI:SS'),
+		 to_date(#ENDTIME#,'yyyy-MM-DD HH24:MI:SS'),
+		 #ISSUER_ID#,#ISSUER_NAME#,#ZTXXID#,#CRENAME#,#UPDNAME#,#STATE#,#CREATER#,sysdate,#DELFLAG#)
+		]]>
+	</insert>
+
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_NOTICE ]]>
+		<dynamic prepend="set">
+	     	<isNotNull property="NOTICE_TYPE" prepend=","><![CDATA[NOTICE_TYPE = #NOTICE_TYPE#]]></isNotNull>
+			<isNotNull property="NOTICE_TITLE" prepend=","><![CDATA[NOTICE_TITLE = #NOTICE_TITLE#]]></isNotNull>
+			<isNotNull property="NOTICE" prepend=","><![CDATA[NOTICE = #NOTICE#]]></isNotNull>
+			<isNotNull property="STATIME" prepend=","><![CDATA[STATIME = to_date(#STATIME#,'yyyy-MM-DD HH24:MI:SS')]]></isNotNull>
+			<isNotNull property="ENDTIME" prepend=","><![CDATA[ENDTIME =to_date(#ENDTIME#,'yyyy-MM-DD HH24:MI:SS')]]></isNotNull>
+			<isNotNull property="ISSUER_ID" prepend=","><![CDATA[ISSUER_ID = #ISSUER_ID#]]></isNotNull>
+			<isNotNull property="ISSUER_NAME" prepend=","><![CDATA[ISSUER_NAME = #ISSUER_NAME#]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="UPDTIME" prepend=","><![CDATA[UPDTIME = sysdate]]></isNotNull>
+			<isNotNull property="UPDATER" prepend=","><![CDATA[UPDATER = #UPDATER#]]></isNotNull>
+			<isNotNull property="UPDNAME" prepend=","><![CDATA[UPDNAME = #UPDNAME#]]></isNotNull>
+			<isNotNull property="DELFLAG" prepend=","><![CDATA[DELFLAG = #DELFLAG#]]></isNotNull>
+			<isNotNull property="NOTICE_OBJ" prepend=","><![CDATA[NOTICE_OBJ = #NOTICE_OBJ#]]></isNotNull>
+			
+		</dynamic>
+		<![CDATA[ where NOTICE_ID = #NOTICE_ID# ]]>
+	</update>
+	<!-- 逻辑删除 只是更新状态-->
+	<delete id="delete" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_NOTICE]]>
+			<dynamic prepend="set">
+			<isNotNull property="UPDTIME" prepend=","><![CDATA[UPDTIME = sysdate]]></isNotNull>
+			<isNotNull property="UPDATER" prepend=","><![CDATA[UPDATER = #UPDATER#]]></isNotNull>
+			<isNotNull property="UPDNAME" prepend=","><![CDATA[UPDNAME = #UPDNAME#]]></isNotNull>
+			<isNotNull property="DELFLAG" prepend=","><![CDATA[DELFLAG = #DELFLAG#]]></isNotNull>
+			</dynamic>
+		<![CDATA[ where NOTICE_ID = #NOTICE_ID# ]]>
+	</delete>
+	
+	<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[  select u.NOTICE_ID,u.NOTICE,u.NOTICE_TITLE,NOTICE_TYPE,
+					to_char(u.STATIME,'yyyy-MM-DD HH24:MI:SS') STATIME,
+					to_char(u.ENDTIME,'yyyy-MM-DD HH24:MI:SS') ENDTIME,
+					u.ZTXXID,u.STATE,u.CREATER,u.CRENAME,u.UPDNAME,
+					to_char(u.CRETIME,'yyyy-MM-DD HH24:MI:SS')CRETIME,CRENAME,
+				    to_char(u.UPDTIME,'yyyy-MM-DD HH24:MI:SS')UPDTIME,u.UPDATER,UPDNAME,
+				    u.DELFLAG,
+				    u.NOTICE_OBJ,
+				    u.ISSUER_ID,u.ISSUER_NAME,u.AUDIT_NAME,
+				    to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS')AUDIT_TIME,
+				    att.ATT_PATH,
+		            att.ATT_ID
+				 from ${SYSSCHEMA}.T_SYS_NOTICE u 
+				  left join  BASE_ATT att on att.FROM_BILL_ID = u.NOTICE_ID
+				 where u.NOTICE_ID = #NOTICE_ID#
+			]]>
+	</select>
+	
+   <!--  =====================================子表sql================================================================================ -->
+
+
+  <!-- 子表新增 -->
+    <insert id="insertChld" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.T_SYS_NOTC_AREA(NOTC_AREA_ID,NOTICE_ID,AREA_ID,AREA_NO,AREA_NAME,DEL_FLAG)
+		 values(#NOTC_AREA_ID#,#NOTICE_ID#,#AREA_ID#,#AREA_NO#,#AREA_NAME#,#DEL_FLAG#)
+		]]>
+	</insert>
+	
+	<!-- 根据主表ID批量查询子表 -->
+	<select id="loadChldByMainId" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[  
+		 	select u.NOTC_AREA_ID,u.NOTICE_ID,u.AREA_ID,u.AREA_NO,u.AREA_NAME,u.DEL_FLAG
+	          from ${SYSSCHEMA}.T_SYS_NOTC_AREA u where u.NOTICE_ID = #NOTICE_ID# and u.DEL_FLAG=#DEL_FLAG#]]>
+	</select>
+	
+	<!-- 根据主表ID批量查询子表 -->
+	<select id="loadCount" parameterClass="map" resultClass="int">
+		<![CDATA[  
+		 	select count(u.NOTC_AREA_ID)
+	          from ${SYSSCHEMA}.T_SYS_NOTC_AREA u where u.NOTICE_ID = #NOTICE_ID#]]>
+	</select>
+	
+	<!-- 批量查询子表 -->
+	<select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[  
+		 	select u.NOTC_AREA_ID,u.NOTICE_ID,u.AREA_ID,u.AREA_NO,u.AREA_NAME,u.DEL_FLAG
+	          from ${SYSSCHEMA}.T_SYS_NOTC_AREA u where u.NOTC_AREA_ID in ($MXIDS$)]]>
+	</select>
+	
+	<!-- 更新子表 -->
+	<update id="updateChldById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_NOTC_AREA ]]>
+		<dynamic prepend="set">
+			<isNotNull property="AREA_ID" prepend=","><![CDATA[AREA_ID = #AREA_ID#]]></isNotNull>
+			<isNotNull property="AREA_NO" prepend=","><![CDATA[AREA_NO = #AREA_NO#]]></isNotNull> 
+			<isNotNull property="AREA_NAME" prepend=","><![CDATA[AREA_NAME = #AREA_NAME#]]></isNotNull> 
+			
+		</dynamic>
+		<![CDATA[ where NOTC_AREA_ID = #NOTC_AREA_ID# ]]>
+	</update>	
+	
+	 <!--根据主表ID软删除子表 -->
+	<update id="updateChldDelMainId" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_NOTC_AREA 
+		               set DEL_FLAG = 1 
+	 	  where 
+		      NOTC_AREA_ID = ($id$)
+	    ]]>
+	</update>
+	 
+	 <!--根据明细IDs删除明细 -->
+	<update id="deleteChldByIds" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_NOTC_AREA 
+		               set DEL_FLAG = #DEL_FLAG#	 
+	 	  where 
+		      NOTC_AREA_ID in ($IDS$)
+	    ]]>
+	</update>
+
+    <!-- 查重 -->
+	<select id="findRepeat" parameterClass="map" resultClass="NotcAreaModel">
+	    SELECT  t.NOTC_AREA_ID  FROM ${SYSSCHEMA}.T_SYS_NOTC_AREA t 
+	      where t.DEL_FLAG=0 and t.NOTICE_ID = #NOTICE_ID# and t.AREA_NO in ($AREANOS$)
+	    <dynamic prepend=" and ">
+		 <isNotEmpty property="CHILDIDS" prepend=","><![CDATA[NOTC_AREA_ID not in ($CHILDIDS$)]]></isNotEmpty>
+		</dynamic>
+	</select>
+	 
+	<!-- ==============================================公告生效区域扁平表(T_SYS_NOTC_AREA_FLAT)=================================================================== --> 
+	 
+    <!-- 根据公告ID删除 区域扁平表 -->
+	<delete id="deleteareaflat" parameterClass="String">
+	<![CDATA[delete from ${SYSSCHEMA}.T_SYS_NOTC_AREA_FLAT where NOTICE_ID = #NOTICE_ID#]]>
+	</delete>
+	
+	 <!-- 根据ID删除 区域扁平表 
+	<delete id="deleteAreaflatById" parameterClass="String">
+	<![CDATA[delete from ${SYSSCHEMA}.T_SYS_NOTC_AREA_FLAT where NOTC_AREA_FLAT_ID in ($NOTC_AREA_FLAT_IDS$)]]>
+	</delete>-->
+	
+	
+	<!-- 根据公告ID查询 旗下的所有 公告生效区域 然后更新 扁平表-->
+	<insert id="insertareaflat" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.T_SYS_NOTC_AREA_FLAT(NOTC_AREA_FLAT_ID,NOTICE_ID,AREA_ID)
+		  select a.NOTC_AREA_ID,a.NOTICE_ID,a.AREA_ID
+		  from ${SYSSCHEMA}.T_SYS_NOTC_AREA a 
+		  where a.NOTICE_ID=#NOTICE_ID#
+		  and a.DEL_FLAG=#DEL_FLAG#
+		]]>
+	</insert>
+	<update id="close" parameterClass="map">
+		<![CDATA[
+			update T_SYS_NOTICE set STATE=#STATE#,UPDTIME=sysdate,UPDATER=#UPDATER#,UPDNAME=#UPDNAME# where NOTICE_ID=#NOTICE_ID#
+		]]>
+	</update>
+
+    <insert id="insertDeptChld" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.T_SYS_NOTC_DEPT(NOTC_DEPT_ID,NOTICE_ID,DEPT_ID,DEPT_NAME,DEL_FLAG)
+		 values(#NOTC_DEPT_ID#,#NOTICE_ID#,#DEPT_ID#,#DEPT_NAME#,#DEL_FLAG#)
+		]]>
+	</insert>
+	
+   <update id="updateDeptChldById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_NOTC_DEPT ]]>
+		<dynamic prepend="set">
+			<isNotNull property="DEPT_ID" prepend=","><![CDATA[DEPT_ID = #DEPT_ID#]]></isNotNull>
+			<isNotNull property="DEPT_NAME" prepend=","><![CDATA[DEPT_NAME = #DEPT_NAME#]]></isNotNull> 
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull> 
+		</dynamic>
+		<![CDATA[ where NOTC_DEPT_ID = #NOTC_DEPT_ID# ]]>
+	</update>	
+	
+	
+	<delete id="deleteDeptChild" >
+	  delete from T_SYS_NOTC_DEPT where NOTC_DEPT_ID in($IDS$)
+	</delete>
+
+	<!-- 根据主表ID批量查询子表 -->
+	<select id="loadDeptChldByMainId" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[  
+		 	select u.NOTC_DEPT_ID,u.NOTICE_ID,u.DEPT_ID,u.DEPT_NAME,u.DEL_FLAG
+	          from ${SYSSCHEMA}.T_SYS_NOTC_DEPT u 
+	          where u.NOTICE_ID = #NOTICE_ID# 
+	          and u.DEL_FLAG=0
+	  ]]>
+	</select>
+	
+		<!-- 批量查询子表 -->
+	<select id="loadDeptChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[  
+		 	select u.NOTC_DEPT_ID,u.NOTICE_ID,u.DEPT_ID,u.DEPT_NAME,u.DEL_FLAG
+	          from ${SYSSCHEMA}.T_SYS_NOTC_DEPT u  where u.NOTC_DEPT_ID in ($MXIDS$)]]>
+	</select>
+	<select id="loadDeptCount" parameterClass="map" resultClass="int">
+		<![CDATA[  
+		 	select count(0)
+	          from ${SYSSCHEMA}.T_SYS_NOTC_DEPT u where u.NOTICE_ID = #NOTICE_ID#]]>
+	</select>
+	
+   <select id="findDeptRepeat" parameterClass="map" resultClass="NotcAreaModel">
+	    SELECT  u.DEPT_NAME  FROM ${SYSSCHEMA}.T_SYS_NOTC_DEPT u 
+	      where u.DEL_FLAG=0 and u.NOTICE_ID = #NOTICE_ID# and u.DEPT_ID in ($DEPT_IDS$)
+	    <dynamic prepend=" and ">
+		 <isNotEmpty property="CHILDIDS" prepend=","><![CDATA[u.NOTC_DEPT_ID not in ($CHILDIDS$)]]></isNotEmpty>
+		</dynamic>
+	</select>
+</sqlMap>
+

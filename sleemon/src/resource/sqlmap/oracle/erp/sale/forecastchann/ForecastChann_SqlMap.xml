@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ *@module  
+ *@func  预计量上报渠道设置
+ *@version 1.1
+ *@author  
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="ForecastChann">
+
+ <!-- 通过typeAlias使得我们在下面使用ProductModel实体类的时候不需要写包名 -->
+<typeAlias type="com.hoperun.base.chann.model.ChannModel" alias="ChannModel" />
+
+<!-- 使用LLGL装载结果集 -->
+<resultMap id="ChannModel" class="ChannModel">
+	<result column="CHANN_ID" property="CHANN_ID" />
+</resultMap>
+ 
+
+
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+<isNotEmpty prepend="and" property="searchFlag">
+	<![CDATA[$searchFlag$]]>
+</isNotEmpty>
+<isNotEmpty prepend="and" property="CHANN_NO">
+	<![CDATA[c.CHANN_NO like '%'|| #CHANN_NO# ||'%']]>
+</isNotEmpty>
+<isNotEmpty prepend="and" property="CHANN_NAME">
+	<![CDATA[c.CHANN_NAME like '%'|| #CHANN_NAME# ||'%']]>
+</isNotEmpty>
+
+<isNotEmpty prepend="and" property="CHANN_TYPE">
+	<![CDATA[c.CHANN_TYPE = #CHANN_TYPE#]]>
+</isNotEmpty>
+ <isNotEmpty prepend="and" property="AREA_SQL">
+	<![CDATA[$AREA_SQL$]]>
+</isNotEmpty>
+ 
+<!-- 显示未分管 -->
+<isNotEmpty prepend="and" property="notcharg">
+      c.IS_REPORT_FLAG =0 
+</isNotEmpty>
+<!-- 显示已分管 -->
+<isNotEmpty prepend="and" property="havecharg">
+      c.IS_REPORT_FLAG =1 
+</isNotEmpty> 
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	   
+select c.CHANN_ID,
+       c.CHANN_NO,
+       c.CHANN_NAME,
+       c.CHANN_TYPE,
+       c.AREA_NAME,
+       c.IS_REPORT_FLAG,
+       a.AREA_NO_P,
+       a.AREA_NAME_P,
+       decode(c.IS_REPORT_FLAG,0,'否',1,'是','否')IS_REPORT_FLAG_ZN
+  from BASE_CHANN c
+  left join BASE_AREA a
+    on c.AREA_ID = a.AREA_ID
+    and a.DEL_FLAG=0
+    where c.DEL_FLAG=0
+    and c.STATE='启用'
+    and c.IS_BASE_FLAG=0
+
+   ]]>
+    <dynamic prepend="and">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[	select count(0)   
+        from BASE_CHANN c
+	   left join BASE_AREA a
+	    on c.AREA_ID = a.AREA_ID
+	    and a.DEL_FLAG=0
+	    where c.DEL_FLAG=0
+	    and c.STATE='启用' ]]>
+	<dynamic prepend="and">
+		 <include refid="queryDynSql"/>
+	</dynamic>
+</select>
+
+
+
+<update id="deleteByIds" parameterClass="String">
+	<![CDATA[
+	  update BASE_CHANN c set c.IS_REPORT_FLAG=0 where c.CHANN_ID in($DELETE_IDS$)
+	]]>
+</update>
+	
+<update id="updateChann" parameterClass="map">
+	<![CDATA[
+	 update BASE_CHANN c set c.IS_REPORT_FLAG=1 where c.CHANN_ID in($CHANN_IDS$)
+	]]>
+</update>
+
+ 
+	 
+ 
+</sqlMap>
+

@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author chenj
+@function 
+@version 2014-01-25 19:49:05
+-->
+<sqlMap  namespace="ExpandvisitMX">
+<typeAlias type="com.hoperun.drp.visit.expandvisit.model.ExpandVisitDtlModel" alias="ExpandVisitDtlModel"/>
+<!-- 使用Promoreim装载结果集 -->
+<resultMap id="ExpandVisitDtlModel" class="ExpandVisitDtlModel">
+    <result column="EXPAND_VISIT_DTL_ID" property="EXPAND_VISIT_DTL_ID" />
+</resultMap>
+<!-- 动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  u.DEL_FLAG = 0 
+  <isNotEmpty prepend="" property="EXPAND_VISIT_NO">
+      and  u.EXPAND_VISIT_NO  like '%'||#EXPAND_VISIT_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="PROVINCE">
+      and  u.PROVINCE  like '%'||#PROVINCE#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CITY">
+      and  u.CITY like '%'||#CITY#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="STATE">
+      and  u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="SVISIT_DATE">
+       <![CDATA[ and u.VISIT_DATE>=to_date(#SVISIT_DATE#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="EVISIT_DATE">
+       <![CDATA[ and u.VISIT_DATE<=to_date(#EVISIT_DATE#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="QXJBCON">
+	  and   $QXJBCON$  
+  </isNotEmpty>
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		 u.EXPAND_VISIT_ID,
+		 u.EXPAND_VISIT_NO,
+         u.VISIT_DATE,
+         u.COUNTRY,
+         u.PROVINCE,
+         u.CITY,
+         u.INPUT_PERSON_ID,
+         u.INPUT_PERSON_NAME,
+         u.POPULATION,
+         u.GDP,
+         u.FURNITURE_CONSUMPTION,
+         u.BRAND,
+         u.PROPAGANDA,
+         u.SHARE_RATE,
+         u.REMARK,
+         u.STATE,
+         u.CREATOR,
+         u.CRE_NAME,
+         to_char(u.CRE_TIME,'yyyy-MM-DD') CRE_TIME,
+         u.UPDATOR,
+         u.UPD_NAME,
+         u.UPD_TIME,
+         u.DEPT_ID,
+         u.DEPT_NAME,
+         u.ORG_ID,
+         u.ORG_NAME,
+         u.LEDGER_ID,
+         u.LEDGER_NAME,
+         u.DEL_FLAG 
+         from ERP_EXPAND_VISIT u 
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt 
+            from ERP_EXPAND_VISIT u
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+ <!-- 查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+
+<select id="queryChildById" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[ 
+	       SELECT    t.EXPAND_VISIT_DTL_ID,
+					 t.EXPAND_VISIT_ID,
+					 t.STORE_NAME,
+			         t.SOFTWARE_LAYER,
+			         t.LOCATION,
+			         t.POPULARITY,
+			         t.OPENNING_TIME,
+			         t.INVESTMENT_TIME,
+			         t.OTHER_INFO,
+			         t.STORE_MNG_NAME,
+			         t.STORE_MNG_TEL,
+			         t.STORE_MNG_EMAIL,
+			         t.INVESTMENT_MNG_NAME,
+			         t.INVESTMENT_MNG_TEL,
+			         t.INVESTMENT_MNG_EMAIL,
+			         t.CUST_NAME,
+			         t.CUST_STATE,
+			         t.CUST_FUNDS,
+			         t.BUSINESS_PHI,
+			         t.CUST_OTHER_INFO,
+			         t.CUST_INTENTION,
+			         t.FOLLOW_WAY,
+			         t.DEL_FLAG
+                     FROM ERP_EXPAND_VISIT_DTL t  
+                     where 
+		             t.DEL_FLAG='0' AND t.EXPAND_VISIT_ID = #EXPAND_VISIT_ID#  
+	]]>
+</select>
+	
+<select id="queryChildByIdT" parameterClass="map" resultClass="ExpandVisitDtlModel">
+		<![CDATA[ 
+	       SELECT    t.EXPAND_VISIT_DTL_ID,
+					 t.EXPAND_VISIT_ID,
+					 t.STORE_NAME,
+			         t.SOFTWARE_LAYER,
+			         t.LOCATION,
+			         t.POPULARITY,
+			         to_char(t.OPENNING_TIME,'yyyy-MM-DD') OPENNING_TIME,
+			         to_char(t.INVESTMENT_TIME,'yyyy-MM-DD') INVESTMENT_TIME,
+			         t.OTHER_INFO,
+			         t.STORE_MNG_NAME,
+			         t.STORE_MNG_TEL,
+			         t.STORE_MNG_EMAIL,
+			         t.INVESTMENT_MNG_NAME,
+			         t.INVESTMENT_MNG_TEL,
+			         t.INVESTMENT_MNG_EMAIL,
+			         t.CUST_NAME,
+			         t.CUST_STATE,
+			         t.CUST_FUNDS,
+			         t.BUSINESS_PHI,
+			         t.CUST_OTHER_INFO,
+			         t.CUST_INTENTION,
+			         t.FOLLOW_WAY,
+			         t.DEL_FLAG
+                     FROM ERP_EXPAND_VISIT_DTL t  
+                     where 
+		             t.DEL_FLAG='0' AND t.EXPAND_VISIT_ID = #EXPAND_VISIT_ID#  
+	]]>
+</select>
+
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_CHANN_VISIT_DTL(
+		 CHANN_VISIT_DTL_ID,
+		 CHANN_VISIT_ID,
+         VISIT_DATE,
+         PRO_NAME,
+         MAIN_TYPE,
+         SUB_TYPE,
+         SIT_ANALYSIS,
+         ACTION_PLAN,
+         COMPLETE_TIME,
+         OTHER_INFO,
+         DEL_FLAG 
+	   )values(
+		 #CHANN_VISIT_DTL_ID#,
+		 #CHANN_VISIT_ID#,
+         to_date(#VISIT_DATE#,'yyyy-MM-DD'),
+         #PRO_NAME#,
+         #MAIN_TYPE#,
+         #SUB_TYPE#,
+         #SIT_ANALYSIS#,
+         #ACTION_PLAN#,
+         #COMPLETE_TIME#,
+         #OTHER_INFO#,
+         #DEL_FLAG# 
+		)
+   ]]>
+</insert>
+
+
+<insert id="insertChild" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_EXPAND_VISIT_DTL(
+	     EXPAND_VISIT_DTL_ID,
+		 EXPAND_VISIT_ID,
+		 STORE_NAME,
+         SOFTWARE_LAYER,
+         LOCATION,
+         POPULARITY,
+         OPENNING_TIME,
+         INVESTMENT_TIME,
+         OTHER_INFO,
+         STORE_MNG_NAME,
+         STORE_MNG_TEL,
+         STORE_MNG_EMAIL,
+         INVESTMENT_MNG_NAME,
+         INVESTMENT_MNG_TEL,
+         INVESTMENT_MNG_EMAIL,
+         CUST_NAME,
+         CUST_STATE,
+         CUST_FUNDS,
+         BUSINESS_PHI,
+         CUST_OTHER_INFO,
+         CUST_INTENTION,
+         FOLLOW_WAY,
+         DEL_FLAG
+	   )values(
+		 #EXPAND_VISIT_DTL_ID#,
+		 #EXPAND_VISIT_ID#,
+		 #STORE_NAME#,
+         #SOFTWARE_LAYER#,
+         #LOCATION#,
+         #POPULARITY#,
+         to_date(#OPENNING_TIME#,'yyyy-MM-DD'),
+         to_date(#INVESTMENT_TIME#,'yyyy-MM-DD'),
+         #OTHER_INFO#,
+         #STORE_MNG_NAME#,
+         #STORE_MNG_TEL#,
+         #STORE_MNG_EMAIL#,
+         #INVESTMENT_MNG_NAME#,
+         #INVESTMENT_MNG_TEL#,
+         #INVESTMENT_MNG_EMAIL#,
+         #CUST_NAME#,
+         #CUST_STATE#,
+         #CUST_FUNDS#,
+         #BUSINESS_PHI#,
+         #CUST_OTHER_INFO#,
+         #CUST_INTENTION#,
+         #FOLLOW_WAY#,
+         #DEL_FLAG#
+		)
+   ]]>
+</insert>
+
+
+
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update ERP_EXPAND_VISIT ]]>
+	<dynamic prepend="set">
+		<isNotNull property="VISIT_DATE" prepend=","><![CDATA[VISIT_DATE = to_date(#VISIT_DATE#,'yyyy-MM-DD')]]></isNotNull>
+	    <isNotNull property="COUNTRY" prepend=","><![CDATA[COUNTRY = #COUNTRY# ]]></isNotNull>
+	    <isNotNull property="PROVINCE" prepend=","><![CDATA[PROVINCE = #PROVINCE# ]]></isNotNull>
+	    <isNotNull property="CITY" prepend=","><![CDATA[CITY = #CITY# ]]></isNotNull>
+	    <isNotNull property="INPUT_PERSON_NAME" prepend=","><![CDATA[INPUT_PERSON_NAME = #INPUT_PERSON_NAME# ]]></isNotNull>
+	    <isNotNull property="POPULATION" prepend=","><![CDATA[POPULATION = #POPULATION# ]]></isNotNull>
+	    <isNotNull property="GDP" prepend=","><![CDATA[GDP = #GDP# ]]></isNotNull>
+	    <isNotNull property="FURNITURE_CONSUMPTION" prepend=","><![CDATA[FURNITURE_CONSUMPTION = #FURNITURE_CONSUMPTION# ]]></isNotNull>
+	    <isNotNull property="BRAND" prepend=","><![CDATA[BRAND = #BRAND# ]]></isNotNull>
+	    <isNotNull property="PROPAGANDA" prepend=","><![CDATA[PROPAGANDA = #PROPAGANDA# ]]></isNotNull>
+	    <isNotNull property="SHARE_RATE" prepend=","><![CDATA[SHARE_RATE = #SHARE_RATE# ]]></isNotNull>
+	    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+	    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+	    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+	    <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where EXPAND_VISIT_ID = #EXPAND_VISIT_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update ERP_EXPAND_VISIT
+	               set DEL_FLAG = #DEL_FLAG#
+ 	          where 
+	          EXPAND_VISIT_ID = #EXPAND_VISIT_ID# 
+    ]]>
+</delete>
+
+<select id="loadByConfId" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[ 
+	    select 
+		 u.EXPAND_VISIT_ID,
+		 u.EXPAND_VISIT_NO,
+         u.VISIT_DATE,
+         u.COUNTRY,
+         u.PROVINCE,
+         u.CITY,
+         u.INPUT_PERSON_ID,
+         u.INPUT_PERSON_NAME,
+         u.POPULATION,
+         u.GDP,
+         u.FURNITURE_CONSUMPTION,
+         u.BRAND,
+         u.PROPAGANDA,
+         u.SHARE_RATE,
+         u.REMARK,
+         u.STATE,
+         u.CREATOR,
+         u.CRE_NAME,
+         to_char(u.CRE_TIME,'yyyy-MM-DD') CRE_TIME,
+         u.UPDATOR,
+         u.UPD_NAME,
+         u.UPD_TIME,
+         u.DEPT_ID,
+         u.DEPT_NAME,
+         u.ORG_ID,
+         u.ORG_NAME,
+         u.LEDGER_ID,
+         u.LEDGER_NAME,
+         u.DEL_FLAG
+         from  ERP_EXPAND_VISIT u 
+         where 
+		 u.EXPAND_VISIT_ID = #EXPAND_VISIT_ID#
+	]]>
+	</select>
+
+<select id="loadByIds" parameterClass="String" resultClass="ExpandVisitDtlModel">
+	<![CDATA[ 
+	  select 
+		u.EXPAND_VISIT_DTL_ID,
+		u.EXPAND_VISIT_ID,
+		u.STORE_NAME,
+		u.SOFTWARE_LAYER,
+		u.LOCATION,
+		u.POPULARITY,
+		to_char(u.OPENNING_TIME,'yyyy-MM-DD') OPENNING_TIME,
+	    to_char(u.INVESTMENT_TIME,'yyyy-MM-DD') INVESTMENT_TIME,
+		u.OTHER_INFO,
+		u.STORE_MNG_NAME,
+		u.STORE_MNG_TEL,
+		u.STORE_MNG_EMAIL,
+		u.INVESTMENT_MNG_NAME,
+		u.INVESTMENT_MNG_TEL,
+		u.INVESTMENT_MNG_EMAIL,
+		u.CUST_NAME,
+		u.CUST_STATE,
+		u.CUST_FUNDS,
+		u.BUSINESS_PHI,
+		u.CUST_OTHER_INFO,
+		u.CUST_INTENTION,
+		u.FOLLOW_WAY
+        from ERP_EXPAND_VISIT_DTL u 
+	    where 
+		u.EXPAND_VISIT_DTL_ID in ($EXPAND_VISIT_DTL_ID$)
+	]]>
+</select>
+
+<update id="deleteByIds" parameterClass="map">
+	<![CDATA[ 
+         update ERP_EXPAND_VISIT_DTL
+             set DEL_FLAG = #DEL_FLAG#
+	         where 
+             EXPAND_VISIT_DTL_ID in ($EXPAND_VISIT_DTL_ID$)
+   ]]>
+</update>
+
+<!--启用/停用-->
+<update id="updStusById" parameterClass="map">	
+     <![CDATA[ 
+	  update ERP_PRMT_COST_REIT 
+	       set STATE = #STATE#
+              ,UPD_NAME=#UPD_NAME#
+              ,UPDATOR=#UPDATOR#
+              ,UPD_TIME=sysdate
+ 	  where 
+	     PRMT_COST_REIT_ID = #PRMT_COST_REIT_ID:VARCHAR# 
+    ]]>
+</update>
+</sqlMap>

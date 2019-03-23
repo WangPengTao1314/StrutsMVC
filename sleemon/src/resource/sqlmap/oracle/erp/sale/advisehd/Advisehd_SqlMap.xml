@@ -1,0 +1,508 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author wdb
+@function 
+@version 2013-08-17 10:29:35
+-->
+<sqlMap  namespace="Advisehd">
+<!-- 定义AdvisehdModel,AdvisehdModelChld -->
+<typeAlias type="com.hoperun.erp.sale.advisehd.model.AdvisehdModel" alias="AdvisehdModel"/>
+<typeAlias type="com.hoperun.erp.sale.advisehd.model.AdvisehdModelChld" alias="AdvisehdModelChld" />
+<!-- 使用AdvisehdModel装载结果集 -->
+<resultMap id="AdvisehdModel" class="AdvisehdModel">
+    <result column="CMPL_ADVS_ID" property="CMPL_ADVS_ID" />
+</resultMap>
+<!-- 使用AdvisehdModelChld装载结果集 -->
+<resultMap id="AdvisehdModelChld" class="AdvisehdModelChld">
+    <result column="CMPL_PRD_DTL_ID" property="CMPL_PRD_DTL_ID" />
+</resultMap>
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  	<isNotEmpty prepend="and" property="CMPL_ADVS_NO">
+    	u.CMPL_ADVS_NO like '%'||#CMPL_ADVS_NO#||'%'
+  	</isNotEmpty>
+  	<isNotEmpty prepend="and" property="CMPL_ADVS_TITLE">
+    	u.CMPL_ADVS_TITLE like '%'||#CMPL_ADVS_TITLE#||'%'
+  	</isNotEmpty>
+  	<isNotEmpty prepend="and" property="RAISE_TIME_FROM">
+		<![CDATA[u.RAISE_TIME >= to_date(#RAISE_TIME_FROM#,'yyyy-MM-DD HH24:MI:SS')]]>
+  	</isNotEmpty>
+  	<isNotEmpty prepend="and" property="RAISE_TIME_TO">
+		<![CDATA[u.RAISE_TIME <= to_date(#RAISE_TIME_TO#,'yyyy-MM-DD HH24:MI:SS') ]]>
+  	</isNotEmpty>
+  	<isNotEmpty prepend="and" property="AREA_NAME">
+    	u.AREA_NAME like '%'||#AREA_NAME#||'%'
+  	</isNotEmpty>
+  	<isNotEmpty prepend="and" property="CHANN_NAME">
+    	u.CHANN_NAME like '%'||#CHANN_NAME#||'%'
+  	</isNotEmpty>
+  	<isNotEmpty prepend="and" property="STATE">
+    	u.STATE = #STATE#
+  	</isNotEmpty>
+  	<isNotEmpty prepend="and" property="CMPL_ADVS_TYPE">
+    	u.CMPL_ADVS_TYPE = #CMPL_ADVS_TYPE#
+  	</isNotEmpty>
+  	<isNotEmpty prepend="and " property="CMPL_OBJ">
+	    u.CMPL_OBJ=#CMPL_OBJ#
+	</isNotEmpty>
+	<isNotEmpty prepend="and " property="CMPL_TO_PSON">
+	    u.CMPL_TO_PSON like '%'||#CMPL_TO_PSON#||'%'
+	</isNotEmpty>
+	<isNotEmpty prepend="and " property="ADVS_TYPE">
+	    u.ADVS_TYPE=#ADVS_TYPE#
+	</isNotEmpty>
+	<isNotEmpty prepend="and " property="DEL_FLAG">
+	    u.DEL_FLAG=#DEL_FLAG#
+	</isNotEmpty>
+    <isNotEmpty prepend="and " property="QXJBCON">
+	    $QXJBCON$
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="APPOINT_PSON_ID">
+		u.APPOINT_PSON_ID=#APPOINT_PSON_ID#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="LEDGER_ID">
+		u.LEDGER_ID=#LEDGER_ID#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="CMPL_OBJ">
+		u.CMPL_OBJ=#CMPL_OBJ#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="CMPL_TO_PSON">
+		u.CMPL_TO_PSON=#CMPL_TO_PSON#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="ADVS_TYPE">
+		u.ADVS_TYPE=#ADVS_TYPE#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="DEAL_PSON_NAME">
+		u.DEAL_PSON_NAME like '%'||#DEAL_PSON_NAME#||'%'
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="APPOINT_PSON_ZW">
+		u.DEAL_PSON_ID in (select temp.XTYHID from (select a.*, b.XM,b.ZW,c.jgmc,d.bmmc from T_SYS_XTYH a 
+              left join T_SYS_RYXX b
+               on a.RYXXID = b.RYXXID
+               and ryzt='启用'
+              left join T_SYS_JGXX c
+              on a.jgxxid = c.jgxxid
+              and c.delflag=0
+              LEFT JOIN T_SYS_BMXX d
+              on a.bmxxid = d.bmxxid
+              and d.bmzt='启用' and d.delflag=0
+              where a.yhzt='启用'
+              and a.delflag=0)temp
+              where temp.ZW like '%'||#APPOINT_PSON_ZW#||'%')
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="PRD_NO">
+		u.CMPL_ADVS_ID in ( select a.CMPL_ADVS_ID from  DRP_CMPL_PRD_DTL a where a.DEL_FLAG=0 and a.PRD_NO like '%'||#PRD_NO#||'%')
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="PRD_NAME">
+		u.CMPL_ADVS_ID in ( select a.CMPL_ADVS_ID from  DRP_CMPL_PRD_DTL a where a.DEL_FLAG=0 and a.PRD_NAME like '%'||#PRD_NAME#||'%')
+	</isNotEmpty>
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.CMPL_ADVS_ID,
+		u.CMPL_ADVS_NO,
+		(case when length(u.CMPL_ADVS_TITLE)>40 then substr(u.CMPL_ADVS_TITLE, 0, 40)||'...' else u.CMPL_ADVS_TITLE end ) CMPL_ADVS_TITLE,
+		u.CMPL_ADVS_TYPE,
+		u.CHANN_ID,
+		u.CHANN_NO,
+		u.CHANN_NAME,
+		u.AREA_NO,
+		u.AREA_NAME,
+		u.AREA_MANAGE_ID,
+		u.AREA_MANAGE_NAME,
+		u.AREA_CHIEF_ID,
+		u.AREA_CHIEF_NAME,
+		u.RAISE_PSON_ID,
+		u.RAISE_PSON_NAME,
+		to_char(u.RAISE_TIME,'yyyy-MM-DD HH24:MI:SS') RAISE_TIME,
+		u.TEL,
+		u.CMPL_OBJ,
+		u.CMPL_TO_PSON,
+		u.ADVS_TYPE,
+		u.ADVS_SMMRY,
+		u.CMPL_ADVS_CONTENT,
+		u.DEAL_PSON_ID,
+		u.DEAL_PSON_NAME,
+		to_char(u.DEAL_TIME,'yyyy-MM-DD HH24:MI:SS') DEAL_TIME,
+		u.FEEDBACK_INFO,
+		u.APPOINT_PSON_ID,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG,
+		u.EMG_LVL,
+		u.ADVS_SOURCE,
+		u.CUSTOMER_TEL,
+		u.CUSTOMER_NAME
+      from DRP_CMPL_ADVS u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM DRP_CMPL_ADVS u ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+
+<!--产品投诉反馈信息查询条件定义 -->
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+     select 
+		u.CMPL_PRD_DTL_ID,
+		u.CMPL_ADVS_ID,
+		u.PRD_ID,
+		u.PRD_NO,
+		u.PRD_NAME,
+		u.PRD_SPEC,
+		u.PRD_PROBLEM_TYPE,
+		u.REMARK,
+		u.PRD_ATT,
+		u.DEL_FLAG,
+		u.USE_TIME,
+		u.SHIP_POINT_NAME,
+		to_char(u.PRDC_DATE,'yyyy-mm-dd') PRDC_DATE,
+		to_char(u.BUY_DATE,'yyyy-mm-dd') BUY_DATE,
+		u.PRD_TYPE,
+		u.PRD_NUM
+       from DRP_CMPL_PRD_DTL u 
+   ]]>
+</sql>
+ <!-- 根据主表Id查询产品投诉反馈信息  -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.CMPL_ADVS_ID=#CMPL_ADVS_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+ <!-- 根据主表Id查询服务投诉反馈信息 --> 
+ 	<select id="querySerCmpl" parameterClass="map" resultClass="AdvisehdModel">
+ 		<![CDATA[
+ 			select 
+ 				u.CMPL_OBJ,
+ 				u.CMPL_TO_PSON,
+ 				u.CMPL_ADVS_CONTENT,
+ 				u.FEEDBACK_INFO
+ 			from DRP_CMPL_ADVS u
+ 			where 
+ 				u.CMPL_ADVS_ID=#CMPL_ADVS_ID#
+ 				and u.DEL_FLAG=#DEL_FLAG#
+ 		]]>
+ 	</select>
+ <!-- 根据主表Id查询建议信息 --> 
+ 	<select id="queryAdvs" parameterClass="map" resultClass="AdvisehdModel">
+ 		<![CDATA[
+ 			select 
+ 				u.ADVS_SMMRY,
+ 				u.CMPL_ADVS_CONTENT,
+ 				u.FEEDBACK_INFO
+ 			from DRP_CMPL_ADVS u
+ 			where 
+ 				u.CMPL_ADVS_ID=#CMPL_ADVS_ID#
+ 				and u.DEL_FLAG=#DEL_FLAG#
+ 		]]>
+ 	</select>
+ 	
+ 	
+ 	 <!-- 根据主表Id查询建议信息 --> 
+ 	<select id="loadById" parameterClass="map" resultClass="java.util.HashMap">
+ 		<![CDATA[
+ 			select 
+ 				 
+		u.CMPL_ADVS_NO,
+		(case when length(u.CMPL_ADVS_TITLE)>40 then substr(u.CMPL_ADVS_TITLE, 0, 40)||'...' else u.CMPL_ADVS_TITLE end ) CMPL_ADVS_TITLE,
+		u.CMPL_ADVS_TYPE,
+		u.CHANN_ID,
+		u.CHANN_NO,
+		u.CHANN_NAME,
+		u.AREA_NO,
+		u.AREA_NAME,
+		u.AREA_MANAGE_ID,
+		u.AREA_MANAGE_NAME,
+		u.AREA_CHIEF_ID,
+		u.AREA_CHIEF_NAME,
+		u.RAISE_PSON_ID,
+		u.RAISE_PSON_NAME,
+		to_char(u.RAISE_TIME,'yyyy-MM-DD HH24:MI:SS') RAISE_TIME,
+		u.TEL,
+		u.CMPL_OBJ,
+		u.CMPL_TO_PSON,
+		u.ADVS_TYPE,
+		u.ADVS_SMMRY,
+		u.CMPL_ADVS_CONTENT,
+		u.DEAL_PSON_ID,
+		u.DEAL_PSON_NAME,
+		to_char(u.DEAL_TIME,'yyyy-MM-DD HH24:MI:SS') DEAL_TIME,
+		u.FEEDBACK_INFO,
+		u.APPOINT_PSON_ID,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG,
+		u.EMG_LVL
+ 			from DRP_CMPL_ADVS u
+ 			where 
+ 				u.CMPL_ADVS_ID=#CMPL_ADVS_ID#
+ 				and u.DEL_FLAG=#DEL_FLAG#
+ 		]]>
+ 	</select>
+ 	
+ 	
+ <!-- 回馈信息更新 -->
+ 	<update id="saveFeedback" parameterClass="map">
+ 		<![CDATA[
+ 			update 
+ 				DRP_CMPL_ADVS u
+ 			set
+ 				DEAL_PSON_ID = #DEAL_PSON_ID#,
+ 				DEAL_PSON_NAME = #DEAL_PSON_NAME#,
+ 				DEAL_TIME = sysdate,
+ 				FEEDBACK_INFO = #FEEDBACK_INFO#,
+ 				UPDATOR = #UPDATOR#,
+ 				UPD_NAME = #UPD_NAME#,
+ 				UPD_TIME = sysdate,
+ 				STATE = #STATE#
+ 			where
+ 				CMPL_ADVS_ID = #CMPL_ADVS_ID#
+ 		]]>
+ 	</update>	
+ 	
+ <!-- 指派处理人 -->
+ 	<update id="appointPson" parameterClass="map">
+ 		<![CDATA[
+ 			update 
+ 				DRP_CMPL_ADVS u
+ 			set
+ 				APPOINT_PSON_ID = #APPOINT_PSON_ID#,
+ 				UPDATOR = #UPDATOR#,
+ 				UPD_NAME = #UPD_NAME#,
+ 				UPD_TIME = sysdate
+ 			where
+ 				CMPL_ADVS_ID = #CMPL_ADVS_ID#
+ 		]]>
+ 	</update>
+ 	
+ 	<!-- 根据主表Id查询产品处理过程信息  -->
+  <select id="queryProcessByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <![CDATA[
+ 			select 
+				u.DRP_CMPL_ADVS_TRACE_ID,
+				u.CMPL_ADVS_ID,
+				u.DEAL_PSON_ID,
+				u.DEAL_PSON_NAME,
+				to_char(u.DEAL_TIME,'yyyy-mm-dd hh24:mi:ss') DEAL_TIME,
+				u.FEEDBACK_INFO,
+				u.STATE
+				 
+		       from DRP_CMPL_ADVS_TRACE u 
+		       where u.CMPL_ADVS_ID=#CMPL_ADVS_ID#
+		       order by u.DEAL_TIME ASC
+ 					 
+ 		]]>
+  </select>
+  
+  <!--  -->
+ 	
+ 	<update id="updateADVS" parameterClass="map">
+	<![CDATA[ update DRP_CMPL_ADVS ]]>
+	<dynamic prepend="set">
+	 
+    <isNotNull property="APPOINT_PSON_ID" prepend=","><![CDATA[APPOINT_PSON_ID = #APPOINT_PSON_ID# ]]></isNotNull>
+    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+    <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    <isNotNull property="DEAL_TIME" prepend=","><![CDATA[DEAL_TIME = sysdate ]]></isNotNull>
+    <isNotNull property="DEAL_PSON_ID" prepend=","><![CDATA[DEAL_PSON_ID = #DEAL_PSON_ID# ]]></isNotNull>
+    <isNotNull property="DEAL_PSON_NAME" prepend=","><![CDATA[DEAL_PSON_NAME = #DEAL_PSON_NAME# ]]></isNotNull>
+    <isNotNull property="FEEDBACK_INFO" prepend=","><![CDATA[FEEDBACK_INFO = #FEEDBACK_INFO# ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull> 
+    </dynamic>
+	<![CDATA[ where CMPL_ADVS_ID = #CMPL_ADVS_ID#]]>
+</update>
+ 	
+ 	<insert id="insertADVSTRACE" parameterClass="map">
+	<![CDATA[
+		insert into DRP_CMPL_ADVS_TRACE(
+			DRP_CMPL_ADVS_TRACE_ID,
+			CMPL_ADVS_ID,
+			DEAL_PSON_ID,
+			DEAL_PSON_NAME,
+         	DEAL_TIME,
+         	FEEDBACK_INFO,
+         	STATE
+         )values(
+         	#DRP_CMPL_ADVS_TRACE_ID#,
+         	#CMPL_ADVS_ID#,
+			#DEAL_PSON_ID#,
+        	#DEAL_PSON_NAME#,
+        	sysdate,
+        	#FEEDBACK_INFO#,
+			#STATE#
+        	)
+	]]>
+</insert>
+<select id="expAdvsImport" parameterClass="map" resultClass="java.util.HashMap">
+<![CDATA[
+	select u.CMPL_ADVS_NO,
+	       u.CMPL_ADVS_TITLE,
+	       u.CMPL_ADVS_TYPE,
+	       u.EMG_LVL,
+	       to_char(u.RAISE_TIME,'yyyy-mm-dd HH24:MI:SS')RAISE_TIME,
+	       u.AREA_NAME,
+	       u.AREA_MANAGE_NAME,
+	       u.AREA_CHIEF_NAME,
+	       u.RAISE_PSON_NAME,
+	       u.ADVS_SOURCE,
+	       u.TEL,
+	       u.CUSTOMER_NAME,
+	       u.CUSTOMER_TEL,
+	       u.DEAL_PSON_NAME,
+	       to_char(u.DEAL_TIME,'yyyy-mm-dd HH24:MI:SS')DEAL_TIME,
+	       u.STATE,
+	       u.STATE,
+	       dtl.ADVS_SMMRY,
+	       dtl.CMPL_ADVS_CONTENT,
+	       dtl.FEEDBACK_INFO,
+	       u.CHANN_NO,
+	       u.CHANN_NAME
+	  from DRP_CMPL_ADVS u
+	  left join DRP_CMPL_ADVS dtl on dtl.CMPL_ADVS_ID=u.CMPL_ADVS_ID and dtl.DEL_FLAG=0
+	   where 1=1 and u.CMPL_ADVS_TYPE='建议'
+]]>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSql" />
+	</dynamic>
+</select>
+<select id="expSrvcmplImport" parameterClass="map" resultClass="java.util.HashMap">
+<![CDATA[
+	select u.CMPL_ADVS_NO,
+	       u.CMPL_ADVS_TITLE,
+	       u.CMPL_ADVS_TYPE,
+	       u.EMG_LVL,
+	       to_char(u.RAISE_TIME,'yyyy-mm-dd HH24:MI:SS')RAISE_TIME,
+	       u.AREA_NAME,
+	       u.AREA_MANAGE_NAME,
+	       u.AREA_CHIEF_NAME,
+	       u.RAISE_PSON_NAME,
+	       u.ADVS_SOURCE,
+	       u.TEL,
+	       u.CUSTOMER_NAME,
+	       u.CUSTOMER_TEL,
+	       u.DEAL_PSON_NAME,
+	       to_char(u.DEAL_TIME,'yyyy-mm-dd HH24:MI:SS')DEAL_TIME,
+	       u.STATE,
+	       dtl.CMPL_OBJ,
+	       dtl.CMPL_TO_PSON,
+	       dtl.CMPL_ADVS_CONTENT,
+	       dtl.FEEDBACK_INFO,
+	       u.CHANN_NO,
+	       u.CHANN_NAME
+	  from DRP_CMPL_ADVS u
+	  left join DRP_CMPL_ADVS dtl on dtl.CMPL_ADVS_ID=u.CMPL_ADVS_ID and dtl.DEL_FLAG=0
+	   where 1=1 and u.CMPL_ADVS_TYPE='服务投诉'
+]]>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSql" />
+	</dynamic>
+</select>
+<select id="expPrdcmplImport" parameterClass="map" resultClass="java.util.HashMap">
+<![CDATA[
+	select u.CMPL_ADVS_NO,
+	       u.CMPL_ADVS_TITLE,
+	       u.CMPL_ADVS_TYPE,
+	       u.EMG_LVL,
+	       to_char(u.RAISE_TIME,'yyyy-mm-dd HH24:MI:SS')RAISE_TIME,
+	       u.AREA_NAME,
+	       u.AREA_MANAGE_NAME,
+	       u.AREA_CHIEF_NAME,
+	       u.RAISE_PSON_NAME,
+	       u.ADVS_SOURCE,
+	       u.TEL,
+	       u.CUSTOMER_NAME,
+	       u.CUSTOMER_TEL,
+	       u.DEAL_PSON_NAME,
+	       to_char(u.DEAL_TIME,'yyyy-mm-dd HH24:MI:SS')DEAL_TIME,
+	       u.STATE,
+	       dtl.PRD_NO,
+	       dtl.PRD_NAME,
+	       dtl.PRD_SPEC,
+	       dtl.PRD_PROBLEM_TYPE,
+	       dtl.REMARK,
+	       dtl.PRD_ATT,
+	       dtl.USE_TIME,
+	       dtl.SHIP_POINT_NAME,
+	       to_char(dtl.PRDC_DATE,'yyyy-mm-dd') PRDC_DATE,
+	       to_char(dtl.BUY_DATE,'yyyy-mm-dd') BUY_DATE,
+	       dtl.PRD_TYPE,
+	       u.FEEDBACK_INFO,
+	       u.CHANN_NO,
+	       u.CHANN_NAME
+	  from DRP_CMPL_ADVS u
+	  left join DRP_CMPL_PRD_DTL dtl on dtl.CMPL_ADVS_ID=u.CMPL_ADVS_ID and dtl.DEL_FLAG=0
+	  where 1=1 and u.CMPL_ADVS_TYPE='产品投诉'
+]]>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSql" />
+	</dynamic>
+</select>
+<select id="getState" parameterClass="string" resultClass="string">
+	select STATE from DRP_CMPL_ADVS u where u.CMPL_ADVS_ID=#CMPL_ADVS_ID#
+</select>
+</sqlMap>

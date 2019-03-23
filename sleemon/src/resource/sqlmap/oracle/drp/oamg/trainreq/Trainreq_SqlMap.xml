@@ -1,0 +1,470 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author wzg
+@function 
+@version 2014-02-28 14:01:04
+-->
+<sqlMap  namespace="Trainreq">
+<!-- 定义TrainreqModel,TrainreqModelChld -->
+<typeAlias type="com.hoperun.drp.oamg.trainreq.model.TrainreqModel" alias="TrainreqModel"/>
+<typeAlias type="com.hoperun.drp.oamg.trainreq.model.TrainreqModelChld" alias="TrainreqModelChld" />
+<!-- 使用TrainreqModel装载结果集 -->
+<resultMap id="TrainreqModel" class="TrainreqModel">
+    <result column="TRAIN_REQ_ID" property="TRAIN_REQ_ID" />
+</resultMap>
+<!-- 使用TrainreqModelChld装载结果集 -->
+<resultMap id="TrainreqModelChld" class="TrainreqModelChld">
+    <result column="TRAIN_REQ_DTL_ID" property="TRAIN_REQ_DTL_ID" />
+</resultMap>
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="CHANNS_CHARG">
+    u.CHANN_ID in $CHANNS_CHARG$
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="TRAIN_REQ_NO">
+    u.TRAIN_REQ_NO like '%'||#TRAIN_REQ_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="TRAIN_ADDR">
+    u.TRAIN_ADDR like '%'||#TRAIN_ADDR#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="TRAIN_TYPE">
+    u.TRAIN_TYPE like '%'||#TRAIN_TYPE#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="REQ_REASON">
+    u.REQ_REASON like '%'||#REQ_REASON#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="TRAIN_COURSE_NAME">
+    u.TRAIN_COURSE_NAME like '%'||#TRAIN_COURSE_NAME#||'%'
+  </isNotEmpty>
+	<isNotEmpty prepend="and " property="DEL_FLAG">
+	        u.DEL_FLAG=#DEL_FLAG#
+	</isNotEmpty>
+    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	</isNotEmpty>
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.TRAIN_REQ_ID,
+		u.TRAIN_REQ_NO,
+		u.CHANN_ID,
+		u.CHANN_NO,
+		u.CHANN_NAME,
+		u.TRAIN_COURSE_NO,
+		u.TRAIN_COURSE_NAME,
+		u.TRAIN_TYPE,
+		to_char(u.TRAIN_TIME_BEG,'yyyy-MM-DD HH24:MI') TRAIN_TIME_BEG,
+		to_char(u.TRAIN_TIME_END,'yyyy-MM-DD HH24:MI') TRAIN_TIME_END,
+		u.TRAIN_ADDR,
+		u.FIXED_PSON_NUM,
+		u.REQ_JOIN_NUM,
+		u.REQ_REASON,
+		u.TRAIN_COURSE_ID,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG
+      from ERP_TRAIN_REQ u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM ERP_TRAIN_REQ u ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_TRAIN_REQ(
+		 TRAIN_REQ_ID,
+		 TRAIN_REQ_NO,
+		 CHANN_ID,
+		 CHANN_NO,
+		 CHANN_NAME,
+		 TRAIN_COURSE_NO,
+		 TRAIN_COURSE_NAME,
+		 TRAIN_TYPE,
+		 TRAIN_TIME_BEG,
+		 TRAIN_TIME_END,
+		 TRAIN_ADDR,
+		 FIXED_PSON_NUM,
+		 REQ_JOIN_NUM,		 
+		 REQ_REASON,
+		 TRAIN_COURSE_ID,
+         CRE_NAME,
+         CREATOR,
+         CRE_TIME,
+         UPD_NAME,
+         UPDATOR,
+         UPD_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         STATE,
+         DEL_FLAG
+	   )values(
+		#TRAIN_REQ_ID#,
+		#TRAIN_REQ_NO#,
+		#CHANN_ID#,
+		#CHANN_NO#,
+		#CHANN_NAME#,
+		#TRAIN_COURSE_NO#,
+		#TRAIN_COURSE_NAME#,
+		#TRAIN_TYPE#,
+		to_date(#TRAIN_TIME_BEG#,'yyyy-MM-DD HH24:MI'),
+		to_date(#TRAIN_TIME_END#,'yyyy-MM-DD HH24:MI'),
+		#TRAIN_ADDR#,
+		#FIXED_PSON_NUM#,
+		#REQ_JOIN_NUM#,
+		#REQ_REASON#,
+		#TRAIN_COURSE_ID#,
+        #CRE_NAME#,
+        #CREATOR#,
+	    sysdate, 
+        #UPD_NAME#,
+        #UPDATOR#,
+		sysdate, 
+        #DEPT_ID#,
+        #DEPT_NAME#,
+        #ORG_ID#,
+        #ORG_NAME#,
+        #LEDGER_ID#,
+        #LEDGER_NAME#,
+        #STATE#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update ERP_TRAIN_REQ ]]>
+	<dynamic prepend="set">	
+	<isNotNull property="CHANN_ID" prepend=","><![CDATA[CHANN_ID = #CHANN_ID# ]]></isNotNull>
+	<isNotNull property="CHANN_NO" prepend=","><![CDATA[CHANN_NO = #CHANN_NO# ]]></isNotNull>
+	<isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME# ]]></isNotNull>
+	<isNotNull property="TRAIN_COURSE_NO" prepend=","><![CDATA[TRAIN_COURSE_NO = #TRAIN_COURSE_NO# ]]></isNotNull>
+	<isNotNull property="TRAIN_COURSE_NAME" prepend=","><![CDATA[TRAIN_COURSE_NAME = #TRAIN_COURSE_NAME# ]]></isNotNull>
+	<isNotNull property="TRAIN_TYPE" prepend=","><![CDATA[TRAIN_TYPE = #TRAIN_TYPE# ]]></isNotNull>
+	<isNotNull property="TRAIN_TIME_BEG" prepend=","><![CDATA[TRAIN_TIME_BEG = to_date(#TRAIN_TIME_BEG#,'yyyy-MM-DD HH24:MI')]]></isNotNull>
+	<isNotNull property="TRAIN_TIME_END" prepend=","><![CDATA[TRAIN_TIME_END = to_date(#TRAIN_TIME_END#,'yyyy-MM-DD HH24:MI')]]></isNotNull>
+	<isNotNull property="TRAIN_ADDR" prepend=","><![CDATA[TRAIN_ADDR = #TRAIN_ADDR# ]]></isNotNull>
+	<isNotNull property="REQ_JOIN_NUM" prepend=","><![CDATA[REQ_JOIN_NUM = #REQ_JOIN_NUM# ]]></isNotNull>
+	<isNotNull property="FIXED_PSON_NUM" prepend=","><![CDATA[FIXED_PSON_NUM = #FIXED_PSON_NUM# ]]></isNotNull>
+	<isNotNull property="REQ_REASON" prepend=","><![CDATA[REQ_REASON = #REQ_REASON# ]]></isNotNull>
+	<isNotNull property="TRAIN_COURSE_ID" prepend=","><![CDATA[TRAIN_COURSE_ID = #TRAIN_COURSE_ID# ]]></isNotNull>
+	<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+     <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where TRAIN_REQ_ID = #TRAIN_REQ_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update ERP_TRAIN_REQ 
+	               set DEL_FLAG = #DEL_FLAG#
+                      ,UPD_NAME=#UPD_NAME#
+                     ,UPDATOR=#UPDATOR#
+                      ,UPD_TIME=sysdate
+ 	  where 
+	     TRAIN_REQ_ID = #TRAIN_REQ_ID:VARCHAR# 
+    ]]>
+</delete>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.TRAIN_REQ_ID,
+		u.TRAIN_REQ_NO,
+		u.CHANN_ID,
+		u.CHANN_NO,
+		u.CHANN_NAME,
+		u.TRAIN_COURSE_NO,
+		u.TRAIN_COURSE_NAME,
+		u.TRAIN_TYPE,
+		to_char(u.TRAIN_TIME_BEG,'yyyy-MM-DD HH24:MI') TRAIN_TIME_BEG,
+		to_char(u.TRAIN_TIME_END,'yyyy-MM-DD HH24:MI') TRAIN_TIME_END,
+		u.TRAIN_ADDR,
+		u.FIXED_PSON_NUM,
+		u.REQ_JOIN_NUM,
+		u.REQ_REASON,
+		u.TRAIN_COURSE_ID,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG
+	  from
+       ERP_TRAIN_REQ u 
+	  where 
+		u.TRAIN_REQ_ID = #TRAIN_REQ_ID#
+	]]>
+</select>
+<!-- 明细操作开始-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+     select 
+		u.TRAIN_REQ_DTL_ID,
+		u.TRAIN_REQ_ID,
+		u.TRAIN_TYPE,
+		u.TRAIN_OBJECT_ID,
+		u.TRAIN_OBJECT_NO,
+		u.TRAIN_OBJECT_NAME,
+		u.REMARK,
+		u.STATE,
+		u.DEL_FLAG
+       from ERP_TRAIN_REQ_DTL u 
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.TRAIN_REQ_ID=#TRAIN_REQ_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+	        u.TRAIN_REQ_DTL_ID in ($TRAIN_REQ_DTL_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+<!--明细表插入 -->
+<insert id="insertChld" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_TRAIN_REQ_DTL(
+		 TRAIN_REQ_DTL_ID,
+		 TRAIN_REQ_ID,
+		 TRAIN_TYPE,
+		 TRAIN_OBJECT_ID,
+		 TRAIN_OBJECT_NO,
+		 TRAIN_OBJECT_NAME,
+		 REMARK,
+         STATE,
+         DEL_FLAG
+	   )values(
+		#TRAIN_REQ_DTL_ID#,
+		#TRAIN_REQ_ID#,
+		#TRAIN_TYPE#,
+		#TRAIN_OBJECT_ID#,
+		#TRAIN_OBJECT_NO#,
+		#TRAIN_OBJECT_NAME#,
+		#REMARK#,
+        #STATE#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+<!--明细表更新 -->
+<update id="updateChldById" parameterClass="map">
+	<![CDATA[ update ERP_TRAIN_REQ_DTL ]]>
+	<dynamic prepend="set">
+	<isNotNull property="TRAIN_TYPE" prepend=","><![CDATA[TRAIN_TYPE = #TRAIN_TYPE# ]]></isNotNull>
+    <isNotNull property="TRAIN_OBJECT_ID" prepend=","><![CDATA[TRAIN_OBJECT_ID = #TRAIN_OBJECT_ID# ]]></isNotNull>
+    <isNotNull property="TRAIN_OBJECT_NO" prepend=","><![CDATA[TRAIN_OBJECT_NO = #TRAIN_OBJECT_NO# ]]></isNotNull>
+    <isNotNull property="TRAIN_OBJECT_NAME" prepend=","><![CDATA[TRAIN_OBJECT_NAME = #TRAIN_OBJECT_NAME# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where TRAIN_REQ_DTL_ID = #TRAIN_REQ_DTL_ID#]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteChldByIds" parameterClass="map">
+	<![CDATA[ update ERP_TRAIN_REQ_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      TRAIN_REQ_DTL_ID in ($TRAIN_REQ_DTL_IDS$)
+    ]]>
+</delete>
+
+<!--根据主键ID删除明细 -->
+<delete id="delChldByFkId" parameterClass="map">
+	<![CDATA[ update ERP_TRAIN_REQ_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      TRAIN_REQ_ID = #TRAIN_REQ_ID:VARCHAR#
+    ]]>
+</delete>
+
+<!-- 培训结果明细 -->
+<sql id="queryDynSqlChldRst">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>
+<sql id="orderSqlChldRst">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChldRst">
+	<![CDATA[ 
+     select 
+		u.TRAIN_RESULT_DTL_ID,
+		u.TRAIN_REQ_ID,
+		u.TRAIN_PER_NO,
+	    u.TRAIN_PER_NAME,
+	    u.THE_ORGAN,
+	    u.THE_POST,
+	    u.SIGN_STATE,
+	    u.TRAIN_PER,
+	    u.TRAIN_ASSES,
+	    u.TRAIN_OVERALL,
+		u.REMARK,
+		u.STATE,
+		u.DEL_FLAG
+       from ERP_TRAIN_RESULT_DTL u 
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldRstByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChldRst"/>
+	  <dynamic prepend="where">
+			u.TRAIN_REQ_ID=#TRAIN_REQ_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChldRst" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChldRst"/>
+	  </isNotNull>
+  </select>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadChldRstByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChldRst"/>
+	  <dynamic prepend="where">
+	        u.TRAIN_RESULT_DTL_ID in ($TRAIN_RESULT_DTL_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChldRst" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChldRst"/>
+	  </isNotNull>
+  </select>
+<!--明细表插入 -->
+<insert id="insertChldRst" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_TRAIN_RESULT_DTL(
+		 TRAIN_RESULT_DTL_ID,
+		 TRAIN_REQ_ID,
+		 TRAIN_PER_NO,
+		 TRAIN_PER_NAME,
+		 THE_ORGAN,
+		 THE_POST,
+		 SIGN_STATE,
+		 TRAIN_PER,
+		 TRAIN_ASSES,
+		 TRAIN_OVERALL,
+		 REMARK,
+         STATE,
+         DEL_FLAG
+	   )values(
+		#TRAIN_RESULT_DTL_ID#,
+		#TRAIN_REQ_ID#,
+		#TRAIN_PER_NO#,
+		#TRAIN_PER_NAME#,
+		#THE_ORGAN#,
+		#THE_POST#,
+		#SIGN_STATE#,
+		#TRAIN_PER#,
+		#TRAIN_ASSES#,
+		#TRAIN_OVERALL#,
+		#REMARK#,
+        #STATE#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+<!--明细表更新 -->
+<update id="updateChldRstById" parameterClass="map">
+	<![CDATA[ update ERP_TRAIN_RESULT_DTL ]]>
+	<dynamic prepend="set">
+	<isNotNull property="TRAIN_PER_NO" prepend=","><![CDATA[TRAIN_PER_NO = #TRAIN_PER_NO# ]]></isNotNull>
+    <isNotNull property="TRAIN_PER_NAME" prepend=","><![CDATA[TRAIN_PER_NAME = #TRAIN_PER_NAME# ]]></isNotNull>
+    <isNotNull property="THE_ORGAN" prepend=","><![CDATA[THE_ORGAN = #THE_ORGAN# ]]></isNotNull>
+    <isNotNull property="SIGN_STATE" prepend=","><![CDATA[SIGN_STATE = #SIGN_STATE# ]]></isNotNull>
+    <isNotNull property="TRAIN_PER" prepend=","><![CDATA[TRAIN_PER = #TRAIN_PER# ]]></isNotNull>
+    <isNotNull property="TRAIN_ASSES" prepend=","><![CDATA[TRAIN_ASSES = #TRAIN_ASSES# ]]></isNotNull>
+    <isNotNull property="TRAIN_OVERALL" prepend=","><![CDATA[TRAIN_OVERALL = #TRAIN_OVERALL# ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>    
+    </dynamic>
+	<![CDATA[ where TRAIN_RESULT_DTL_ID = #TRAIN_RESULT_DTL_ID#]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteChldRstByIds" parameterClass="map">
+	<![CDATA[ update ERP_TRAIN_RESULT_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      TRAIN_RESULT_DTL_ID in ($TRAIN_RESULT_DTL_IDS$)
+    ]]>
+</delete>
+</sqlMap>

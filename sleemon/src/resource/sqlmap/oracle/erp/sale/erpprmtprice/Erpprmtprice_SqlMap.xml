@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ *@module 基础资料
+ *@func 渠道信息
+ *@version 1.1
+ *@author 刘曰刚
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Erpprmtprice">
+
+	<typeAlias type="com.hoperun.erp.sale.erpprmtprice.model.ErpprmtpriceModel"
+		alias="ErpprmtpriceModel" />
+
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="ErpprmtpriceModel" class="ErpprmtpriceModel">
+		<result column="PRMT_PRICE_ID" property="PRMT_PRICE_ID" />
+	</resultMap>
+	<!-- 动态查询 and 列表排序 -->
+	<sql id="queryDynSql"> 
+	    <isNotEmpty prepend="and " property="seachFlag">$seachFlag$</isNotEmpty>
+		<isNotEmpty prepend="and " property="priceFlag">$priceFlag$</isNotEmpty>
+	    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	   </isNotEmpty>
+		<isNotEmpty prepend="and " property="PRMT_PLAN_NO">PRMT_PLAN_NO =#PRMT_PLAN_NO#</isNotEmpty>
+		<isNotEmpty prepend="and " property="STATE">STATE =#STATE#</isNotEmpty>
+		<isNotEmpty prepend="and " property="PRMT_PLAN_NAME">PRMT_PLAN_NAME=#PRMT_PLAN_NAME#</isNotEmpty>
+		<isNotEmpty prepend="and " property="PAR_PRD_NAME">PRD_ID in (select PRD_ID from BASE_PRODUCT where DEL_FLAG=0 $PAR_PRD_NAME$)</isNotEmpty>
+		<isNotEmpty prepend=" and " property="PRD_GROUP_NAME">
+			PRD_ID in (
+				select b.PRD_ID 
+				from BASE_PRD_GROUP a 
+				left join BASE_PRD_GROUP_DTL b on a.PRD_GROUP_ID=b.PRD_GROUP_ID and b.DEL_FLAG=0
+				where a.DEL_FLAG=0 and a.STATE='启用'  $PRD_GROUP_NAME$)
+		</isNotEmpty>
+		<isNotEmpty prepend="  " property="PRD_NO">$PRD_NO$</isNotEmpty>
+		<isNotEmpty prepend="  " property="PRD_NAME">$PRD_NAME$</isNotEmpty>
+	  </sql>
+	   <sql id="prdQueryDynSql"> 
+	   <isNotEmpty prepend="and " property="COMM_FLAG">COMM_FLAG=#COMM_FLAG#</isNotEmpty>
+	   <isNotEmpty prepend="and " property="seachFlag">$seachFlag$</isNotEmpty>
+		<isNotEmpty prepend="and " property="prdFlag">$prdFlag$</isNotEmpty>
+		<isNotEmpty prepend=" and " property="PRD_GROUP_NAME">
+			PRD_ID in (
+				select b.PRD_ID 
+				from BASE_PRD_GROUP a 
+				left join BASE_PRD_GROUP_DTL b on a.PRD_GROUP_ID=b.PRD_GROUP_ID and b.DEL_FLAG=0
+				where a.DEL_FLAG=0 and a.STATE='启用'  $PRD_GROUP_NAME$)
+		</isNotEmpty>
+		<isNotEmpty prepend="  " property="PAR_PRD_NAME">$PAR_PRD_NAME$</isNotEmpty>
+		<isNotEmpty prepend="  " property="PRD_NO">$PRD_NO$</isNotEmpty>
+		<isNotEmpty prepend="  " property="PRD_NAME">$PRD_NAME$</isNotEmpty>
+	</sql>
+    <sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField"> $orderField$,</isNotEmpty>PRD_NO
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[
+			select a.PRD_ID,
+			       a.PRD_NO,
+			       a.PRD_NAME,
+			       a.PRD_SPEC,
+			       a.BRAND,
+			       a.PRD_COLOR,
+			       a.PRVD_PRICE,
+			       '' EFFCT_DATE_BEG,
+			       '' EFFCT_DATE_END,
+			       0 DECT_RATE,
+			       0 PRMT_PRVD_PRICE,
+			       '' PRMT_PRICE_ID,
+			       '' PRMT_PLAN_NO,
+			       '' PRMT_PLAN_NAME,
+			       a.COMM_FLAG,
+			       '' STATE
+			  from BASE_PRODUCT a
+			  where PRD_ID not in (select PRD_ID from ERP_PRMT_PRICE where DEL_FLAG = 0
+				]]>
+		<dynamic prepend=" and ">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<![CDATA[
+			) and IS_NO_STAND_FLAG=0 and FINAL_NODE_FLAG=1
+		]]>
+		<dynamic prepend=" and ">
+			<include refid="prdQueryDynSql" />
+		</dynamic>
+		<![CDATA[
+			union 
+				select PRD_ID,
+			       PRD_NO,
+			       PRD_NAME,
+			       PRD_SPEC,
+			       BRAND,
+			       PRD_COLOR,
+			       PRVD_PRICE,
+			       to_char(EFFCT_DATE_BEG,'yyyy-mm-dd')EFFCT_DATE_BEG,
+			       to_char(EFFCT_DATE_END,'yyyy-mm-dd')EFFCT_DATE_END,
+			       round((case when NVL(PRVD_PRICE,0)=0 then 0 else NVL(PRMT_PRVD_PRICE,0)/NVL(PRVD_PRICE,0) end),2)DECT_RATE,
+			       PRMT_PRVD_PRICE,
+			       PRMT_PRICE_ID,
+			       PRMT_PLAN_NO,
+			       PRMT_PLAN_NAME,
+			       1,
+			       STATE
+			  from ERP_PRMT_PRICE 
+			  where DEL_FLAG=0
+		]]>
+		<dynamic prepend=" and ">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[
+		select count(PRD_ID) cnt from(
+			select a.PRD_ID,
+			       a.PRD_NO,
+			       a.PRD_NAME,
+			       a.PRD_SPEC,
+			       a.BRAND,
+			       a.PRD_COLOR,
+			       a.PRVD_PRICE,
+			       '' EFFCT_DATE_BEG,
+			       '' EFFCT_DATE_END,
+			       0 PRMT_PRVD_PRICE,
+			       '' PRMT_PRICE_ID,
+			       '' PRMT_PLAN_NO,
+			       '' PRMT_PLAN_NAME,
+			       a.COMM_FLAG,
+			       ''STATE
+			  from BASE_PRODUCT a
+			  where prd_id not in (select PRD_ID from ERP_PRMT_PRICE where DEL_FLAG = 0
+				]]>
+		<dynamic prepend=" and ">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<![CDATA[
+			) and IS_NO_STAND_FLAG=0 and FINAL_NODE_FLAG=1
+		]]>
+		<dynamic prepend=" and ">
+			<include refid="prdQueryDynSql" />
+		</dynamic>
+		<![CDATA[
+			union 
+				select PRD_ID,
+			       PRD_NO,
+			       PRD_NAME,
+			       PRD_SPEC,
+			       BRAND,
+			       PRD_COLOR,
+			       PRVD_PRICE,
+			       to_char(EFFCT_DATE_BEG,'yyyy-mm-dd')EFFCT_DATE_BEG,
+			       to_char(EFFCT_DATE_END,'yyyy-mm-dd')EFFCT_DATE_END,
+			       PRMT_PRVD_PRICE,
+			       PRMT_PRICE_ID,
+			       PRMT_PLAN_NO,
+			       PRMT_PLAN_NAME,
+			       1,
+			       STATE
+			  from ERP_PRMT_PRICE where DEL_FLAG=0
+		]]>
+		<dynamic prepend=" and ">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<![CDATA[
+			)
+		]]>
+	</select>
+
+   <!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	<insert id="insert" parameterClass="map">
+		insert into ERP_PRMT_PRICE(
+	        PRMT_PRICE_ID,
+	        PRMT_PLAN_ID,
+	        PRMT_PLAN_NO,
+	        PRMT_PLAN_NAME,
+	        PRMT_TYPE,
+	        EFFCT_DATE_BEG,
+	        EFFCT_DATE_END,
+	        PRD_ID,
+	        PRD_NO,
+	        PRD_NAME,
+	        PRD_SPEC,
+	        PRD_COLOR,
+	        BRAND,
+	        PRVD_PRICE,
+	        PRMT_PRVD_PRICE,
+	        STATE,
+	        REMARK,
+	        CREATOR,
+	        CRE_NAME,
+	        CRE_TIME,
+	        DEPT_ID,
+	        DEPT_NAME,
+	        ORG_ID,
+	        ORG_NAME,
+	        LEDGER_ID,
+	        LEDGER_NAME,
+	        DEL_FLAG
+	)
+	select 
+	        #PRMT_PRICE_ID#,
+	        b.PRMT_PLAN_ID,
+	        b.PRMT_PLAN_NO,
+	        b.PRMT_PLAN_NAME,
+	        b.PRMT_TYPE,
+	        b.EFFCT_DATE_BEG,
+	        b.EFFCT_DATE_END,
+	        a.PRD_ID,
+	        a.PRD_NO,
+	        a.PRD_NAME,
+	        a.PRD_SPEC,
+	        a.PRD_COLOR,
+	        a.BRAND,
+	        a.PRVD_PRICE,
+	        #PRMT_PRVD_PRICE#,
+	        #STATE#,
+	        #REMARK#,
+	        #CREATOR#,
+	        #CRE_NAME#,
+	        sysdate,
+	        #DEPT_ID#,
+	        #DEPT_NAME#,
+	        #ORG_ID#,
+	        #ORG_NAME#,
+	        #LEDGER_ID#,
+	        #LEDGER_NAME#,
+	        #DEL_FLAG#
+	  from BASE_PRODUCT a,ERP_PRMT_PLAN b
+	  where b.PRMT_PLAN_ID=#PRMT_PLAN_ID#  and a.prd_id=#PRD_ID#
+	</insert>
+	<update id="update" parameterClass="map">
+		update ERP_PRMT_PRICE
+		   set PRMT_PRVD_PRICE = #PRMT_PRVD_PRICE# , UPDATOR = #UPDATOR#,
+		 UPD_NAME = #UPD_NAME#, UPD_TIME = sysdate
+		 where PRMT_PRICE_ID = #PRMT_PRICE_ID#
+	</update>
+	<update id="updateState" parameterClass="map">
+		<![CDATA[
+			update ERP_PRMT_PRICE set 
+				UPDATOR = #UPDATOR#,
+		 		UPD_NAME = #UPD_NAME#, 
+		 		UPD_TIME = sysdate,
+		 		STATE=#STATE#
+		 	where PRMT_PRICE_ID in ($PRMT_PRICE_IDS$)
+		]]>
+	</update>
+</sqlMap>

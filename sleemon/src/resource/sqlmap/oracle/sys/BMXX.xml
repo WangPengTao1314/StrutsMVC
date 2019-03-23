@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="BMXX">
+	<!-- 
+		*@module 系统管理
+		*@func 部门信息维护
+		*@version 1.1
+		*@author 吴亚林
+		*  -->
+	<typeAlias type="com.hoperun.sys.model.BMXXModel" alias="BMXXModel" />
+
+	<!-- 使用BMXX装载结果集 -->
+	<resultMap id="BMXXModel" class="BMXXModel">
+		<result column="BMXXID" property="BMXXID" />
+	</resultMap>
+
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="BMXXID">
+			(u.BMXXID = #BMXXID# OR u.SJBM = #BMXXID#)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="BMBH">
+			u.BMBH like '%'||#BMBH#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="BMMCQuery">
+			u.BMMC like '%'||#BMMCQuery#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="BMJC">
+			u.BMJC like '%'||#BMJC#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="BMZT">
+			u.BMZT = #BMZT#
+		</isNotEmpty>
+		
+		<isNotEmpty prepend="and" property="SJBMMCQuery">
+			u.SJBM in (select BMXXID from T_SYS_BMXX where 1=1 $SJBMMCQuery$)
+		</isNotEmpty>
+		
+		
+		<isNotEmpty prepend="and" property="DELFLAG">
+			u.DELFLAG = #DELFLAG#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="JGMC">
+			j.JGMC like '%'||#JGMC#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="JGXXID">
+			j.JGXXID like '%'||#JGXXID#||'%'
+		</isNotEmpty>
+	</sql>
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField">
+			$orderField$,
+		</isNotEmpty>
+		BMBH
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[  SELECT U.BMXXID,U.BMBH,
+		                U.BMMC,U.BMJC,U.DH,U.CZ,U.DZYJ,U.SJBM,
+		                K. BMMC SJBMMC,
+		                U.BMZT,U.QTSM,U.XXDZ,U.JGXXID,J.JGMC,U.ZTXXID,U.XH,U.YZBM,
+		                U.ZYDZ,
+		                U.DELFLAG FROM ${SYSSCHEMA}.T_SYS_BMXX U LEFT JOIN T_SYS_JGXX J ON U.JGXXID=J.JGXXID
+		                left join ${SYSSCHEMA}.T_SYS_BMXX K on K.BMXXID = U.SJBM
+		                ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql" />
+		</dynamic>
+	</sql>
+
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(U.BMXXID) cnt FROM ${SYSSCHEMA}.T_SYS_BMXX U LEFT JOIN T_SYS_JGXX J ON U.JGXXID=J.JGXXID ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+
+	<!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	<!-- 新增 -->
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.T_SYS_BMXX(BMXXID,BMBH,BMMC,BMJC,DH,CZ,DZYJ,ZYDZ,YZBM,SJBM,BMZT,QTSM,XXDZ,XH,JGXXID,ZTXXID,DELFLAG)
+		 values(#BMXXID#,#BMBH#,#BMMC#,#BMJC#,#DH#,#CZ#,#DZYJ#,#ZYDZ#,#YZBM#,#SJBM:VARCHAR:NULL#,#BMZT#,#QTSM#,#XXDZ#,#XH#,#JGXXID#,#ZTXXID#,0)
+		]]>
+	</insert>
+	<!-- 根据ID修改 -->
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_BMXX ]]>
+		<!-- CHANAME, CHADES,CHADATE,CHASTU     -->
+		<dynamic prepend="set">
+			<isNotNull property="BMBH" prepend=","><![CDATA[BMBH = #BMBH#]]></isNotNull>
+			<isNotNull property="BMMC" prepend=","><![CDATA[BMMC = #BMMC#]]></isNotNull>
+			<isNotNull property="BMJC" prepend=","><![CDATA[BMJC = #BMJC#]]></isNotNull>
+			<isNotNull property="DH" prepend=","><![CDATA[DH = #DH#]]></isNotNull>
+			<isNotNull property="CZ" prepend=","><![CDATA[CZ = #CZ#]]></isNotNull>
+			<isNotNull property="DZYJ" prepend=","><![CDATA[DZYJ = #DZYJ#]]></isNotNull>
+			<isNotNull property="ZYDZ" prepend=","><![CDATA[ZYDZ = #ZYDZ#]]></isNotNull>
+			<isNotNull property="YZBM" prepend=","><![CDATA[YZBM = #YZBM#]]></isNotNull>
+			<isNotNull property="SJBM" prepend=","><![CDATA[SJBM = #SJBM#]]></isNotNull>
+			<isNotNull property="BMZT" prepend=","><![CDATA[BMZT = #BMZT#]]></isNotNull>
+			<isNotNull property="QTSM" prepend=","><![CDATA[QTSM = #QTSM#]]></isNotNull>
+			<isNotNull property="XXDZ" prepend=","><![CDATA[XXDZ = #XXDZ#]]></isNotNull>
+			<isNotNull property="XH" prepend=","><![CDATA[XH = #XH#]]></isNotNull>
+			<isNotNull property="JGXXID" prepend=","><![CDATA[JGXXID = #JGXXID#]]></isNotNull>
+			<isNotNull property="ZTXXID" prepend=","><![CDATA[ZTXXID = #ZTXXID#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where BMXXID = #BMXXID# ]]>
+	</update>
+
+<!-- 根据NO修改 -->
+	<update id="updateByNo" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_BMXX ]]>
+		<!-- CHANAME, CHADES,CHADATE,CHASTU     -->
+		<dynamic prepend="set">
+			<isNotNull property="BMMC" prepend=","><![CDATA[BMMC = #BMMC#]]></isNotNull>
+			<isNotNull property="BMJC" prepend=","><![CDATA[BMJC = #BMJC#]]></isNotNull>
+			<isNotNull property="DH" prepend=","><![CDATA[DH = #DH#]]></isNotNull>
+			<isNotNull property="CZ" prepend=","><![CDATA[CZ = #CZ#]]></isNotNull>
+			<isNotNull property="DZYJ" prepend=","><![CDATA[DZYJ = #DZYJ#]]></isNotNull>
+			<isNotNull property="ZYDZ" prepend=","><![CDATA[ZYDZ = #ZYDZ#]]></isNotNull>
+			<isNotNull property="YZBM" prepend=","><![CDATA[YZBM = #YZBM#]]></isNotNull>
+			<isNotNull property="SJBM" prepend=","><![CDATA[SJBM = #SJBM#]]></isNotNull>
+			<isNotNull property="BMZT" prepend=","><![CDATA[BMZT = #BMZT#]]></isNotNull>
+			<isNotNull property="QTSM" prepend=","><![CDATA[QTSM = #QTSM#]]></isNotNull>
+			<isNotNull property="XXDZ" prepend=","><![CDATA[XXDZ = #XXDZ#]]></isNotNull>
+			<isNotNull property="XH" prepend=","><![CDATA[XH = #XH#]]></isNotNull>
+			<isNotNull property="JGXXID" prepend=","><![CDATA[JGXXID = #JGXXID#]]></isNotNull>
+			<isNotNull property="ZTXXID" prepend=","><![CDATA[ZTXXID = #ZTXXID#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where BMBH = #BMBH# ]]>
+	</update>
+	<!-- 删除部门 -->
+	<delete id="delete" parameterClass="String">
+		<![CDATA[ delete from  ${SYSSCHEMA}.T_SYS_BMXX  where BMXXID = #BMXXID:VARCHAR# ]]>
+	</delete>
+    
+    <insert id="insertBM" parameterClass="map">
+       insert into ${SYSSCHEMA}.t_sys_datarecycle(DATARECYCLEID,DELETOR,DELTIME,BUSINESSTYPE,DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10,DF11,DF12,DF13,DF14,DF15,DF16,DF17,DF18)
+	    select #DATARECYCLEID#,#DELETOR#,sysdate,'部门信息维护',BMXXID,BMBH,BMMC,BMJC,DH,CZ,DZYJ,SJBM,BMZT,QTSM,XXDZ,JGXXID,ZTXXID,XH,YZBM,ZYDZ,DELFLAG,CWDZM
+        from ${SYSSCHEMA}.T_SYS_BMXX
+	    where BMXXID = #BMXXID:VARCHAR#
+    </insert>
+	<select id="loadById" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<![CDATA[  SELECT U.BMXXID,
+		                U.BMBH,
+		                U.BMMC,
+		                U.BMJC,
+		                U.DH,
+		                U.CZ,
+		                U.DZYJ,
+		                U.SJBM,
+		                (SELECT BMMC FROM T_SYS_BMXX B WHERE B.BMXXID = U.SJBM) SJBMMC,
+		                U.BMZT,
+		                U.QTSM,
+		                U.XXDZ,
+		                U.JGXXID,
+		                J.JGMC,
+		                U.ZTXXID,
+		                U.XH,
+		                U.YZBM,
+		                U.ZYDZ,
+		                U.DELFLAG FROM ${SYSSCHEMA}.T_SYS_BMXX U LEFT JOIN T_SYS_JGXX J ON U.JGXXID=J.JGXXID WHERE U.BMXXID = #BMXXID#]]>
+	</select>
+
+	<!-- 部门树 -->
+	<select id="queryTree" parameterClass="map" resultClass="com.hoperun.sys.model.BMXXTree">
+		<![CDATA[ SELECT JGXXID ID, JGBH||'('||JGMC||')' NAME, SJJG PID, '0' FLAG,$ctx$||'/styles/'||$theme$||'/images/tree3/jg.png' icon FROM T_SYS_JGXX WHERE DELFLAG = 0 
+					UNION ALL
+				  SELECT BMXXID ID, BMBH||'('||BMMC||')' NAME, NVL(SJBM, JGXXID) PID, '1' FLAG,$ctx$||'/styles/'||$theme$||'/images/tree3/bm.png' FROM T_SYS_BMXX WHERE DELFLAG = 0 
+				  order by NAME
+				  ]]>
+	</select>
+
+	<select id="getExits" parameterClass="String" resultClass="int">
+		<![CDATA[SELECT COUNT(T.BMBH) FROM T_SYS_BMXX T WHERE T.BMBH=#BMBH# ]]>
+	</select>
+	
+	<select id="getWsxSJ" parameterClass="map" resultClass="int">
+		<![CDATA[select count(0) from (  SELECT * FROM T_SYS_BMXX T start with bmxxid=#BMXXID# connect by  bmxxid = prior SJBM) u where u.bmzt<>'启用' and u.bmxxid <>#BMXXID#]]>
+	</select>
+	
+	<select id="getWtyXJ" parameterClass="map" resultClass="int">
+		<![CDATA[select count(0) from T_SYS_RYXX where bmxxid in (select bmxxid from 
+		(SELECT * FROM T_SYS_BMXX T start with bmxxid=#BMXXID# connect by  prior bmxxid =  SJBM) u where u.bmzt='启用' and u.delflag='0')
+			and delflag='0' and ryzt='启用'	
+		]]>
+	</select>
+	
+	<update id="updateAllById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_BMXX set bmzt='停用'  where BMXXID in (select bmxxid from 
+		(SELECT * FROM T_SYS_BMXX T start with bmxxid=#BMXXID# connect by  prior bmxxid =   SJBM) u where u.bmzt='启用' and u.delflag='0')]]>
+	</update>
+	
+	<update id="updateRById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_RYXX  set RYZT='停用' where BMXXID in (select bmxxid from 
+		(SELECT * FROM T_SYS_BMXX T start with bmxxid=#BMXXID# connect by  prior bmxxid =   SJBM) u where u.bmzt='启用' and u.delflag='0')
+			and delflag='0' and ryzt='启用'	 ]]>
+	</update>
+	
+	<select id="loadBMZT" parameterClass="String" resultClass="String">
+		<![CDATA[ select BMZT from ${SYSSCHEMA}.T_SYS_BMXX WHERE BMXXID = #SJBM#]]>
+	</select>
+	
+	<update id="updateStateById" parameterClass="map">	
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_BMXX ]]>
+		<dynamic prepend="set">
+			<isNotNull property="DELFLAG" prepend=","><![CDATA[DELFLAG = #DELFLAG#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where BMXXID in(select BMXXID from T_SYS_BMXX
+                              start with BMXXID = #BMXXID#
+                              connect by prior BMXXID = SJBM) ]]>	
+	</update>
+	
+</sqlMap>
+

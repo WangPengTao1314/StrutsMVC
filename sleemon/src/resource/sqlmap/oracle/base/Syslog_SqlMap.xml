@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ *@module 基础数据
+ *@func  系统日志
+ *@version 1.1
+ *@author  
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Syslog">
+
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[select  u.SYSLOG_ID,u.UC_NAME,u.ACT_NAME ,u.OPRATOR, u.ACT_TIME, u.STATE,
+		 u.REMARK,u.APPCODE,u.APPID,u.OPRCODE from ${SYSSCHEMA}.T_SYS_SYSLOG u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	   	<dynamic prepend="order by ">
+			<include refid="orderSql" />
+		</dynamic> 
+	</sql>
+	
+	   <!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+	    <isNotEmpty prepend="and" property="SYSLOG_ID">
+			u.SYSLOG_ID = #SYSLOG_ID#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="UC_NAME">
+			u.UC_NAME LIKE '%'|| #UC_NAME# ||'%'
+		</isNotEmpty> 
+		<isNotEmpty prepend="and" property="ACT_NAME">
+			u.ACT_NAME LIKE '%'|| #ACT_NAME# ||'%'
+		</isNotEmpty> 
+		<isNotEmpty prepend="and" property="OPRATOR">
+			u.OPRATOR = #OPRATOR#
+		</isNotEmpty>		
+	    <isNotEmpty prepend="and" property="ACT_TIME_FROM">
+			<![CDATA[to_date(u.ACT_TIME,'yyyy-MM-DD HH24:MI:SS') >= to_date(#ACT_TIME_FROM#,'yyyy-MM-DD HH24:MI:SS')]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="ACT_TIME_TO">
+			<![CDATA[to_date(u.ACT_TIME,'yyyy-MM-DD HH24:MI:SS') <= to_date(#ACT_TIME_TO#,'yyyy-MM-DD HH24:MI:SS')]]>
+		</isNotEmpty>
+	    <isNotEmpty prepend="and" property="STATE">
+			u.STATE = #STATE#
+	    </isNotEmpty> 
+	    <isNotEmpty prepend="and" property="APPCODE">
+			u.APPCODE = #APPCODE#
+	    </isNotEmpty> 
+	    <isNotEmpty prepend="and " property="APPID">
+	        u.APPID = #APPID#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="and " property="OPRCODE">
+	        u.OPRCODE = #OPRCODE#
+	    </isNotEmpty>
+	</sql>
+	<sql id="orderSql">
+	   <isNotEmpty prepend=" " property="orderField">
+			$orderField$,
+		</isNotEmpty>
+		u.ACT_TIME　desc
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+	
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(u.SYSLOG_ID) cnt FROM ${SYSSCHEMA}.T_SYS_SYSLOG u]]>
+		 <dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+	
+	<!-- 根据ID查找 -->
+	<select id="loadById" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[select  u.SYSLOG_ID,u.UC_NAME,u.ACT_NAME ,u.OPRATOR, u.ACT_TIME, u.STATE,
+		 u.REMARK,u.APPCODE,u.APPID,u.OPRCODE from ${SYSSCHEMA}.T_SYS_SYSLOG u 
+				where
+					u.SYSLOG_ID = #SYSLOG_ID#
+		]]>
+	</select>
+	
+	
+</sqlMap>
+

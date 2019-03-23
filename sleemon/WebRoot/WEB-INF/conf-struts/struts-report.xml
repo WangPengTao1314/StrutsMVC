@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://struts.apache.org/dtds/struts-config_1_2.dtd">
+<struts-config>
+	<action-mappings>
+	    <!--润乾报表管理 -->
+		<action parameter="action" path="/report/raq" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+		 <forward name="frames" path="/report/reportcomm/report_Frame.jsp"/>
+		 <forward name="realPageResult" path="/report/reportcomm/Real_Page_Result.jsp"/>
+		 <forward name="bastPageResult" path="/report/reportcomm/Bast_Page_Result.jsp"/>
+		 <forward name="testRealRpt"  path="/report/reportcon/RealTestCondiotion.jsp"/>
+		 <forward name="testBastRpt"  path="/report/reportcon/BastTestCondiotion.jsp"/>
+		 <forward name="errorPage"    path="/report/reportcomm/report_error.jsp"/>
+		 <forward name="pageResult"   path="/report/reportcomm/report_Result.jsp"/>
+		 <forward name="pageCalendar" path="/report/reportcomm/report_Calendar.jsp"/>
+		 <forward name="toDetail"     path="/report/reportcomm/report_Detail.jsp"></forward>
+		 <!-- 门店销售统计表 -->
+		 <forward name="saleCountCon" path="/report/reportcon/SaleCount_Condition.jsp"/>
+		 <!-- 财务》》门店销售统计表 -->
+		 <forward name="FDsaleCountCon" path="/report/reportcon/FDSaleCount_Condition.jsp"/>
+		  <!-- 门店库存查询 -->
+		 <forward name="storeStockCon" path="/report/reportcon/StoreStock_Condition.jsp"/>
+		 <!-- 待确认预订单统计 -->
+		 <forward name="toUncomm" path="/report/reportcon/Uncomm_Condition.jsp"/>
+		 
+		 <forward name="returnCountCon" path="/report/reportcon/ReturnCount_Condition.jsp"/>
+		 <!-- 调拨表统计 -->
+		 <forward name="allocatecount" path="/report/reportcon/Allocatecount_Condition.jsp"/>
+		 <forward name="freezeStockCon" path="/report/reportcon/freezeStock_Condition.jsp"/>
+		 <!-- 信用查询 -->
+		 <forward name="creditCon" path="/report/reportcon/credit_Condition.jsp"/>
+		 <!-- 新信用查询 -->
+		 <forward name="newCreditCon" path="/report/reportcon/newCredit_Condition.jsp"/>
+		
+		 <!-- 发货情况统计表 -->
+		 <forward name="queryDeliver" path="/report/reportcon/deliver_Condition.jsp"/>
+		 <!-- 新发货情况统计表 -->
+		 <forward name="queryNewDeliver" path="/report/reportcon/newDeliver_Condition.jsp"/>
+		 <!--销售订单出货明细-->
+		 <forward name="toSaleOrderSendResult" path="/report/reportcon/SaleorderSendoutMX_Condition.jsp"/>
+		 <!--订货订单信息 -->
+		 <forward name="toGoodsorderCon" path="/report/reportcon/Goodsorder_Condition.jsp"/>		
+		 <!--退货统计 -->
+		 <forward name="toReturncountCon" path="/report/reportcon/ReturnCount_Condition.jsp"/>		 
+		 <!--总仓库存 -->
+		 <forward name="toStoreRepertoryCon" path="/report/reportcon/StoreRepertory_Condition.jsp"/>
+		 <!-- 订单发货状态跟踪查询-->
+		 <forward name="queryGoods" path="/report/reportcon/goods_Condition.jsp"/>
+		 <!-- 返利抵扣查询 -->
+		 <forward name="queryRrebate" path="/report/reportcon/RebateDeducted_Condition.jsp"/>
+		 <!-- 合同执行情况查询 --> 
+		 <forward name="queryContract" path="/report/reportcon/Contract_Condition.jsp"/>
+		 <!-- 收款情况查询 -->
+		 <forward name="queryClause" path="/report/reportcon/importClause_Condition.jsp"/>
+		 <!-- 返款情况查询 -->
+		 <forward name="queryRebates" path="/report/reportcon/rebatesClause_Condition.jsp"/>
+		 <!--日销售商品明细表-->
+		 <forward name="queryAdvcOrder" path="/report/reportcon/AdvcOrder_Condition.jsp"/>
+		 <forward name="queryInvocAcct" path="/report/reportcon/InvocAcct_Condition.jsp"/>
+		 <!--信用流水账-->
+		 <forward name="toCreditAcctResult" path="/report/reportcon/Credit_Acct_Condition.jsp"/>
+		 <!--信用流水账对外查询-->
+		 <forward name="toCreditAcctOutResult" path="/report/reportcon/CreditAcct_Out_Condition.jsp"/>
+ 
+		 <forward name="queryInvocAcct" path="/report/reportcon/InvocAcct_Condition.jsp"/>
+		 <!-- 仓库进销存报表 -->
+		 <forward name="queryInvocNum" path="/report/reportcon/InvocNum_Condition.jsp"/>
+		 <forward name="queryAdvcStoreAcct" path="/report/reportcon/AdvcStoreAcct_Condition.jsp"/>
+		 <!--门店发货统计表-->
+		 <forward name="termSaleSendcount" path="/report/reportcon/termSaleSendcount_Condition.jsp"/>
+ 		 <forward name="advcList" path="/pages/drp/sale/advcorder/Advcorder_Info_List.jsp"/>
+ 		 <!-- 未处理的订货订单冻结信用 -->
+ 		 <forward name="toCreditFreeze" path="/report/reportcon/CreditFreeze_Condition.jsp"/>
+ 		 <!-- 返利订单扣除信用 -->
+ 		 <forward name="toRebateFreeze" path="/report/reportcon/RebateFreeze_Condition.jsp"/>
+ 		 <!-- TOP10产品 -->
+ 		 <forward name="toTop10Product" path="/report/reportcon/Top10Product_Condition.jsp"/>
+ 		 <!-- 销量统计比例 -->
+ 		 <forward name="toSalePercentage" path="/report/reportcon/SalePercentage_Condition.jsp"/>
+ 		 <!-- 分类销量统计 -->
+ 		 <forward name="toCOSS" path="/report/reportcon/COSS_Condition.jsp"/>
+ 		 <!-- 原发运单查询 -->
+ 		 <forward name="toOldDelivery" path="/report/reportcon/oldDeliveryQuery_Condition.jsp"/>
+ 		 <!-- 待确认预订单 -->
+ 		 <forward name="toUncommAdvc" path="/report/reportcon/uncommAdvc_Condition.jsp"/>
+ 		 <!-- 总部销售报表 -->
+ 		 <forward name="erpSaleReport" path="/report/reportcon/ErpSaleReport_Condition.jsp"/>
+ 		 <!-- 分销销售报表 -->
+ 		 <forward name="drpSaleReport" path="/report/reportcon/DrpSaleReport_Condition.jsp"/>
+ 		 <!-- 销售计划达成率报表 -->
+ 		 <forward name="salePlanReport" path="/report/reportcon/SalePlanReport_Condition.jsp"/>
+ 		 <!-- 月度拜访工作计划达成率 -->
+ 		 <forward name="toQueryMonthvisitResult" path="/report/reportcon/QueryMonthvisit_Condition.jsp"/>
+ 		 <!-- 门店精致化检查分数 -->
+ 		 <forward name="toQueryRCheckResult"     path="/report/reportcon/QueryCheckResult_Condition.jsp"/> 
+ 		 <!-- 有效门店达成数-->
+ 		 <forward name="toWareaQuarterOpenNumReport"    path="/report/reportcon/WareaQuarterOpenNumReport_Condition.jsp"/> 
+ 		 <!-- 终端门店报表 -->
+ 		 <forward name="toTerminalOpenReport"    path="/report/reportcon/TerminalOpenReport_Condition.jsp"/> 
+ 		 <!-- 拜访达成考核目标报表 -->
+ 		 <forward name="toVisitTaskAssessReport"    path="/report/reportcon/VisitTaskAssess_Condition.jsp"/> 
+ 		 <!-- 活动销售报表 -->
+ 		 <forward name="toMarketSaleReport"    path="/report/reportcon/MarketSale_Condition.jsp"/> 
+ 		 <!-- 活动提成查询报表 -->
+ 		 <forward name="toMarketCommReport"    path="/report/reportcon/MarketComm_Condition.jsp"/> 
+ 		 <!-- 加盟商推广费用使用明细 -->
+ 		 <forward name="toPrmtCostReqReport"    path="/report/reportcon/PrmtCostReq_Condition.jsp"/>
+ 		 <!-- 加盟商推广费用报表 -->
+ 		 <forward name="toPrmtCostReport"   path="/report/reportcon/PrmtCost_Condition.jsp"></forward> 
+ 		 <!-- 门店销售排名 -->
+ 		 <forward name="toSaleRanking"      path="/report/reportcon/SaleRanking_Condition.jsp"/> 
+ 		 <!-- 总部对账单查询 -->
+         <forward  name="toAccountReport" path="/report/reportcon/AccountReport_Condition.jsp"/>
+         <!-- 月工作计划提交情况 -->
+         <forward  name="toMonthWorkPlan" path="/report/reportcon/MonthWorkPlanReport_Condition.jsp"/>
+         <!-- 直营办-销售情况统计表 -->
+         <forward  name="toSaleaOrderReport" path="/report/reportcon/saleaOrderReport_Condition.jsp"/>
+         <!-- 直营办-发货情况统计表 -->
+         <forward  name="toStoreoutaReport" path="/report/reportcon/storeoutaReport_Condition.jsp"/>
+         <!-- 直营办-退货情况统计表 -->
+         <forward  name="toReturnaReport" path="/report/reportcon/returnaReport_Condition.jsp"/>
+         <!-- 直营办-进销存报表 -->
+         <forward  name="toInvocAcctaReport" path="/report/reportcon/InvocAccta_Condition.jsp"/>
+         <!-- 战区推广费 -->
+         <forward  name="toWareExtensionFee" path="/report/reportcon/WareExtensionFee_Condition.jsp"/>
+         <!-- 区域推广费 -->
+         <forward  name="toAreaExtensionFee" path="/report/reportcon/AreaExtensionFee_Condition.jsp"/>
+         <!-- 卡券清单 -->
+         <forward  name="toCardList" path="/report/reportcon/CardList_Condition.jsp"/>
+         <!-- 年度返利汇总 -->
+         <forward name="toAnnualRebateReport" path="/report/reportcon/AnnualRebate_Condition.jsp"/>
+         <!-- 直营办零售数据跟踪 -->
+         <forward name="toChildCompSaleTrakingReport" path="/report/reportcon/ChildCompSaleTraking_Condition.jsp"/>
+         <!-- 每月售后投诉报表 -->
+         <forward name="toAdviseMonthStatisReport" path="/report/reportcon/AdviseMonthStatis_Condition.jsp"/>
+         <!-- 床垫季/年度售后投诉报表 -->
+         <forward name="toAdviseCDMonthStatisReport" path="/report/reportcon/AdviseCDMonthStatis_Condition.jsp"/>
+		 <!-- 软床季/年度售后投诉报表 -->
+         <forward name="toAdviseRCMonthStatisReport" path="/report/reportcon/AdviseRCMonthStatis_Condition.jsp"/>
+		 <!-- 床头柜季/年度售后投诉报表 -->
+         <forward name="toAdviseCTGMonthStatisReport" path="/report/reportcon/AdviseCTGMonthStatis_Condition.jsp"/>
+ 
+		 <!-- XXXX年XX月国内销售民用产品预估表 -->
+         <forward name="toForecastAdvcMonthPrdReport" path="/report/reportcon/toForecastAdvcMonthPrd_Condition.jsp"/>
+         <!---偏差率 -->
+         <forward name="toRptChannPrdDiffReport" path="/report/reportcon/RptChannPrdDiffReport_Condition.jsp"/>
+		 <!-- 营销经理日报 -->
+		 <forward name="toMkmDayReport"   path="/report/reportcon/MkmDayReport_Condition.jsp"/>
+		 <!-- 加盟商营销经理评分 -->
+		 <forward name="toChannMkmReport" path="/report/reportcon/ChannMkmReport_Condition.jsp"></forward>
+		 <!-- 分销商购货月报 -->
+		 <forward name="toDistributorSaleRpt" path="/report/reportcon/DistributorSaleRpt_Condition.jsp"></forward>
+		</action> 
+		
+		<action parameter="action" path="/report/drpreportlist" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+		  <forward name="list" path="/pages/drp/report/reportlist/Drp_Report_List.jsp"/>
+		</action>
+		<action parameter="action" path="/report/financialreportlist" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+		  <forward name="list" path="/pages/drp/report/financialList/Drp_Financial_List.jsp"/>
+		</action>
+		<action parameter="action" path="/report/savereptshareview" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+		</action>
+	</action-mappings>
+</struts-config>
+

@@ -1,0 +1,21 @@
+@charset "utf-8";
+  
+/*------分页相关--------------*/  
+span.firstPage{padding:0px 1px;background:url(../images/tools/arr_first.gif);width:18px;height:16px;cursor: pointer;}
+span.lastPage{padding:0px 1px;background:url(../images/tools/arr_last.gif);width:18px;height:16px;cursor: pointer;}
+span.prevPage{padding:0px 1px;background:url(../images/tools/arr_pre.gif);width:18px;height:16px;cursor: pointer;}
+span.nextPage{padding:0px 1px;background:url(../images/tools/arr_next.gif);width:18px;height:16px;cursor: pointer;}
+span.goPage{padding:0px 1px;background:url(../images/tools/page-go.jpg);width:18px;height:16px;cursor: pointer;}
+span.firstDis2{padding:0px 1px;background:url(../images/tools/arr_first_black.gif);width:18px;height:16px;}
+span.lastDis2{padding:0px 1px;background:url(../images/tools/arr_last_black.gif);width:18px;height:16px;}
+span.prevDis2{padding:0px 1px;background:url(../images/tools/arr_pre_black.gif);width:18px;height:16px;}
+span.nextDis2{padding:0px 1px;background:url(../images/tools/arr_next_black.gif);width:18px;height:16px;}
+input.gotoPage {width:40px;height:20px;}
+input.gotoPageBtn {width:40px;height:20px;}
+span.number{padding:0px 2px;}
+span.wait{width:16px;height:16px;background:url(../images/plus/wait.gif)}
+
+/*------排序相关--------------*/  
+span.ascOrder{background:url(../images/tools/icon_up.gif) no-repeat;width:7px;height:9px;}
+span.descOrder{padding:0pt;background:url(../images/tools/icon_down.gif) no-repeat;width:7px;height:9px;}
+ 

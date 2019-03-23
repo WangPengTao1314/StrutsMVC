@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+	@author zcx
+	@function  渠道参数设置
+	@version 2014-05-20 11:13:12
+-->
+<sqlMap namespace="rnvtncheck">
+	<typeAlias
+		type="com.hoperun.drp.oamg.rnvtncheck.model.RnvtncheckModel"
+		alias="RnvtncheckModel" />
+	<!-- 使用Resvstore装载结果集 -->
+	<resultMap id="RnvtncheckModel" class="RnvtncheckModel">
+		<result column="RNVTN_CHECK_ID" property="RNVTN_CHECK_ID" />
+	</resultMap>
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		u.DEL_FLAG = 0
+		<isNotEmpty  property="CHANNS_CHARG">
+         and  u.CHANN_ID in $CHANNS_CHARG$
+        </isNotEmpty>  
+		<isNotEmpty property="RNVTN_CHECK_NO">
+			and u.RNVTN_CHECK_NO like '%'||#RNVTN_CHECK_NO#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="CHANN_RNVTN_NO">
+			and u.CHANN_RNVTN_NO like '%'||#CHANN_RNVTN_NO#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="TERM_NO">
+			and u.TERM_NO like '%'||#TERM_NO#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="TERM_NAME">
+			and u.TERM_NAME like '%'||#TERM_NAME#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="AREA_NAME">
+			and u.AREA_NAME like '%'||#AREA_NAME#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="AREA_MANAGE_NAME">
+			and u.AREA_MANAGE_NAME like '%'||#AREA_MANAGE_NAME#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="RNVTN_PROP">
+			and u.RNVTN_PROP = #RNVTN_PROP#
+		</isNotEmpty>
+		<isNotEmpty property="STATE">
+			and u.STATE like '%'||#STATE#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="LEDGER_ID">
+			and u.LEDGER_ID = #LEDGER_ID#
+		</isNotEmpty>
+		<isNotEmpty property="QXJBCON">and $QXJBCON$</isNotEmpty>
+
+	</sql>
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField">
+			$orderField$
+		</isNotEmpty>
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[ 
+			select
+			   u.RNVTN_CHECK_ID,
+		       u.RNVTN_CHECK_NO,
+		       u.CHANN_RNVTN_NO,
+		       u.TERM_NO,
+		       u.TERM_NAME,
+		       u.RNVTN_PROP,
+		       u.PLAN_SBUSS_DATE,
+		       u.AREA_NO,
+		       u.AREA_NAME,
+		       u.LOCAL_TYPE,
+		       u.BUSS_SCOPE,
+		       u.RNVTN_PRINCIPAL,
+		       u.RNVTN_CHECK_DATE,
+		       u.STATE
+		       from DRP_RNVTN_CHECK u
+   ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql" />
+		</dynamic>
+	</sql>
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[
+	   select count(0) cnt 
+            from DRP_RNVTN_CHECK u 
+		   ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+	<!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+	  insert into DRP_RNVTN_CHECK(
+		 RNVTN_CHECK_ID,
+		 RNVTN_CHECK_NO,
+		 CHANN_RNVTN_ID,
+		 CHANN_RNVTN_NO,
+		 RNVTN_PRINCIPAL,
+		 RNVTN_CHECK_DATE,
+		 TERM_ID,
+		 TERM_NO,
+		 TERM_NAME,
+		 RNVTN_PROP,
+		 PLAN_SBUSS_DATE,
+		 AREA_ID,
+		 AREA_NO,
+		 AREA_NAME,
+		 AREA_MANAGE_ID,
+		 AREA_MANAGE_NAME,
+		 AREA_MANAGE_TEL,
+		 SALE_STORE_ID,
+		 SALE_STORE_NAME,
+		 ZONE_ADDR,
+		 LOCAL_TYPE,
+		 BUSS_SCOPE,
+		 CHECK_SCORE,
+		 STATE,
+		 CHECK_REMARK,
+		 PUNISH_REMARK,
+		 REMARK,
+		 DEL_FLAG,
+		 CREATOR,
+		 CRE_NAME,
+		 CRE_TIME,
+		 DEPT_ID,
+		 DEPT_NAME,
+		 ORG_ID,
+		 ORG_NAME,
+		 LEDGER_ID,
+		 LEDGER_NAME
+	   )values(
+		 #RNVTN_CHECK_ID#,
+		 #RNVTN_CHECK_NO#,
+		 #CHANN_RNVTN_ID#,
+		 #CHANN_RNVTN_NO#,
+		 #RNVTN_PRINCIPAL#,
+		 to_date(#RNVTN_CHECK_DATE#,'yyyy-MM-DD'),
+		 #TERM_ID#,
+		 #TERM_NO#,
+		 #TERM_NAME#,
+		 #RNVTN_PROP#,
+		 to_date(#PLAN_SBUSS_DATE#,'yyyy-MM-DD'),
+		 #AREA_ID#,
+		 #AREA_NO#,
+		 #AREA_NAME#,
+		 #AREA_MANAGE_ID#,
+		 #AREA_MANAGE_NAME#,
+		 #AREA_MANAGE_TEL#,
+		 #SALE_STORE_ID#,
+		 #SALE_STORE_NAME#,
+		 #ZONE_ADDR#,
+		 #LOCAL_TYPE#,
+		 #BUSS_SCOPE#,
+		 #CHECK_SCORE#,
+		 #STATE#,
+		 #CHECK_REMARK#,
+		 #PUNISH_REMARK#,
+		 #REMARK#,
+		 
+		 #DEL_FLAG#,
+		 #CREATOR#,
+		 #CRE_NAME#,
+		 sysdate,
+		 
+		 #DEPT_ID#,
+		 #DEPT_NAME#,
+		 #ORG_ID#,
+		 #ORG_NAME#,
+		 #LEDGER_ID#,
+		 #LEDGER_NAME#
+		)
+   ]]>
+	</insert>
+
+	<insert id="insertChild" parameterClass="map">
+		<![CDATA[
+	  insert into DRP_RNVTN_CHECK_DTL(
+	     RNVTN_CHECK_DTL_ID,
+		 RNVTN_CHECK_ID,
+		 PRJ_TYPE,
+		 PRJ_NAME,
+		 PRJ_SCORE,
+		 CHECK_SCORE,
+		 CHECK_REMARK,
+		 DEL_FLAG,
+		 IS_REFORM_FLAG
+	   )values(
+	     #RNVTN_CHECK_DTL_ID#,
+		 #RNVTN_CHECK_ID#,
+		 #PRJ_TYPE#,
+		 #PRJ_NAME#,
+		 #PRJ_SCORE#,
+		 #CHECK_SCORE#,
+		 #CHECK_REMARK#,
+		 #DEL_FLAG#,
+		 #IS_REFORM_FLAG#
+		)
+   ]]>
+	</insert>
+	
+   <update id="updateChild" parameterClass="map">
+		<![CDATA[ update DRP_RNVTN_CHECK_DTL ]]>
+		<dynamic prepend="set">
+			<isNotNull property="RNVTN_CHECK_ID" prepend=","><![CDATA[RNVTN_CHECK_ID = #RNVTN_CHECK_ID# ]]></isNotNull>
+			<isNotNull property="PRJ_TYPE" prepend=","><![CDATA[PRJ_TYPE = #PRJ_TYPE# ]]></isNotNull>
+			<isNotNull property="PRJ_NAME" prepend=","><![CDATA[PRJ_NAME = #PRJ_NAME# ]]></isNotNull>
+			<isNotNull property="PRJ_SCORE" prepend=","><![CDATA[PRJ_SCORE = #PRJ_SCORE# ]]></isNotNull>
+			<isNotNull property="CHECK_SCORE" prepend=","><![CDATA[CHECK_SCORE = #CHECK_SCORE# ]]></isNotNull>
+			<isNotNull property="CHECK_REMARK" prepend=","><![CDATA[CHECK_REMARK = #CHECK_REMARK# ]]></isNotNull>
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+			<isNotNull property="IS_REFORM_FLAG" prepend=","><![CDATA[IS_REFORM_FLAG = #IS_REFORM_FLAG# ]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where RNVTN_CHECK_DTL_ID = #RNVTN_CHECK_DTL_ID#]]>
+	</update>
+	
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update DRP_RNVTN_CHECK ]]>
+		<dynamic prepend="set">
+		
+		    <isNotNull property="CHANN_RNVTN_ID" prepend=","><![CDATA[CHANN_RNVTN_ID = #CHANN_RNVTN_ID# ]]></isNotNull>
+		    <isNotNull property="CHANN_RNVTN_NO" prepend=","><![CDATA[CHANN_RNVTN_NO = #CHANN_RNVTN_NO# ]]></isNotNull>
+		 
+			<isNotNull property="RNVTN_CHECK_NO" prepend=","><![CDATA[RNVTN_CHECK_NO = #RNVTN_CHECK_NO# ]]></isNotNull>
+			<isNotNull property="RNVTN_PRINCIPAL" prepend=","><![CDATA[RNVTN_PRINCIPAL = #RNVTN_PRINCIPAL# ]]></isNotNull>
+			<isNotNull property="RNVTN_CHECK_DATE" prepend=","><![CDATA[RNVTN_CHECK_DATE = to_date(#RNVTN_CHECK_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+			<isNotNull property="TERM_ID" prepend=","><![CDATA[TERM_ID = #TERM_ID# ]]></isNotNull>
+			<isNotNull property="TERM_NO" prepend=","><![CDATA[TERM_NO = #TERM_NO# ]]></isNotNull>
+			<isNotNull property="TERM_NAME" prepend=","><![CDATA[TERM_NAME = #TERM_NAME# ]]></isNotNull>
+			<isNotNull property="RNVTN_PROP" prepend=","><![CDATA[RNVTN_PROP = #RNVTN_PROP# ]]></isNotNull>
+			<isNotNull property="PLAN_SBUSS_DATE" prepend=","><![CDATA[PLAN_SBUSS_DATE = to_date(#PLAN_SBUSS_DATE#,'yyyy-MM-DD')]]></isNotNull>
+			<isNotNull property="AREA_ID" prepend=","><![CDATA[AREA_ID = #AREA_ID# ]]></isNotNull>
+			<isNotNull property="AREA_NO" prepend=","><![CDATA[AREA_NO = #AREA_NO# ]]></isNotNull>
+			<isNotNull property="AREA_NAME" prepend=","><![CDATA[AREA_NAME = #AREA_NAME# ]]></isNotNull>
+			<isNotNull property="AREA_MANAGE_ID" prepend=","><![CDATA[AREA_MANAGE_ID = #AREA_MANAGE_ID# ]]></isNotNull>
+			<isNotNull property="AREA_MANAGE_NAME" prepend=","><![CDATA[AREA_MANAGE_NAME = #AREA_MANAGE_NAME# ]]></isNotNull>
+			<isNotNull property="AREA_MANAGE_TEL" prepend=","><![CDATA[AREA_MANAGE_TEL = #AREA_MANAGE_TEL# ]]></isNotNull>
+			<isNotNull property="SALE_STORE_NAME" prepend=","><![CDATA[SALE_STORE_NAME = #SALE_STORE_NAME# ]]></isNotNull>
+			<isNotNull property="ZONE_ADDR" prepend=","><![CDATA[ZONE_ADDR = #ZONE_ADDR# ]]></isNotNull>
+			<isNotNull property="LOCAL_TYPE" prepend=","><![CDATA[LOCAL_TYPE = #LOCAL_TYPE# ]]></isNotNull>
+			<isNotNull property="BUSS_SCOPE" prepend=","><![CDATA[BUSS_SCOPE = #BUSS_SCOPE# ]]></isNotNull>
+			<isNotNull property="CHECK_SCORE" prepend=","><![CDATA[CHECK_SCORE = #CHECK_SCORE#]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+			
+			<isNotNull property="PUNISH_REMARK" prepend=","><![CDATA[PUNISH_REMARK = #PUNISH_REMARK# ]]></isNotNull>
+			<isNotNull property="CHECK_REMARK" prepend=","><![CDATA[CHECK_REMARK = #CHECK_REMARK# ]]></isNotNull>
+			<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where RNVTN_CHECK_ID = #RNVTN_CHECK_ID#]]>
+	</update>
+	
+	<update id="updateState" parameterClass="map">
+	   <![CDATA[ update DRP_RNVTN_CHECK ]]>
+		<dynamic prepend="set">
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where RNVTN_CHECK_ID = #RNVTN_CHECK_ID#]]>
+	
+	</update>
+
+
+	<select id="queryChildById" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<![CDATA[ 
+	       SELECT  t.RNVTN_CHECK_DTL_ID,
+                   t.RNVTN_CHECK_ID ,
+                   t.PRJ_TYPE,
+	               t.PRJ_NAME,
+	               t.PRJ_SCORE,
+	               t.CHECK_SCORE,
+	               t.CHECK_REMARK,
+	               t.IS_REFORM_FLAG
+                   FROM DRP_RNVTN_CHECK_DTL t  
+                   where 
+		           t.DEL_FLAG='0' AND t.RNVTN_CHECK_ID = #RNVTN_CHECK_ID#  
+	]]>
+	</select>
+	
+	<select id="queryChildByIdT" parameterClass="map"
+		resultClass="RnvtncheckModel">
+		<![CDATA[ 
+	         select 
+	            t.RNVTN_CHECK_DTL_ID,
+	            t.RNVTN_CHECK_ID ,
+	            t.PRJ_TYPE,
+	            t.PRJ_NAME,
+	            t.PRJ_SCORE,
+	            t.CHECK_SCORE,
+	            t.CHECK_REMARK,
+	            t.IS_REFORM_FLAG
+	            from DRP_RNVTN_CHECK_DTL t left join DRP_RNVTN_CHECK k on k.RNVTN_CHECK_ID = t.RNVTN_CHECK_ID
+	            where 
+		        t.DEL_FLAG='0' AND  t.RNVTN_CHECK_ID = #RNVTN_CHECK_ID#
+	]]>
+	</select>
+
+	<select id="loadById" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[ 
+	  select 
+		 u.RNVTN_SUBST_STD_ID,
+		 u.RNVTN_SUBST_STD_NO,
+		 u.BRAND,
+		 u.MIN_AREA,
+		 u.STD_AREA,
+		 u.BUILD_COST,
+		 u.DECORATE_COST,
+		 u.RNVTN_SUBST_STD_VSION,
+		 u.STATE,
+		 u.REMARK,
+		 u.CREATOR,
+		 u.CRE_NAME,
+		 to_char(u.CRE_TIME,'yyyy-MM-DD') CRE_TIME,
+		 u.DEPT_ID,
+		 u.DEPT_NAME,
+		 u.ORG_ID,
+		 u.ORG_NAME,
+		 u.LEDGER_ID,
+		 u.LEDGER_NAME,
+		 u.REMARK,
+		 PUNISH_REMARK,
+		 CHECK_REMARK
+         from DRP_RNVTN_SUBST_STD u  
+	     where 
+		 u.RNVTN_SUBST_STD_ID = #RNVTN_SUBST_STD_ID#
+	]]>
+	</select>
+
+	<select id="loadByConfId" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[ 
+	  select 
+	     b.ATT_ID,
+         b.ATT_PATH,
+		 u.RNVTN_CHECK_ID,
+		 u.RNVTN_CHECK_NO,
+		 u.CHANN_RNVTN_NO,
+		 u.RNVTN_PRINCIPAL,
+		 u.RNVTN_CHECK_DATE,
+		 u.TERM_NO,
+		 u.TERM_NAME,
+		 u.RNVTN_PROP,
+		 u.PLAN_SBUSS_DATE,
+		 u.AREA_NO,
+		 u.AREA_NAME,
+		 u.AREA_MANAGE_NAME,
+		 u.AREA_MANAGE_TEL,
+		 u.SALE_STORE_NAME,
+		 u.ZONE_ADDR,
+		 u.LOCAL_TYPE,
+		 u.BUSS_SCOPE,
+		 u.CHECK_SCORE,
+		 u.STATE,
+		 u.CHECK_REMARK,
+		 u.PUNISH_REMARK,
+		 u.REMARK
+         from DRP_RNVTN_CHECK u left join BASE_ATT b on  u.RNVTN_CHECK_ID = b.from_bill_id
+	     where 
+		 u.RNVTN_CHECK_ID = #RNVTN_CHECK_ID# 
+	]]>
+	</select>
+
+	<!--启用/停用-->
+	<update id="updStusById" parameterClass="map">
+		<![CDATA[ 
+	  update DRP_CHANN_RNVTN
+	         set CHANN_RNVTN_ID = #CHANN_RNVTN_ID#
+ 	  where 
+	     CHANN_RNVTN_ID = #CHANN_RNVTN_ID:VARCHAR# 
+    ]]>
+	</update>
+
+	<!-- 修改是否删除记录 -->
+	<update id="updDelFlag" parameterClass="map">
+		<![CDATA[ 
+	         update DRP_RNVTN_CHECK_DTL
+	         set DEL_FLAG = #DEL_FLAG# 
+ 	         where 
+	         RNVTN_CHECK_DTL_ID in ($RNVTN_CHECK_DTL_ID$)
+    ]]>
+	</update>
+	
+	<update id="deleteByIds" parameterClass="map">
+		<![CDATA[ 
+	  update DRP_RNVTN_CHECK_DTL
+	         set DEL_FLAG = #DEL_FLAG#
+ 	         where 
+	         RNVTN_CHECK_DTL_ID in ('$RNVTN_CHECK_DTL_ID$')
+    ]]>
+	</update>
+	
+	<delete id="deleteByIdsT" parameterClass="String">
+		<![CDATA[ update DRP_RNVTN_CHECK_DTL d 
+		          set d.DEL_FLAG = 1
+		          where d.RNVTN_CHECK_DTL_ID in ($RNVTN_CHECK_DTL_ID$) ]]>
+    </delete>
+	
+	<update id="deleteByIds1" parameterClass="map">
+		<![CDATA[ 
+	  update DRP_RNVTN_CHECK_DTL
+	         set DEL_FLAG = #DEL_FLAG#
+ 	         where 
+	         RNVTN_CHECK_DTL_ID in ('$RNVTN_CHECK_DTL_ID$')
+    ]]>
+	</update>
+	
+	<delete id="deleteCheck" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.DRP_RNVTN_CHECK ]]>
+		<dynamic prepend="set">
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where RNVTN_CHECK_ID = #RNVTN_CHECK_ID# ]]>
+	</delete>
+     
+    <delete id="delete" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.DRP_RNVTN_CHECK_DTL ]]>
+		<dynamic prepend="set">
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where RNVTN_CHECK_DTL_ID in ($RNVTN_CHECK_DTL_ID$)]]>
+	</delete> 
+     
+	<select id="loadByIds" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[  
+	 	 select 
+		  u.rnvtn_check_dtl_id,
+		  u.prj_type,
+		  u.prj_name,
+		  u.prj_score,
+		  u.check_score,
+		  u.check_remark,
+		  u.del_flag
+		  from  DRP_RNVTN_CHECK_DTL u
+	            where u.rnvtn_check_dtl_id in ($rnvtn_check_dtl_id$)]]>
+	</select>
+	
+	<select id="loadByCheckId" parameterClass="String" resultClass="RnvtncheckModel">
+		<![CDATA[  
+	 	        select c.rnvtn_check_id,c.rnvtn_check_no,c.chann_rnvtn_id,c.chann_rnvtn_no,
+	 	        c.rnvtn_principal,c.rnvtn_check_date ,c.term_id,c.term_no,c.term_name,c.rnvtn_prop,
+	 	        c.plan_sbuss_date,c.sale_store_id,c.sale_store_name,c.local_type,c.buss_scope,c.spcl_store_type ,c.state
+	 	        from DRP_RNVTN_CHECK c
+	            where c.RNVTN_CHECK_ID in ('$RNVTN_CHECK_ID$')]]>
+	</select>
+
+	<select id="loadByIds1" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<![CDATA[  
+	 	select  t.RNVTN_CHECK_ID ,
+	 	        t.RNVTN_CHECK_DTL_ID,
+	            t.PRJ_TYPE,
+	            t.PRJ_NAME,
+	            t.PRJ_SCORE,
+	            t.CHECK_SCORE,
+	            t.CHECK_REMARK,
+	            t.IS_REFORM_FLAG
+	            from DRP_RNVTN_CHECK_DTL t left join DRP_RNVTN_CHECK d on t.rnvtn_check_id = d.RNVTN_CHECK_ID
+	            where t.RNVTN_CHECK_ID in ('$RNVTN_CHECK_ID$')]]>
+	</select>
+	
+	<select id="queryNum" parameterClass="map" resultClass="String">
+	<![CDATA[ 
+	    select p.DATA_DTL_NAME 
+	    from  PROJECT_DATA_DICTIONARY_DTL  p
+	    where p.DATA_DTL_CODE=#DATA_DTL_CODE#
+	]]>
+    </select>
+
+	<!-- 查询重复 -->
+	<select id="queryBhForInt" parameterClass="map" resultClass="int">
+		select count(u.CHANN_RNVTN_ID) from DRP_CHANN_RNVTN u where
+		u.CHANN_RNVTN_ID=#CHANN_RNVTN_ID#
+		<isNotEmpty prepend="and" property="CHANN_NAME">
+			u.CHANN_NAME != #CHANN_NAME#
+		</isNotEmpty>
+
+	</select>
+</sqlMap>

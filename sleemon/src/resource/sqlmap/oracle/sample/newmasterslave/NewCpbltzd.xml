@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<!--
+	@module 质检管理
+	@fuc 成品不良通知单
+	@version 1.1
+	@author zhuxw
+-->
+
+<sqlMap namespace="NewCpbltzd">
+    <typeAlias type="com.hoperun.sample.newmasterslave.model.NewMasterSlaveModel" alias="CpbltzdModel" />
+    <!-- 使用Cpbltzd装载结果集 -->
+	<resultMap id="CpbltzdModel" class="CpbltzdModel">
+		<result column="CPBLTZDID" property="CPBLTZDID" />
+	</resultMap>
+    <!-- 动态查询 and 列表分页 -->
+     <sql id="queryDynSql">
+        <isNotEmpty prepend="and" property="JGMC">
+            u.JGMC like '%$JGMC$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="JGXXID">
+            u.JGXXID like '%$JGXXID$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="JJ">
+            u.JJ like '%$JJ$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="JYRID">
+            u.JYRID like '%$JYRID$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="JYRXM">
+            u.JYRXM like '%$JYRXM$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="JYSJ">
+            u.JYSJ like '%$JYSJ$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="LCH">
+            u.LCH like '%$LCH$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="NF">
+            u.NF=#NF#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="PP">
+            u.PP like '%$PP$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="RBJSSL">
+            u.RBJSSL=#RBJSSL#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="REMARK">
+            u.REMARK like '%$REMARK$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="STATE">
+            u.STATE =#STATE#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="THSL">
+            u.THSL=#THSL#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="TZBHGSL">
+            u.TZBHGSL=#TZBHGSL#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="TZHGSL">
+            u.TZHGSL=#TZHGSL#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="TZSL">
+            u.TZSL=#TZSL#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="UPDATER">
+            u.UPDATER like '%$UPDATER$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="UPDTIME">
+            u.UPDTIME like '%$UPDTIME$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="WBYYBJ">
+            u.WBYYBJ=#WBYYBJ#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="WLBH">
+            u.WLBH like '%$WLBH$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="WLDWBH">
+            u.WLDWBH like '%$WLDWBH$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="WLDWMC">
+            u.WLDWMC like '%$WLDWMC$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="WLDWXXID">
+            u.WLDWXXID like '%$WLDWXXID$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="WLMC">
+            u.WLMC like '%$WLMC$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="WLXXID">
+            u.WLXXID like '%$WLXXID$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="WLXXYSID">
+            u.WLXXYSID like '%$WLXXYSID$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="XSSL">
+            u.XSSL=#XSSL#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="YSBH">
+            u.YSBH like '%$YSBH$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="YSMC">
+            u.YSMC like '%$YSMC$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="ZTXXID">
+            u.ZTXXID like '%$ZTXXID$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="BFSL">
+            u.BFSL=#BFSL#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="BMMC">
+            u.BMMC like '%$BMMC$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="BMXXID">
+            u.BMXXID like '%$BMXXID$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="CLYJ">
+            u.CLYJ like '%$CLYJ$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="CPBLTZDBH">
+            u.CPBLTZDBH like '%$CPBLTZDBH$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="CPCGDDBH">
+            u.CPCGDDBH like '%$CPCGDDBH$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="CPZJDBH">
+            u.CPZJDBH like '%$CPZJDBH$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="CPZJTZDID">
+            u.CPZJTZDID like '%$CPZJTZDID$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="CREATER">
+            u.CREATER like '%$CREATER$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="CRENAME">
+            u.CRENAME like '%$CRENAME$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and " property="frCRETIME">
+          		 u.CRETIME<![CDATA[ >= ]]>to_date(#frCRETIME#||' 00:00:00', 'yyyy-mm-dd HH24:MI:SS')
+        	</isNotEmpty>
+        	<isNotEmpty prepend="and " property="toCRETIME">
+          		 u.CRETIME<![CDATA[ <= ]]>to_date(#toCRETIME#||' 23:59:59','yyyy-mm-dd HH24:MI:SS')
+       	</isNotEmpty>
+        <isNotEmpty prepend="and" property="DELFLAG">
+            u.DELFLAG=#DELFLAG#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="CPBLTZDID">
+            u.CPBLTZDID like '%$CPBLTZDID$%'
+        </isNotEmpty>
+	    <isNotEmpty prepend="and" property="QXJBCON"> 
+		    $QXJBCON$
+		</isNotEmpty>
+        <isNotEmpty prepend="and" property="conditionString">
+            $conditionString$
+        </isNotEmpty>
+    </sql>
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField"> 
+		    $orderField$
+		</isNotEmpty>
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[  select u.YTZBHGSL,u.KTZBHGSL,u.CPBLTZDID,u.DELFLAG,u.CPBLTZDBH,u.LCH,u.CPZJDBH,u.JGXXID,u.WLDWBH,u.WLDWMC,u.ZTXXID,u.YSMC,u.BMXXID,u.WLBH,u.WLXXID,u.PP,u.NF,u.JJ,u.WLXXYSID,u.CPZJTZDID,u.WLDWXXID,u.WLMC,u.THSL,u.CPCGDDBH,u.TZBHGSL,u.RBJSSL,u.BFSL,u.XSSL,u.YSBH,u.JYRID,u.JYRXM,to_char(u.JYSJ,'yyyy-MM-dd hh24:mi:ss') JYSJ,u.WBYYBJ,u.TZSL,u.CLYJ,u.REMARK,u.STATE,u.CREATER,u.CRENAME,u.CRETIME,u.UPDATER,u.UPDTIME,u.BMMC,u.JGMC,u.TZHGSL
+		 from ${SYSSCHEMA}.t_erp_zj_cpbltzd u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(0) cnt FROM ${SYSSCHEMA}.t_erp_zj_cpbltzd u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+    <!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+   <!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.t_erp_zj_cpbltzd(CPBLTZDID,CPBLTZDBH,CPZJDBH
+		 ,TZSL,JYSJ,REMARK
+		  ,ZTXXID,BMXXID,STATE,DELFLAG,CREATER,CRENAME,CRETIME,JGXXID
+		 )values(#CPBLTZDID#,#CPBLTZDBH#,#CPZJDBH#,#TZSL#,to_date(#JYSJ#,'yyyy-MM-dd hh24:mi:ss')
+		 ,#REMARK# ,#ZTXXID#,#BMXXID#,#STATE#,#DELFLAG#,#CREATER#,#CRENAME#,sysdate,#JGXXID#)
+		]]>
+	</insert>
+    <update id="updateById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.t_erp_zj_cpbltzd ]]>
+		<dynamic prepend="set">
+			<isNotNull property="CPBLTZDID" prepend=","><![CDATA[CPBLTZDID = #CPBLTZDID#]]></isNotNull>
+			<isNotNull property="DELFLAG" prepend=","><![CDATA[DELFLAG = #DELFLAG#]]></isNotNull>
+			<isNotNull property="CPBLTZDBH" prepend=","><![CDATA[CPBLTZDBH = #CPBLTZDBH#]]></isNotNull>
+			<isNotNull property="LCH" prepend=","><![CDATA[LCH = #LCH#]]></isNotNull>
+			<isNotNull property="CPZJDBH" prepend=","><![CDATA[CPZJDBH = #CPZJDBH#]]></isNotNull>
+			<isNotNull property="JGXXID" prepend=","><![CDATA[JGXXID = #JGXXID#]]></isNotNull>
+			<isNotNull property="WLDWBH" prepend=","><![CDATA[WLDWBH = #WLDWBH#]]></isNotNull>
+			<isNotNull property="WLDWMC" prepend=","><![CDATA[WLDWMC = #WLDWMC#]]></isNotNull>
+			<isNotNull property="ZTXXID" prepend=","><![CDATA[ZTXXID = #ZTXXID#]]></isNotNull>
+			<isNotNull property="YSMC" prepend=","><![CDATA[YSMC = #YSMC#]]></isNotNull>
+			<isNotNull property="BMXXID" prepend=","><![CDATA[BMXXID = #BMXXID#]]></isNotNull>
+			<isNotNull property="WLBH" prepend=","><![CDATA[WLBH = #WLBH#]]></isNotNull>
+			<isNotNull property="WLXXID" prepend=","><![CDATA[WLXXID = #WLXXID#]]></isNotNull>
+			<isNotNull property="PP" prepend=","><![CDATA[PP = #PP#]]></isNotNull>
+			<isNotNull property="NF" prepend=","><![CDATA[NF = #NF#]]></isNotNull>
+			<isNotNull property="JJ" prepend=","><![CDATA[JJ = #JJ#]]></isNotNull>
+			<isNotNull property="WLXXYSID" prepend=","><![CDATA[WLXXYSID = #WLXXYSID#]]></isNotNull>
+			<isNotNull property="CPZJTZDID" prepend=","><![CDATA[CPZJTZDID = #CPZJTZDID#]]></isNotNull>
+			<isNotNull property="WLDWXXID" prepend=","><![CDATA[WLDWXXID = #WLDWXXID#]]></isNotNull>
+			<isNotNull property="WLMC" prepend=","><![CDATA[WLMC = #WLMC#]]></isNotNull>
+			<isNotNull property="THSL" prepend=","><![CDATA[THSL = #THSL#]]></isNotNull>
+			<isNotNull property="CPCGDDBH" prepend=","><![CDATA[CPCGDDBH = #CPCGDDBH#]]></isNotNull>
+			<isNotNull property="TZBHGSL" prepend=","><![CDATA[TZBHGSL = #TZBHGSL#]]></isNotNull>
+			<isNotNull property="YTZBHGSL" prepend=","><![CDATA[YTZBHGSL = #YTZBHGSL#]]></isNotNull>
+			<isNotNull property="KTZBHGSL" prepend=","><![CDATA[KTZBHGSL = #KTZBHGSL#]]></isNotNull>
+			<isNotNull property="RBJSSL" prepend=","><![CDATA[RBJSSL = #RBJSSL#]]></isNotNull>
+			<isNotNull property="BFSL" prepend=","><![CDATA[BFSL = #BFSL#]]></isNotNull>
+			<isNotNull property="XSSL" prepend=","><![CDATA[XSSL = #XSSL#]]></isNotNull>
+			<isNotNull property="YSBH" prepend=","><![CDATA[YSBH = #YSBH#]]></isNotNull>
+			<isNotNull property="JYRID" prepend=","><![CDATA[JYRID = #JYRID#]]></isNotNull>
+			<isNotNull property="JYRXM" prepend=","><![CDATA[JYRXM = #JYRXM#]]></isNotNull>
+			<isNotNull property="JYSJ" prepend=","><![CDATA[JYSJ = to_date(#JYSJ#,'yyyy-MM-dd hh24:mi:ss')]]></isNotNull>
+			<isNotNull property="WBYYBJ" prepend=","><![CDATA[WBYYBJ = #WBYYBJ#]]></isNotNull>
+			<isNotNull property="TZSL" prepend=","><![CDATA[TZSL = #TZSL#]]></isNotNull>
+			<isNotNull property="CLYJ" prepend=","><![CDATA[CLYJ = #CLYJ#]]></isNotNull>
+			<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK#]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="CREATER" prepend=","><![CDATA[CREATER = #CREATER#]]></isNotNull>
+			<isNotNull property="CRENAME" prepend=","><![CDATA[CRENAME = #CRENAME#]]></isNotNull>
+			<isNotNull property="CRETIME" prepend=","><![CDATA[CRETIME = #CRETIME#]]></isNotNull>
+			<isNotNull property="UPDATER" prepend=","><![CDATA[UPDATER = #UPDATER#]]></isNotNull>
+			<isNotNull property="UPDTIME" prepend=","><![CDATA[UPDTIME = to_date(#UPDTIME#,'yyyy-MM-dd hh24:mi:ss')]]></isNotNull>
+			<isNotNull property="BMMC" prepend=","><![CDATA[BMMC = #BMMC#]]></isNotNull>
+			<isNotNull property="JGMC" prepend=","><![CDATA[JGMC = #JGMC#]]></isNotNull>
+			<isNotNull property="TZHGSL" prepend=","><![CDATA[TZHGSL = #TZHGSL#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where CPBLTZDID = #CPBLTZDID# ]]>
+	</update>
+	<!-- 逻辑删除 只是更新状态-->
+	<delete id="delete" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.t_erp_zj_cpbltzd set DELFLAG = #DELFLAG# ,UPDATER = #UPDATER#, UPDNAME = #UPDNAME#,UPDTIME =sysdate where CPBLTZDID = #CPBLTZDID:VARCHAR# ]]>
+	</delete>
+	<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[  select u.YTZBHGSL,u.KTZBHGSL,u.CPBLTZDID,u.DELFLAG,u.CPBLTZDBH,u.LCH,u.CPZJDBH,u.JGXXID,u.WLDWBH,u.WLDWMC,u.ZTXXID,
+		 u.YSMC,u.BMXXID,u.WLBH,u.WLXXID,u.PP,u.NF,u.JJ,u.WLXXYSID,u.CPZJTZDID,u.WLDWXXID,u.WLMC,u.THSL,u.CPCGDDBH,
+		 u.TZBHGSL,u.RBJSSL,u.BFSL,u.XSSL,u.YSBH,u.JYRID,u.JYRXM,to_char(u.JYSJ,'yyyy-MM-dd') JYSJ,
+		 u.WBYYBJ,u.TZSL,u.CLYJ,u.REMARK,u.STATE,u.CREATER,u.CRENAME,u.CRETIME,u.UPDATER,u.UPDTIME,u.BMMC,u.JGMC,u.TZHGSL
+		 from ${SYSSCHEMA}.t_erp_zj_cpbltzd u where u.CPBLTZDID = #CPBLTZDID#]]>
+	</select>
+	<select id="selCPBLTZDMX" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[  
+		select RBJSSL,THSL,CPBLTZDMXID from T_ERP_ZJ_CPBLTZDMX 
+		where CPBLTZDID=#CPBLTZDID# ]]>
+	</select>
+</sqlMap>
+

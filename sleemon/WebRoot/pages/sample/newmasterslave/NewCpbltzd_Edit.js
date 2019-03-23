@@ -1,0 +1,1 @@
+/** * @module 质检管理 * @fuc 成品不良通知单 * @version 1.1 * @author zhuxw */$(function(){	//下帧跳转	parent.window.gotoBottomPage();	//form校验设置	InitFormValidator(0);});

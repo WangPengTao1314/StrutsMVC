@@ -1,0 +1,705 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author chenj
+@function 
+@version 2014-01-25 19:49:05
+-->
+<sqlMap  namespace="Expandvisit">
+<typeAlias type="com.hoperun.drp.visit.expandvisit.model.ExpandVisitModel" alias="ExpandVisitModel"/>
+<!-- 使用Promoreim装载结果集 -->
+<resultMap id="expandVisitModel" class="expandVisitModel">
+    <result column="EXPAND_VISIT_ID" property="EXPAND_VISIT_ID" />
+</resultMap>
+<!-- 动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  u.DEL_FLAG = 0 
+  <isNotEmpty prepend="" property="EXPAND_VISIT_NO">
+      and  u.EXPAND_VISIT_NO  like '%'||#EXPAND_VISIT_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CHANN_NAME">
+      and  u.CHANN_NAME  like '%'||#CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="VISIT_PEOPLE">
+      and  u.VISIT_PEOPLE like '%'||#VISIT_PEOPLE#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="STATE">
+      and  u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="SVISIT_DATE">
+       <![CDATA[ and u.VISIT_DATE>=to_date(#SVISIT_DATE#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="EVISIT_DATE">
+       <![CDATA[ and u.VISIT_DATE<=to_date(#EVISIT_DATE#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="QXJBCON">
+	  and   $QXJBCON$  
+  </isNotEmpty>
+</sql>
+
+<sql id="qDynSql">
+    and   temp.CORRELATIONID = u.EXPAND_VISIT_ID 
+  <isNotEmpty prepend="" property="EXPAND_VISIT_NO">
+      and  u.EXPAND_VISIT_NO  like '%'||#EXPAND_VISIT_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CHANN_NAME">
+      and  u.CHANN_NAME  like '%'||#CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="VISIT_PEOPLE">
+      and  u.VISIT_PEOPLE like '%'||#VISIT_PEOPLE#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="STATE">
+      and  u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="SVISIT_DATE">
+       <![CDATA[ and u.VISIT_DATE>=to_date(#SVISIT_DATE#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="EVISIT_DATE">
+       <![CDATA[ and u.VISIT_DATE<=to_date(#EVISIT_DATE#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+</sql>
+
+
+<sql id="queryDynSqlT">
+  u.DEL_FLAG = 0 
+  <isNotEmpty prepend="" property="EXPAND_VISIT_NO">
+      and  u.EXPAND_VISIT_NO  like '%'||#EXPAND_VISIT_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CHANN_NAME">
+      and  u.CHANN_NAME  like '%'||#CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="VISIT_PEOPLE">
+      and  u.VISIT_PEOPLE like '%'||#VISIT_PEOPLE#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="STATE">
+      and  u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="SVISIT_DATE">
+       <![CDATA[ and u.VISIT_DATE>=to_date(#SVISIT_DATE#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="EVISIT_DATE">
+       <![CDATA[ and u.VISIT_DATE<=to_date(#EVISIT_DATE#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="QXJBCON">
+	  and   $QXJBCON$  
+  </isNotEmpty>
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+	     DISTINCT
+		 u.EXPAND_VISIT_ID,
+         u.EXPAND_VISIT_NO,
+         u.VISIT_PEOPLE,
+         u.VISIT_DATE,
+         u.TITLE,
+         u.EME_DEGREE,
+         u.APPLY_PERSON,
+         u.APPLY_DEP,
+         u.APPLY_DATE,
+         u.REMARK,
+         u.STATE,
+         u.CREATOR,
+         u.CRE_NAME,
+         to_char(u.CRE_TIME,'yyyy-MM-DD') CRE_TIME,
+         u.UPDATOR,
+         u.UPD_NAME,
+         u.UPD_TIME,
+         u.DEPT_ID,
+         u.DEPT_NAME,
+         u.ORG_ID,
+         u.ORG_NAME,
+         u.LEDGER_ID,
+         u.LEDGER_NAME,
+         u.DEL_FLAG,
+         u.VISIT_TYPE 
+         from ERP_EXPAND_VISIT u ,
+   ]]>
+    <isNotEmpty prepend="" property="QXJBCON">
+	   $QXJBCON$  
+    </isNotEmpty>
+    <include refid="qDynSql" />
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+<sql id="coreSqlT">
+  <![CDATA[ 
+	select 
+		 u.EXPAND_VISIT_ID,
+         u.EXPAND_VISIT_NO,
+         u.VISIT_PEOPLE,
+         u.VISIT_DATE,
+         u.TITLE,
+         u.EME_DEGREE,
+         u.APPLY_PERSON,
+         u.APPLY_DEP,
+         u.APPLY_DATE,
+         u.REMARK,
+         u.STATE,
+         u.CREATOR,
+         u.CRE_NAME,
+         to_char(u.CRE_TIME,'yyyy-MM-DD') CRE_TIME,
+         u.UPDATOR,
+         u.UPD_NAME,
+         u.UPD_TIME,
+         u.DEPT_ID,
+         u.DEPT_NAME,
+         u.ORG_ID,
+         u.ORG_NAME,
+         u.LEDGER_ID,
+         u.LEDGER_NAME,
+         u.DEL_FLAG,
+         u.VISIT_TYPE 
+         from ERP_EXPAND_VISIT u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSqlT" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+
+
+<!-- 分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+<select id="pageQueryT" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSqlT" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+	<![CDATA[
+	     SELECT COUNT(*) FROM (select DISTINCT *
+            from ERP_EXPAND_VISIT u,
+		   ]]>
+	<isNotEmpty prepend="" property="QXJBCON">
+       $QXJBCON$  
+    </isNotEmpty>
+	<include refid="qDynSql" />
+	<![CDATA[
+	   ) u
+	]]>
+</select>
+
+<select id="pageCountT" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt 
+            from ERP_EXPAND_VISIT u
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSqlT"/>
+	</dynamic>
+</select>
+ <!-- 查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+
+    <select id="queryChildById" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<![CDATA[ 
+	       SELECT    t.EXPAND_VISIT_DTL_ID,
+					 t.EXPAND_VISIT_ID,
+					 t.STORE_NAME,
+			         t.SOFTWARE_LAYER,
+			         t.LOCATION,
+			         t.POPULARITY,
+			         to_char(t.OPENNING_TIME,'yyyy-MM-DD') OPENNING_TIME,
+			         to_char(t.INVESTMENT_TIME,'yyyy-MM-DD') INVESTMENT_TIME,
+			         t.OTHER_INFO,
+			         t.STORE_MNG_NAME,
+			         t.STORE_MNG_TEL,
+			         t.STORE_MNG_EMAIL,
+			         t.INVESTMENT_MNG_NAME,
+			         t.INVESTMENT_MNG_TEL,
+			         t.INVESTMENT_MNG_EMAIL,
+			         t.CUST_NAME,
+			         t.CUST_STATE,
+			         t.CUST_FUNDS,
+			         t.BUSINESS_PHI,
+			         t.CUST_OTHER_INFO,
+			         t.CUST_INTENTION,
+			         t.FOLLOW_WAY,
+			         t.DEL_FLAG
+                     FROM ERP_EXPAND_VISIT_DTL t  
+                     where 
+		             t.DEL_FLAG='0' AND t.EXPAND_VISIT_ID = #EXPAND_VISIT_ID#  
+	]]>
+	</select>
+	
+	
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_EXPAND_VISIT(
+		 EXPAND_VISIT_ID,
+		 EXPAND_VISIT_NO,
+		 TITLE,
+		 EME_DEGREE,
+		 APPLY_PERSON,
+		 APPLY_DEP,
+		 APPLY_DATE,
+		 VISIT_PEOPLE,
+		 VISIT_DATE,
+		 EXIST_STORE_NAME,
+		 EXIST_STORE_ADDR,
+		 EXIST_STORE_AREA,
+		 EXIST_STORE_RANGE,
+		 EXIST_STORE_COMPETITION,
+		 NEW_STORE_NAME,
+		 NEW_STORE_ADDR,
+		 NEW_STORE_AREA,
+		 NEW_STORE_RANGE,
+		 NEW_STORE_DATE,
+		 CHANN_NAME,
+		 BUSS_SCOPE,
+		 STORE_NAME,
+		 PURPOSE_STORE_NAME,
+		 TEL,
+		 CHANN_REMARK,
+		 SOLUTION,
+		 COMPETITION_INFO,
+		 SUPPORT_DEMAND,
+		 PROCESS,
+		 REMARK,
+         STATE,
+         CREATOR,
+         CRE_NAME,
+         CRE_TIME,
+         UPDATOR,
+         UPD_NAME,
+         UPD_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         DEL_FLAG,
+         VISIT_TYPE,
+         ADVANTAGES,
+         VISIT_PEOPLE_ID
+	   )values(
+		 #EXPAND_VISIT_ID#,
+		 #EXPAND_VISIT_NO#,
+		 #TITLE#,
+		 #EME_DEGREE#,
+		 #APPLY_PERSON#,
+		 #APPLY_DEP#,
+		 to_date(#APPLY_DATE#,'yyyy-MM-DD'),
+		 #VISIT_PEOPLE#,
+		 to_date(#VISIT_DATE#,'yyyy-MM-DD'),
+		 #EXIST_STORE_NAME#,
+		 #EXIST_STORE_ADDR#,
+		 #EXIST_STORE_AREA#,
+		 #EXIST_STORE_RANGE#,
+		 #EXIST_STORE_COMPETITION#,
+		 #NEW_STORE_NAME#,
+		 #NEW_STORE_ADDR#,
+		 #NEW_STORE_AREA#,
+		 #NEW_STORE_RANGE#,
+		 #NEW_STORE_DATE#, 
+		 #CHANN_NAME#,
+		 #BUSS_SCOPE#,
+		 #STORE_NAME#,
+		 #PURPOSE_STORE_NAME#,
+		 #TEL#,
+		 #CHANN_REMARK#,
+		 #SOLUTION#,
+		 #COMPETITION_INFO#,
+		 #SUPPORT_DEMAND#,
+		 #PROCESS#,
+		 #REMARK#,
+         #STATE#,
+         #CREATOR#,
+         #CRE_NAME#,
+         sysdate,
+         #UPDATOR#,
+         #UPD_NAME#,
+         #UPD_TIME#,
+         #DEPT_ID#,
+         #DEPT_NAME#,
+         #ORG_ID#,
+         #ORG_NAME#,
+         #LEDGER_ID#,
+         #LEDGER_NAME#,
+         #DEL_FLAG#,
+         #VISIT_TYPE#,
+         #ADVANTAGES#,
+         #VISIT_PEOPLE_ID#
+		)
+   ]]>
+</insert>
+
+
+<insert id="insertChild" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_EXPAND_VISIT_DTL(
+	     EXPAND_VISIT_DTL_ID,
+		 EXPAND_VISIT_ID,
+		 STORE_NAME,
+         SOFTWARE_LAYER,
+         LOCATION,
+         POPULARITY,
+         OPENNING_TIME,
+         INVESTMENT_TIME,
+         OTHER_INFO,
+         STORE_MNG_NAME,
+         STORE_MNG_TEL,
+         STORE_MNG_EMAIL,
+         INVESTMENT_MNG_NAME,
+         INVESTMENT_MNG_TEL,
+         INVESTMENT_MNG_EMAIL,
+         CUST_NAME,
+         CUST_STATE,
+         CUST_FUNDS,
+         BUSINESS_PHI,
+         CUST_OTHER_INFO,
+         CUST_INTENTION,
+         FOLLOW_WAY,
+         DEL_FLAG
+	   )values(
+		 #EXPAND_VISIT_DTL_ID#,
+		 #EXPAND_VISIT_ID#,
+		 #STORE_NAME#,
+         #SOFTWARE_LAYER#,
+         #LOCATION#,
+         #POPULARITY#,
+         to_date(#OPENNING_TIME#,'yyyy-MM-DD'),
+         to_date(#INVESTMENT_TIME#,'yyyy-MM-DD'),
+         #OTHER_INFO#,
+         #STORE_MNG_NAME#,
+         #STORE_MNG_TEL#,
+         #STORE_MNG_EMAIL#,
+         #INVESTMENT_MNG_NAME#,
+         #INVESTMENT_MNG_TEL#,
+         #INVESTMENT_MNG_EMAIL#,
+         #CUST_NAME#,
+         #CUST_STATE#,
+         #CUST_FUNDS#,
+         #BUSINESS_PHI#,
+         #CUST_OTHER_INFO#,
+         #CUST_INTENTION#,
+         #FOLLOW_WAY#,
+         #DEL_FLAG#
+		)
+   ]]>
+</insert>
+
+<update id="updateChild" parameterClass="map">
+	<![CDATA[ update ERP_EXPAND_VISIT_DTL ]]>
+	<dynamic prepend="set">
+		<isNotNull property="EXPAND_VISIT_ID" prepend=","><![CDATA[EXPAND_VISIT_ID = #EXPAND_VISIT_ID#]]></isNotNull>
+	    <isNotNull property="STORE_NAME" prepend=","><![CDATA[STORE_NAME = #STORE_NAME# ]]></isNotNull>
+	    <isNotNull property="SOFTWARE_LAYER" prepend=","><![CDATA[SOFTWARE_LAYER = #SOFTWARE_LAYER# ]]></isNotNull>
+	    <isNotNull property="LOCATION" prepend=","><![CDATA[LOCATION = #LOCATION# ]]></isNotNull>
+	    <isNotNull property="POPULARITY" prepend=","><![CDATA[POPULARITY = #POPULARITY# ]]></isNotNull>
+	    <isNotNull property="OPENNING_TIME" prepend=","><![CDATA[OPENNING_TIME = to_date(#OPENNING_TIME#,'yyyy-MM-DD') ]]></isNotNull>
+	    <isNotNull property="INVESTMENT_TIME" prepend=","><![CDATA[INVESTMENT_TIME = to_date(#INVESTMENT_TIME#,'yyyy-MM-DD') ]]></isNotNull>
+	    <isNotNull property="OTHER_INFO" prepend=","><![CDATA[OTHER_INFO = #OTHER_INFO# ]]></isNotNull>
+	    <isNotNull property="STORE_MNG_NAME" prepend=","><![CDATA[STORE_MNG_NAME = #STORE_MNG_NAME# ]]></isNotNull>
+	    <isNotNull property="STORE_MNG_TEL" prepend=","><![CDATA[STORE_MNG_TEL = #STORE_MNG_TEL# ]]></isNotNull>
+	    <isNotNull property="STORE_MNG_EMAIL" prepend=","><![CDATA[STORE_MNG_EMAIL = #STORE_MNG_EMAIL# ]]></isNotNull>
+	    <isNotNull property="INVESTMENT_MNG_NAME" prepend=","><![CDATA[INVESTMENT_MNG_NAME = #INVESTMENT_MNG_NAME# ]]></isNotNull>
+	    <isNotNull property="INVESTMENT_MNG_TEL" prepend=","><![CDATA[INVESTMENT_MNG_TEL = #INVESTMENT_MNG_TEL# ]]></isNotNull>
+	    <isNotNull property="INVESTMENT_MNG_EMAIL" prepend=","><![CDATA[INVESTMENT_MNG_EMAIL = #INVESTMENT_MNG_EMAIL# ]]></isNotNull>
+	    <isNotNull property="CUST_NAME" prepend=","><![CDATA[CUST_NAME = #CUST_NAME#]]></isNotNull>
+	    <isNotNull property="CUST_STATE" prepend=","><![CDATA[CUST_STATE = #CUST_STATE# ]]></isNotNull>
+	    <isNotNull property="CUST_FUNDS" prepend=","><![CDATA[CUST_FUNDS = #CUST_FUNDS# ]]></isNotNull>
+	    <isNotNull property="BUSINESS_PHI" prepend=","><![CDATA[BUSINESS_PHI = #BUSINESS_PHI# ]]></isNotNull>
+	    <isNotNull property="CUST_OTHER_INFO" prepend=","><![CDATA[CUST_OTHER_INFO = #CUST_OTHER_INFO#]]></isNotNull>
+	    <isNotNull property="CUST_INTENTION" prepend=","><![CDATA[CUST_INTENTION = #CUST_INTENTION# ]]></isNotNull>
+	    <isNotNull property="FOLLOW_WAY" prepend=","><![CDATA[FOLLOW_WAY = #FOLLOW_WAY#]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where EXPAND_VISIT_DTL_ID = #EXPAND_VISIT_DTL_ID#]]>
+</update>
+
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update ERP_EXPAND_VISIT ]]>
+	<dynamic prepend="set">
+	    <isNotNull property="TITLE" prepend=","><![CDATA[TITLE = #TITLE# ]]></isNotNull>
+	    <isNotNull property="EME_DEGREE" prepend=","><![CDATA[EME_DEGREE = #EME_DEGREE# ]]></isNotNull>
+	    <isNotNull property="APPLY_PERSON" prepend=","><![CDATA[APPLY_PERSON = #APPLY_PERSON# ]]></isNotNull>
+	    <isNotNull property="APPLY_DATE" prepend=","><![CDATA[APPLY_DATE = to_date(#APPLY_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+	    <isNotNull property="VISIT_PEOPLE" prepend=","><![CDATA[VISIT_PEOPLE = #VISIT_PEOPLE# ]]></isNotNull>
+	    <isNotNull property="VISIT_DATE" prepend=","><![CDATA[VISIT_DATE = to_date(#VISIT_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+	    <isNotNull property="EXIST_STORE_NAME" prepend=","><![CDATA[EXIST_STORE_NAME = #EXIST_STORE_NAME# ]]></isNotNull>
+	    <isNotNull property="EXIST_STORE_ADDR" prepend=","><![CDATA[EXIST_STORE_ADDR = #EXIST_STORE_ADDR# ]]></isNotNull>
+		<isNotNull property="EXIST_STORE_AREA" prepend=","><![CDATA[EXIST_STORE_AREA = #EXIST_STORE_AREA#]]></isNotNull>
+	    <isNotNull property="EXIST_STORE_RANGE" prepend=","><![CDATA[EXIST_STORE_RANGE = #EXIST_STORE_RANGE# ]]></isNotNull>
+	    <isNotNull property="EXIST_STORE_COMPETITION" prepend=","><![CDATA[EXIST_STORE_COMPETITION = #EXIST_STORE_COMPETITION# ]]></isNotNull>
+	    <isNotNull property="NEW_STORE_NAME" prepend=","><![CDATA[NEW_STORE_NAME = #NEW_STORE_NAME# ]]></isNotNull>
+	    <isNotNull property="NEW_STORE_ADDR" prepend=","><![CDATA[NEW_STORE_ADDR = #NEW_STORE_ADDR# ]]></isNotNull>
+	    <isNotNull property="NEW_STORE_AREA" prepend=","><![CDATA[NEW_STORE_AREA = #NEW_STORE_AREA# ]]></isNotNull>
+	    <isNotNull property="NEW_STORE_RANGE" prepend=","><![CDATA[NEW_STORE_RANGE = #NEW_STORE_RANGE# ]]></isNotNull>
+	    <isNotNull property="NEW_STORE_DATE" prepend=","><![CDATA[NEW_STORE_DATE = #NEW_STORE_DATE# ]]></isNotNull>
+	    <isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME# ]]></isNotNull>
+	    <isNotNull property="BUSS_SCOPE" prepend=","><![CDATA[BUSS_SCOPE = #BUSS_SCOPE# ]]></isNotNull>
+	    <isNotNull property="STORE_NAME" prepend=","><![CDATA[STORE_NAME = #STORE_NAME# ]]></isNotNull>
+	    <isNotNull property="PURPOSE_STORE_NAME" prepend=","><![CDATA[PURPOSE_STORE_NAME = #PURPOSE_STORE_NAME# ]]></isNotNull>
+	    <isNotNull property="TEL" prepend=","><![CDATA[TEL = #TEL# ]]></isNotNull>
+	    <isNotNull property="CHANN_REMARK" prepend=","><![CDATA[CHANN_REMARK = #CHANN_REMARK# ]]></isNotNull>
+	    <isNotNull property="SOLUTION" prepend=","><![CDATA[SOLUTION =  #SOLUTION# ]]></isNotNull>
+	    <isNotNull property="COMPETITION_INFO" prepend=","><![CDATA[COMPETITION_INFO = #COMPETITION_INFO# ]]></isNotNull>
+	    <isNotNull property="SUPPORT_DEMAND" prepend=","><![CDATA[SUPPORT_DEMAND = #SUPPORT_DEMAND# ]]></isNotNull>
+	    <isNotNull property="PROCESS" prepend=","><![CDATA[PROCESS = #PROCESS# ]]></isNotNull>
+	    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+	    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+	    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+	    <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+	    <isNotNull property="ADVANTAGES" prepend=","><![CDATA[ADVANTAGES = #ADVANTAGES# ]]></isNotNull>
+	    <isNotNull property="VISIT_PEOPLE_ID" prepend=","><![CDATA[VISIT_PEOPLE_ID = #VISIT_PEOPLE_ID# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where EXPAND_VISIT_ID = #EXPAND_VISIT_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update ERP_EXPAND_VISIT
+	               set DEL_FLAG = #DEL_FLAG#
+ 	          where 
+	          EXPAND_VISIT_ID = #EXPAND_VISIT_ID# 
+    ]]>
+</delete>
+
+<select id="queryPro" parameterClass="String"
+		resultClass="String">
+		<![CDATA[ 
+	      select DATA_DTL_NAME from project_data_dictionary_dtl t where  t.delflag=0 and  t.DATA_DTL_ID = #DATA_DTL_ID#
+	]]>
+</select>
+
+<select id="loadByConfId" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[ 
+	     select 
+	         u.EXPAND_VISIT_ID,
+	         u.EXPAND_VISIT_NO,
+	         u.TITLE,
+	         u.EME_DEGREE,
+	         u.APPLY_PERSON,
+	         u.APPLY_DEP,
+	         u.APPLY_DATE,
+	         u.VISIT_PEOPLE,
+	         u.VISIT_DATE,
+	         u.EXIST_STORE_NAME,
+	         u.EXIST_STORE_ADDR,
+	         u.EXIST_STORE_AREA,
+	         u.EXIST_STORE_RANGE,
+	         u.EXIST_STORE_COMPETITION,
+	         u.NEW_STORE_NAME,
+	         u.NEW_STORE_ADDR,
+	         u.NEW_STORE_AREA,
+	         u.NEW_STORE_RANGE,
+	         u.NEW_STORE_DATE,
+	         u.CHANN_NAME,
+	         t.data_dtl_name BUSS_SCOPE,
+	         u.STORE_NAME,
+	         u.PURPOSE_STORE_NAME,
+	         u.TEL,
+	         u.CHANN_REMARK,
+	         u.SOLUTION,
+	         u.COMPETITION_INFO,
+	         u.SUPPORT_DEMAND,
+	         u.PROCESS,
+	         u.REMARK,
+	         u.STATE,
+	         b.ATT_PATH
+	         from  ERP_EXPAND_VISIT u  join BASE_ATT  b on u.expand_visit_id = b.from_bill_id 
+	         left join PROJECT_DATA_DICTIONARY_DTL  t on t.data_dtl_code =  u.buss_scope
+	         where 
+			 u.EXPAND_VISIT_ID = #EXPAND_VISIT_ID#
+	]]>
+	</select>
+	
+	
+	<select id="loadByConfIdT" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[ 
+	     select 
+	         u.EXPAND_VISIT_ID,
+	         u.EXPAND_VISIT_NO,
+	         u.TITLE,
+	         u.EME_DEGREE,
+	         u.APPLY_PERSON,
+	         u.APPLY_DEP,
+	         u.APPLY_DATE,
+	         u.VISIT_PEOPLE,
+	         u.VISIT_DATE,
+	         u.EXIST_STORE_NAME,
+	         u.EXIST_STORE_ADDR,
+	         u.EXIST_STORE_AREA,
+	         u.EXIST_STORE_RANGE,
+	         u.EXIST_STORE_COMPETITION,
+	         u.NEW_STORE_NAME,
+	         u.NEW_STORE_ADDR,
+	         u.NEW_STORE_AREA,
+	         u.NEW_STORE_RANGE,
+	         u.NEW_STORE_DATE,
+	         u.CHANN_NAME,
+	         u.BUSS_SCOPE,
+	         u.STORE_NAME,
+	         u.PURPOSE_STORE_NAME,
+	         u.TEL,
+	         u.CHANN_REMARK,
+	         u.SOLUTION,
+	         u.COMPETITION_INFO,
+	         u.SUPPORT_DEMAND,
+	         u.PROCESS,
+	         u.REMARK,
+	         u.STATE,
+	         b.ATT_PATH,
+	         u.VISIT_TYPE,
+	         u.ADVANTAGES
+	         from  ERP_EXPAND_VISIT u  join BASE_ATT  b on u.expand_visit_id = b.from_bill_id 
+	         where 
+			 u.EXPAND_VISIT_ID = #EXPAND_VISIT_ID#
+	]]>
+	</select>
+
+    <select id="loadByIds" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.EXPAND_VISIT_DTL_ID,
+		u.EXPAND_VISIT_ID,
+		u.STORE_NAME,
+		u.SOFTWARE_LAYER,
+		u.LOCATION,
+		u.POPULARITY,
+		u.OPENNING_TIME,
+		u.INVESTMENT_TIME,
+		u.OTHER_INFO,
+		u.STORE_MNG_NAME,
+		u.STORE_MNG_TEL,
+		u.STORE_MNG_EMAIL,
+		u.INVESTMENT_MNG_NAME,
+		u.INVESTMENT_MNG_TEL,
+		u.INVESTMENT_MNG_EMAIL,
+		u.CUST_NAME,
+		u.CUST_STATE,
+		u.CUST_FUNDS,
+		u.BUSINESS_PHI,
+		u.CUST_OTHER_INFO,
+		u.CUST_INTENTION,
+		u.FOLLOW_WAY
+        from ERP_EXPAND_VISIT_DTL u 
+	    where 
+		u.EXPAND_VISIT_DTL_ID in ($EXPAND_VISIT_DTL_ID$)
+	]]>
+</select>
+
+<select id="expertExcel" parameterClass="map" resultClass="ExpandVisitModel">
+	<![CDATA[
+	   select
+	         DISTINCT
+	         u.EXPAND_VISIT_ID,
+	         u.EXPAND_VISIT_NO,
+	         u.TITLE,
+	         u.EME_DEGREE,
+	         u.APPLY_PERSON,
+	         u.APPLY_DEP,
+	         u.APPLY_DATE,
+	         u.VISIT_PEOPLE,
+	         u.VISIT_DATE,
+	         u.EXIST_STORE_NAME,
+	         u.EXIST_STORE_ADDR,
+	         u.EXIST_STORE_AREA,
+	         u.EXIST_STORE_RANGE,
+	         u.EXIST_STORE_COMPETITION,
+	         u.NEW_STORE_NAME,
+	         u.NEW_STORE_ADDR,
+	         u.NEW_STORE_AREA,
+	         u.NEW_STORE_RANGE,
+	         u.NEW_STORE_DATE,
+	         u.CHANN_NAME,
+	         u.BUSS_SCOPE,
+	         u.STORE_NAME,
+	         u.PURPOSE_STORE_NAME,
+	         u.TEL,
+	         u.CHANN_REMARK,
+	         u.SOLUTION,
+	         u.COMPETITION_INFO,
+	         u.SUPPORT_DEMAND,
+	         u.PROCESS,
+	         u.REMARK,
+	         u.STATE,
+	         u.VISIT_TYPE,
+	         u.ADVANTAGES
+	         from  ERP_EXPAND_VISIT u 
+	]]>
+	<dynamic prepend="where">
+	  <include refid="queryDynSqlT"/>
+	</dynamic>
+</select>
+
+<select id="expertExcelSH" parameterClass="map" resultClass="ExpandVisitModel">
+	<![CDATA[
+	   select
+	         DISTINCT
+	         u.EXPAND_VISIT_ID,
+	         u.EXPAND_VISIT_NO,
+	         u.TITLE,
+	         u.EME_DEGREE,
+	         u.APPLY_PERSON,
+	         u.APPLY_DEP,
+	         u.APPLY_DATE,
+	         u.VISIT_PEOPLE,
+	         u.VISIT_DATE,
+	         u.EXIST_STORE_NAME,
+	         u.EXIST_STORE_ADDR,
+	         u.EXIST_STORE_AREA,
+	         u.EXIST_STORE_RANGE,
+	         u.EXIST_STORE_COMPETITION,
+	         u.NEW_STORE_NAME,
+	         u.NEW_STORE_ADDR,
+	         u.NEW_STORE_AREA,
+	         u.NEW_STORE_RANGE,
+	         u.NEW_STORE_DATE,
+	         u.CHANN_NAME,
+	         u.BUSS_SCOPE,
+	         u.STORE_NAME,
+	         u.PURPOSE_STORE_NAME,
+	         u.TEL,
+	         u.CHANN_REMARK,
+	         u.SOLUTION,
+	         u.COMPETITION_INFO,
+	         u.SUPPORT_DEMAND,
+	         u.PROCESS,
+	         u.REMARK,
+	         u.STATE,
+	         u.VISIT_TYPE,
+	         u.ADVANTAGES
+	         from  ERP_EXPAND_VISIT u ,
+	]]>
+	<isNotEmpty prepend="" property="QXJBCON">
+	   $QXJBCON$  
+    </isNotEmpty>
+    <include refid="qDynSql" />
+</select>
+
+<!--启用/停用-->
+<update id="updStusById" parameterClass="map">	
+     <![CDATA[ 
+	  update ERP_PRMT_COST_REIT 
+	       set STATE = #STATE#
+              ,UPD_NAME=#UPD_NAME#
+              ,UPDATOR=#UPDATOR#
+              ,UPD_TIME=sysdate
+ 	  where 
+	     PRMT_COST_REIT_ID = #PRMT_COST_REIT_ID:VARCHAR# 
+    ]]>
+</update>
+</sqlMap>

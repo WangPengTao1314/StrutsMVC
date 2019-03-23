@@ -1,0 +1,173 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author glw
+@function 
+@version 2013-08-15 09:31:13
+-->
+<sqlMap  namespace="Payment">
+<typeAlias type="com.hoperun.erp.sale.payment.model.PaymentModel" alias="PaymentModel"/>
+<!-- 使用Payment装载结果集 -->
+<resultMap id="PaymentModel" class="PaymentModel">
+    <result column="PAYMENT_ID" property="PAYMENT_ID" />
+</resultMap>
+<!-- 动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="PAYMENT_NO">
+    u.PAYMENT_NO like '%'||#PAYMENT_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CHANN_NO">
+    u.CHANN_NO like '%'||#CHANN_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CHANN_NAME">
+    u.CHANN_NAME like '%'||#CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="AREA_NO">
+    u.AREA_NO like '%'||#AREA_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="AREA_NAME">
+    u.AREA_NAME like '%'||#AREA_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_BEG">
+     <![CDATA[u.CRE_TIME >=to_date(#CRE_TIME_BEG#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+     <![CDATA[u.CRE_TIME <=  to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE like '%'||#STATE#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CHANNS_CHARG">
+     u.CHANN_ID in $CHANNS_CHARG$
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="DEL_FLAG">
+        u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+ <isNotEmpty prepend="and " property="QXJBCON">
+        $QXJBCON$
+ </isNotEmpty>
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.PAYMENT_ID,
+		u.PAYMENT_NO,
+		u.CHANN_ID,
+		u.CHANN_NO,
+		u.CHANN_NAME,
+		u.CHANN_ABBR,
+		u.CHANN_TYPE,
+		u.CHAA_LVL,
+		u.AREA_NO,
+		u.AREA_NAME,
+		u.PAY_AMONT,
+		to_char(u.PAY_DATE,'yyyy-MM-DD') PAY_DATE,
+		u.REMARK,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG,
+		u.BILL_TYPE,
+		u.BRRW_DRCT
+       from ERP_PAYMENT u 
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt 
+            from ERP_PAYMENT u 
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+ <!-- 查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_PAYMENT(
+		 PAYMENT_ID,
+	   )values(
+		#PAYMENT_ID#,
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update ERP_PAYMENT ]]>
+	<dynamic prepend="set">
+    </dynamic>
+	<![CDATA[ where PAYMENT_ID = #PAYMENT_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update ERP_PAYMENT 
+	               set DEL_FLAG = #DEL_FLAG#
+ 	  where 
+	     PAYMENT_ID = #PAYMENT_ID:VARCHAR# 
+    ]]>
+</delete>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.PAYMENT_ID,
+		u.PAYMENT_NO,
+		u.CHANN_ID,
+		u.CHANN_NO,
+		u.CHANN_NAME,
+		u.CHANN_ABBR,
+		u.CHANN_TYPE,
+		u.CHAA_LVL,
+		u.AREA_NO,
+		u.AREA_NAME,
+		u.PAY_AMONT,
+		to_char(u.PAY_DATE,'yyyy-MM-DD') PAY_DATE,
+		u.REMARK,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG
+            from ERP_PAYMENT u 
+	  where 
+		u.PAYMENT_ID = #PAYMENT_ID#
+	]]>
+</select>
+</sqlMap>

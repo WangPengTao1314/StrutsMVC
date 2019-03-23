@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd"
+	default-autowire="byName">
+	<!--快逸报表管理 -->
+	<bean id = "reportService" parent="IBaseService" class = "com.hoperun.report.reportcomm.service.Impl.ReportServiceImpl"/>
+	
+	<!--订货订单信息 -->
+	<bean id = "rGoodsorderService" parent="IBaseService" class = "com.hoperun.report.goodsorder.service.impl.GoodsorderServiceImpl"/>
+	
+	<!--未出货统计表 -->
+	<bean id = "rNoshippmentService" parent="IBaseService" class = "com.hoperun.report.noshippment.service.impl.NoshippmentServiceImpl"/>
+	
+	<!--门店库存 -->
+	<bean id = "rInventoryService" parent="IBaseService" class = "com.hoperun.report.inventory.service.impl.InventoryServiceImpl"/>
+	
+	<!--退款申请表 -->
+	<bean id = "rRefundapplyService" parent="IBaseService" class = "com.hoperun.report.refundapply.service.impl.RefundapplyServiceImpl"/>
+	
+	<!-- 门店销售统计 -->
+	<bean id = "rSalecountService" parent="IBaseService" class = "com.hoperun.report.salecount.service.impl.SalecountServiceImpl"/>
+	
+	<!-- 退货统计 -->
+	<bean id = "rReturncountService" parent="IBaseService" class = "com.hoperun.report.returncount.service.impl.ReturncountServiceImpl"/>
+	
+	<!-- 门店销售跟踪表 -->
+	<bean id = "rTermsaletraceService" parent="IBaseService" class = "com.hoperun.report.termsaletrace.service.impl.TermsaletraceServiceImpl"/>
+	
+	<!-- 调拨表统计 -->
+	<bean id = "rAllocatecountService" parent="IBaseService" class = "com.hoperun.report.allocatecount.service.impl.AllocatecountServiceImpl"/>
+	
+	<!-- 报表抄送 -->
+	<bean id = "saveReptShareViewService" parent="IBaseService" class = "com.hoperun.report.savereptshareview.service.impl.SaveReptShareViewServiceImpl"/>
+	
+	<!-- 销售订单出货明细-->
+	<bean id = "saleorderSendoutService" parent="IBaseService" class = "com.hoperun.report.saleordersendout.service.impl.SaleorderSendoutServiceImpl"/>
+	
+	<!-- 总仓库存-->
+	<bean id = "storeRepertoryService" parent="IBaseService" class = "com.hoperun.report.store.service.impl.StoreRepertoryServiceImpl"/>
+	
+	
+</beans>

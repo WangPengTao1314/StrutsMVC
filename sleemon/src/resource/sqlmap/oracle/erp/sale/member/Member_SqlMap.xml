@@ -1,0 +1,496 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zzb
+@function 
+@version 2013-09-15 10:35:10
+-->
+<sqlMap  namespace="Member">
+<!-- 定义  -->
+<typeAlias type="com.hoperun.erp.sale.member.model.MemberModel" alias="MemberModel"/>
+<typeAlias type="com.hoperun.erp.sale.member.model.MemberActModel" alias="MemberActModel"/>
+<typeAlias type="com.hoperun.erp.sale.member.model.MemberCardModel" alias="MemberCardModel" />
+
+<!-- 使用 MemberModel装载结果集 -->
+<resultMap id="MemberModel" class="MemberModel">
+    <result column="MEMBER_ID" property="MEMBER_ID" />
+</resultMap>
+
+<!-- 使用MemberActModel 装载结果集 -->
+<resultMap id="MemberActModel" class="MemberActModel">
+    <result column="MEMBER_ACT_DTL_ID" property="MEMBER_ACT_DTL_ID" />
+</resultMap>
+<!-- 使用MemberCardModel装载结果集 -->
+<resultMap id="MemberCardModel" class="MemberCardModel">
+    <result column="MEMBER_CARD_DTL_ID" property="MEMBER_CARD_DTL_ID" />
+</resultMap>
+ 
+
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="MEMBER_NO">
+    u.MEMBER_NO like '%'||#MEMBER_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="MOBILE_PHONE">
+    u.MOBILE_PHONE like '%'||#MOBILE_PHONE#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CHANN_NO">
+    u.CHANN_NO like '%'||#CHANN_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CHANN_NAME">
+    u.CHANN_NAME like '%'||#CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="MEMBER_NAME">
+    u.MEMBER_NAME like '%'||#MEMBER_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="START_DATE">
+	  <![CDATA[  u.START_DATE >= to_date(#START_DATE#,'yyyy-MM-DD')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="END_DATE">
+	  <![CDATA[  u.END_DATE <= to_date(#END_DATE#,'yyyy-MM-DD')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="CRE_TIME_BEGIN">
+	  <![CDATA[  u.CRE_TIME >= to_date(#CRE_TIME_BEGIN#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+	  <![CDATA[  u.CRE_TIME <= to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>  
+  
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="DEL_FLAG">
+    u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="QXJBCON">
+        $QXJBCON$
+  </isNotEmpty>
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.MEMBER_ID,
+		u.MEMBER_NO,
+		u.MEMBER_NAME,
+		u.MOBILE_PHONE,
+		u.SEX,
+		u.POINT_VALUE,
+		u.CHANN_ID,
+		u.CHANN_NO,
+		u.CHANN_NAME,
+		u.BIRTHDAY,
+		u.HOBBY,
+		u.ADDRESS,
+		u.STATE,
+		u.REMARK,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.DEL_FLAG
+      from ERP_MEMBER_INFO u
+      
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM ERP_MEMBER_INFO u ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+
+ 
+	
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_MEMBER_INFO(
+		 MEMBER_ID,
+		 MEMBER_NO,
+		 MEMBER_NAME,
+		 MOBILE_PHONE,
+		 SEX,
+		 POINT_VALUE,
+		 CHANN_ID,
+		 CHANN_NO,
+		 CHANN_NAME,
+		 BIRTHDAY,
+		 HOBBY,
+		 ADDRESS,
+		 STATE,
+		 REMARK,
+         CRE_NAME,
+         CREATOR,
+         CRE_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         DEL_FLAG
+	   )values(
+		#MEMBER_ID#,
+		#MEMBER_NO#,
+		#MEMBER_NAME#,
+		#MOBILE_PHONE#,
+		#SEX#,
+		#POINT_VALUE#,
+		#CHANN_ID#,
+		#CHANN_NO#,
+		#CHANN_NAME#,
+		to_date(#BIRTHDAY#,'yyyy-MM-DD'),
+		#HOBBY#,
+		#ADDRESS#,
+		#STATE#,
+		#REMARK#,
+        #CRE_NAME#,
+        #CREATOR#,
+	    sysdate, 
+        #DEPT_ID#,
+        #DEPT_NAME#,
+        #ORG_ID#,
+        #ORG_NAME#,
+        #LEDGER_ID#,
+        #LEDGER_NAME#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update ERP_MEMBER_INFO ]]>
+	<dynamic prepend="set">
+	<isNotNull property="MOBILE_PHONE" prepend=","><![CDATA[MOBILE_PHONE = #MOBILE_PHONE# ]]></isNotNull>
+	<isNotNull property="MEMBER_NAME" prepend=","><![CDATA[MEMBER_NAME = #MEMBER_NAME# ]]></isNotNull>
+    <isNotNull property="SEX" prepend=","><![CDATA[SEX = #SEX# ]]></isNotNull>
+    <isNotNull property="POINT_VALUE" prepend=","><![CDATA[POINT_VALUE = #POINT_VALUE# ]]></isNotNull>
+    <isNotNull property="CHANN_ID" prepend=","><![CDATA[CHANN_ID = #CHANN_ID# ]]></isNotNull>
+    <isNotNull property="CHANN_NO" prepend=","><![CDATA[CHANN_NO = #CHANN_NO# ]]></isNotNull>
+    <isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME# ]]></isNotNull>
+    <isNotNull property="BIRTHDAY" prepend=","><![CDATA[BIRTHDAY = to_date(#BIRTHDAY#,'yyyy-MM-DD') ]]></isNotNull>
+    <isNotNull property="HOBBY" prepend=","><![CDATA[HOBBY = #HOBBY# ]]></isNotNull>
+    <isNotNull property="ADDRESS" prepend=","><![CDATA[ADDRESS = #ADDRESS# ]]></isNotNull>
+    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+    <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where MEMBER_ID = #MEMBER_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update ERP_MEMBER_INFO 
+	               set DEL_FLAG = #DEL_FLAG#
+                      ,UPD_NAME=#UPD_NAME#
+                     ,UPDATOR=#UPDATOR#
+                      ,UPD_TIME=sysdate
+ 	  where 
+	     MEMBER_ID = #MEMBER_ID# 
+    ]]>
+</delete>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	 select 
+		u.MEMBER_ID,
+		u.MEMBER_NO,
+		u.MEMBER_NAME,
+		u.MOBILE_PHONE,
+		u.SEX,
+		u.POINT_VALUE,
+		u.CHANN_ID,
+		u.CHANN_NO,
+		u.CHANN_NAME,
+		u.BIRTHDAY,
+		u.HOBBY,
+		u.ADDRESS,
+		u.STATE,
+		u.REMARK,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.DEL_FLAG
+      from ERP_MEMBER_INFO u
+	  where 
+		u.MEMBER_ID = #MEMBER_ID#
+	]]>
+</select>
+
+
+<!-- ==========================================================MemberAct明细操作开始================-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlMemberAct">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlMemberAct">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlMemberAct">
+	<![CDATA[ 
+     select 
+        u.MEMBER_ID,
+        u.MEMBER_ACT_DTL_ID,
+		u.MARKETING_ACT_ID,
+		u.MARKETING_ACT_NO,
+		u.MARKETING_ACT_NAME,
+		to_char(u.START_DATE,'yyyy-MM-DD')START_DATE,
+		to_char(u.END_DATE,'yyyy-MM-DD')END_DATE,
+		u.SPONSOR_NAME
+       from ERP_MEMBER_ACT_DTL u
+       	 
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryMemberActByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlMemberAct"/>
+	  <dynamic prepend="where">
+			u.MEMBER_ID=#MEMBER_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlMemberAct" />
+	  </dynamic>
+  </select>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadMemberActByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlMemberAct"/>
+	  <dynamic prepend="where">
+	        u.MEMBER_ACT_DTL_ID in ($MEMBER_ACT_DTL_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlMemberAct" />
+	  </dynamic>
+  </select>
+<!--明细表插入 -->
+<insert id="insertMemberAct" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_MEMBER_ACT_DTL(
+		MEMBER_ID,
+        MEMBER_ACT_DTL_ID,
+		MARKETING_ACT_ID,
+		MARKETING_ACT_NO,
+		MARKETING_ACT_NAME,
+		START_DATE,
+		END_DATE,
+		SPONSOR_NAME,
+		DEL_FLAG
+	   )values(
+		#MEMBER_ID#,
+        #MEMBER_ACT_DTL_ID#,
+		#MARKETING_ACT_ID#,
+		#MARKETING_ACT_NO#,
+		#MARKETING_ACT_NAME#,
+		to_date(#START_DATE#,'yyyy-MM-DD'),
+		to_date(#END_DATE#,'yyyy-MM-DD'),	
+		#SPONSOR_NAME#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+<!--明细表更新 -->
+<update id="updateMemberActById" parameterClass="map">
+	<![CDATA[ update ERP_MEMBER_ACT_DTL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="MARKETING_ACT_ID" prepend=","><![CDATA[MARKETING_ACT_ID = #MARKETING_ACT_ID# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where MEMBER_ACT_DTL_ID = #MEMBER_ACT_DTL_ID#]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteMemberActByIds" parameterClass="map">
+	<![CDATA[ update ERP_MEMBER_ACT_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      MEMBER_ACT_DTL_ID in ($MEMBER_ACT_DTL_IDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细 -->
+<delete id="delMemberActByFkId" parameterClass="map">
+	<![CDATA[ update ERP_MEMBER_ACT_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      MEMBER_ID = #MEMBER_ID#
+    ]]>
+</delete>
+ 
+
+<!-- ==========================================================MemberCard明细操作开始================-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlMemberCard">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlMemberCard">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+	 u.MARKETING_CARD_NO ASC
+</sql>
+<sql id="coreSqlMemberCard">
+	<![CDATA[ 
+     select 
+        u.MEMBER_ID,
+        u.MEMBER_ACT_DTL_ID,
+        u.MEMBER_CARD_DTL_ID,
+		u.MARKETING_CARD_ID,
+		u.MARKETING_CARD_NO,
+		u.CARD_TYPE,
+		u.CARD_VALUE,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.STATE,
+		u.DEL_FLAG,
+		b.MARKETING_ACT_NAME
+       from ERP_MEMBER_CARD_DTL u
+        left join ERP_MEMBER_ACT_DTL b on u.MEMBER_ACT_DTL_ID = b.MEMBER_ACT_DTL_ID
+       	 
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryMemberCardByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlMemberCard"/>
+	  <dynamic prepend="where">
+			u.MEMBER_ID=#MEMBER_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlMemberCard" />
+	  </dynamic>
+	  <dynamic prepend="order by ">
+	   <include refid="orderSqlMemberCard"/>
+	</dynamic>
+  </select>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadMemberCardByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlMemberCard"/>
+	  <dynamic prepend="where">
+	        u.MEMBER_CARD_DTL_ID in ($MEMBER_CARD_DTL_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlMemberCard" />
+	  </dynamic>
+  </select>
+<!--明细表插入 -->
+<insert id="insertMemberCard" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_MEMBER_CARD_DTL(
+	    MEMBER_ID,
+	    MEMBER_ACT_DTL_ID,
+        MEMBER_CARD_DTL_ID,
+		MARKETING_CARD_ID,
+		MARKETING_CARD_NO,
+		CARD_TYPE,
+		CARD_VALUE,
+		CRE_TIME,
+		STATE,
+		DEL_FLAG
+	   )values(
+	    #MEMBER_ID#,
+	    #MEMBER_ACT_DTL_ID#,
+        #MEMBER_CARD_DTL_ID#,
+		#MARKETING_CARD_ID#,
+		#MARKETING_CARD_NO#,
+		#CARD_TYPE#,
+		#CARD_VALUE#,
+	    to_date(#CRE_TIME#,'yyyy-MM-DD'),
+		#STATE#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+<!--明细表更新 -->
+<update id="updateMemberCardById" parameterClass="map">
+	<![CDATA[ update ERP_MEMBER_CARD_DTL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="CARD_TYPE" prepend=","><![CDATA[CARD_TYPE = #CARD_TYPE# ]]></isNotNull>
+    <isNotNull property="CARD_VALUE" prepend=","><![CDATA[CARD_VALUE = #CARD_VALUE# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where MEMBER_CARD_DTL_ID = #MEMBER_CARD_DTL_ID#]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteMemberCardByIds" parameterClass="map">
+	<![CDATA[ update ERP_MEMBER_CARD_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      MEMBER_CARD_DTL_ID in ($MEMBER_CARD_DTL_IDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细 -->
+<delete id="delMemberCardByFkId" parameterClass="map">
+	<![CDATA[ update ERP_MEMBER_CARD_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      MEMBER_ID = #MEMBER_ID#
+    ]]>
+</delete>  
+
+
+<!-- ================================================积分流水========================================================= -->
+   <select id="queryMemberPointByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  select MEMBER_ID,
+	  MEMBER_POINT_DTL_ID,
+	  BUS_TYPE,
+	  BUS_ORDER_NO,
+	  CURR_POINT,
+	  NEW_POINT,
+	  POINT_EDIT_TIME
+	  from  ERP_MEMBER_POINT_DTL
+	  where MEMBER_ID = #MEMBER_ID#
+  </select>
+     
+ <!-- 查询已参加的活动ID -->
+ <select id="queryActIdsByFkId" parameterClass="map" resultClass="java.util.HashMap" >
+    select to_char(wmsys.wm_concat( '''' || a.MARKETING_ACT_ID  || '''' )) ACT_DTLS 
+    from ERP_MEMBER_ACT_DTL a  where a.MEMBER_ID = #MEMBER_ID#
+    and a.DEL_FlAG=0
+ </select>
+ 
+  <!-- 查询已发放的卡券ID -->
+ <select id="queryCardIdsByFkId" parameterClass="map" resultClass="java.util.HashMap" >
+     select to_char(wmsys.wm_concat( '''' || a.MARKETING_CARD_ID || '''' )) CARD_DTLS 
+    from ERP_MEMBER_CARD_DTL a  where a.MEMBER_ID = #MEMBER_ID#
+    and a.DEL_FlAG=0
+ </select>
+ 
+</sqlMap>

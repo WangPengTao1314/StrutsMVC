@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ *@module 基础数据
+ *@func  信用额度变更申请
+ *@version 1.1
+ *@author  
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="CreditReq">
+
+    <!-- 通过typeAlias使得我们在下面使用CreditReqModel实体类的时候不需要写包名 -->
+	<typeAlias alias="CreditReqModel"  type="com.hoperun.erp.sale.creditreq.model.CreditReqModel"
+		 />
+
+	<!-- 使用LLGL装载结果集 -->
+	
+	<resultMap id="CreditReqModel" class="CreditReqModel">
+		<result column="CREDIT_REQ_ID" property="CREDIT_REQ_ID" />
+	</resultMap>
+	
+		 	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[select u.CREDIT_REQ_ID,u.CHANN_ID,u.CHANN_NO,u.CHANN_NAME,u.AREA_NO,u.AREA_NAME,u.OLD_CREDIT_TOTAL,
+				 u.NEW_CREDIT_TOTAL,u.REQ_PSON_ID,u.REQ_PSON_NAME,u.STATE,u.REMARK,u.CREATOR,u.CRE_NAME,
+				 to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,u.UPDATOR,u.UPD_NAME,
+				 to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,u.AUDIT_ID,
+				 u.AUDIT_NAME,u.AUDIT_TIME, u.DEPT_ID,u.DEPT_NAME,u.ORG_ID,u.ORG_NAME,u.LEDGER_ID,u.LEDGER_NAME,u.DEL_FLAG
+		 from ERP_CREDIT_REQ u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	   	<dynamic prepend="order by ">
+			<include refid="orderSql" />
+		</dynamic> 
+	</sql>
+	
+	   <!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+	     
+	     <isNotEmpty prepend="and" property="CREDIT_REQ_ID">
+			u.CREDIT_REQ_ID LIKE '%'|| #CREDIT_REQ_ID# ||'%'
+		</isNotEmpty> 
+		<isNotEmpty prepend="and" property="CHANN_NO">
+			u.CHANN_NO LIKE '%'|| #CHANN_NO# ||'%'
+		</isNotEmpty> 
+		<isNotEmpty prepend="and" property="CHANN_NAME">
+			u.CHANN_NAME LIKE '%'|| #CHANN_NAME# ||'%'
+		</isNotEmpty> 
+		<isNotEmpty prepend="and" property="AREA_NO">
+			u.AREA_NO LIKE '%'|| #AREA_NO# ||'%'
+		</isNotEmpty> 
+		<isNotEmpty prepend="and" property="AREA_NAME">
+			u.AREA_NAME LIKE  '%'||#AREA_NAME#||'%'
+		</isNotEmpty> 
+	   <isNotEmpty prepend="and" property="STATE">
+			u.STATE = #STATE#
+	  </isNotEmpty> 
+	  <isNotEmpty prepend="and" property="LEDGER_ID">
+			u.LEDGER_ID = #LEDGER_ID#
+	  </isNotEmpty> 
+	  <isNotEmpty prepend="and" property="CRE_TIME_BEGIN">
+			u.CRE_TIME &gt;= to_date(#CRE_TIME_BEGIN#,'yyyy-MM-DD HH24:MI:SS')
+		</isNotEmpty> 
+		<isNotEmpty prepend="and" property="CRE_TIME_END">
+			u.CRE_TIME &lt;= to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')
+		</isNotEmpty> 
+		
+	  <isNotEmpty prepend="and" property="DEL_FLAG">
+			u.DEL_FLAG = #DEL_FLAG#
+	  </isNotEmpty> 
+	 <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	</isNotEmpty>
+	<isNotEmpty prepend="and " property="BASE_CHANNIN">
+	        $BASE_CHANNIN$
+	</isNotEmpty>
+	<!-- 
+	<![CDATA[ and u.CHANN_ID in (select c.chann_id from BASE_CHANN c where c.area_id  in (select distinct f.area_id from BASE_AREA_CHRG_FLAT f where f.chrg_pson_id=#XTYHID#)) ]]>
+	 -->
+	</sql>
+	<sql id="orderSql">
+	   <isNotEmpty prepend=" " property="orderField">
+			$orderField$
+		</isNotEmpty>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	 
+
+	
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(u.CREDIT_REQ_ID) cnt FROM ERP_CREDIT_REQ u]]>
+		 <dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+	
+	
+    <select id="loadById" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[  
+			select 
+				u.CREDIT_REQ_ID,
+				u.CHANN_ID,
+				u.CHANN_NO,
+				u.CHANN_NAME,
+				u.AREA_NO,
+				u.AREA_NAME,
+				u.OLD_CREDIT_TOTAL,
+		 		u.NEW_CREDIT_TOTAL,
+		 		u.REQ_PSON_ID,
+		 		u.REQ_PSON_NAME,
+		 		u.STATE,
+		 		u.REMARK,
+		 		u.CREATOR,
+		 		u.CRE_NAME,
+		 		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		 		u.UPDATOR,
+		 		u.UPD_NAME,
+		 		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		 		u.AUDIT_ID,
+		 		u.AUDIT_NAME,
+		 		to_char(u.AUDIT_TIME, 'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		 		u.DEPT_ID,
+		 		u.DEPT_NAME,
+		 		u.ORG_ID,
+		 		u.ORG_NAME,
+		 		u.LEDGER_ID,
+		 		u.LEDGER_NAME,
+		 		u.DEL_FLAG
+		  from ERP_CREDIT_REQ u
+		  where u.CREDIT_REQ_ID = #CREDIT_REQ_ID#]]>
+	</select>
+	
+ 
+	
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ERP_CREDIT_REQ(CREDIT_REQ_ID,CHANN_ID,CHANN_NO,CHANN_NAME,AREA_NO,AREA_NAME,OLD_CREDIT_TOTAL,
+		 NEW_CREDIT_TOTAL,REQ_PSON_ID,REQ_PSON_NAME,STATE,REMARK,CREATOR,CRE_NAME,CRE_TIME,AUDIT_ID,
+		 AUDIT_NAME,AUDIT_TIME, DEPT_ID,DEPT_NAME,ORG_ID,ORG_NAME,LEDGER_ID,LEDGER_NAME,DEL_FLAG)
+		 values(#CREDIT_REQ_ID#,#CHANN_ID#,#CHANN_NO#,#CHANN_NAME#,#AREA_NO#,#AREA_NAME#,#OLD_CREDIT_TOTAL#,
+		 #NEW_CREDIT_TOTAL#,#REQ_PSON_ID#,#REQ_PSON_NAME#,#STATE#,#REMARK#,#CREATOR#,#CRE_NAME#,sysdate,
+		 #AUDIT_ID#,#AUDIT_NAME#,#AUDIT_TIME#,#DEPT_ID#,#DEPT_NAME#,
+		 #ORG_ID#,#ORG_NAME#,#LEDGER_ID#,#LEDGER_NAME#,#DEL_FLAG#)
+		]]>
+	</insert>
+
+	<update id="updateById" parameterClass="map">
+		 <![CDATA[ update ERP_CREDIT_REQ ]]>
+		 
+		<dynamic prepend="set">
+			<isNotNull property="CREDIT_REQ_ID" prepend=","><![CDATA[CREDIT_REQ_ID = #CREDIT_REQ_ID#]]></isNotNull>
+			<isNotNull property="CHANN_ID" prepend=","><![CDATA[CHANN_ID = #CHANN_ID#]]></isNotNull>
+			<isNotNull property="CHANN_NO" prepend=","><![CDATA[CHANN_NO = #CHANN_NO#]]></isNotNull>
+			<isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME#]]></isNotNull>
+			<isNotNull property="AREA_NO" prepend=","><![CDATA[AREA_NO = #AREA_NO#]]></isNotNull>
+			<isNotNull property="AREA_NAME" prepend=","><![CDATA[AREA_NAME = #AREA_NAME#]]></isNotNull>
+			<isNotNull property="OLD_CREDIT_TOTAL" prepend=","><![CDATA[OLD_CREDIT_TOTAL = #OLD_CREDIT_TOTAL#]]></isNotNull>
+			<isNotNull property="NEW_CREDIT_TOTAL" prepend=","><![CDATA[NEW_CREDIT_TOTAL = #NEW_CREDIT_TOTAL#]]></isNotNull>
+			<isNotNull property="REQ_PSON_NAME" prepend=","><![CDATA[REQ_PSON_NAME = #REQ_PSON_NAME#]]></isNotNull>
+			<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK#]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where CREDIT_REQ_ID = #CREDIT_REQ_ID# ]]>
+	</update>
+	
+	
+	 
+	<delete id="delete" parameterClass="String">
+	<![CDATA[delete from ERP_CREDIT_REQ 
+							where CREDIT_REQ_ID = #CREDIT_REQ_ID#
+                              
+     ]]>
+	</delete>
+	
+	
+	<update id="updateStateById" parameterClass="map">	
+		<![CDATA[ update ERP_CREDIT_REQ ]]>
+		<dynamic prepend="set">
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+		</dynamic>
+		<![CDATA[, UPD_TIME = sysdate]]>
+		<![CDATA[ where CREDIT_REQ_ID = #CREDIT_REQ_ID#  ]]>	
+	</update>
+	
+	<!-- 信用额度变更申请 审核后的操作 -->
+	<update id="updateAuditAfter" parameterClass="map">	
+	 update BASE_CHANN a set 
+	 a.CREDIT_CURRT=(NVL(CREDIT_CURRT,0) + (#INI_CREDIT# - NVL(INI_CREDIT,0))),
+	 a.INI_CREDIT=#INI_CREDIT#,
+	 a.CREDIT_CRE_NAME=#CREDIT_CRE_NAME#,
+	 a.CREDIT_CRE_TIME = sysdate
+	 where a.CHANN_ID = #CHANN_ID#
+	 
+	</update>
+	
+	<!-- 信用额度变更申请 审核后用的操作  记信用流水账 -->	
+	<insert id="insertChangeCredit" parameterClass="map">
+		<![CDATA[
+insert into BASE_JOURNAL_CREDIT_ACCT
+  (JOURNAL_CREDIT_ACCT_ID,
+   BUSS_TYPE,
+   LEDGER_ID,
+   CHANN_ID,
+   CHANN_NO,
+   CHANN_NAME,
+   PRD_AMOUNT,
+   DEAL_TIME,
+   YEAR_MONTH,
+   DIRECTION)
+  select sys_guid(),
+         '信用额变更',
+         t.LEDGER_ID,
+         t.CHANN_ID,
+         t.CHANN_NO,
+         t.CHANN_NAME,
+         (#INI_CREDIT# - NVL(t.INI_CREDIT, 0)) CHANGE_AMOUNT,
+         to_char(sysdate, 'yyyy-MM-DD HH24:MI:SS'),
+         to_char(sysdate, 'yyyy/MM'),
+         CASE
+           WHEN (#INI_CREDIT# - NVL(t.INI_CREDIT, 0)) >= 0 THEN
+            0
+           ELSE
+            1
+         END
+    from BASE_CHANN t
+   WHERE t.CHANN_ID =  #CHANN_ID#
+
+		]]>
+	</insert>
+</sqlMap>
+

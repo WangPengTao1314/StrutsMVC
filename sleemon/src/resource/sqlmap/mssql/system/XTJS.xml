@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="XTJS">
+
+	<typeAlias type="com.hoperun.sys.model.XTJSBean"
+		alias="XTJSBean" />
+
+	<!-- 使用XTJS装载结果集 -->
+	<resultMap id="XTJSBean" class="XTJSBean">
+		<result column="XTJSID" property="XTJSID" />
+	</resultMap>
+
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="JSBH">
+			u.JSBH like '%'+#JSBH#+'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="JSMC">
+			u.JSMC like '%'+#JSMC#+'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="YHZT">
+			u.state like '%'+#YHZT#+'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="DELFLAG">
+			u.DELFLAG = $DELFLAG$
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="YHBH">
+			c.YHBH like '%'+#YHBH#+'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="YHM">
+			c.YHM like '%'+#YHM#+'%'
+		</isNotEmpty>		
+	</sql>
+    <sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField">
+			 $orderField$,
+		</isNotEmpty>jsbh asc
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[  SELECT  DISTINCT U.*,row_number() over(order by ]]>
+		<isNotEmpty prepend=" " property="orderField">
+			 $orderField$
+		</isNotEmpty>
+		<isEmpty prepend=" " property="orderField">
+			JSBH ASC
+		</isEmpty>
+		<![CDATA[ )rownum_ FROM ${SYSSCHEMA}.T_SYS_XTJS U 
+					LEFT JOIN (SELECT  A.XTJSID ,B.YHBH ,B.YHM,A.XTYHID FROM  ${SYSSCHEMA}.T_SYS_XTYHJS A
+					 LEFT JOIN ${SYSSCHEMA}.T_SYS_XTYH B 
+					ON A.XTYHID = B.XTYHID
+					AND B.DELFLAG=0
+					WHERE A.DELFLAG=0
+					 ) C
+					ON U.XTJSID = C.XTJSID
+		]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT  COUNT(DISTINCT U.XTJSID) CNT FROM T_SYS_XTJS U 
+		          LEFT JOIN (SELECT  A.XTJSID ,B.YHBH ,B.YHM,A.XTYHID FROM T_SYS_XTYHJS A
+		           LEFT JOIN T_SYS_XTYH B 
+		          ON A.XTYHID = B.XTYHID
+		          AND B.DELFLAG=0
+		          WHERE A.DELFLAG=0
+		           ) C
+		          ON U.XTJSID = C.XTJSID]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+
+   <!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.T_SYS_XTJS(XTJSID,JSBH,JSMC,JSSM,DELFLAG,STATE)
+		 values(#XTJSID#,#JSBH#,#JSMC#,#JSSM#,#DELFLAG#,#STATE#)
+		]]>
+	</insert>
+
+<select id="getXTJSBH" parameterClass="String" resultClass="String">
+		<![CDATA[ SELECT LPAD(ERP_JC_XTJSBH.NEXTVAL,'4','0') 
+					FROM dual]]>
+	</select>
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_XTJS ]]>
+		<!-- CHANAME, CHADES,CHADATE,CHASTU     ,,,,,,,,,-->
+		<dynamic prepend="set">
+			<isNotNull property="JSBH" prepend=","><![CDATA[JSBH = #JSBH#]]></isNotNull>
+			<isNotNull property="JSMC" prepend=","><![CDATA[JSMC = #JSMC#]]></isNotNull>
+			<isNotNull property="JSSM" prepend=","><![CDATA[JSSM = #JSSM#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where XTJSID = #XTJSID# ]]>
+	</update>
+		<!-- 删除菜单delete from ${SYSSCHEMA}.T_SYS_XTJS where XTJSID = #xtjsID:VARCHAR#  -->
+	<delete id="delete" parameterClass="String">
+		<![CDATA[ 
+		delete from ${SYSSCHEMA}.T_SYS_XTJS where XTJSID = #xtjsID:VARCHAR#
+		]]>
+	</delete>
+	<delete id="deleteJSMX" parameterClass="String">
+	   DELETE FROM T_SYS_XTYHJS WHERE XTJSID = #XTJSID:VARCHAR#
+	</delete>
+	<insert id="insertJS" parameterClass="map">
+	   insert into ${SYSSCHEMA}.t_sys_datarecycle(DATARECYCLEID,DELETOR,DELTIME,BUSINESSTYPE,DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8)
+	    select #DATARECYCLEID#,#DELETOR#,CONVERT(varchar(100), GETDATE(), 20),'角色信息维护',XTJSID,JSBH,JSMC,JSSM,SJJS,JGXXID,STATE,DELFLAG
+        from ${SYSSCHEMA}.T_SYS_XTJS where XTJSID = #xtjsID:VARCHAR#
+	</insert>
+	<insert id="insertJSMX" parameterClass="map">
+	   insert into ${SYSSCHEMA}.t_sys_datarecycle(DATARECYCLEID,DELETOR,DELTIME,BUSINESSTYPE,DF1,DF2,DF3,DF4,DF5)
+	    select #DATARECYCLEID#+convert(varchar,row_number() over(order by XTJSID)),#DELETOR#,CONVERT(varchar(100), GETDATE(), 20),'角色用户信息维护', XTYHJSID,XTJSID,XTYHID,STATE,DELFLAG
+        from ${SYSSCHEMA}.T_SYS_XTYHjs where XTJSID = #xtjsID:VARCHAR#
+	</insert>
+	<select id="getmxts" parameterClass="String" resultClass="int">
+	     select count(*)
+         from ${SYSSCHEMA}.T_SYS_XTYHjs where XTJSID = #XTJSID:VARCHAR#
+	</select>
+	<select id="loadById" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[  select  u.* from ${SYSSCHEMA}.T_SYS_XTJS u where u.XTJSID = #XTJSID#]]>
+	</select>
+	
+	<select id="getBHList" parameterClass="String" resultClass="XTJSBean">
+	    select JSBH from ${SYSSCHEMA}.T_SYS_XTJS where delflag = 0
+	</select>
+	
+	<update id="updateJSStatus" parameterClass="map">
+	    UPDATE ${SYSSCHEMA}.T_SYS_XTJS
+	    SET STATE=#STATE#
+	    WHERE XTJSID=#xtjsid#
+	</update>
+</sqlMap>
+

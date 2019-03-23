@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="gb2312"?>
+<!--
+	注意：请将旧文件中的配置文件拷贝过来，每个人在添加table的时候必须注明添加的时间、
+	使用的模块、添加人，修改时需注明修改时间和修改人，否则追究责任。在添加之前请仔细
+	检查，是否有可以借用的配置，尽量不要重复添加。
+	selectFlag  控制是否可选标记
+-->
+<tables>
+ <!--Type: Added by zhxuw On:   -->
+    <table id="0" pyName="T_SYS_RYXX" lgName="人员信息"  orderName="RYBH" orderType="ASC">
+        <field pyName="XM" lgName="姓名" isShow="T" isSearch="T" type="char"/>
+        <field pyName="RYBH" lgName="人员编号" isShow="T" isSearch="T" type="char"/>
+        <field pyName="RYXXID" lgName="" primaryKeyId="0" isNode="T" isKey="T" isShow="F" isSearch="F" type="char" />
+        <field pyName="SJ" lgName="手机" isShow="T" isSearch="T" type="char"/>
+        <field pyName="RYJB" lgName="人员级别" isShow="T" isSearch="T" type="char"/>
+    </table>
+    <!--Type: Added by zhxuw On:   -->
+    <table id="1" pyName="(select t.*,a.jgbh,a.jgmc from T_SYS_BMXX t left join T_SYS_JGXX a on a.jgxxid=t.jgxxid and a.delflag=0 and t.delflag=0)" asName='BMXX' lgName="部门信息"  orderName="BMBH" orderType="ASC" isTree="T"  displayModel="[#BMBH#]#BMMC#">
+        <field pyName="BMBH" lgName="部门编号" isShow="T" isSearch="T" type="char"/>
+        <field pyName="BMMC" lgName="部门名称" isShow="T" isSearch="T" type="char"/>
+        <field pyName="JGXXID" lgName="" isShow="F" isSearch="F" type="char"/>
+        <field pyName="JGMC" lgName="机构名称" isShow="T" isSearch="T" type="char"/>
+        <field pyName="ZTXXID" lgName="" isShow="F" isSearch="F" type="char"/>  
+        <field pyName="SJBM" isParentNode="T" isShow="F" isSearch="F" type="char"/>      
+        <field pyName="BMXXID" lgName="" primaryKeyId="0" isNode="T" isKey="T" isShow="F" isSearch="F" type="char" />
+    </table>
+    <!--Type: Added by zhxuw On:   -->
+    <table id="2" pyName="T_SYS_JGXX" lgName="机构信息"  orderName="JGBH" orderType="ASC"  isTree="T"  displayModel="[#JGBH#]#JGMC#">
+        <field pyName="JGBH" lgName="机构编号" isShow="T" isSearch="T" type="char"/>
+        <field pyName="JGMC" lgName="机构名称" isShow="T" isSearch="T" type="char"/>
+        <field pyName="ZTXXID" lgName="帐套" isShow="F" isSearch="F" type="char"/>
+         <field pyName="SJJG" isParentNode="T" isShow="F" isSearch="F" type="char"/>
+        <field pyName="JGXXID" lgName="" primaryKeyId="0" isNode="T" isKey="T" isShow="F" isSearch="F" type="char" />
+    </table>
+    <!-- 2011-08-06 qiao_jiansheng -->
+   <table id="3" pyName="V_XTYH_JGXX_BMXX_RYXX" lgName="机构部门人员"  orderName="YHBH" orderType="ASC">
+        <field pyName="YHBH" lgName="用户编号" isShow="T" isSearch="T" type="char"/>
+        <field pyName="YHM" lgName="用户名" isShow="T" isSearch="T" type="char"/>
+        <field pyName="RYXXID" lgName="人员信息Id" isShow="F" isSearch="F" type="char"/>
+        <field pyName="XM" lgName="人员姓名" isShow="T" isSearch="T" type="char"/>
+        <field pyName="BMXXID" lgName="部门信息Id" isShow="F" isSearch="F" type="char"/>
+        <field pyName="BMMC" lgName="部门名称" isShow="T" isSearch="T" type="char"/>
+        <field pyName="JGXXID" lgName="机构信息ID" isShow="F" isSearch="F" type="char"/>
+        <field pyName="JGMC" lgName="机构名称" isShow="T" isSearch="T" type="char"/>
+        <field pyName="XTYHID" lgName="" primaryKeyId="0" isNode="T" isKey="T" isShow="F" isSearch="F" type="char" />
+    </table>
+    
+ 	<table id="4" pyName="T_SYS_XTJS" lgName="系统角色"  orderName="XTJSID" orderType="ASC">
+        <field pyName="JSBH" lgName="角色编号" isShow="T" isSearch="T" type="char"/>
+        <field pyName="JSMC" lgName="角色名称" isShow="T" isSearch="T" type="char"/>
+        <field pyName="XTJSID" lgName="" primaryKeyId="0" isNode="T" isKey="T" isShow="F" isSearch="F" type="char" />
+    </table>
+    <table id="5" pyName="(select  a.ZTBH, a.ZTXXID,a.ZTMC,a.ZTLB,a.SJZT,a.STATE,b.ZTMC SJZTMC  from T_SYS_ZTXX a left join T_SYS_ZTXX b on a.SJZT=b.ZTXXID)" asName='ZTXX'  lgName="帐套信息"   isTree="T" displayModel="[#ZTBH#]#ZTMC#" orderName="ZTBH" orderType="ASC">
+        <field pyName="ZTBH" lgName="帐套编号" isShow="T" isSearch="T" type="char"/>
+        <field pyName="ZTMC" lgName="帐套名称" isShow="T" isSearch="T" type="char"/>
+        <field pyName="ZTLB" lgName="帐套类别" isShow="T" isSearch="T" type="char"/>
+        <field pyName="SJZTMC" lgName="上级帐套名称" isShow="T" isSearch="T" type="char"/>
+        <field pyName="STATE" lgName="状态" isShow="T" isSearch="T" type="char"/>
+        <field pyName="ZTXXID" lgName="" primaryKeyId="0" isNode="T" isKey="T" isShow="F" isSearch="F" type="char" />
+        <field pyName="SJZT" isParentNode="T" isShow="F" isSearch="F" type="char"/>
+    </table> 
+     <table id="6" pyName="T_SYS_SJZDMX" lgName="上级数据项"  orderName="SJZDMXID" orderType="ASC" isTree="T" displayModel="[#SJXZ#]#SJXMC#">
+        <field pyName="SJXMC" lgName="数据字典名称" isShow="T" isSearch="T" type="char"/>
+        <field pyName="SJXZ" lgName="数据项值" isShow="T" isSearch="T" type="char"/>
+        <field pyName="SJGL" lgName="数据归类" isShow="T" isSearch="T" type="char"/>
+        <field pyName="REMARK" lgName="备注" isShow="T" isSearch="T" type="char"/>
+        <field pyName="SJZDMXID" lgName="" primaryKeyId="0" isNode="T" isKey="T" isShow="F" isSearch="F" type="char" />
+    </table>
+    <table id="7" pyName="(select a.*, b.XM,c.jgmc,d.bmmc from T_SYS_XTYH a 
+							left join T_SYS_RYXX b
+							 on a.RYXXID = b.RYXXID
+							 and ryzt='启用'
+							left join T_SYS_JGXX c
+							on a.jgxxid = c.jgxxid
+							and c.delflag=0
+							LEFT JOIN T_SYS_BMXX d
+							on a.bmxxid = d.bmxxid
+							and d.bmzt='启用' and d.delflag=0
+							where a.yhzt='启用'
+							and a.delflag=0) TEMP " lgName="系统用户" orderName="XTYHID" orderType="ASC">
+        <field pyName="YHBH" lgName="用户编号" isShow="T" isSearch="T" type="char"/>
+        <field pyName="YHM" lgName="用户名称" isShow="T" isSearch="T" type="char"/>
+        <field pyName="XM" lgName="姓名" isShow="T" isSearch="T" type="char"/>
+        <field pyName="YHLB" lgName="用户类别" isShow="T" isSearch="T" type="char"/>
+        <field pyName="JGXXID" lgName="机构信息ID" isShow="F" isSearch="F" type="char"/>
+        <field pyName="JGMC" lgName="机构名称" isShow="T" isSearch="T" type="char"/>
+        <field pyName="BMXXID" lgName="部门信息ID" isShow="F" isSearch="F" type="char"/>
+        <field pyName="BMMC" lgName="部门名称" isShow="T" isSearch="T" type="char"/>
+        <field pyName="XTYHID" lgName="" primaryKeyId="0" isNode="T" isKey="T" isShow="F" isSearch="F" type="char" />
+    </table>
+    <table id="8" pyName="T_SYS_DZXX" lgName="地址信息"  orderName="DZXXID" orderType="ASC">
+		
+        <field pyName="GJ" lgName="国家" isShow="T" isSearch="T" type="char"/>
+        <field pyName="SF" lgName="省份" isShow="T" isSearch="T" type="char"/>
+        <field pyName="CS" lgName="城市" isShow="T" isSearch="T" type="char"/>
+        <field pyName="DZXXID" lgName="" primaryKeyId="0" isNode="T" isKey="T" isShow="F" isSearch="F" type="char" />
+    </table>
+     <table id="9" pyName="(SELECT U.BMXXID,U.BMMC,U.BMBH,U.JGXXID,U.ZTXXID,J.JGBH,J.JGMC,U.BMJC,U.BMZT,J.IS_DRP_LEDGER  
+     FROM T_SYS_BMXX U 
+     LEFT JOIN T_SYS_JGXX J ON U.JGXXID=J.JGXXID 
+     LEFT JOIN BASE_CHANN d on d.CHANN_ID = j.ZTXXID 
+     WHERE    U.DELFLAG = 0) temp" lgName="部门信息" orderName="BMBH" orderType="ASC">
+     <field pyName="BMMC" lgName="部门名称" isShow="T" isSearch="T" type="char"/>
+        <field pyName="BMBH" lgName="部门编号" isShow="T" isSearch="T" type="char"/>
+        <field pyName="BMJC" lgName="部门简称" isShow="T" isSearch="T" type="char"/> 
+        <field pyName="JGMC" lgName="机构名称" isShow="T" isSearch="T" type="char"/> 
+        <field pyName="JGBH" lgName="机构编号" isShow="T" isSearch="T" type="char"/> 
+        <field pyName="JGXXID" lgName="" isShow="F" isSearch="F" type="char"/>
+        <field pyName="ZTXXID" lgName="" isShow="F" isSearch="F" type="char"/>
+        <field pyName="BMXXID" lgName="" primaryKeyId="0" isNode="T" isKey="T" isShow="F" isSearch="F" type="char" />
+    </table> 
+    <table id="10" pyName="(select a.ryxxid,a.rybh,a.xm,c.bmxxid,c.bmbh,c.bmmc,b.jgxxid,b.jgbh,b.jgmc,b.ztxxid from (select * from T_SYS_RYXX where ryzt='启用' and delflag=0) a left join (select * from T_SYS_JGXX where jgzt='启用'  and delflag=0) b on a.jgxxid=b.jgxxid left join (select * from T_SYS_BMXX where bmzt='启用' and delflag=0) c on a.bmxxid=c.bmxxid) temp"
+  		lgName="人员信息" orderName="rybh" orderType="ASC">
+	  <field pyName="RYBH" lgName="人员编号" isShow="T" isSearch="T" type="char" />
+	  <field pyName="XM" lgName="姓名" isShow="T" isSearch="T" type="char" />
+	  <field pyName="BMBH" lgName="部门编号" isShow="T" isSearch="T" type="char" />
+	  <field pyName="BMMC" lgName="部门名称" isShow="T" isSearch="T" type="char" />
+	  <field pyName="JGBH" lgName="机构编号" isShow="T" isSearch="T" type="char" />
+	  <field pyName="JGMC" lgName="机构名称" isShow="T" isSearch="T" type="char" />
+	  <field pyName="BMXXID" lgName="" isShow="F" isSearch="F" type="char" />
+	  <field pyName="JGXXID" lgName="" isShow="F" isSearch="F"  type="char" />
+	  <field pyName="RYXXID" lgName="" isShow="F" isSearch="F"  type="char" />
+	  <field pyName="ZTXXID" lgName="" primaryKeyId="0" isNode="T" isKey="T" isShow="F" isSearch="F" type="char" />
+	 </table>
+	 <table id="11" pyName="T_SYS_JGXX A" lgName="机构信息" orderName="JGXXID " orderType="ASC">
+		<field pyName="JGBH" lgName="机构编号" isShow="T" isSearch="T" type="char" />
+		<field pyName="JGMC" lgName="机构名称" isShow="T" isSearch="T" type="char" />
+		<field pyName="JGXXID" lgName="机构信息ID" primaryKeyId="0" isNode="T" isKey="T" isShow="F" isSearch="F" type="char" />
+	</table>
+	<table id="12" pyName="t_sys_sjzd" lgName="数据字典信息" orderName="SJZDID " orderType="ASC">
+	 <field pyName="SJZDBH" lgName="数据字典编号" isShow="T" isSearch="T" type="char" />
+	 <field pyName="SJZDMC" lgName="数据字典名称" isShow="T" isSearch="T" type="char" />
+	 <field pyName="SJZDID" lgName="数据字典ID" primaryKeyId="0" isNode="T" isKey="T" isShow="F" isSearch="F" type="char" />
+	</table>
+	<table id="13" pyName="T_SYS_GZZXX" lgName="工作组信息" orderName="GZZXXID " orderType="ASC">
+		<field pyName="GZZBH" lgName="工作组编号" isShow="T" isSearch="T" type="char" />
+		<field pyName="GZZMC" lgName="工作组名称" isShow="T" isSearch="T" type="char" />
+		<field pyName="GZZXXID" lgName="工作组ID" primaryKeyId="0" isNode="T" isKey="T" isShow="F" isSearch="F" type="char" />
+	</table>
+	 <table id="14" pyName="T_SYS_BMGZ" lgName="编码规则" orderName="BMGZID" orderType="ASC">
+         <field pyName="BMBH" lgName="编码编号" isShow="T" isSearch="T" type="char"/>
+         <field pyName="BMDX" lgName="编码对象" isShow="T" isSearch="T" type="char"/>
+         <field pyName="GZMC" lgName="规则名称" isShow="T" isSearch="T" type="char"/>
+         <field pyName="BMGZID" lgName="" primaryKeyId="0" isNode="T" isKey="T" isShow="F" isSearch="T" type="char" />
+      </table>
+      <table id="15" pyName="(select MENU_ID,MENU_NAME,BUSINESSTYPE from T_SYS_MENUINFO where length(MENU_QXCODE)=9 and MENU_ID not like 'XT%' and BUSINESSTYPE is not null)jsutForOracl" lgName="选择" orderName="MENU_ID" orderType="ASC">
+         <field pyName="MENU_NAME" lgName="模块名称" isShow="T" isSearch="T" type="char"/>
+         <field pyName="BUSINESSTYPE" lgName="业务类型" isShow="T" isSearch="T" type="char"/>
+         <field pyName="MENU_ID" lgName="" primaryKeyId="0" isNode="T" isKey="T" isShow="F" isSearch="T" type="char" />
+      </table>
+      <table id="16" pyName="(select MENU_ID,MENU_NAME,BUSINESSTYPE from T_SYS_MENUINFO where len(MENU_QXCODE)=9 and MENU_ID not like 'XT%' and BUSINESSTYPE is not null)jsutForMssql" lgName="选择" orderName="MENU_ID" orderType="ASC">
+         <field pyName="MENU_NAME" lgName="模块名称" isShow="T" isSearch="T" type="char"/>
+         <field pyName="BUSINESSTYPE" lgName="业务类型" isShow="T" isSearch="T" type="char"/>
+         <field pyName="MENU_ID" lgName="" primaryKeyId="0" isNode="T" isKey="T" isShow="F" isSearch="T" type="char" />
+      </table>
+      <!--Type: Added by zhxuw On: -->
+      <table id="17" pyName="T_SYS_JGXX" lgName="物料信息"  checkCondition="1=1" isTree="T" orderName="JGBH" orderType="ASC" displayModel="【#JGBH#】#JGMC#">
+        <field pyName="JGMC" lgName="机构名称" isShow="T" isSearch="T" type="char"/>
+        <field pyName="JGBH" lgName="机构编号" isShow="T" isSearch="T" type="char"/>
+        <field pyName="ZTXXID" lgName="帐套" isShow="F" isSearch="F" type="char"/>
+         <field pyName="SJJG" isParentNode="T" isShow="F" isSearch="F" type="char"/>
+        <field pyName="JGXXID" lgName="" primaryKeyId="0" isNode="T" isKey="T" isShow="F" isSearch="F" type="char" />
+    </table>
+    
+    <table id="18" pyName="PROJECT_DATA_DICTIONARY_DTL" lgName="项目数据字典明细"  checkCondition="1=1" isTree="F" orderName="DATA_DTL_CODE" orderType="ASC" >
+        <field pyName="DATA_DTL_ID" lgName="数据明细ID" isShow="F" isSearch="F" type="char"/>
+        <field pyName="DATA_DTL_CODE" lgName="数据明细编号" isShow="T" isSearch="T" type="char"/>
+        <field pyName="DATA_DTL_NAME" lgName="数据明细名称" isShow="T" isSearch="T" type="char"/>
+    </table>
+    <!-- 获取所有表名 -->
+    <table id="19" pyName="(
+    	select a.TABLE_NAME,b.COMMENTS from DBA_TABLES a left join USER_TAB_COMMENTS  b on a.TABLE_NAME=b.TABLE_NAME where OWNER='XLM' 
+    )" lgName="项目数据字典明细"  checkCondition="1=1" isTree="F" orderName="TABLE_NAME" orderType="ASC" >
+        <field pyName="TABLE_NAME" lgName="表名" isShow="T" isSearch="T" type="char"/>
+        <field pyName="COMMENTS" lgName="表注释" isShow="T" isSearch="T" type="char"/>
+    </table>
+</tables>
+   <!--
+     注意：请将旧文件中的配置文件拷贝过来，每个人在添加table的时候必须注明添加的时间、
+     使用的模块、添加人，修改时需注明修改时间和修改人，否则追究责任。在添加之前请仔细
+     检查，是否有可以借用的配置，尽量不要重复添加。
+  -->

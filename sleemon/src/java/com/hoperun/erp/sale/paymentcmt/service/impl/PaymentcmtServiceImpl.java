@@ -1,0 +1,155 @@
+﻿/**
+ * prjName:喜临门营销平台
+ * ucName:付款凭证确认
+ * fileName:PaymentcmtServiceImpl
+*/
+package com.hoperun.erp.sale.paymentcmt.service.impl;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.hoperun.commons.exception.ServiceException;
+import com.hoperun.commons.model.BusinessConsts;
+import com.hoperun.commons.model.IListPage;
+import com.hoperun.commons.service.BaseService;
+import com.hoperun.commons.util.LogicUtil;
+import com.hoperun.commons.util.StringUtil;
+import com.hoperun.erp.sale.paymentcmt.model.PaymentcmtModel;
+import com.hoperun.erp.sale.paymentcmt.service.PaymentcmtService;
+import com.hoperun.sys.model.UserBean;
+/**
+ * *@serviceImpl
+ * *@func
+ * *@version 1.1
+ * *@author lyg
+ * *@createdate 2013-08-25 09:50:09
+ */
+public class PaymentcmtServiceImpl extends BaseService implements PaymentcmtService {
+    /**
+	 * @查询
+	 * @param params map
+	 * @param pageNo 
+	 *
+	 * @return the ilistpage
+	 */
+	public IListPage pageQuery(Map<String,String> params, int pageNo) {
+		return this.pageQuery("Paymentcmt.pageQuery", "Paymentcmt.pageCount",params, pageNo);
+	}
+	
+	/**
+	 * * 增加
+	 * * @param params 
+	 * 
+	 * @return true, if tx insert
+	 */
+	public boolean txInsert(Map<String,String> params) {
+		insert("Paymentcmt.insert", params);
+		return true;
+	}
+	/**
+	 * @删除
+	 * @param PAYMENT_UPLOAD_ID
+	 * 
+	 * @return true, if tx delete
+	 */
+	public boolean txDelete(Map <String, String> params) {
+        return update("Paymentcmt.delete", params);
+	}
+	
+	/**
+	 * * update data
+	 * * @param params
+	 * 
+	 * 
+	 * @return true, if tx update by id
+	 */
+	public boolean txUpdateById(Map<String,String> params) {
+		return update("Paymentcmt.updateById", params);
+	}
+	
+	/**
+	 * @编辑
+	 * @Description :
+	 * @param PAYMENT_UPLOAD_ID
+	 * @param PaymentcmtModel
+	 * @param userBean.
+	 *
+	 * @return true, if tx txEdit 
+	 */
+	public void txEdit(String PAYMENT_UPLOAD_ID, PaymentcmtModel model, UserBean userBean) {
+		Map<String,String> params = new HashMap<String,String>();
+		    params.put("AREA_ID",model.getAREA_ID());
+		    params.put("AREA_NO",model.getAREA_NO());
+		    params.put("REQ_PSON_ID",model.getREQ_PSON_ID());
+		    params.put("REQ_PSON_NAME",model.getREQ_PSON_NAME());
+		    params.put("PAYMENT_AMOUNT",model.getPAYMENT_AMOUNT());
+		    params.put("AREA_NAME",model.getAREA_NAME());
+		    params.put("TEL",model.getTEL());
+		    params.put("PAYMENT_UPLOAD_ID",model.getPAYMENT_UPLOAD_ID());
+		    params.put("CHANN_ID",model.getCHANN_ID());
+		    params.put("PAYMENT_UPLOAD_NO",model.getPAYMENT_UPLOAD_NO());
+		    params.put("PAYMENT_NO",model.getPAYMENT_NO());
+		    params.put("CHANN_NO",model.getCHANN_NO());
+		    params.put("CHANN_NAME",model.getCHANN_NAME());
+		if(StringUtil.isEmpty(PAYMENT_UPLOAD_ID)){
+			PAYMENT_UPLOAD_ID= StringUtil.uuid32len();
+			params.put("PAYMENT_UPLOAD_ID", PAYMENT_UPLOAD_ID);
+		    params.put("CRE_NAME",userBean.getXM());
+		    params.put("CREATOR",userBean.getXTYHID());
+		    params.put("UPD_NAME",userBean.getXM());
+		    params.put("UPDATOR",userBean.getXTYHID());
+		    params.put("DEPT_ID",userBean.getBMXXID());
+		    params.put("DEPT_NAME",userBean.getBMMC());
+		    params.put("ORG_ID",userBean.getJGXXID());
+		    params.put("ORG_NAME",userBean.getJGMC());
+		    params.put("LEDGER_ID",userBean.getLoginZTXXID());
+		    params.put("LEDGER_NAME",userBean.getLoginZTMC());
+			params.put("STATE",BusinessConsts.JC_STATE_DEFAULT);
+		    params.put("DEL_FLAG",BusinessConsts.DEL_FLAG_COMMON);
+		txInsert(params);
+		} else{
+		    params.put("UPD_NAME",userBean.getXM());
+		    params.put("UPDATOR",userBean.getXTYHID());
+		    params.put("UPD_TIME","sysdate");
+			params.put("PAYMENT_UPLOAD_ID", PAYMENT_UPLOAD_ID);
+			txUpdateById(params);
+			clearCaches(PAYMENT_UPLOAD_ID);
+		}
+	}
+	/**
+	 * @详细
+	 * @param param PAYMENT_UPLOAD_ID
+	 * @param param the param
+	 * 
+	 * @return the map< string, string>
+	 */
+	@SuppressWarnings("unchecked")
+	public Map<String,String> load(String param) {
+		return (Map<String,String>) load("Paymentcmt.loadById", param);
+	}
+
+	public void txPaymentComit(Map<String,String> map)throws Exception{
+		String stats = map.get("STATE");
+		if("确认".equals(stats)){
+			String paymentId = map.get("PAYMENT_UPLOAD_ID");
+			LogicUtil.updPaymentCredit(BusinessConsts.ACCT_PAYMENT_CONF_ID, paymentId);
+			String state=(String) this.load("Paymentcmt.getState",paymentId);
+			if(!"提交".equals(state)){
+				throw new ServiceException("该单据已被处理，现在为"+state+"状态");
+			}
+			EditState(map);
+		}else if("退回".equals(stats)){
+			EditState(map);
+		}else{
+			throw new Exception("this Paymentcmt stats is error!");
+		}
+		
+	}
+	/**
+	 * 确认/打回
+	 * 状态修改
+	 */
+	public boolean EditState(Map<String,String> map){
+		return update("Paymentcmt.alterState", map);
+	}
+	
+}

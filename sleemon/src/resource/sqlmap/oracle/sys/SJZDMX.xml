@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+  *@module 系统管理
+  *@fuc 数据字典子表sql
+  *@version 1.1
+  *@author 张羽
+  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="SJZDMX">
+
+	<typeAlias type="com.hoperun.sys.model.SJZDMxModel"
+		alias="SJZDMXModel" />
+
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="SJZDMXModel" class="SJZDMXModel">
+		<result column="SJZDID" property="SJZDID" />
+	</resultMap>
+
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="SJZDMXID">
+			u.SJZDMXID = #SJZDMXID#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="SJZDID">
+			u.SJZDID = #SJZDID#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="SJXMC">
+			u.SJXMC like '%'||#SJXMC#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="SJXZ">
+			u.SJXZ like '%'||#SJXZ#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="SJSJZDMXID">
+			u.SJSJZDMXID like '%'||#SJSJZDMXID#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="SJGL">
+			u.SJGL like '%'||#SJGL#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="DELFLAG">
+			u.DELFLAG = #DELFLAG#
+		</isNotEmpty>
+	</sql>
+    <sql id="orderSql">
+		<isNotEmpty prepend="" property="orderField">
+			 $orderField$
+		</isNotEmpty>
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[  select u.*, a.SJXMC as SJSJZDMXMC
+	from T_SYS_SJZDMX u left join  T_SYS_SJZDMX a on u.sjsjzdmxid = a.sjzdmxid  ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(SJZDMXID) cnt FROM ${SYSSCHEMA}.T_SYS_SJZDMX u  ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+
+   <!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.T_SYS_SJZDMX(KEYCODE,SJZDMXID,SJZDID,SJXMC,SJXZ,SJSJZDMXID,SJGL,CRETIME,UPDTIME,DELFLAG,REMARK)
+		 values(#KEYCODE#,#SJZDMXID#,#SJZDID#,#SJXMC#,#SJXZ#,#SJSJZDMXID#,#SJGL#,sysdate,sysdate,0,#REMARK#)
+		]]>
+	</insert>
+
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_SJZDMX ]]>
+		<!-- CHANAME, CHADES,CHADATE,CHASTU -->
+		<dynamic prepend="set">
+			<isNotNull property="SJZDID" prepend=","><![CDATA[SJZDID = #SJZDID#]]></isNotNull>
+			<isNotNull property="SJZDMXID" prepend=","><![CDATA[SJZDMXID = #SJZDMXID#]]></isNotNull>
+			<isNotNull property="SJXMC" prepend=","><![CDATA[SJXMC = #SJXMC#]]></isNotNull>
+			<isNotNull property="SJXZ" prepend=","><![CDATA[SJXZ = #SJXZ#]]></isNotNull>
+			<isNotNull property="KEYCODE" prepend=","><![CDATA[KEYCODE = #KEYCODE#]]></isNotNull>
+			<isNotNull property="SJSJZDMXID" prepend=","><![CDATA[SJSJZDMXID = #SJSJZDMXID#]]></isNotNull>
+			<isNotNull property="SJGL" prepend=","><![CDATA[SJGL = #SJGL#]]></isNotNull>
+			<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where SJZDMXID = #SJZDMXID# ]]>
+	</update>
+	<!-- 删除菜单 -->
+	<delete id="deleteByFkId" parameterClass="String">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_SJZDMX set delflag='1' where SJZDID = #SJZDID:VARCHAR# ]]>
+	</delete>
+	<delete id="deleteByIds" parameterClass="String">
+		<![CDATA[ delete from ${SYSSCHEMA}.T_SYS_SJZDMX  where SJZDMXID in ($sjzdmxids$) ]]>
+	</delete>
+	<insert id="insertSJZDMX" parameterClass="map">
+	    insert into ${SYSSCHEMA}.t_sys_datarecycle(DATARECYCLEID,DELETOR,DELTIME,BUSINESSTYPE,DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10,DF11,DF12)
+	    select #DATARECYCLEID#||rownum,#DELETOR#,sysdate,'数据字典明细信息维护', SJZDMXID,SJZDID,SJXMC,SJXZ,SJSJZDMXID,SJGL,DELFLAG,CREATER,CRETIME,REMARK,UPDTIME,KEYCODE
+        from ${SYSSCHEMA}.T_SYS_SJZDMX where SJZDMXID in ($sjzdmxids$)
+	</insert>
+	<select id="loadById" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[  select u.*, a.SJXMC as SJSJZDMXMC
+	from T_SYS_SJZDMX u left join  T_SYS_SJZDMX a on u.sjsjzdmxid = a.sjzdmxid where  u.SJZDMXID = #SJZDMXID#]]>
+	</select>
+	<select id="loadByIds" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[  
+		 	select u.*, a.SJXMC as SJSJZDMXMC
+	from T_SYS_SJZDMX u left join  T_SYS_SJZDMX a on u.sjsjzdmxid = a.sjzdmxid
+		  where u.SJZDMXID in ($SJZDMXIDS$)]]>
+	</select>
+	
+	<select id="getMXBySJZDID" parameterClass="map" resultClass="SJZDMxModel">
+	    SELECT * FROM T_SYS_SJZDMX t where t.DELFLAG=0 and t.SJZDID=#SJZDID#
+	    <dynamic prepend=" and ">
+		 <isNotEmpty property="SJZDMXIDS" prepend=","><![CDATA[SJZDMXID not in ($SJZDMXIDS$)]]></isNotEmpty>
+		</dynamic>
+	</select>
+</sqlMap>
+

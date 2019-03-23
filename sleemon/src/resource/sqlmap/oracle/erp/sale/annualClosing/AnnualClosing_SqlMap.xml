@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="AnnualClosing">
+	<typeAlias type="com.hoperun.erp.sale.annualClosing.model.AnnualClosingModel" alias="AnnualClosingModel" />
+
+	<!-- 使用CREDIT装载结果集 -->
+	<resultMap id="AnnualClosingModel" class="AnnualClosingModel">
+		<result column="AREBATE_YEAR_ACCT_ID" property="AREBATE_YEAR_ACCT_ID" />
+	</resultMap>
+
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="DEL_FLAG">
+			a.DEL_FLAG=#DEL_FLAG#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="STATE">
+			a.STATE in ($STATE$)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="YEAR">
+			b.YEAR =#YEAR#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CHANNS_CHARG">
+			a.CHANN_ID in ($CHANNS_CHARG$)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="QXJBCON">
+			$QXJBCON$
+		</isNotEmpty>				
+	</sql>
+
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField">
+			$orderField$
+		</isNotEmpty>
+	</sql>
+
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[
+		select a.CHANN_NO,
+		       a.CHANN_NAME,
+		       a.AREA_NO,
+		       a.AREA_NAME,
+		       b.YEAR,
+		       b.REBATE_TOTAL
+		  from BASE_CHANN a
+		  left join BASE_REBATE_YEAR_ACCT b
+		    on a.CHANN_ID = b.CHANN_ID 
+		]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql" />
+		</dynamic>
+	</sql>
+
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[
+			SELECT count(1) cnt
+			  FROM BASE_CHANN a
+			  left join BASE_REBATE_YEAR_ACCT b
+			    on a.CHANN_ID = b.CHANN_ID 
+		]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+
+	<!-- 查询 -->
+	<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	<update id="update" parameterClass="map">
+		update BASE_REBATE_YEAR_ACCT a
+   set (a.REBATE_TOTAL, a.BEG_BALANCE, a.END_BALANCE) =
+       (select b.REBATE_TOTAL,c.END_BALANCE,b.REBATE_CURRT
+          from BASE_CHANN b
+          left join BASE_REBATE_YEAR_ACCT c
+            on b.CHANN_ID = c.CHANN_ID
+           and c.YEAR = #YEAR# - 1
+         where b.CHANN_ID = a.CHANN_ID)
+ where a.CHANN_ID in
+       (select b.CHANN_ID
+          from BASE_CHANN b
+         where b.DEL_FLAG = #DEL_FLAG#
+           and b.STATE in ($STATE$)
+           and b.CHANN_ID in ((select CHANN_ID from BASE_CHANN)))
+   and a.YEAR = #YEAR#
+
+	</update>
+	<insert id="insert" parameterClass="map">
+	insert into BASE_REBATE_YEAR_ACCT
+	  (REBATE_YEAR_ACCT_ID,
+	   YEAR,
+	   CHANN_ID,
+	   REBATE_TOTAL,
+	   BEG_BALANCE,
+	   END_BALANCE)
+	  select RAWTOHEX(SYS_GUID()) AS UUID,
+	         #YEAR#,
+	         a.CHANN_ID,
+	         a.REBATE_TOTAL,
+	         b.END_BALANCE,
+	         a.REBATE_CURRT
+	    from BASE_CHANN a
+	    left join BASE_REBATE_YEAR_ACCT b
+	      on a.CHANN_ID = b.CHANN_ID
+	     and b.YEAR = #YEAR# - 1
+	   where a.DEL_FLAG = #DEL_FLAG#
+	     and a.STATE in ($STATE$)
+	     and a.CHANN_ID in ($CHANNS_CHARG$)
+	     and a.CHANN_ID not in (select a.CHANN_ID
+	                              from BASE_REBATE_YEAR_ACCT a
+	                             where a.YEAR = #YEAR#)
+
+
+	</insert>
+	
+</sqlMap>
+

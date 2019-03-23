@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="TABLE">
+	<!-- 
+		*@module 系统管理
+		*@func 系统表信息维护
+		*@version 1.1
+		*@author 郭利伟
+	-->
+	<typeAlias type="com.hoperun.base.table.model.TableModel" alias="TableModel" />
+
+	<!-- 使用TERMINAL装载结果集 -->
+	<resultMap id="TableModel" class="TableModel">
+		<result column="TABLE_NAME_EN" property="TABLE_NAME_EN" />
+		<result column="TABLE_NAME_ZH" property="TABLE_NAME_ZH" />
+	</resultMap>
+
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+	        t.TABLE_NAME_ZH is not null 
+		<isNotEmpty prepend=" " property="TABLE_NAME_EN">
+			and t.TABLE_NAME_EN like '%'||#TABLE_NAME_EN#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend=" " property="TABLE_NAME_ZH">
+			and t.TABLE_NAME_ZH like '%'||#TABLE_NAME_ZH#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="QXJBCON">
+			 $QXJBCON$
+		</isNotEmpty>				
+	</sql>
+
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField">
+			$orderField$
+		</isNotEmpty>
+	</sql>
+
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[ 
+		   select  t.TABLE_NAME_EN,
+			       t.TABLE_NAME_ZH,
+			       t.TABLE_DESC,
+			       t.TABLE_OWNER
+			       from T_SYS_TABLE t
+		]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql" />
+		</dynamic>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[select 
+					count(1) cnt 
+				  from T_SYS_TABLE t
+		]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+	
+	<select id="load" parameterClass="map" resultClass="TableModel">
+	<![CDATA[ 
+	    SELECT 
+	      col.TABLE_COL_EN,
+	      col.TABLE_COL_ZH,
+	      col.TABLE_NAME_EN,
+	      col.COL_TYPE,
+	      col.COL_LENGTH,
+	      col.RELATE_TABLE_NAME_EN,
+	     (SELECT t.TABLE_NAME_ZH FROM T_SYS_TABLE t where t.TABLE_NAME_EN = col.RELATE_TABLE_NAME_EN) RELATE_TABLE_NAME_ZH
+		  FROM T_SYS_TABLE_COL col
+		  LEFT JOIN T_SYS_TABLE t
+	      on col.TABLE_COL_EN = t.TABLE_NAME_EN
+	      AND col.TABLE_COL_ZH = t.TABLE_NAME_ZH
+	      WHERE col.TABLE_NAME_EN = #TABLE_NAME_EN#
+	      ORDER BY col.col_index
+	]]>
+</select>
+
+<select id="loadbycolName" parameterClass="map" resultClass="TableModel">
+	<![CDATA[ 
+	    SELECT 
+	      col.TABLE_COL_EN,
+	      col.TABLE_COL_ZH,
+	      col.TABLE_NAME_EN,
+	      (SELECT t.TABLE_NAME_ZH FROM T_SYS_TABLE t where t.TABLE_NAME_EN=col.TABLE_NAME_EN and t.TABLE_NAME_ZH IS NOT NULL) TABLE_NAME_ZH,
+	      col.COL_TYPE,
+	      col.COL_LENGTH
+		  FROM T_SYS_TABLE_COL col
+		  LEFT JOIN T_SYS_TABLE t
+	      on col.TABLE_COL_EN = t.TABLE_NAME_EN
+	      AND col.TABLE_COL_ZH = t.TABLE_NAME_ZH
+	      WHERE col.TABLE_COL_EN = #TABLE_COL_EN#
+	      AND col.TABLE_COL_ZH IS NOT NULL
+	]]>
+</select>
+
+<select id="loadByTableNameEn" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	    SELECT 
+	      t.TABLE_NAME_ZH
+		  FROM T_SYS_TABLE t
+	      WHERE t.TABLE_NAME_EN = #TABLE_NAME_EN#
+	]]>
+</select>
+
+<!-- 查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+	
+</sqlMap>

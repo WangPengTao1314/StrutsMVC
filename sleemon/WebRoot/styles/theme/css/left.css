@@ -1,0 +1,22 @@
+/* CSS Document */
+body,td {
+	margin: 0px;
+	font-size: 12px;
+}
+
+img,image,form {
+	border: 0;
+}
+
+a:link {
+	color: #000;
+	text-decoration: none;
+}
+
+a:visited {
+	color: #000;
+	text-decoration: none;
+}
+.ygtvitem{
+ font-size:12px;
+}

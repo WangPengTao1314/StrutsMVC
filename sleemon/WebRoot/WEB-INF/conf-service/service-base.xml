@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd"
+	default-autowire="byName">
+	<!-- 通用组件 仅做示例用，版本正式发布时删除 -->
+	<bean id = "sampleService" parent="IBaseService" class = "com.hoperun.commons.sample.service.impl.SampleServiceImpl"/>
+	<bean id = "singleTableService" parent="IBaseService" class = "com.hoperun.sample.singletable.service.impl.SingleTableServiceImpl"/>
+	<!-- 1.1版本新单表 add by zhuxw -->
+	<bean id = "newsingleTableService" parent="IBaseService" class = "com.hoperun.sample.newsingletable.service.impl.NewSingleTableServiceImpl"/>
+	<!-- 1.1版本新主从表 add by zhuxw -->
+	<bean id = "newMasterSlaveService" parent="IBaseService" class = "com.hoperun.sample.newmasterslave.service.impl.NewMasterSlaveServiceImpl"/>
+	<bean id = "grantService" parent="IBaseService" class = "com.hoperun.sample.grant.service.impl.GrantServiceImpl"/>
+	
+	 <!-- 生产基地维护 add by wzg -->
+    <bean id = "FactoryService" parent="IBaseService" class = "com.hoperun.base.factory.service.impl.FactoryServiceImpl"/>
+	
+	 <!-- 发货点维护 add by wzg -->
+    <bean id = "ShipPointService" parent="IBaseService" class = "com.hoperun.base.shipPoint.service.impl.ShipPointServiceImpl"/>
+	
+	<!-- 渠道信息 -->
+    <bean id="channService" parent="IBaseService" class="com.hoperun.base.chann.service.impl.ChannServiceImpl"></bean>
+
+    <!-- 区域信息 -->
+    <bean id="areaService" parent="IBaseService" class="com.hoperun.base.area.service.impl.AreaServiceImpl"/>
+        <!-- 区域分管信息 -->
+    <bean id="areaChrgService" parent="IBaseService" class="com.hoperun.base.area.service.impl.AreaChrgServiceImpl"/>
+ 
+    <!-- 行政区划 -->
+    <bean id ="zoneService" parent="IBaseService" class ="com.hoperun.base.zone.service.impl.ZoneServiceImpl"/>
+    <!-- 供应商信息 -->
+    <bean id ="providerService" parent="IBaseService" class ="com.hoperun.base.provider.service.impl.ProviderServiceImpl"/>
+    <!-- 单位维护 -->
+    <bean id ="unitService" parent="IBaseService" class ="com.hoperun.base.unit.service.impl.UnitServiceImpl"/>
+	<!-- 品牌信息 -->
+    <bean id="brandService" parent="IBaseService" class="com.hoperun.base.brand.service.Impl.BrandServiceImpl"></bean>
+    <!-- 货品信息 -->
+    <bean id ="productService" parent="IBaseService" class ="com.hoperun.base.product.service.impl.ProductServiceImpl"/>
+	 <!-- 路线信息-->
+    <bean id ="haulwayService" parent="IBaseService" class ="com.hoperun.base.haulway.service.impl.HaulwayServiceImpl"/>
+   
+    <!-- 货品组信息 -->
+    <bean id ="prdGroupService" parent="IBaseService" class ="com.hoperun.base.prdgroup.service.impl.PrdGroupServiceImpl"/>
+    
+     <!-- 终端信息-->
+    <bean id ="terminalService" parent="IBaseService" class ="com.hoperun.base.terminal.service.Impl.TerminalServiceImpl"/>
+    
+    <!-- 物流供应商 -->
+    <bean id ="logicprvdService" parent="IBaseService" class ="com.hoperun.base.logicprvd.service.impl.LogicprvdServiceImpl"/>
+    <!-- 货品信息 -->
+    <bean id ="pdtmenuService" parent="IBaseService" class ="com.hoperun.base.pdtmenu.service.impl.PdtmenuServiceImpl"/>
+    
+    <!-- 系统日志 -->
+    <bean id ="syslogService" parent="IBaseService" class ="com.hoperun.base.syslog.service.impl.SyslogServiceImpl"/>
+    
+    <!-- 渠道分管设置 -->
+    <bean id="channChrgService" parent="IBaseService" class="com.hoperun.base.channchrg.service.impl.ChannChrgServiceImpl"/>
+    
+    <!-- 分销渠道信息 -->
+    <bean id="distributorService" parent="IBaseService" class="com.hoperun.base.distributor.service.impl.DistributorServiceImpl"></bean>
+    <!-- 系统业务表 -->
+    <bean id="tableService" parent="IBaseService" class="com.hoperun.base.table.service.impl.TableServiceImpl"></bean>
+</beans>
+	 

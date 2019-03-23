@@ -1,0 +1,1017 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zhuxw
+@function 二套帐月结
+@version 20140909
+-->
+<sqlMap namespace="acctengi">
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+   <isNotEmpty prepend="and" property="LEDGER_ID">
+     u.LEDGER_ID in $LEDGER_IDS$
+   </isNotEmpty>
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	        select 
+			   u.ACCT_ENGI_NOTE_ID,
+			   u.YEAR,
+			   u.MONTH,
+			   u.UPD_NAME,
+			   to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+			   u.LEDGER_ID,
+			   u.STATE,
+			   a.CHANN_NO,
+			   a.CHANN_NAME
+			 from BASE_CHANN a,DRP_ACCT_ENGI_NOTE u 
+		   where a.CHANN_ID=u.LEDGER_ID
+   ]]>
+    <dynamic prepend="">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM DRP_ACCT_ENGI_NOTE u ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+ <select id="getChannInfo" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		    select INIT_YEAR,INIT_MONTH, COST_TYPE,CHANN_NAME from BASE_CHANN where  CHANN_ID=#LEDGER_ID#
+		]]>
+  </select>
+  <select id="chkAccount" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		select sum(THE_NUM)THE_NUM,sum(PRE_NUM)PRE_NUM 
+		from 
+		(
+		    select count(*) THE_NUM ,0 PRE_NUM   from DRP_ACCT_ENGI_NOTE where LEDGER_ID=#LEDGER_ID#  and YEAR=#YEAR#  and MONTH=#MONTH# and STATE=#STATE#
+          union all
+            select 0 THE_NUM, count(*) PRE_NUM  from DRP_ACCT_ENGI_NOTE where LEDGER_ID=#LEDGER_ID# and YEAR=#PRE_YEAR# and MONTH=#PRE_MONTH#  and STATE=#STATE#
+         )temp
+		]]>
+  </select>
+  <select id="chkNotice" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		    select count(*) IS_NOTICE_FLAG from DRP_ACCT_ENGI_NOTE where LEDGER_ID=#LEDGER_ID#  and YEAR=#YEAR#  and MONTH=#MONTH# 
+        ]]>
+  </select>
+  <select id="chkPreAccount" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		    select count(*) IS_ACCT_FLAG from DRP_ACCT_ENGI_NOTE where LEDGER_ID=#LEDGER_ID#  and YEAR=#NEX_YEAR#  and MONTH=#NEX_MONTH# and STATE='已月结'
+        ]]>
+  </select>
+  <update id="updNotice" parameterClass="map">
+		<![CDATA[ update DRP_ACCT_ENGI_NOTE set STATE = '已生成', UPD_NAME = #UPD_NAME#, UPD_TIME = sysdate where LEDGER_ID=#LEDGER_ID# and YEAR=#YEAR# and MONTH=#MONTH#  ]]>
+  </update>
+   <update id="updCancleAmount" parameterClass="map">
+		<![CDATA[ update DRP_ACCT_ENGI_NOTE set STATE = '取消生成', UPD_NAME = #UPD_NAME#, UPD_TIME = sysdate where LEDGER_ID=#LEDGER_ID# and YEAR=#YEAR# and MONTH=#MONTH# and STATE='已生成' ]]>
+  </update>
+  <insert id="insNotice" parameterClass="map">
+		<![CDATA[
+		 insert into DRP_ACCT_ENGI_NOTE(ACCT_ENGI_NOTE_ID,YEAR,MONTH,UPD_NAME,UPD_TIME,LEDGER_ID,STATE)
+		values
+		 (#ACCT_ENGI_NOTE_ID#,#YEAR#,#MONTH#,#UPD_NAME#,sysdate,#LEDGER_ID#,'已生成')
+		]]>
+  </insert>
+  <!--直营办销售订单-->
+  <delete id="delSaleOrderDtl_A" parameterClass="map">
+		<![CDATA[ delete from  DRP_SALE_ORDER_DTL_A  where  SALE_ORDER_ID in( select  SALE_ORDER_ID from   DRP_SALE_ORDER_A  where LEDGER_ID=#LEDGER_ID#  and YEAR_MONTH=#YEAR_MONTH#)]]>
+  </delete>
+  <delete id="delSaleOrder_A" parameterClass="map">
+		<![CDATA[ delete from  DRP_SALE_ORDER_A  where LEDGER_ID=#LEDGER_ID#  and YEAR_MONTH=#YEAR_MONTH#  ]]>
+  </delete>
+  <!--直营办出货单 -->
+  <delete id="delStoreOutDtl_A" parameterClass="map">
+        <![CDATA[ delete from  DRP_STOREOUT_DTL_A  where  STOREOUT_ID in( select  STOREOUT_ID from   DRP_STOREOUT_A  where LEDGER_ID=#LEDGER_ID#  and YEAR_MONTH=#YEAR_MONTH#)]]>
+  </delete>
+  <delete id="delStoreOut_A" parameterClass="map">
+		<![CDATA[ delete from  DRP_STOREOUT_A  where LEDGER_ID=#LEDGER_ID#  and YEAR_MONTH=#YEAR_MONTH#  ]]>
+  </delete>
+  <!--直营办退货单 -->
+  <delete id="delReturnDtl_A" parameterClass="map">
+        <![CDATA[ delete from  DRP_RETURN_DTL_A  where  PRD_RETURN_ID in( select  PRD_RETURN_ID from   DRP_RETURN_A  where LEDGER_ID=#LEDGER_ID#  and YEAR_MONTH=#YEAR_MONTH#)]]>
+  </delete>
+  <delete id="delReturn_A" parameterClass="map">
+		<![CDATA[ delete from  DRP_RETURN_A  where LEDGER_ID=#LEDGER_ID#  and YEAR_MONTH=#YEAR_MONTH#  ]]>
+  </delete>
+   <!-- 直营办退货入库单 -->
+  <delete id="delReturnStoreInDtl_A" parameterClass="map">
+        <![CDATA[ delete from  DRP_RETURN_STOREIN_DTL_A  where  STOREIN_ID in( select  STOREIN_ID from   DRP_RETURN_STOREIN_A  where LEDGER_ID=#LEDGER_ID#  and YEAR_MONTH=#YEAR_MONTH#)]]>
+  </delete>
+  <delete id="delReturnStoreIn_A" parameterClass="map">
+		<![CDATA[ delete from  DRP_RETURN_STOREIN_A  where LEDGER_ID=#LEDGER_ID#  and YEAR_MONTH=#YEAR_MONTH#  ]]>
+  </delete>
+  <!-- 门店销售出库单 -->
+  <delete id="delTermStoreOutDtl_A" parameterClass="map">
+        <![CDATA[ delete from  DRP_TERM_STOREOUT_DTL_A  where  STOREOUT_ID in( select  STOREOUT_ID from   DRP_TERM_STOREOUT_A  where YEAR_MONTH=#YEAR_MONTH# and LEDGER_ID in (select TERM_ID  from BASE_TERMINAL a where a.CHANN_ID_P=#LEDGER_ID# ))]]>
+  </delete>
+  <delete id="delTermStoreout_A" parameterClass="map">
+		<![CDATA[ delete from  DRP_TERM_STOREOUT_A  where  YEAR_MONTH=#YEAR_MONTH# and LEDGER_ID in (select TERM_ID  from BASE_TERMINAL a where a.CHANN_ID_P=#LEDGER_ID# )  ]]>
+  </delete>
+  <!--门店退货出库单 -->
+  <delete id="delTermReturnStoreOutDtl_A" parameterClass="map">
+        <![CDATA[ delete from  DRP_TREM_RETURN_STOREOUT_DTL_A  where  STOREOUT_ID in( select  STOREOUT_ID from   DRP_TREM_RETURN_STOREOUT_A   where YEAR_MONTH=#YEAR_MONTH# and LEDGER_ID in (select TERM_ID  from BASE_TERMINAL a where a.CHANN_ID_P=#LEDGER_ID# ))]]>
+  </delete>
+  <delete id="delTermReturnStoreout_A" parameterClass="map">
+		<![CDATA[ delete from  DRP_TREM_RETURN_STOREOUT_A  where YEAR_MONTH=#YEAR_MONTH# and LEDGER_ID in (select TERM_ID  from BASE_TERMINAL a where a.CHANN_ID_P=#LEDGER_ID# ) ]]>
+  </delete>
+  <!--门店退货入库单 -->
+  <delete id="delTermReturnStoreInDtl_A" parameterClass="map">
+        <![CDATA[ delete from  DRP_TREM_RETURN_STOREIN_DTL_A  where  STOREIN_ID in( select  STOREIN_ID from   DRP_TREM_RETURN_STOREIN_A  where YEAR_MONTH=#YEAR_MONTH#  and  LEDGER_ID in (select TERM_ID  from BASE_TERMINAL a where a.CHANN_ID_P=#LEDGER_ID# ) )]]>
+  </delete>
+  <delete id="delTermReturnStoreIn_A" parameterClass="map">
+		<![CDATA[ delete from  DRP_TREM_RETURN_STOREIN_A  where  YEAR_MONTH=#YEAR_MONTH#  and  LEDGER_ID in (select TERM_ID  from BASE_TERMINAL a where a.CHANN_ID_P=#LEDGER_ID# ) ]]>
+  </delete>
+  
+  <!--插入直营办向门店的销售订单 -->
+  <insert id="insSaleOrder_A" parameterClass="map">
+  <![CDATA[
+	  insert into 
+		DRP_SALE_ORDER_A(SALE_ORDER_ID,SALE_ORDER_NO,BILL_TYPE,FROM_BILL_ID,
+		FROM_BILL_NO, ORDER_CHANN_ID , ORDER_CHANN_NO, ORDER_CHANN_NAME,
+		ORDER_DATE,PERSON_CON,TEL,RECV_ADDR,STATE,REMARK, CREATOR ,CRE_NAME,CRE_TIME,
+		UPDATOR ,UPD_NAME,UPD_TIME, AUDIT_ID,AUDIT_NAME,AUDIT_TIME,DEPT_ID,
+		DEPT_NAME, ORG_ID ,ORG_NAME ,LEDGER_ID, LEDGER_NAME, DEL_FLAG,AREA_ID, AREA_NO,AREA_NAME,
+		RECV_ADDR_NO,YEAR_MONTH,RSP_NAME)
+		select 
+		  a.STOREOUT_ID   SALE_ORDER_ID,
+		  replace(a.STOREOUT_NO,'CK','SO')SALE_ORDER_NO,
+		  '正常销售' BILL_TYPE,
+		  a.STOREOUT_ID FROM_BILL_ID,
+		  a.STOREOUT_NO FROM_BILL_NO,
+		  a.TERM_ID   ORDER_CHANN_ID,
+		  a.TERM_NO   ORDER_CHANN_NO,
+		  a.TERM_NAME ORDER_CHANN_NAME,
+		  a.SALE_DATE ORDER_DATE,
+		  ''          PERSON_CON,
+		  ''          TEL,
+		  c.ADDRESS   RECV_ADDR, 
+		  '审核通过'STATE,
+		  '' REMARK,
+		  a.CREATOR,
+		  a.CRE_NAME,
+		  a.SALE_DATE+(1/24)*( mod(rownum,10)) +(1/24/60)*(30+ mod(rownum,200))+(1/24/60/60)*(mod(rownum,20))  CRE_TIME,
+		  a.UPDATOR,
+		  a.UPD_NAME,
+		  a.DEAL_TIME UPD_TIME,
+		  #CREATOR# AUDIT_ID,
+		  #CRE_NAME# AUDIT_NAME,
+		  a.DEAL_TIME AUDIT_TIME,
+		  a.DEPT_ID,
+		  a.DEPT_NAME,
+		  a.ORG_ID,
+		  a.ORG_NAME,
+		  a.LEDGER_ID,
+		  a.LEDGER_NAME,
+		   0 DEL_FLAG,
+		   c.AREA_ID, 
+		   c.AREA_NO,
+		   c.AREA_NAME,
+		   '' RECV_ADDR_NO,
+		  #YEAR_MONTH# YEAR_MONTH,
+		  c.CUST_NAME RSP_NAME
+		 from 
+		  DRP_STOREOUT a 
+		     left join BASE_TERMINAL c on a.TERM_ID=c.TERM_ID 
+		 where 
+		      a.STATE='已处理'
+		  and a.DEL_FLAG=0    
+		  and a.BILL_TYPE='销售出库'
+		  and a.LEDGER_ID=#LEDGER_ID#
+		  and to_char(a.DEAL_TIME,'YYYYMM')=#YEAR_MONTH#
+	 	
+	]]>
+  </insert> 
+  <insert id="insSaleOrderDtl_A" parameterClass="map">
+  <![CDATA[
+	  insert into 
+		DRP_SALE_ORDER_DTL_A(SALE_ORDER_DTL_ID,SALE_ORDER_ID,PRD_ID,PRD_NO,PRD_NAME,PRD_SPEC,BRAND,STD_UNIT,IS_NO_STAND_FLAG,
+								PRICE,DECT_RATE,DECT_PRICE,ORDER_NUM,ORDER_AMOUNT,SENDED_NUM,CANCLE_NUM,REMARK,
+								DEL_FLAG,FROM_BILL_DTL_ID,CANCEL_FLAG,SPCL_TECH_ID,YEAR_MONTH,PRD_TYPE)
+			select
+				 b.STOREOUT_DTL_ID SALE_ORDER_DTL_ID,
+				 a.STOREOUT_ID   SALE_ORDER_ID,
+				 b.PRD_ID,
+				 b.PRD_NO,
+				 b.PRD_NAME,
+				 b.PRD_SPEC,
+				 b.BRAND,
+				 b.STD_UNIT,
+				 0  IS_NO_STAND_FLAG,
+				 NVL(c.PRVD_PRICE*NVL(d.CHANN_SALE_RATE,1.1),0) PRICE,
+				 1,
+				 NVL(c.PRVD_PRICE*NVL(d.CHANN_SALE_RATE,1.1),0) DECT_PRICE,
+				 b.REAL_NUM ORDER_NUM,
+				 b.REAL_NUM*NVL(c.PRVD_PRICE*NVL(d.CHANN_SALE_RATE,1.1),0)  ORDER_AMOUNT,
+				 b.REAL_NUM SENDED_NUM,
+				 0 CANCLE_NUM,
+				 '' REMARK,
+				 0 DEL_FLAG,
+				 b.STOREOUT_DTL_ID FROM_BILL_DTL_ID,
+				 0 CANCEL_FLAG,
+				 b.SPCL_TECH_ID SPCL_TECH_ID,
+				 #YEAR_MONTH# YEAR_MONTH,
+				 b.PRD_TYPE
+				from 
+				DRP_STOREOUT a ,DRP_STOREOUT_DTL_V b ,BASE_PRODUCT c , BASE_CHANN d
+				 where 
+				      a.STOREOUT_ID=b.STOREOUT_ID
+				  and  b.PRD_ID=c.PRD_ID
+                  and  a.LEDGER_ID=d.CHANN_ID
+				  and a.DEAL_FLAG=1
+				  and a.DEL_FLAG=0
+				  and a.BILL_TYPE='销售出库'
+				  and a.LEDGER_ID=#LEDGER_ID#
+				  and to_char(a.DEAL_TIME,'YYYYMM')=#YEAR_MONTH#
+				  and b.DEL_FLAG=0
+								
+	]]>
+  </insert> 
+  
+  <!--直营办出货单 -->
+  <insert id="insStoreOut_A" parameterClass="map">
+  <![CDATA[
+        insert into DRP_STOREOUT_A
+        (STOREOUT_ID,STOREOUT_NO,FROM_BILL_ID,FROM_BILL_NO,STOREOUT_STORE_ID,STOREOUT_STORE_NO,
+		 STOREOUT_STORE_NAME,RECV_CHANN_ID,RECV_CHANN_NO,RECV_CHANN_NAME,SALE_DATE,RECV_ADDR,
+		 STOREOUT_AMOUNT,STATE,DEAL_TIME,REMARK,CREATOR,CRE_NAME,CRE_TIME,UPDATOR,UPD_NAME,UPD_TIME,DEPT_ID,
+		 DEPT_NAME,ORG_ID,ORG_NAME,LEDGER_ID,LEDGER_NAME,DEL_FLAG,YEAR_MONTH,RSP_NAME)
+		select 
+		  a.STOREOUT_ID,
+		  a.STOREOUT_NO,
+		  a.STOREOUT_ID,
+		  replace(a.STOREOUT_NO,'CK','SO')  FROM_BILL_NO,
+		  a.STOREOUT_STORE_ID,
+		  a.STOREOUT_STORE_NO,
+		  a.STOREOUT_STORE_NAME,
+		  a.TERM_ID RECV_CHANN_ID,
+		  a.TERM_NO RECV_CHANN_NO,
+		  a.TERM_NAME RECV_CHANN_NAME,
+		  a.SALE_DATE,
+		  c.ADDRESS RECV_ADDR,
+		  a.STOREOUT_AMOUNT,
+		  a.STATE,
+		  a.DEAL_TIME,
+		  '' REMARK,
+		  a.DEAL_PSON_ID,
+		  a.DEAL_PSON_NAME,
+		  a.DEAL_TIME-(1/24/60)*(30+ mod(rownum,200)) -(1/24/60/60)*(mod(rownum,20)) CRE_TIME,
+		  a.DEAL_PSON_ID,
+		  a.DEAL_PSON_NAME,
+		  a.DEAL_TIME UPD_TIME,
+		  a.DEPT_ID,
+		  a.DEPT_NAME,
+		  a.ORG_ID,
+		  a.ORG_NAME,
+		  a.LEDGER_ID,
+		  a.LEDGER_NAME,
+		  0 DEL_FLAG,
+		  #YEAR_MONTH# YEAR_MONTH,
+		  c.CUST_NAME RSP_NAME
+		 from 
+			  DRP_STOREOUT a left join BASE_TERMINAL c on a.TERM_ID=c.TERM_ID
+			 where 
+			      a.STATE='已处理'
+		      and a.DEL_FLAG=0    
+		      and a.BILL_TYPE='销售出库'   
+			  and a.LEDGER_ID=#LEDGER_ID#    
+			  and to_char(a.DEAL_TIME,'YYYYMM')=#YEAR_MONTH#
+		
+		
+	 ]]>
+  </insert> 
+  <insert id="insStoreOutDtl_A" parameterClass="map">
+  <![CDATA[
+       insert into DRP_STOREOUT_DTL_A
+       (STOREOUT_DTL_ID,STOREOUT_ID,PRD_ID,PRD_NO,PRD_NAME,PRD_SPEC,
+		PRD_COLOR,BRAND,STD_UNIT,NOTICE_NUM,PRICE,DECT_RATE,DECT_PRICE,
+		DECT_AMOUNT,REMARK,DEL_FLAG,FROM_BILL_DTL_ID,SPCL_TECH_ID,
+		REAL_NUM,YEAR_MONTH,PRD_TYPE)
+	  select
+         b.STOREOUT_DTL_ID,
+         a.STOREOUT_ID,
+         b.PRD_ID,
+         b.PRD_NO,
+         b.PRD_NAME,
+         b.PRD_SPEC,
+         b.PRD_COLOR,
+         b.BRAND,
+         b.STD_UNIT,
+         b.REAL_NUM NOTICE_NUM,
+         NVL(c.PRVD_PRICE*NVL(d.CHANN_SALE_RATE,1.1),0) PRICE,
+         1 DECT_RATE,
+         NVL(c.PRVD_PRICE*NVL(d.CHANN_SALE_RATE,1.1),0) DECT_PRICE,
+         b.REAL_NUM*NVL(c.PRVD_PRICE*NVL(d.CHANN_SALE_RATE,1.1),0) DECT_AMOUNT,
+         '' REMARK,
+         0 DEL_FLAG,
+         b.STOREOUT_DTL_ID FROM_BILL_DTL_ID,
+         b.SPCL_TECH_ID,
+         b.REAL_NUM ,
+         #YEAR_MONTH# YEAR_MONTH,
+         b.PRD_TYPE
+        from 
+        DRP_STOREOUT a ,DRP_STOREOUT_DTL_V b ,BASE_PRODUCT c , BASE_CHANN d
+         where 
+              a.STOREOUT_ID=b.STOREOUT_ID
+          and  b.PRD_ID=c.PRD_ID
+          and  a.LEDGER_ID=d.CHANN_ID    
+          and b.DEL_FLAG=0
+          and a.LEDGER_ID=#LEDGER_ID#
+          and a.STATE='已处理'
+          and a.BILL_TYPE='销售出库'
+		  and a.DEL_FLAG=0    
+          and to_char(a.DEAL_TIME,'YYYYMM')=#YEAR_MONTH#
+		
+	 ]]>
+  </insert>
+  <update id="updStoreOut_A" parameterClass="map">
+	<![CDATA[
+		  
+			 update DRP_STOREOUT_A a  set a.STOREOUT_AMOUNT=(select sum(DECT_AMOUNT) from  DRP_STOREOUT_DTL_A b where a.STOREOUT_ID=b.STOREOUT_ID)
+			 where 
+			      a.STATE='已处理'
+			  and a.YEAR_MONTH=#YEAR_MONTH#
+			  and a.LEDGER_ID=#LEDGER_ID#
+		   
+	]]>
+  </update>
+  <!--直营办退货单 -->
+  
+  <insert id="insReturn_A" parameterClass="map">
+  <![CDATA[
+     insert into DRP_RETURN_A(PRD_RETURN_ID,PRD_RETURN_NO,BILL_TYPE,FROM_BILL_ID,
+			FROM_BILL_NO,RETURN_CHANN_ID,RETURN_CHANN_NO,RETURN_CHANN_NAME,
+			EXPECT_RETURNDATE,STATE,REMARK,CREATOR,CRE_NAME,CRE_TIME,UPDATOR,
+			UPD_NAME,UPD_TIME,AUDIT_ID,AUDIT_NAME,AUDIT_TIME,DEPT_ID,
+			DEPT_NAME,ORG_ID,ORG_NAME,LEDGER_ID,LEDGER_NAME,DEL_FLAG,
+			RETURN_RSON,YEAR_MONTH,RSP_NAME)
+	 select
+		    a.STOREIN_ID PRD_RETURN_ID,
+		    replace(a.STOREIN_NO,'RK','RT')PRD_RETURN_NO,
+		    '正常退货' BILL_TYPE,
+		    a.STOREIN_ID FROM_BILL_ID,
+		    a.STOREIN_NO FROM_BILL_NO,
+		    b.TERM_ID   RETURN_CHANN_ID,
+		    b.TERM_NO   RETURN_CHANN_NO,
+		    b.TERM_NAME RETURN_CHANN_NAME,
+		    b.SALE_DATE EXPECT_RETURNDATE,
+		    a.STATE,
+		    '' REMARK,
+		    a.CREATOR,
+			a.CRE_NAME,
+			a.CRE_TIME,
+			a.UPDATOR,
+			a.UPD_NAME,
+			a.UPD_TIME,
+			a.DEAL_PSON_ID AUDIT_ID,
+			a.DEAL_PSON_NAME AUDIT_NAME,
+		    (a.CRE_TIME+(1/24/60)*(30+ mod(rownum,200)) ) AUDIT_TIME,
+			a.DEPT_ID,
+			a.DEPT_NAME,
+			a.ORG_ID,
+			a.ORG_NAME,
+			a.LEDGER_ID,
+			a.LEDGER_NAME,
+			0 DEL_FLAG,
+			'' RETURN_RSON,
+			#YEAR_MONTH# YEAR_MONTH,
+			c.CUST_NAME
+		   from DRP_STOREIN a  ,DRP_ADVC_ORDER b left join BASE_TERMINAL c on b.TERM_ID=c.TERM_ID
+		where 
+		    a.BILL_TYPE='终端退货'
+		and a.FROM_BILL_ID=b.ADVC_ORDER_ID	
+		and a.LEDGER_ID=#LEDGER_ID#
+		and to_char(a.DEAL_TIME,'YYYYMM')=#YEAR_MONTH#
+        and a.STATE='已处理'	
+        and a.DEL_FLAG=0
+  ]]>
+  </insert> 
+   <insert id="insReturnDtl_A" parameterClass="map">
+  <![CDATA[
+     insert into  DRP_RETURN_DTL_A
+           (PRD_RETURN_DTL_ID,PRD_RETURN_ID,FROM_BILL_DTL_ID,PRD_ID,PRD_NO,
+			PRD_NAME,PRD_SPEC,PRD_COLOR,BRAND,STD_UNIT,RETURN_PRICE,RETURN_NUM,
+			RETURN_AMOUNT,RETURN_RSON,DEL_FLAG,PRD_TYPE,SPCL_TECH_ID,YEAR_MONTH)
+		select 
+		  c.STOREIN_DTL_ID PRD_RETURN_DTL_ID,
+		  c.STOREIN_ID     PRD_RETURN_ID,
+		  c.STOREIN_DTL_ID  FROM_BILL_DTL_ID,
+		  c.PRD_ID,
+		  c.PRD_NO,
+		  c.PRD_NAME,
+		  c.PRD_SPEC,
+		  c.PRD_COLOR,
+		  c.BRAND,
+		  c.STD_UNIT,
+		  c.DECT_PRICE RETURN_PRICE,
+		  c.REAL_NUM RETURN_NUM,
+		  c.DECT_AMOUNT RETURN_AMOUNT,
+		  '' RETURN_RSON,
+		  0 DEL_FLAG,
+		  '' PRD_TYPE,
+		  c.SPCL_TECH_ID,
+		 #YEAR_MONTH# YEAR_MONTH
+		 from DRP_STOREIN a ,DRP_ADVC_ORDER b,DRP_STOREIN_DTL c
+				where 
+				    a.BILL_TYPE='终端退货'
+				and a.FROM_BILL_ID=b.ADVC_ORDER_ID	
+		        and a.STOREIN_ID=c.STOREIN_ID
+				and a.LEDGER_ID=#LEDGER_ID#
+				and to_char(a.DEAL_TIME,'YYYYMM')=#YEAR_MONTH#
+		        and a.STATE='已处理'	
+		        and a.DEL_FLAG=0
+		        and b.DEL_FLAG=0		
+     
+  ]]>
+  </insert> 
+  <!--直营办退货入库单 -->
+  
+  <insert id="insReturnStoreIn_A" parameterClass="map">
+  <![CDATA[
+      insert into DRP_RETURN_STOREIN_A
+      (
+        STOREIN_ID,STOREIN_NO,BILL_TYPE,FROM_BILL_ID,FROM_BILL_NO,
+		ORDER_CHANN_ID,ORDER_CHANN_NO,ORDER_CHANN_NAME,
+		STOREIN_STORE_ID,STOREIN_STORE_NO,
+		STOREIN_STORE_NAME,STATE,REMARK,CREATOR,CRE_NAME,
+		CRE_TIME,
+		UPDATOR,
+		UPD_NAME,
+		UPD_TIME,
+		DEPT_ID,
+		DEPT_NAME,
+		ORG_ID,
+		ORG_NAME,
+		LEDGER_ID,
+		LEDGER_NAME,
+		DEL_FLAG,
+		DEAL_FLAG,
+		DEAL_TIME,
+		DEAL_PSON_ID,
+		DEAL_PSON_NAME,
+		STATEMENUT_DATE	,
+		YEAR_MONTH,
+		RSP_NAME
+       )
+    select 
+      a.STOREIN_ID,
+      a.STOREIN_NO,
+      '退货入库' BILL_TYPE,
+      a.STOREIN_ID FROM_BILL_ID,
+      replace(a.STOREIN_NO,'RK','RT')  FROM_BILL_NO,
+      b.TERM_ID   RETURN_CHANN_ID,
+	  b.TERM_NO   RETURN_CHANN_NO,
+	  b.TERM_NAME RETURN_CHANN_NAME,
+      a.STOREIN_STORE_ID,
+      a.STOREIN_STORE_NO,
+      a.STOREIN_STORE_NAME,
+      a.STATE,
+      '' REMARK,
+      a.CREATOR,
+      a.CRE_NAME,
+      a.CRE_TIME,
+      a.UPDATOR,
+      a.UPD_NAME,
+      a.UPD_TIME,
+      a.DEPT_ID,
+      a.DEPT_NAME,
+      a.ORG_ID,
+      a.ORG_NAME,
+      a.LEDGER_ID,
+      a.LEDGER_NAME,
+      0 DEL_FLAG,
+      1 DEAL_FLAG,
+      a.DEAL_TIME,
+      a.DEAL_PSON_ID,
+      a.DEAL_PSON_NAME,
+      a.STATEMENUT_DATE,
+      #YEAR_MONTH# YEAR_MONTH,
+      c.CUST_NAME RSP_NAME
+    from   
+      DRP_STOREIN a  ,DRP_ADVC_ORDER b left join BASE_TERMINAL c on b.TERM_ID=c.TERM_ID 
+    where 
+		    a.BILL_TYPE='终端退货'
+		and a.FROM_BILL_ID=b.ADVC_ORDER_ID	
+		and a.LEDGER_ID=#LEDGER_ID#
+	    and to_char(a.DEAL_TIME,'YYYYMM')=#YEAR_MONTH#
+        and a.STATE='已处理'	
+        and a.DEL_FLAG=0
+  ]]>
+  </insert> 
+   <insert id="insReturnStoreInDtl_A" parameterClass="map">
+  <![CDATA[
+    insert into DRP_RETURN_STOREIN_DTL_A
+     (
+        STOREIN_DTL_ID,FROM_BILL_DTL_ID,STOREIN_ID,
+		PRD_ID,PRD_NO,PRD_NAME,PRD_SPEC,BRAND,
+		STD_UNIT,NOTICE_NUM,REAL_NUM,REMARK,
+		PRICE,DECT_RATE,DECT_PRICE,DECT_AMOUNT,
+		DEL_FLAG,SPCL_TECH_ID,TAX_RATE,NO_TAX_DECT_PRICE,
+		NO_TAX_DECT_AMOUNT,TAX_AMOUNT,YEAR_MONTH,PRD_TYPE
+      )
+    select
+     c.STOREIN_DTL_ID,
+     c.STOREIN_DTL_ID FROM_BILL_DTL_ID,
+     c.STOREIN_ID,
+     c.PRD_ID,
+     c.PRD_NO,
+     c.PRD_NAME,
+     c.PRD_SPEC,
+     c.BRAND,
+     c.STD_UNIT,
+     c.NOTICE_NUM,
+     c.REAL_NUM,
+     c.REMARK,
+     c.PRICE,
+     c.DECT_RATE,
+     c.DECT_PRICE,
+     c.DECT_AMOUNT,
+     0 DEL_FLAG,
+     c.SPCL_TECH_ID,
+     c.TAX_RATE,
+     c.NO_TAX_DECT_PRICE,
+     c.NO_TAX_DECT_AMOUNT,
+     c.TAX_AMOUNT,
+     #YEAR_MONTH# YEAR_MONTH,
+     d.PRD_TYPE
+   from DRP_STOREIN a ,DRP_ADVC_ORDER b,DRP_STOREIN_DTL c  left join DRP_ADVC_ORDER_DTL d on c.FROM_BILL_DTL_ID=d.ADVC_ORDER_DTL_ID
+				where 
+				    a.BILL_TYPE='终端退货'
+				and a.FROM_BILL_ID=b.ADVC_ORDER_ID	
+		        and a.STOREIN_ID=c.STOREIN_ID
+		    	and a.LEDGER_ID=#LEDGER_ID#
+			    and to_char(a.DEAL_TIME,'YYYYMM')=#YEAR_MONTH#
+		        and a.STATE='已处理'	
+		        and a.DEL_FLAG=0
+		        and b.DEL_FLAG=0
+  ]]>
+  </insert>
+  <!-- 门店销售出库单 -->
+   <insert id="insTermStoreout_A" parameterClass="map">
+  <![CDATA[
+        insert into DRP_TERM_STOREOUT_A
+        (
+        STOREOUT_ID,
+		STOREOUT_NO,
+		BILL_TYPE,
+		FROM_BILL_ID,
+		FROM_BILL_NO,
+		STOREOUT_STORE_ID,
+		STOREOUT_STORE_NO,
+		STOREOUT_STORE_NAME,
+		TERM_ID,
+		TERM_NO,
+		TERM_NAME,
+		SALE_DATE,
+		SALE_PSON_ID,
+		SALE_PSON_NAME,
+		CUST_NAME,
+		TEL,
+		RECV_ADDR,
+		ORDER_RECV_DATE,
+		STOREOUT_AMOUNT,
+		ADVC_AMOUNT,
+		PAYABLE_AMOUNT,
+		STATE,
+		REMARK,
+		CREATOR,
+		CRE_NAME,
+		CRE_TIME,
+		UPDATOR,
+		UPD_NAME,
+		UPD_TIME,
+		DEPT_ID,
+		DEPT_NAME,
+		ORG_ID,
+		ORG_NAME,
+		LEDGER_ID,
+		LEDGER_NAME,
+		DEL_FLAG,
+		DEAL_FLAG,
+		DEAL_TIME,
+		DEAL_PSON_ID,
+		DEAL_PSON_NAME,
+		YEAR_MONTH
+         )
+    select 
+		a.STOREOUT_ID,
+		a.STOREOUT_NO,
+		'销售出库' BILL_TYPE,
+		a.FROM_BILL_ID,
+		a.FROM_BILL_NO,
+		a.TERM_ID   STOREOUT_STORE_ID,
+		a.TERM_NO||'-00'  STOREOUT_STORE_NO,
+		e.CUST_NAME||'库房' STOREOUT_STORE_NAME,
+		a.TERM_ID,
+		a.TERM_NO,
+		a.TERM_NAME,
+		a.SALE_DATE,
+		a.SALE_PSON_ID,
+		a.SALE_PSON_NAME,
+		a.CUST_NAME,
+		a.TEL,
+		a.RECV_ADDR,
+		a.ORDER_RECV_DATE,
+		a.STOREOUT_AMOUNT,
+		a.ADVC_AMOUNT,
+		a.PAYABLE_AMOUNT,
+		a.STATE,
+		a.REMARK,
+		c.CREATOR,
+		c.CRE_NAME,
+		c.CRE_TIME,
+		c.UPDATOR,
+		c.UPD_NAME,
+		c.UPD_TIME,
+		a.TERM_ID DEPT_ID,
+		e.CUST_NAME DEPT_NAME,
+		a.TERM_ID ORG_ID,
+		e.CUST_NAME ORG_NAME,
+		a.TERM_ID LEDGER_ID,
+		e.CUST_NAME LEDGER_NAME,
+		0 DEL_FLAG,
+		1 DEAL_FLAG,
+		a.DEAL_TIME,
+		c.CREATOR  DEAL_PSON_ID,
+		c.CRE_NAME DEAL_PSON_NAME,
+		#YEAR_MONTH# YEAR_MONTH
+ from 
+		  DRP_STOREOUT a
+          left join DRP_ADVC_SEND_REQ c on a.FROM_BILL_ID=c.ADVC_SEND_REQ_ID 
+          left join DRP_ADVC_ORDER d on c.FROM_BILL_ID=d.ADVC_ORDER_ID
+          left join BASE_TERMINAL e on a.TERM_ID=e.TERM_ID
+		 where 
+		      a.STATE='已处理'
+		  and a.DEL_FLAG=0    
+		  and a.BILL_TYPE='销售出库'
+		  and a.LEDGER_ID=#LEDGER_ID#
+		  and to_char(a.DEAL_TIME,'YYYYMM')=#YEAR_MONTH#
+     
+  ]]>
+  </insert>
+  <insert id="insTermStoreOutDtl_A" parameterClass="map">
+  <![CDATA[
+    insert into DRP_TERM_STOREOUT_DTL_A
+      (STOREOUT_DTL_ID,STOREOUT_ID,PRD_ID,PRD_NO,PRD_NAME,
+		PRD_SPEC,BRAND,STD_UNIT,NOTICE_NUM,REAL_NUM,PRICE,
+		DECT_RATE,DECT_PRICE,DECT_AMOUNT,REMARK,DEL_FLAG,
+		FROM_BILL_DTL_ID,SPCL_TECH_ID,PRD_TYPE,YEAR_MONTH)
+	select 
+	    c.STOREOUT_DTL_ID,
+	    c.STOREOUT_ID,
+	    c.PRD_ID,
+	    c.PRD_NO,
+	    c.PRD_NAME,
+	    c.PRD_SPEC,
+	    c.BRAND,
+	    c.STD_UNIT,
+	    c.NOTICE_NUM,
+	    c.REAL_NUM,
+	    c.PRICE,
+	    c.DECT_RATE,
+	    c.DECT_PRICE,
+	    c.DECT_AMOUNT,
+	    c.REMARK,
+	    0 DEL_FLAG,
+	    c.FROM_BILL_DTL_ID,
+	    c.SPCL_TECH_ID,
+	    c. PRD_TYPE,
+	    #YEAR_MONTH# YEAR_MONTH
+	  from
+	   DRP_STOREOUT a ,DRP_STOREOUT_DTL c
+		  where 
+			 a.STOREOUT_ID=c.STOREOUT_ID
+		 and a.DEAL_FLAG=1
+		 and a.BILL_TYPE='销售出库'
+		 and a.LEDGER_ID=#LEDGER_ID#
+		 and to_char(a.DEAL_TIME,'YYYYMM')=#YEAR_MONTH#
+		 and c.DEL_FLAG=0 	
+		 and a.DEL_FLAG=0
+  ]]>
+  </insert>
+  <!--门店退货出库单 -->
+  <insert id="insTermReturnStoreout_A" parameterClass="map">
+  <![CDATA[
+     insert into DRP_TREM_RETURN_STOREOUT_A(
+        STOREOUT_ID,STOREOUT_NO,FROM_BILL_ID,FROM_BILL_NO,STOREOUT_STORE_ID,
+		STOREOUT_STORE_NO,STOREOUT_STORE_NAME,SALE_DATE,RECV_ADDR,
+		RECV_CHANN_ID,RECV_CHANN_NO,RECV_CHANN_NAME,STOREOUT_AMOUNT,STATE,
+		REMARK,CREATOR,CRE_NAME,CRE_TIME,UPDATOR,UPD_NAME,UPD_TIME,DEPT_ID,
+		DEPT_NAME,ORG_ID,ORG_NAME,LEDGER_ID,LEDGER_NAME,DEL_FLAG,YEAR_MONTH
+     )
+     select 
+	   a.STOREIN_ID STOREOUT_ID,
+	   replace(a.STOREIN_NO,'RK','CK')  STOREOUT_NO,
+	   a.FROM_BILL_ID FROM_BILL_ID,
+	   a.FROM_BILL_NO FROM_BILL_NO,
+	   b.TERM_ID  STOREOUT_STORE_ID,
+	   b.TERM_NO||'-00' STOREOUT_STORE_NO,
+	   e.CUST_NAME||'库房'  STOREOUT_STORE_NAME,
+	   b.SALE_DATE,
+	   '' RECV_ADDR,
+	   d.CHANN_ID  RECV_CHANN_ID,
+	   d.CHANN_NO RECV_CHANN_NO,
+	   d.CHANN_NAME RECV_CHANN_NAME,
+	   0 STOREOUT_AMOUNT,
+	   '已处理' STATE,
+	   '' REMARK,
+	    b. CREATOR,
+		b.CRE_NAME,
+		b.CRE_TIME,
+		b.UPDATOR,
+		b.UPD_NAME,
+		b.UPD_TIME,
+		b.TERM_ID DEPT_ID,
+		e.CUST_NAME DEPT_NAME,
+		b.TERM_ID ORG_ID,
+		e.CUST_NAME ORG_NAME,
+		b.TERM_ID  LEDGER_ID,
+		e.CUST_NAME LEDGER_NAME,
+		0 DEL_FLAG,
+		#YEAR_MONTH# YEAR_MONTH
+	 from   
+	      DRP_STOREIN a 
+	       left join BASE_CHANN d on a.LEDGER_ID=d.CHANN_ID 
+	       ,DRP_ADVC_ORDER b  left join BASE_TERMINAL e on b.TERM_ID=e.TERM_ID 
+	    where 
+			    a.BILL_TYPE='终端退货'
+			and a.FROM_BILL_ID=b.ADVC_ORDER_ID	
+         	and a.LEDGER_ID=#LEDGER_ID#
+		    and to_char(a.DEAL_TIME,'YYYYMM')=#YEAR_MONTH#
+	        and a.STATE='已处理'	
+	        and a.DEL_FLAG=0
+	        and b.DEL_FLAG=0
+     
+  ]]>
+  </insert>
+  <insert id="insTermReturnStoreOutDtl_A" parameterClass="map">
+  <![CDATA[
+     insert into DRP_TREM_RETURN_STOREOUT_DTL_A
+     (
+     STOREOUT_DTL_ID,STOREOUT_ID,PRD_ID,PRD_NO,PRD_NAME,PRD_SPEC,PRD_COLOR,
+	BRAND,STD_UNIT,NOTICE_NUM,PRICE,DECT_RATE,DECT_PRICE,DECT_AMOUNT,
+	REMARK,DEL_FLAG,FROM_BILL_DTL_ID,SPCL_TECH_ID,REAL_NUM,PRD_TYPE,YEAR_MONTH
+     )
+     select
+    b.STOREIN_DTL_ID   STOREOUT_DTL_ID,
+    b.STOREIN_ID       STOREOUT_ID,
+    b.PRD_ID,
+    b.PRD_NO,
+    b.PRD_NAME,
+    b.PRD_SPEC,
+    b.PRD_COLOR,
+    b.BRAND,
+    b.STD_UNIT,
+    b.NOTICE_NUM,
+    b.PRICE,
+    b.DECT_RATE,
+    b.DECT_PRICE,
+    b.DECT_AMOUNT,
+    '' REMARK,
+    0 DEL_FLAG,
+    b.FROM_BILL_DTL_ID,
+    b.SPCL_TECH_ID,
+    b.REAL_NUM,
+    c.PRD_TYPE,
+   #YEAR_MONTH# YEAR_MONTH
+ from   
+        DRP_STOREIN a  ,DRP_STOREIN_DTL b left join DRP_ADVC_ORDER_DTL c on b.FROM_BILL_DTL_ID=c.ADVC_ORDER_DTL_ID
+   where     
+			    a.BILL_TYPE='终端退货'
+			and a.STOREIN_ID=b.STOREIN_ID	
+     	and a.LEDGER_ID=#LEDGER_ID#
+	    and to_char(a.DEAL_TIME,'YYYYMM')=#YEAR_MONTH#
+	    and a.STATE='已处理'	
+	    and a.DEL_FLAG=0
+	    and b.DEL_FLAG=0
+  ]]>
+  </insert>
+  <!--门店退货入库单 -->
+  <insert id="insTermReturnStoreIn_A" parameterClass="map">
+  <![CDATA[
+     insert into DRP_TREM_RETURN_STOREIN_A
+     (
+     STOREIN_ID,STOREIN_NO,BILL_TYPE,FROM_BILL_ID  ,FROM_BILL_NO,
+	 TERM_ID,TERM_NO,TERM_NAME,SALE_DATE,SALE_PSON_ID,SALE_PSON_NAME,
+	 CUST_NAME,TEL,STOREIN_STORE_ID,STOREIN_STORE_NO,STOREIN_STORE_NAME,
+	 STATE,REMARK,CREATOR,CRE_NAME,CRE_TIME,UPDATOR,UPD_NAME,UPD_TIME  ,
+	 DEPT_ID,DEPT_NAME,ORG_ID,ORG_NAME,LEDGER_ID,LEDGER_NAME,DEL_FLAG,
+	 DEAL_FLAG,DEAL_TIME,DEAL_PSON_ID,DEAL_PSON_NAME,STATEMENUT_DATE,YEAR_MONTH
+     )
+    select 
+      a.STOREIN_ID,
+      a.STOREIN_NO,
+      '退货入库'BILL_TYPE,
+      a.FROM_BILL_ID,
+      a.FROM_BILL_NO,
+      b.TERM_ID,
+      b.TERM_NO,
+      e.CUST_NAME TERM_NAME,
+      b.SALE_DATE,
+      b.SALE_PSON_ID,
+      b.SALE_PSON_NAME,
+      b.CUST_NAME,
+      b.TEL,
+      b.TERM_ID STOREIN_STORE_ID,
+      b.TERM_NO||'-00' STOREIN_STORE_NO,
+      e.CUST_NAME||'库房' STOREIN_STORE_NAME,
+      '已处理'STATE,
+      '' REMARK,
+      b.CREATOR,
+      b.CRE_NAME,
+      b.CRE_TIME,
+      b.UPDATOR,
+      b.UPD_NAME,
+      b.UPD_TIME,
+      b.TERM_ID DEPT_ID,
+      e.CUST_NAME DEPT_NAME,
+      b.TERM_ID ORG_ID,
+      e.CUST_NAME ORG_NAME,
+      b.TERM_ID LEDGER_ID,
+      e.CUST_NAME LEDGER_NAME,
+      0 DEL_FLAG,
+      1 DEAL_FLAG,
+      a.DEAL_TIME,
+      a.DEAL_PSON_ID,
+      a.DEAL_PSON_NAME,
+      a.STATEMENUT_DATE,
+      #YEAR_MONTH# YEAR_MONTH
+  from   
+	      DRP_STOREIN a left join BASE_CHANN d on a.LEDGER_ID=d.CHANN_ID ,DRP_ADVC_ORDER b  
+	                 left join BASE_TERMINAL e on b.TERM_ID=e.TERM_ID 
+	    where 
+			    a.BILL_TYPE='终端退货'
+			and a.FROM_BILL_ID=b.ADVC_ORDER_ID	
+            and a.LEDGER_ID=#LEDGER_ID#
+		    and to_char(a.DEAL_TIME,'YYYYMM')=#YEAR_MONTH#
+	        and a.STATE='已处理'	
+	        and a.DEL_FLAG=0 
+	        and b.DEL_FLAG=0
+  ]]>
+  </insert>
+  <insert id="insTermReturnStoreInDtl_A" parameterClass="map">
+  <![CDATA[
+     insert into DRP_TREM_RETURN_STOREIN_DTL_A
+     (STOREIN_DTL_ID,STOREIN_ID,FROM_BILL_DTL_ID,PRD_ID,PRD_NO,
+		PRD_NAME,PRD_SPEC,BRAND,STD_UNIT,NOTICE_NUM,REAL_NUM,
+		REMARK,PRICE,DECT_RATE,DECT_PRICE,DECT_AMOUNT,DEL_FLAG,SPCL_TECH_ID,
+		TAX_RATE,NO_TAX_DECT_PRICE,NO_TAX_DECT_AMOUNT,TAX_AMOUNT,YEAR_MONTH,
+		PRD_TYPE)
+    select 
+	   b.STOREIN_DTL_ID,
+	   b.STOREIN_ID,
+	   b.FROM_BILL_DTL_ID,
+	   b.PRD_ID,
+	   b.PRD_NO,
+	   b.PRD_NAME,
+	   b.PRD_SPEC,
+	   b.BRAND,
+	   b.STD_UNIT,
+	   b.NOTICE_NUM,
+	   b.REAL_NUM,
+	   ''REMARK,
+	   b.PRICE,
+	   b.DECT_RATE,
+	   b.DECT_PRICE,
+	   b.DECT_AMOUNT,
+	   0 DEL_FLAG,
+	   b.SPCL_TECH_ID,
+	   b.TAX_RATE,
+	   b.NO_TAX_DECT_PRICE,
+	   b.NO_TAX_DECT_AMOUNT,
+	   b.TAX_AMOUNT,
+	  #YEAR_MONTH# YEAR_MONTH,
+	   c.PRD_TYPE
+	   
+	  from   
+	        DRP_STOREIN a  ,DRP_STOREIN_DTL b left join DRP_ADVC_ORDER_DTL c on b.FROM_BILL_DTL_ID=c.ADVC_ORDER_DTL_ID
+	   where     
+				    a.BILL_TYPE='终端退货'
+				and a.STOREIN_ID=b.STOREIN_ID	
+	     	and a.LEDGER_ID=#LEDGER_ID#
+		    and to_char(a.DEAL_TIME,'YYYYMM')=#YEAR_MONTH#
+		    and a.STATE='已处理'	
+		    and a.DEL_FLAG=0	
+		    and b.DEL_FLAG=0	
+  ]]>
+  </insert>
+  <!-- begin -->
+ <update id="updSaleOrderDtlPrice1" parameterClass="map">
+	<![CDATA[
+	update DRP_SALE_ORDER_DTL_A u  set PRICE=
+	NVL((select $PRICE_EXPRESS$
+        from DRP_STOREOUT_DTL  b ,BASE_PRODUCT c
+    where  b.PRD_ID=c.PRD_ID
+     and   b.STOREOUT_DTL_ID=u.From_Bill_Dtl_Id ),0)
+   where 
+      u.SALE_ORDER_ID in ( select  SALE_ORDER_ID from DRP_SALE_ORDER_A  where LEDGER_ID=#LEDGER_ID#  and YEAR_MONTH=#YEAR_MONTH# and ORDER_CHANN_ID=#TERM_ID#)
+	]]>
+  </update> 
+  <update id="updStoreOutDtlPrice1" parameterClass="map">
+	<![CDATA[
+	update  DRP_STOREOUT_DTL_A u  set PRICE=
+	NVL((select PRICE
+        from DRP_SALE_ORDER_DTL_A b
+    where   b.SALE_ORDER_DTL_ID=u.From_Bill_Dtl_Id ),0)
+   where
+       u.STOREOUT_ID in( select  STOREOUT_ID from   DRP_STOREOUT_A  where LEDGER_ID=#LEDGER_ID#  and YEAR_MONTH=#YEAR_MONTH# and RECV_CHANN_ID=#TERM_ID#) 
+	]]>
+  </update> 
+  
+   
+  <update id="updReturnDtlPrice1" parameterClass="map">
+	<![CDATA[
+	update DRP_RETURN_DTL_A u  set RETURN_PRICE=
+	NVL((select $PRICE_EXPRESS$
+        from DRP_STOREIN_DTL b ,BASE_PRODUCT c
+    where  b.PRD_ID=c.PRD_ID
+     and   b.STOREIN_DTL_ID=u.From_Bill_Dtl_Id ),0)
+   where 
+      u.PRD_RETURN_ID in( select  PRD_RETURN_ID from   DRP_RETURN_A  where LEDGER_ID=#LEDGER_ID#  and YEAR_MONTH=#YEAR_MONTH# and RETURN_CHANN_ID=#TERM_ID#)
+   ]]>
+  </update> 
+   <update id="updReturnStoreInDtlPrice1" parameterClass="map">
+	<![CDATA[
+	update  DRP_RETURN_STOREIN_DTL_A u  set PRICE=
+	NVL((select PRICE
+        from DRP_RETURN_DTL_A b
+    where   b.PRD_RETURN_DTL_ID=u.From_Bill_Dtl_Id ),0)
+   where
+       u.STOREIN_ID in( select  STOREIN_ID from   DRP_RETURN_STOREIN_A  where LEDGER_ID=#LEDGER_ID#  and YEAR_MONTH=#YEAR_MONTH# and ORDER_CHANN_ID=#TERM_ID#)
+	]]>
+  </update> 
+  
+  
+  <update id="updTermReturnStoreOutDtlPrice1" parameterClass="map">
+	<![CDATA[
+	update  DRP_TREM_RETURN_STOREOUT_DTL_A u  set PRICE=
+	NVL((select PRICE
+        from DRP_RETURN_DTL_A b
+    where   b.PRD_RETURN_DTL_ID=u.From_Bill_Dtl_Id ),0)
+   where
+       u.STOREOUT_ID in( select  STOREOUT_ID from   DRP_TREM_RETURN_STOREOUT_A   where YEAR_MONTH=#YEAR_MONTH# and LEDGER_ID=#TERM_ID# )
+	]]>
+  </update>
+  
+   <update id="updSaleOrderDtlPrice2" parameterClass="map">
+	<![CDATA[
+	 update DRP_SALE_ORDER_DTL_A u set DECT_PRICE=PRICE, ORDER_AMOUNT= PRICE*ORDER_NUM 
+    where 
+      u.SALE_ORDER_ID in ( select  SALE_ORDER_ID from DRP_SALE_ORDER_A  where LEDGER_ID=#LEDGER_ID#  and YEAR_MONTH=#YEAR_MONTH#)
+	]]>
+  </update> 
+
+  <update id="updStoreOutDtlPrice2" parameterClass="map">
+	<![CDATA[
+	 update DRP_STOREOUT_DTL_A u set DECT_PRICE= PRICE, DECT_AMOUNT =PRICE*REAL_NUM 
+    where 
+      u.STOREOUT_ID in( select  STOREOUT_ID from   DRP_STOREOUT_A  where LEDGER_ID=#LEDGER_ID#  and YEAR_MONTH=#YEAR_MONTH# )
+	]]>
+  </update> 
+  <update id="updReturnDtlPrice2" parameterClass="map">
+	<![CDATA[
+	update DRP_RETURN_DTL_A u  set RETURN_AMOUNT =RETURN_PRICE*RETURN_NUM
+   where 
+      u.PRD_RETURN_ID in( select  PRD_RETURN_ID from   DRP_RETURN_A  where LEDGER_ID=#LEDGER_ID#  and YEAR_MONTH=#YEAR_MONTH#)
+   ]]>
+  </update> 
+   <update id="updReturnStoreInDtlPrice2" parameterClass="map">
+	<![CDATA[
+	update  DRP_RETURN_STOREIN_DTL_A u  set DECT_PRICE=PRICE,
+	DECT_AMOUNT=DECT_PRICE*REAL_NUM,
+	NO_TAX_DECT_PRICE= round(DECT_PRICE/1.17,2),
+	NO_TAX_DECT_AMOUNT=round(DECT_PRICE/1.17,2)*REAL_NUM,
+	TAX_AMOUNT=DECT_PRICE*REAL_NUM-round(DECT_PRICE/1.17,2)*REAL_NUM 
+	where
+       u.STOREIN_ID in( select  STOREIN_ID from   DRP_RETURN_STOREIN_A  where LEDGER_ID=#LEDGER_ID#  and YEAR_MONTH=#YEAR_MONTH#)
+	]]>
+  </update> 
+  <update id="updTermReturnStoreOutDtlPrice2" parameterClass="map">
+	<![CDATA[
+	  update  DRP_TREM_RETURN_STOREOUT_DTL_A u  set DECT_PRICE=PRICE,DECT_AMOUNT= PRICE*REAL_NUM 
+	where
+       u.STOREOUT_ID in( select  STOREOUT_ID from   DRP_TREM_RETURN_STOREOUT_A   where YEAR_MONTH=#YEAR_MONTH# and LEDGER_ID in (select TERM_ID  from BASE_TERMINAL a where a.CHANN_ID_P=#LEDGER_ID# ))
+	]]>
+  </update>
+ </sqlMap>

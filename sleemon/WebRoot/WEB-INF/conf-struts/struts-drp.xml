@@ -1,0 +1,1249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://struts.apache.org/dtds/struts-config_1_2.dtd">
+<struts-config>
+
+	<form-beans>
+		<form-bean name="BaseForm" type="com.hoperun.commons.sample.form.BaseForm"/>
+	</form-beans>
+	
+	<!-- 通用组件 仅做示例用，版本正式发布时删除 -->
+	<action-mappings>
+		<!-- 分发指令接收 -->
+		<action parameter="action" path="/dstrorder" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale/dstrorder/Dstrorder_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/dstrorder/Dstrorder_List.jsp" />
+			<forward name="toedit" path="/pages/drp/sale/dstrorder/Dstrorder_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/sale/dstrorder/Dstrorder_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/sale/dstrorder/Dstrorder_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/sale/dstrorder/Dstrorder_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/sale/dstrorder/Dstrorder_Edit_Chld.jsp"/>
+		</action>
+	
+		<!-- 预订单录入 -->
+		<action parameter="action" path="/advcorder" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale/advcorder/Advcorder_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/advcorder/Advcorder_List.jsp" />
+			<forward name="toedit" path="/pages/drp/sale/advcorder/Advcorder_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/sale/advcorder/Advcorder_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/sale/advcorder/Advcorder_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/sale/advcorder/Advcorder_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/sale/advcorder/Advcorder_Edit_Chld.jsp"/>
+			<forward name="gchildlist" path="/pages/drp/sale/advcorder/Advcorder_List_Gchld.jsp"/>
+			<forward name="gchildedit" path="/pages/drp/sale/advcorder/Advcorder_Edit_Gchld.jsp"/>
+			<forward name="traceList" path="/pages/drp/sale/advcorder/Advcorder_List_Trace.jsp"/>
+			<forward name="priceModify" path="/pages/drp/sale/advcorder/Advcorder_List_PriceModify.jsp"/>
+			<forward name="allPrint" path="/pages/drp/sale/advcorder/Advcorder_List_AllPrint.jsp"/>
+			<forward name="joinAdvc" path="/pages/drp/sale/advcorder/Advcorder_List_JoinAdvc.jsp"/>
+		</action>
+		
+		<!-- 库房库位信息 -->
+		<action parameter="action" path="/store" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/base/store/Store_Frame.jsp" />
+			<forward name="list" path="/pages/drp/base/store/Store_List.jsp" />
+			<forward name="toedit" path="/pages/drp/base/store/Store_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/base/store/Store_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/base/store/Store_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/base/store/Store_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/base/store/Store_Edit_Chld.jsp"/>
+		</action>
+		
+		
+		<!-- 退货申请单维护 add by  wzg -->
+		<action parameter="action" path="/prdreturnreq" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale/prdreturnreq/Prdreturnreq_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/prdreturnreq/Prdreturnreq_List.jsp" />
+			<forward name="toedit" path="/pages/drp/sale/prdreturnreq/Prdreturnreq_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/sale/prdreturnreq/Prdreturnreq_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/sale/prdreturnreq/Prdreturnreq_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/sale/prdreturnreq/Prdreturnreq_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/sale/prdreturnreq/Prdreturnreq_Edit_Chld.jsp"/>
+		</action>
+		
+		<!-- 我的退货单add by  wzg -->
+		<action parameter="action" path="/myretrun" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale/myretrun/Myretrun_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/myretrun/Myretrun_List.jsp" />
+			<forward name="toedit" path="/pages/drp/sale/myretrun/Myretrun_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/sale/myretrun/Myretrun_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/sale/myretrun/Myretrun_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/sale/myretrun/Myretrun_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/sale/myretrun/Myretrun_Edit_Chld.jsp"/>
+		</action>
+		
+		
+		<!-- 喜临门营销平台 -->
+		<action parameter="action" path="/storediff" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/store/storediff/Storediff_Frame.jsp" />
+			<forward name="list" path="/pages/drp/store/storediff/Storediff_List.jsp" />
+			<forward name="toedit" path="/pages/drp/store/storediff/Storediff_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/store/storediff/Storediff_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/store/storediff/Storediff_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/store/storediff/Storediff_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/store/storediff/Storediff_Edit_Chld.jsp"/>
+			<forward name="deallist" path="/pages/drp/store/storediff/Storediffdeal_List_Chld.jsp"/>
+			<forward name="dealedit" path="/pages/drp/store/storediff/Storediffdeal_Edit_Chld.jsp"/>
+		</action>
+		
+		
+		
+		
+		<!-- 投诉与建议查询 -->
+		<action parameter="action" path="/advise" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale/advise/Advise_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/advise/Advise_List.jsp" />
+			<forward name="prdcmpl" path="/pages/drp/sale/advise/Advise_PrdCmpl.jsp"/>
+			<forward name="sercmpl" path="/pages/drp/sale/advise/Advise_SerCmpl.jsp"/>
+			<forward name="advs" path="/pages/drp/sale/advise/Advise_Advs.jsp"/>
+			<forward name="dealProcess" path="/pages/erp/sale/advisehd/AdviseDealProcess_list.jsp"/>
+		</action>
+		
+		<!-- 入库通知单维护 -->
+		<action parameter="action" path="/storeinnotice" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/store/storeinnotice/Storeinnotice_Frame.jsp" />
+			<forward name="list" path="/pages/drp/store/storeinnotice/Storeinnotice_List.jsp" />
+			<forward name="toedit" path="/pages/drp/store/storeinnotice/Storeinnotice_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/store/storeinnotice/Storeinnotice_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/store/storeinnotice/Storeinnotice_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/store/storeinnotice/Storeinnotice_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/store/storeinnotice/Storeinnotice_Edit_Chld.jsp"/>
+		</action>
+		<!-- 终端退货录入 -->
+		<action parameter="action" path="/termreturn" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale/termreturn/Termreturn_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/termreturn/Termreturn_List.jsp" />
+			<forward name="toedit" path="/pages/drp/sale/termreturn/Termreturn_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/sale/termreturn/Termreturn_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/sale/termreturn/Termreturn_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/sale/termreturn/Termreturn_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/sale/termreturn/Termreturn_Edit_Chld.jsp"/>
+		</action>
+		<!-- 投诉与建议 -->
+		<action parameter="action" path="/adviseinit" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale/adviseinit/Adviseinit_Frame.jsp" />
+			<forward name="prdcmpl" path="/pages/drp/sale/adviseinit/Adviseinit_ProCmpl.jsp" />
+			<forward name="sercmpl" path="/pages/drp/sale/adviseinit/Adviseinit_SerCmpl.jsp" />
+			<forward name="advs" path="/pages/drp/sale/adviseinit/Adviseinit_Advs.jsp" />
+		</action>
+		<!-- 付款凭证上传 -->
+		<action parameter="action" path="/paymentup" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale/paymentup/Paymentup_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/paymentup/Paymentup_List.jsp" />
+			<forward name="toedit" path="/pages/drp/sale/paymentup/Paymentup_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/sale/paymentup/Paymentup_Detail.jsp" />
+		</action>
+		<!-- 分销业务一》人员信息 -->
+		<action parameter="action" path="/employee" scope="request"  type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/base/employee/Employee_Frame.jsp" />
+			<forward name="list" path="/pages/drp/base/employee/Employee_List.jsp" />
+			<forward name="toedit" path="/pages/drp/base/employee/Employee_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/base/employee/Employee_Detail.jsp" />
+			<forward name="childlist" path="/pages/drp/base/employee/Employee_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/base/employee/Employee_Edit_Chld.jsp"/>
+		</action>
+		<!-- 入库单处理 -->
+		<action parameter="action" path="/storein" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/store/storein/Storein_Frame.jsp" />
+			<forward name="list" path="/pages/drp/store/storein/Storein_List.jsp" />
+			<forward name="toedit" path="/pages/drp/store/storein/Storein_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/store/storein/Storein_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/store/storein/Storein_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/store/storein/Storein_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/store/storein/Storein_Edit_Chld.jsp"/>
+			<forward name="grandChildlist" path="/pages/drp/store/storein/Storein_List_Grand_Chld.jsp"/>
+			<forward name="grandChildedit" path="/pages/drp/store/storein/Storein_Edit_Grand_Chld.jsp"/>
+			<forward name="scan" path="/pages/drp/store/storein/Storein_Scan.jsp" />
+		</action> 
+		<!-- 预订单转订货 -->
+		<action parameter="action" path="/advctoorder" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale/advctoorder/Advctoorder_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/advctoorder/Advctoorder_List.jsp" />
+			<forward name="todetail" path="/pages/drp/sale/advctoorder/Advctoorder_Detail.jsp" />
+			<forward name="childlist" path="/pages/drp/sale/advctoorder/Advctoorder_List_Chld.jsp"/>
+			<forward name="shiftlist" path="/pages/drp/sale/advctoorder/Advctoorder_List_shift.jsp" />
+			<forward name="childGroEdit" path="/pages/drp/sale/advctoorder/Advctoorder_Edit_Chld.jsp" />
+			<forward name="gchildlist" path="/pages/drp/sale/advctoorder/Advctoorder_List_Gchld.jsp"/>
+			<forward name="toListPro" path="/pages/drp/sale/advctoorder/Advctoorder_List_product.jsp" />
+		</action>
+		
+		<!-- 转储 -->
+		<action parameter="action" path="/dump" scope="request" 
+		        type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/store/dump/Dump_Frame.jsp" />
+			<forward name="list" path="/pages/drp/store/dump/Dump_List.jsp" />
+			<forward name="toedit" path="/pages/drp/store/dump/Dump_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/store/dump/Dump_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/store/dump/Dump_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/store/dump/Dump_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/store/dump/Dump_Edit_Chld.jsp"/>
+		</action>
+		
+		<!--调拨申请维护/审核  -->
+		<action parameter="action" path="/allocate" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/store/allocate/Allocate_Frame.jsp" />
+			<forward name="list" path="/pages/drp/store/allocate/Allocate_List.jsp" />
+			<forward name="toedit" path="/pages/drp/store/allocate/Allocate_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/store/allocate/Allocate_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/store/allocate/Allocate_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/store/allocate/Allocate_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/store/allocate/Allocate_Edit_Chld.jsp"/>
+		</action>
+		<!--盘点单维护/审核  -->
+		<action parameter="action" path="/inventory" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/store/inventory/Inventory_Frame.jsp" />
+			<forward name="list" path="/pages/drp/store/inventory/Inventory_List.jsp" />
+			<forward name="toedit" path="/pages/drp/store/inventory/Inventory_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/store/inventory/Inventory_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/store/inventory/Inventory_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/store/inventory/Inventory_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/store/inventory/Inventory_Edit_Chld.jsp"/>
+		</action>
+		
+		<!-- 库存储备 -->
+		<action parameter="action" path="/resvstore" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/base/resvstore/Resvstore_Frame.jsp" />
+			<forward name="list" path="/pages/drp/base/resvstore/Resvstore_List.jsp" />
+			<forward name="toedit" path="/pages/drp/base/resvstore/Resvstore_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/base/resvstore/Resvstore_Detail.jsp" />
+		</action>
+		
+		
+		<!-- 分销首页 -->
+		<action parameter="action" path="/drpFirpage" scope="request" 
+		        type="org.springframework.web.struts.DelegatingActionProxy">
+		        
+			<forward name="toMoreNotice" path="/pages/drp/main/firpage/Notice_Frame.jsp" />
+			<forward name="toNoticeDetail" path="/pages/drp/main/firpage/Notice_Detail.jsp" />
+			<forward name="listNotice" path="/pages/drp/main/firpage/Notice_List.jsp" />
+			<forward name="toMorePrmt" path="/pages/drp/main/firpage/Prmtplan_Frame.jsp" />
+			<forward name="toPrmtDetail" path="/pages/drp/main/firpage/Prmtplan_Detail.jsp" />
+			<forward name="listPrmt" path="/pages/drp/main/firpage/Prmtplan_List.jsp" />
+			
+		</action>
+		<!-- 我要订货 -->
+		<action parameter="action" path="/myorder" scope="request" 
+		        type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="selPrd" path="/pages/drp/main/myorder/Myorder_Sel.jsp" />
+			<forward name="list" path="/pages/drp/main/myorder/Myorder_List.jsp" />
+			<forward name="picture" path="/pages/drp/main/myorder/Myorder_Picture.jsp" />
+			<forward name="error" path="/pages/drp/main/myorder/Myorder_error.jsp" />
+		</action>
+		<!-- 销售出库处理 -->
+		<action parameter="action" path="/storeout" scope="request" 
+		        type="org.springframework.web.struts.DelegatingActionProxy">
+		    <forward name="frames" path="/pages/drp/store/storeout/Salestoreout_Frame.jsp" />
+			<forward name="list" path="/pages/drp/store/storeout/Salestoreout_List.jsp" />
+			<forward name="childlist" path="/pages/drp/store/storeout/Salestoreout_List_Chld.jsp" />
+			<forward name="childedit" path="/pages/drp/store/storeout/Salestoreout_Edit_Chld.jsp" />
+			<forward name="grandchildlist" path="/pages/drp/store/storeout/Salestorgout_List_Chld.jsp" />
+			<forward name="grandchildedit" path="/pages/drp/store/storeout/Salestorgout_Edit_Chld.jsp" />
+			<forward name="detail" path="/pages/drp/store/storeout/Salestoreout_Detail.jsp" />
+			<forward name="scan" path="/pages/drp/store/storeout/Salestoreout_Scan.jsp" />
+			<forward name="channList" path="/pages/drp/areaser/serstoreouthd/Serstoreouthd_List.jsp" />
+		</action>
+
+		<!-- 退货出库处理 -->
+		<action parameter="action" path="/rtstoreout" scope="request" 
+		        type="org.springframework.web.struts.DelegatingActionProxy">
+		    <forward name="frames" path="/pages/drp/store/rtstoreout/Rtstoreout_Frame.jsp" />
+			<forward name="list" path="/pages/drp/store/rtstoreout/Rtstoreout_List.jsp" />
+			<forward name="childlist" path="/pages/drp/store/rtstoreout/Rtstoreout_List_Chld.jsp" />
+			<forward name="detail" path="/pages/drp/store/rtstoreout/Rtstoreout_Detail.jsp" />
+			<forward name="childedit" path="/pages/drp/store/rtstoreout/Rtstoreout_Edit_Chld.jsp" />
+			<forward name="grandchildlist" path="/pages/drp/store/rtstoreout/Rtstorgout_List_Chld.jsp" />
+			<forward name="grandchildedit" path="/pages/drp/store/rtstoreout/Rtstorgout_Edit_Chld.jsp" />
+			<forward name="scan" path="/pages/drp/store/rtstoreout/Rtstoreout_Scan.jsp" />
+		</action>
+
+		<!-- 调拨出库处理 -->
+		<action parameter="action" path="/dbstoreout" scope="request" 
+		        type="org.springframework.web.struts.DelegatingActionProxy">
+		    <forward name="frames" path="/pages/drp/store/dbstoreout/Dbstoreout_Frame.jsp" />
+			<forward name="list" path="/pages/drp/store/dbstoreout/Dbstoreout_List.jsp" />
+			<forward name="childlist" path="/pages/drp/store/dbstoreout/Dbstoreout_List_Chld.jsp" />
+			<forward name="childedit" path="/pages/drp/store/dbstoreout/Dbstoreout_Edit_Chld.jsp" />
+			<forward name="detail" path="/pages/drp/store/dbstoreout/Dbstoreout_Detail.jsp" />
+			<forward name="grandchildlist" path="/pages/drp/store/dbstoreout/Dbstorgout_List_Chld.jsp" />
+			<forward name="grandchildedit" path="/pages/drp/store/dbstoreout/Dbstorgout_Edit_Chld.jsp" />
+			<forward name="scan" path="/pages/drp/store/dbstoreout/Dbstoreout_Scan.jsp" />
+		</action>
+		
+		<!-- 分发出库处理 -->
+		<action parameter="action" path="/dstrstoreout" scope="request" 
+		        type="org.springframework.web.struts.DelegatingActionProxy">
+		    <forward name="frames" path="/pages/drp/store/dstrstoreout/Dstrstoreout_Frame.jsp" />
+			<forward name="list" path="/pages/drp/store/dstrstoreout/Dstrstoreout_List.jsp" />
+			<forward name="childlist" path="/pages/drp/store/dstrstoreout/Dstrstoreout_List_Chld.jsp" />
+			<forward name="childedit" path="/pages/drp/store/dstrstoreout/Dstrstoreout_Edit_Chld.jsp" />
+			<forward name="detail" path="/pages/drp/store/dstrstoreout/Dstrstoreout_Detail.jsp" />
+			<forward name="grandchildlist" path="/pages/drp/store/dstrstoreout/Dstrstorgout_List_Chld.jsp" />
+			<forward name="grandchildedit" path="/pages/drp/store/dstrstoreout/Dstrstorgout_Edit_Chld.jsp" />
+			<forward name="scan" path="/pages/drp/store/dstrstoreout/Dstrstoreout_Scan.jsp" />
+		</action>
+		
+		<!-- 返修出库处理 -->
+		<action parameter="action" path="/repairstoreout" scope="request" 
+		        type="org.springframework.web.struts.DelegatingActionProxy">
+		    <forward name="frames" path="/pages/drp/store/repairstoreout/Repairstoreout_Frame.jsp" />
+			<forward name="list" path="/pages/drp/store/repairstoreout/Repairstoreout_List.jsp" />
+			<forward name="childlist" path="/pages/drp/store/repairstoreout/Repairstoreout_List_Chld.jsp" />
+			<forward name="childedit" path="/pages/drp/store/repairstoreout/Repairstoreout_Edit_Chld.jsp" />
+			<forward name="detail" path="/pages/drp/store/repairstoreout/Repairstoreout_Detail.jsp" />
+			<forward name="grandchildlist" path="/pages/drp/store/repairstoreout/Repairstoreout_List_Chld.jsp" />
+			<forward name="grandchildedit" path="/pages/drp/store/repairstoreout/Repairstoreout_Edit_Chld.jsp" />
+			<forward name="scan" path="/pages/drp/store/repairstoreout/Repairstoreout_Scan.jsp" />
+		</action>
+		
+		<!--分销 订货订单维护  -->
+		<action parameter="action" path="/goodsorderhd" scope="request" 
+		type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale/goodsorderhd/Goodsorderhd_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/goodsorderhd/Goodsorderhd_List.jsp" />
+			<forward name="toedit" path="/pages/drp/sale/goodsorderhd/Goodsorderhd_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/sale/goodsorderhd/Goodsorderhd_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/sale/goodsorderhd/Goodsorderhd_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/sale/goodsorderhd/Goodsorderhd_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/sale/goodsorderhd/Goodsorderhd_Edit_Chld.jsp"/>
+			<forward name="traceList" path="/pages/drp/sale/goodsorderhd/Goodsorderhd_List_Trace.jsp"/>
+			<forward name="lookAdvcDtl" path="/pages/drp/sale/goodsorderhd/Goodsorderhd_Look_AdvcDtl.jsp"/>
+			
+		</action>
+		<!-- 购物车 -->
+		<action parameter="action" path="/shopcar" scope="request" 
+		        type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="info" path="/pages/drp/main/shopcar/Shopcar_OrderInfo.jsp" />
+			<forward name="list" path="/pages/drp/main/shopcar/Shopcar_List.jsp" />
+			<forward name="picture" path="/pages/drp/main/shopcar/Shopcar_Picture.jsp" />
+			<forward name="error" path="/pages/drp/main/shopcar/Shopcar_error.jsp" />
+		</action>
+		
+	    <!-- 整车计算 -->
+		<action parameter="action" path="/carcalculate" scope="request" 
+		    type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="list" path="/pages/drp/main/carcalculate/Carcalculate_List.jsp" />
+			<forward name="notsend_list" path="/pages/drp/main/carcalculate/Carcalculate_Notsend_List.jsp" />
+		</action>
+		<!-- 预订单发货 -->
+		<action parameter="action" path="/advctoout" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale/advctoout/Advctoout_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/advctoout/Advctoout_List.jsp" />
+			<forward name="todetail" path="/pages/drp/sale/advctoout/Advctoout_Detail.jsp" />
+			<forward name="childlist" path="/pages/drp/sale/advctoout/Advctoout_List_Chld.jsp"/>
+			<forward name="childGroEdit" path="/pages/drp/sale/advctoout/Advctoout_Edit_Chld.jsp" />
+			<forward name="toListPro" path="/pages/drp/sale/advctoout/Advctoout_List_product.jsp" />
+		</action>
+		<!-- 客户收款单 -->
+		<action parameter="action" path="/advpayment" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/finance/advpayment/Advpayment_Frame.jsp" />
+			<forward name="list" path="/pages/drp/finance/advpayment/Advpayment_List.jsp" />
+			<forward name="toedit" path="/pages/drp/finance/advpayment/Advpayment_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/finance/advpayment/Advpayment_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/finance/advpayment/Advpayment_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/finance/advpayment/Advpayment_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/finance/advpayment/Advpayment_Edit_Chld.jsp"/>
+		</action>
+		<!-- 客户退款单 -->
+		<action parameter="action" path="/custrefundments" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/finance/custrefundments/Custrefundments_Frame.jsp" />
+			<forward name="list" path="/pages/drp/finance/custrefundments/Custrefundments_List.jsp" />
+			<forward name="toedit" path="/pages/drp/finance/custrefundments/Custrefundments_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/finance/custrefundments/Custrefundments_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/finance/custrefundments/Custrefundments_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/finance/custrefundments/Custrefundments_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/finance/custrefundments/Custrefundments_Edit_Chld.jsp"/>
+		</action>
+		<!-- 预定单结算 -->
+		<action parameter="action" path="/preorderpayment" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/finance/preorderpayment/Preorderpayment_Frame.jsp" />
+			<forward name="list" path="/pages/drp/finance/preorderpayment/Preorderpayment_List.jsp" />
+			<forward name="toedit" path="/pages/drp/finance/preorderpayment/Preorderpayment_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/finance/preorderpayment/Preorderpayment_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/finance/preorderpayment/Preorderpayment_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/finance/preorderpayment/Preorderpayment_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/finance/preorderpayment/Preorderpayment_Edit_Chld.jsp"/>
+			<forward name="tochildlist" path="/pages/drp/finance/preorderpayment/Preorderpayment_List_toChld.jsp"/>
+			
+		</action>
+		<!-- 预订单退货 -->
+		<action parameter="action" path="/advcreturn" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale/advcreturn/Advcreturn_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/advcreturn/Advcreturn_List.jsp" />
+			<forward name="todetail" path="/pages/drp/sale/advcreturn/Advcreturn_Detail.jsp" />
+			<forward name="childlist" path="/pages/drp/sale/advcreturn/Advcreturn_List_Chld.jsp"/>
+			<forward name="childGroEdit" path="/pages/drp/sale/advcreturn/Advcreturn_Edit_Chld.jsp" />
+		</action>
+		<!-- 客户退货结算 -->
+		<action parameter="action" path="/restatements" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/finance/restatements/Restatements_Frame.jsp" />
+			<forward name="list" path="/pages/drp/finance/restatements/Restatements_List.jsp" />
+			<forward name="toedit" path="/pages/drp/finance/restatements/Restatements_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/finance/restatements/Restatements_Detail.jsp" />
+			<forward name="childlist" path="/pages/drp/finance/restatements/Restatements_List_Chld.jsp" />
+		</action>
+		
+		<!-- 预订单核销 -->
+		<action parameter="action" path="/advcverify" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/finance/advcverify/Advcverify_Frame.jsp" />
+			<forward name="list" path="/pages/drp/finance/advcverify/Advcverify_List.jsp" />
+			<forward name="tochild" path="/pages/drp/finance/advcverify/Advcverify_Child_List.jsp" />
+		</action>
+		
+		<!-- 预订单核价 -->
+		<action parameter="action" path="/advccheckprice" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale/advccheckprice/Advccheckprice_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/advccheckprice/Advccheckprice_List.jsp" />
+			<forward name="todetail" path="/pages/drp/sale/advccheckprice/Advccheckprice_Detail.jsp" />
+			<forward name="childlist" path="/pages/drp/sale/advccheckprice/Advccheckprice_List_Chld.jsp"/>
+			<forward name="gchildlist" path="/pages/drp/sale/advccheckprice/Advccheckprice_List_Gchld.jsp"/>
+		</action>
+		<!-- 预订单发货申请 -->
+		<action parameter="action" path="/advcgoodsapp" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale//advcgoodsapp/Advcgoodsapp_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale//advcgoodsapp/Advcgoodsapp_List.jsp" />
+			<forward name="toedit" path="/pages/drp/sale//advcgoodsapp/Advcgoodsapp_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/sale//advcgoodsapp/Advcgoodsapp_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/sale//advcgoodsapp/Advcgoodsapp_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/sale//advcgoodsapp/Advcgoodsapp_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/sale//advcgoodsapp/Advcgoodsapp_Edit_Chld.jsp"/>
+		</action>
+		<!-- 返修单申请审核 -->
+		<action parameter="action" path="/repairapp" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale/repairapp/Repairapp_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/repairapp/Repairapp_List.jsp" />
+			<forward name="toedit" path="/pages/drp/sale/repairapp/Repairapp_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/sale/repairapp/Repairapp_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/sale/repairapp/Repairapp_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/sale/repairapp/Repairapp_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/sale/repairapp/Repairapp_Edit_Chld.jsp"/>
+		</action>
+		<!-- 返修出库 -->
+		<action parameter="action" path="/repairout" scope="request" 
+		        type="org.springframework.web.struts.DelegatingActionProxy">
+		    <forward name="frames" path="/pages/drp/sale/repairstoreout/Repairstoreout_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/repairstoreout/Repairstoreout_List.jsp" />
+			<forward name="childlist" path="/pages/drp/sale/repairstoreout/Repairstoreout_List_Chld.jsp" />
+			 
+			<forward name="todetail" path="/pages/drp/sale/repairstoreout/Repairstoreout_Detail.jsp" />
+		</action>
+		<!-- 返修收货确认 -->
+		<action parameter="action" path="/repairrecv" scope="request" 
+		        type="org.springframework.web.struts.DelegatingActionProxy">
+		    <forward name="frames" path="/pages/drp/sale/repairrecv/Repairrecv_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/repairrecv/Repairrecv_List.jsp" />
+			<forward name="childlist" path="/pages/drp/sale/repairrecv/Repairrecv_List_Chld.jsp" />
+			 <forward name="editFrame" path="/pages/drp/sale/repairrecv/Repairrecv_Edit_Frame.jsp" />
+			<forward name="todetail" path="/pages/drp/sale/repairrecv/Repairrecv_Detail.jsp" />
+			<forward name="toedit" path="/pages/drp/sale/repairrecv/Repairrecv_Edit.jsp" />
+			<forward name="childedit" path="/pages/drp/sale/repairrecv/Repairrecv_Edit_Chld.jsp" />
+		</action>
+		<!-- 返修发货 -->
+		<action parameter="action" path="/repairsend" scope="request" 
+		        type="org.springframework.web.struts.DelegatingActionProxy">
+		    <forward name="frames" path="/pages/drp/sale/repairsend/Repairsend_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/repairsend/Repairsend_List.jsp" />
+			<forward name="childlist" path="/pages/drp/sale/repairsend/Repairsend_List_Chld.jsp" />
+			<forward name="todetail" path="/pages/drp/sale/repairsend/Repairsend_Detail.jsp" />
+			<forward name="toTypeWindow" path="/pages/drp/sale/repairsend/Repairsend_Type.jsp" />
+		</action>
+		<!-- 销售收货确认 -->
+		<action parameter="action" path="/storeoutconfirm" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/store/storeoutconfirm/Storeoutconfirm_Frame.jsp" />
+			<forward name="list" path="/pages/drp/store/storeoutconfirm/Storeoutconfirm_List.jsp" />
+			<forward name="todetail" path="/pages/drp/store/storeoutconfirm/Storeoutconfirm_Detail.jsp" />
+			<forward name="childlist" path="/pages/drp/store/storeoutconfirm/Storeoutconfirm_List_Chld.jsp"/>
+			<forward name="gchildlist" path="/pages/drp/store/storeoutconfirm/Storeoutconfirm_List_Gchld.jsp"/>
+			<forward name="deallist" path="/pages/drp/store/storeoutconfirm/Storeoutconfirmdeal_List_Chld.jsp"/>
+			<forward name="firmList" path="/pages/drp/store/storeoutconfirm/Storeoutconfirm_Edit_Chld.jsp"/>
+		</action>
+		<!-- 订单特殊工艺 lyg -->
+		<action parameter="action" path="/techorderManager" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="toList" path="/pages/common/techorder/TechorderManager_List.jsp" />
+			 <forward name="toEdit" path="/pages/common/techorder/TechorderManager_Edit.jsp" />
+			<forward name="toFrame" path="/pages/common/techorder/TechorderManager_Frame.jsp" /> 
+			<forward name="toHistoryList" path="/pages/common/techorder/TechorderManager_History_List.jsp" /> 
+		</action>
+		
+		<!-- 应收余额查询 -->
+		<action parameter="action" path="/querypaymentrep" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+		    <forward name="frames" path="/pages/drp/report/querypaymentrep/Querypaymentrep_Frame.jsp" />
+			<forward name="list" path="/pages/drp/report/querypaymentrep/Querypaymentrep_List.jsp" />
+		</action>
+		
+		<!-- 库存查询 -->
+		<action parameter="action" path="/querystock" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+		    <forward name="frames" path="/pages/drp/report/querystock/Querystock_Frame.jsp" />
+			<forward name="list" path="/pages/drp/report/querystock/Querystock_List.jsp" />
+		</action>
+		
+		<!--报表[退货查询 ]-->
+		<action parameter="action" path="/drp/report/queryReutrnRep" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/report/queryReutrnRep/QueryReutrnRep_Frame.jsp" />
+			<forward name="list" path="/pages/drp/report/queryReutrnRep/QueryReutrnRep_List.jsp" />
+		</action>
+		<!--报表[生产情况查询]-->
+		<action parameter="action" path="/drp/report/queryProStatus" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/report/queryProStatus/QueryProStatus_Frame.jsp" />
+			<forward name="list" path="/pages/drp/report/queryProStatus/QueryProStatus_List.jsp" />			
+		</action>
+		
+		<!-- 渠道参数设置 -->
+		<action parameter="action" path="/paramset" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+		    <forward name="frames" path="/pages/drp/base/paramset/Paramset_Frame.jsp" />
+			<forward name="list"   path="/pages/drp/base/paramset/Paramset_List.jsp" />
+			<forward name="detail" path="/pages/drp/base/paramset/Paramset_Detail.jsp" />
+			<forward name="toedit" path="/pages/drp/base/paramset/Paramset_Edit.jsp" />
+			<forward name="editFrame" path="/pages/drp/base/paramset/Paramset_Edit_T.jsp" />
+		</action>
+		
+		<!--预订单变更-->
+		<action parameter="action" path="/changeadvcorder" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale/changeadvcorder/Changeadvcorder_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/changeadvcorder/Changeadvcorder_List.jsp" />
+			<forward name="childlist" path="/pages/drp/sale/changeadvcorder/Changeadvcorder_List_Chld.jsp" />
+			<forward name="editFrame" path="/pages/drp/sale/changeadvcorder/Changeadvcorder_Edit_Frame.jsp"/>
+			<forward name="toedit" path="/pages/drp/sale/changeadvcorder/Changeadvcorder_Edit.jsp" />
+			<forward name="childedit" path="/pages/drp/sale/changeadvcorder/Changeadvcorder_Edit_Chld.jsp"/>
+			<forward name="todetail" path="/pages/drp/sale/changeadvcorder/Changeadvcorder_Detail.jsp" />
+			<forward name="gchildlist" path="/pages/drp/sale/changeadvcorder/Changeadvcorder_List_Gchld.jsp" />
+		</action>
+		
+		<!-- 预订单发货取消-->
+		<action parameter="action" path="/advccancelsapp" scope="request" 
+		        type="org.springframework.web.struts.DelegatingActionProxy">
+		    <forward name="frames" path="/pages/drp/sale/advccancelsapp/Advccancelsapp_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/advccancelsapp/Advccancelsapp_List.jsp" />
+			<forward name="childlist" path="/pages/drp/sale/advccancelsapp/Advccancelsapp_List_Chld.jsp" />
+			<forward name="todetail" path="/pages/drp/sale/advccancelsapp/Advccancelsapp_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/sale/advccancelsapp/Advccancelsapp_Edit_Frame.jsp"/>
+			<forward name="childedit" path="/pages/drp/sale/advccancelsapp/Advccancelsapp_Edit_Chld.jsp"/>
+			<forward name="toedit" path="/pages/drp/sale/advccancelsapp/Advccancelsapp_Edit.jsp" />
+		</action>
+		
+		<!-- 分销 - 区域服务中心- 订货订单处理 -->
+		<action parameter="action" path="/sergoodsorder" scope="request" 
+		type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale/sergoodsorder/Sergoodsorder_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/sergoodsorder/Sergoodsorder_List.jsp" />
+			<forward name="todisposed" path="/pages/drp/sale/sergoodsorder/Sergoodsorder_Edit_Frame.jsp" />
+			<forward name="parentlist" path="/pages/drp/sale/sergoodsorder/Sergoodsorder_Itself_List.jsp" />
+			<forward name="tospcldetail" path="/pages/drp/sale/sergoodsorder/Sergoodsorder_Spcl_Tech.jsp" />
+			<forward name="todetail" path="/pages/drp/sale/sergoodsorder/Sergoodsorder_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/sale/sergoodsorder/Sergoodsorder_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/sale/sergoodsorder/Sergoodsorder_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/sale/sergoodsorder/Sergoodsorder_Edit_Chld.jsp"/>
+			<forward name="toreason" path="/pages/drp/sale/sergoodsorder/reason.jsp"/>
+			<forward name="traceList" path="/pages/drp/sale/sergoodsorder/Sergoodsorder_List_Trace.jsp"/>
+		</action>
+		
+		<!-- 分销 - 区域服务中心- 销售订单转订货 -->
+		<action parameter="action" path="/sotoadvorder" scope="request" 
+		type="org.springframework.web.struts.DelegatingActionProxy">
+		    <forward name="frames" path="/pages/drp/areaser/sotoadvorder/Sotoadvorder_Frame.jsp" />
+			<forward name="list" path="/pages/drp/areaser/sotoadvorder/Sotoadvorder_List.jsp" />
+			<forward name="childlist" path="/pages/drp/areaser/sotoadvorder/Sotoadvorder_List_Chld.jsp"/>
+			<forward name="shiftlist" path="/pages/drp/areaser/sotoadvorder/Sotoadvorder_List_shift.jsp" />
+			<forward name="childGroEdit" path="/pages/drp/areaser/sotoadvorder/Sotoadvorder_Edit_Chld.jsp" />
+			<forward name="todetail" path="/pages/drp/areaser/sotoadvorder/Sotoadvorder_Detail.jsp" />
+			<forward name="toListPro" path="/pages/drp/areaser/sotoadvorder/Sotoadvorder_List_product.jsp" />
+			
+		</action>
+		
+		<!-- 装修申请单维护 -->
+		<action parameter="action"  path="/decorationapp" scope="request"  type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames"  path="/pages/drp/oamg/decorationapp/DecorationSQ_Frame.jsp" />
+			<forward name="framesT" path="/pages/drp/oamg/decorationapp/DecorationSQ_Frame_T.jsp" />
+			<forward name="list"    path="/pages/drp/oamg/decorationapp/DecorationSQ_List.jsp" />
+			<forward name="detail"  path="/pages/drp/oamg/decorationapp/DecorationSQ_Detail.jsp" />
+			<forward name="toedit"  path="/pages/drp/oamg/decorationapp/DecorationSQ_Edit.jsp" />
+			<forward name="toedit1" path="/pages/drp/oamg/decorationapp/DecorationSQ_Edit_T.jsp" />
+			<forward name="listSH" path="/pages/drp/oamg/decorationapp/DecorationSQ_ListSH.jsp" /> 
+			<forward name="toedit1" path="/pages/drp/oamg/decorationapp/DecorationSQ_Edit_T.jsp" />
+			<forward name="toeditsh" path="/pages/drp/oamg/decorationapp/DecorationSQ_Edit_SH.jsp" />
+		</action>
+		
+		<!-- 装修补贴标准维护 -->
+		<action parameter="action"      path="/decorationallo" scope="request"  type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames"      path="/pages/drp/oamg/decorationallo/Decorationallo_Frame.jsp" />
+			<forward name="list"        path="/pages/drp/oamg/decorationallo/Decorationallo_List.jsp" />
+			<forward name="detail"      path="/pages/drp/oamg/decorationallo/Decorationallo_Detail.jsp" />
+			<forward name="editFrame"   path="/pages/drp/oamg/decorationallo/Decorationallo_Edit_Frame.jsp"/>
+			<forward name="editFrame_T" path="/pages/drp/oamg/decorationallo/Decorationallo_Edit_Frame_T.jsp"></forward>
+			<forward name="toedit"      path="/pages/drp/oamg/decorationallo/Decorationallo_Edit.jsp"/> 
+			<forward name="childlist"   path="/pages/drp/oamg/decorationallo/Decorationallo_Mx_List.jsp"/>
+			<forward name="childedit"   path="/pages/drp/oamg/decorationallo/Decorationallo_Mx_Edit.jsp"/>
+			<forward name="toedit"      path="/pages/drp/oamg/decorationallo/Decorationallo_Edit.jsp"/>
+			<forward name="toeditT"     path="/pages/drp/oamg/decorationallo/Decorationallo_Edit_T.jsp"/>
+			<forward name="todetail"    path="/pages/drp/oamg/decorationallo/Decorationallo_Detail.jsp"/>    
+		</action>   
+		
+		<!-- 装修验收单维护 -->
+		<action parameter="action"      path="/rnvtncheck" scope="request"  type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames"      path="/pages/drp/oamg/rnvtncheck/Rnvtncheck_Frame.jsp" />
+			<forward name="list"        path="/pages/drp/oamg/rnvtncheck/Rnvtncheck_List.jsp" />
+			<forward name="detail"      path="/pages/drp/oamg/rnvtncheck/Rnvtncheck_Detail.jsp" />
+			<forward name="editFrame"   path="/pages/drp/oamg/rnvtncheck/Rnvtncheck_Edit_Frame.jsp"/>
+			<forward name="editFrame_T" path="/pages/drp/oamg/rnvtncheck/Rnvtncheck_Edit_Frame_T.jsp"></forward>
+			<forward name="toedit"      path="/pages/drp/oamg/rnvtncheck/Rnvtncheck_Edit.jsp"/> 
+			<forward name="childlist"   path="/pages/drp/oamg/rnvtncheck/Rnvtncheck_MX_List.jsp"/>
+			<forward name="childedit"   path="/pages/drp/oamg/rnvtncheck/Rnvtncheck_MX_Edit.jsp"/>
+			<forward name="toedit"      path="/pages/drp/oamg/rnvtncheck/Rnvtncheck_Edit.jsp"/>
+			<forward name="toeditT"     path="/pages/drp/oamg/rnvtncheck/Rnvtncheck_Edit_T.jsp"/>
+			<forward name="todetail"    path="/pages/drp/oamg/rnvtncheck/Rnvtncheck_Detail.jsp"/>    
+		</action>  
+		
+		<!-- 装修整改单维护 --> 
+		<action parameter="action"      path="/rnvtnreform" scope="request"  type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames"      path="/pages/drp/oamg/rnvtnreform/Rnvtnreform_Frame.jsp" />
+			<forward name="list"        path="/pages/drp/oamg/rnvtnreform/Rnvtnreform_List.jsp" />
+			<forward name="detail"      path="/pages/drp/oamg/rnvtnreform/Rnvtnreform_Detail.jsp" />
+			<forward name="editFrame"   path="/pages/drp/oamg/rnvtnreform/Rnvtnreform_Edit_Frame.jsp"/>
+			<forward name="editFrame_T" path="/pages/drp/oamg/rnvtnreform/Rnvtnreform_Edit_Frame_T.jsp"></forward>
+			<forward name="toedit"      path="/pages/drp/oamg/rnvtnreform/Rnvtnreform_Edit.jsp"/> 
+			<forward name="childlist"   path="/pages/drp/oamg/rnvtnreform/Rnvtnreform_MX_List.jsp"/>
+			<forward name="childedit"   path="/pages/drp/oamg/rnvtnreform/Rnvtnreform_MX_Edit.jsp"/>
+			<forward name="toedit"      path="/pages/drp/oamg/rnvtnreform/Rnvtnreform_Edit.jsp"/>
+			<forward name="toeditT"     path="/pages/drp/oamg/rnvtnreform/Rnvtnreform_Edit_T.jsp"/>
+			<forward name="todetail"    path="/pages/drp/oamg/rnvtnreform/Rnvtnreform_Detail.jsp"/>    
+		</action>  
+		
+		<!-- 装修整改验收单维护 -->
+		<action parameter="action"      path="/rnvtnreformcheck" scope="request"  type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames"      path="/pages/drp/oamg/rnvtnreformcheck/Rnvtnreformcheck_Frame.jsp" />
+			<forward name="list"        path="/pages/drp/oamg/rnvtnreformcheck/Rnvtnreformcheck_List.jsp" />
+			<forward name="childlist"   path="/pages/drp/oamg/rnvtnreformcheck/Rnvtnreformcheck_MX_List.jsp"/>
+			<forward name="detail"      path="/pages/drp/oamg/rnvtnreformcheck/Rnvtnreformcheck_Detail.jsp" />
+			<forward name="todetail"    path="/pages/drp/oamg/rnvtnreformcheck/Rnvtnreformcheck_Detail.jsp"/>
+			<forward name="editFrame"   path="/pages/drp/oamg/rnvtnreformcheck/Rnvtnreformcheck_Edit_Frame.jsp"/>
+			<forward name="editFrame_T" path="/pages/drp/oamg/rnvtnreformcheck/Rnvtnreformcheck_Edit_Frame_T.jsp"/> 
+			<forward name="toedit"      path="/pages/drp/oamg/rnvtnreformcheck/Rnvtnreformcheck_Edit.jsp"/>
+			<forward name="toeditT"     path="/pages/drp/oamg/rnvtnreformcheck/Rnvtnreformcheck_Edit_T.jsp"/>
+			<forward name="childedit"   path="/pages/drp/oamg/rnvtnreformcheck/Rnvtnreformcheck_MX_Edit.jsp"/>
+			<forward name="toedit"      path="/pages/drp/oamg/rnvtnreformcheck/Rnvtnreformcheck_Edit.jsp"/> 
+		</action> 
+		
+		<!-- 分销 - 区域服务中心- 销售订单处理 -->
+		<action parameter="action" path="/sersaleorder" scope="request" 
+		type="org.springframework.web.struts.DelegatingActionProxy">
+		    <forward name="frames" path="/pages/drp/sale/sersaleorder/Sersaleorder_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/sersaleorder/Sersaleorder_List.jsp" />
+			<forward name="todetail" path="/pages/drp/sale/sersaleorder/Sersaleorder_Detail.jsp" />
+			<forward name="childlist" path="/pages/drp/sale/sersaleorder/Sersaleorder_List_Chld.jsp"/>
+			<forward name="editFrame" path="/pages/drp/sale/sersaleorder/Sersaleorder_Edit_Frame.jsp"/>
+			<forward name="childedit" path="/pages/drp/sale/sersaleorder/Sersaleorder_Edit_Chld.jsp"/>
+			<forward name="toedit" path="/pages/drp/sale/sersaleorder/Sersaleorder_Edit.jsp" />
+		</action>
+
+		<!--专卖店转分销店申请单维护-->
+		<action parameter="action" path="/storetoretail" scope="request" 
+		        type="org.springframework.web.struts.DelegatingActionProxy">
+		    <forward name="frames" path="/pages/drp/oamg/storetoretail/Storetoretail_Frame.jsp" />
+			<forward name="list" path="/pages/drp/oamg/storetoretail/Storetoretail_List.jsp" />
+			<forward name="view"   path="/pages/drp/oamg/storetoretail/Storetoretail_Detail.jsp" />
+			<forward name="toedit" path="/pages/drp/oamg/storetoretail/Storetoretail_Edit.jsp" />
+		</action>
+		<!-- 分销 - 区域服务中心- 出库通知管理-销售出库通知单维护 -->
+		<action parameter="action" path="/storeoutnotice" scope="request" 
+		type="org.springframework.web.struts.DelegatingActionProxy">
+		    <forward name="frames" path="/pages/drp/areaser/storeoutnotice/Storeoutnotice_Frame.jsp" />
+			<forward name="list" path="/pages/drp/areaser/storeoutnotice/Storeoutnotice_List.jsp" />
+			<forward name="todetail" path="/pages/drp/areaser/storeoutnotice/Storeoutnotice_Detail.jsp" />
+			<forward name="childlist" path="/pages/drp/areaser/storeoutnotice/Storeoutnotice_List_Chld.jsp"/>
+			<forward name="editFrame" path="/pages/drp/areaser/storeoutnotice/Storeoutnotice_Edit_Frame.jsp"/>
+			<forward name="childedit" path="/pages/drp/areaser/storeoutnotice/Storeoutnotice_Edit_Chld.jsp"/>
+			<forward name="toedit" path="/pages/drp/areaser/storeoutnotice/Storeoutnotice_Edit.jsp" />
+		</action>
+	    <!-- 分销 - 区域服务中心- 退货单审核 -->
+		<action parameter="action" path="/returnpdtrls" scope="request" 
+		type="org.springframework.web.struts.DelegatingActionProxy">
+		    <forward name="frames" path="/pages/drp/areaser/returnpdtrls/Returnpdtrls_Frame.jsp" />
+			<forward name="list" path="/pages/drp/areaser/returnpdtrls/Returnpdtrls_List.jsp" />
+			<forward name="childlist" path="/pages/drp/areaser/returnpdtrls/Returnpdtrls_List_Chld.jsp"/>
+			<forward name="todetail" path="/pages/drp/areaser/returnpdtrls/Returnpdtrls_Detail.jsp" />
+		</action>
+		<!-- 分销 - 区域服务中心- 下级销售出库处理 -->
+		<action parameter="action" path="/serstoreouthd" scope="request"  type="org.springframework.web.struts.DelegatingActionProxy">
+		    <forward name="frames" path="/pages/drp/areaser/serstoreouthd/Serstoreouthd_Frame.jsp" />
+			<forward name="list" path="/pages/drp/areaser/serstoreouthd/Serstoreouthd_List.jsp" />
+			<forward name="childlist" path="/pages/drp/store/storeout/Salestoreout_List_Chld.jsp" />
+			<forward name="childedit" path="/pages/drp/areaser/serstoreouthd/Serstoreouthd_List_Chld.jsp" />
+			<forward name="grandchildlist" path="/pages/drp/store/storeout/Salestorgout_List_Chld.jsp" />
+			<forward name="grandchildedit" path="/pages/drp/store/storeout/Salestorgout_Edit_Chld.jsp" />
+			<forward name="detail" path="/pages/drp/areaser/serstoreouthd/Serstoreouthd_Detail.jsp" />
+			<forward name="scan" path="/pages/drp/areaser/serstoreouthd/Serstoreouthd_Scan.jsp" />
+		</action>
+
+
+        <!-- 渠道管理-装修管理-装修报销申请单维护 -->
+		<action parameter="action" path="/decorationreit" scope="request" 
+		type="org.springframework.web.struts.DelegatingActionProxy">
+		    <forward name="frames" path="/pages/drp/oamg/decorationreit/Decorationreit_Frame.jsp" />
+			<forward name="list" path="/pages/drp/oamg/decorationreit/Decorationreit_List.jsp" />
+			<forward name="todetail" path="/pages/drp/oamg/decorationreit/Decorationreit_Detail.jsp" />
+			<forward name="toedit"   path="/pages/drp/oamg/decorationreit/Decorationreit_Edit.jsp" />
+			<forward name="toedit1"  path="/pages/drp/oamg/decorationreit/Decorationreit_Edit1.jsp" />
+		</action>
+		
+		<!-- 推广费用申请单维护 -->
+		<action parameter="action"   path="/promoexpen" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames"   path="/pages/drp/oamg/promoexpen/Promoexpen_Frame.jsp" />
+			<forward name="list"     path="/pages/drp/oamg/promoexpen/Promoexpen_List.jsp" />
+			<forward name="listsh"   path="/pages/drp/oamg/promoexpen/Promoexpen_ListSH.jsp" />
+			<forward name="toedit"   path="/pages/drp/oamg/promoexpen/Promoexpen_Edit.jsp" />
+			<forward name="toeditT"  path="/pages/drp/oamg/promoexpen/Promoexpen_Edit_T.jsp" />
+			<forward name="todetail" path="/pages/drp/oamg/promoexpen/Promoexpen_Detail.jsp" />
+		</action>
+		<!-- 推广费用报销单维护 -->
+		<action parameter="action" path="/promoreim" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/oamg/promoreim/Promoreim_Frame.jsp" />
+			<forward name="list" path="/pages/drp/oamg/promoreim/Promoreim_List.jsp" />
+			<forward name="toedit" path="/pages/drp/oamg/promoreim/Promoreim_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/oamg/promoreim/Promoreim_Detail.jsp" />
+		</action>
+		
+		<!-- 开业大礼包申请单维护 -->
+		<action parameter="action" path="/openbusspkg" scope="request" 
+		        type="org.springframework.web.struts.DelegatingActionProxy">
+		    <forward name="frames" path="/pages/drp/oamg/openbusspkg/Openbusspkg_Frame.jsp" />
+			<forward name="list" path="/pages/drp/oamg/openbusspkg/Openbusspkg_List.jsp" />
+			<forward name="view"   path="/pages/drp/oamg/openbusspkg/Openbusspkg_Detail.jsp" />
+			<forward name="toedit" path="/pages/drp/oamg/openbusspkg/Openbusspkg_Edit.jsp" />
+		</action>
+		<!-- 门店精致化检查结果 -->
+		<action parameter="action" path="/termrefinecheck" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/oamg/termrefinecheck/Termrefinecheck_Frame.jsp" />
+			<forward name="list" path="/pages/drp/oamg/termrefinecheck/Termrefinecheck_List.jsp" />
+			<forward name="toedit" path="/pages/drp/oamg/termrefinecheck/Termrefinecheck_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/oamg/termrefinecheck/Termrefinecheck_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/oamg/termrefinecheck/Termrefinecheck_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/oamg/termrefinecheck/Termrefinecheck_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/oamg/termrefinecheck/Termrefinecheck_Edit_Chld.jsp"/>
+		</action>
+		
+		<!-- 检查方案 -->
+		<action parameter="action"      path="/plancheck" scope="request"  type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames"      path="/pages/drp/oamg/plancheck/Palncheck_Frame.jsp" />
+			<forward name="list"        path="/pages/drp/oamg/plancheck/Palncheck_List.jsp" />
+			<forward name="detail"      path="/pages/drp/oamg/plancheck/Palncheck_Detail.jsp" />
+			<forward name="editFrame"   path="/pages/drp/oamg/plancheck/Palncheck_Edit_Frame.jsp"/>
+			<forward name="editFrame_T" path="/pages/drp/oamg/plancheck/Palncheck_Edit_Frame_T.jsp"></forward>
+			<forward name="toedit"      path="/pages/drp/oamg/plancheck/Palncheck_Edit.jsp"/> 
+			<forward name="childlist"   path="/pages/drp/oamg/plancheck/Palncheck_Mx_List.jsp"/>
+			<forward name="childedit"   path="/pages/drp/oamg/plancheck/Palncheck_Mx_Edit.jsp"/>
+			<forward name="toedit"      path="/pages/drp/oamg/plancheck/Palncheck_Edit.jsp"/>
+			<forward name="toeditT"     path="/pages/drp/oamg/plancheck/Palncheck_Edit_T.jsp"/>
+			<forward name="todetail"    path="/pages/drp/oamg/plancheck/Palncheck_Detail.jsp"/>   
+		</action>   
+		
+		<!-- 总部直发通知单 -->
+		<action parameter="action" path="/senddirectnotice" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/areaser/senddirectnotice/Senddirectnotice_Frame.jsp" />
+			<forward name="list" path="/pages/drp/areaser/senddirectnotice/Senddirectnotice_List.jsp" />
+			<forward name="todetail" path="/pages/drp/areaser/senddirectnotice/Senddirectnotice_Detail.jsp" />
+			<forward name="childlist" path="/pages/drp/areaser/senddirectnotice/Senddirectnotice_List_Chld.jsp"/>
+			<forward name="childInfo" path="/pages/drp/areaser/senddirectnotice/Senddirectnotice_List_ChldInfo.jsp"/>
+			<forward name="allotEdit" path="/pages/drp/areaser/senddirectnotice/Senddirectnotice_Edit_Chld.jsp"/>
+		</action>
+		
+		<!-- 拓展拜访表维护 -->
+		<action parameter="action"      path="/expandvisit" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames"      path="/pages/drp/visit/expandvisit/Expandvisit_Frame.jsp" />
+			<forward name="framesT"     path="/pages/drp/visit/expandvisit/Expandvisit_Frame_T.jsp" />
+			<forward name="list"        path="/pages/drp/visit/expandvisit/Expandvisit_List.jsp" />
+			<forward name="listSH"      path="/pages/drp/visit/expandvisit/Expandvisit_ListSH.jsp" />
+			<forward name="editFrame"   path="/pages/drp/visit/expandvisit/Expandvisit_Edit_Frame.jsp"/>
+			<forward name="editFrame_T" path="/pages/drp/visit/expandvisit/Expandvisit_Edit_Frame_T.jsp"></forward>
+			<forward name="toedit"      path="/pages/drp/visit/expandvisit/Expandvisit_Edit.jsp"/> 
+			<forward name="childlist"   path="/pages/drp/visit/expandvisit/Expandvisit_MX_List.jsp"/>
+			<forward name="childlistSH" path="/pages/drp/visit/expandvisit/ExpandvisitSH_MX_List.jsp"/>
+			<forward name="childedit"   path="/pages/drp/visit/expandvisit/Expandvisit_MX_Edit.jsp"/>
+			<forward name="toedit"      path="/pages/drp/visit/expandvisit/Expandvisit_Edit.jsp"/>
+			<forward name="toeditT"     path="/pages/drp/visit/expandvisit/Expandvisit_Edit_T.jsp"/>
+			<forward name="todetail"    path="/pages/drp/visit/expandvisit/Expandvisit_Detail.jsp"/>    
+		</action>
+		
+		<!-- 加盟商拜访表维护 -->
+		<action parameter="action"      path="/channvisit" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames"      path="/pages/drp/visit/channvisit/Channvisit_Frame.jsp" />
+			<forward name="framesT"     path="/pages/drp/visit/channvisit/Channvisit_Frame_T.jsp" />
+			<forward name="list"        path="/pages/drp/visit/channvisit/Channvisit_List.jsp" />
+			<forward name="listSH"      path="/pages/drp/visit/channvisit/Channvisit_ListSH.jsp" />
+			<forward name="editFrame"   path="/pages/drp/visit/channvisit/Channvisit_Edit_Frame.jsp"/>
+			<forward name="editFrame_T" path="/pages/drp/visit/channvisit/Channvisit_Edit_Frame_T.jsp"></forward>
+			<forward name="toedit"      path="/pages/drp/visit/channvisit/Channvisit_Edit.jsp"/> 
+			<forward name="childlist"   path="/pages/drp/visit/channvisit/Channvisit_MX_List.jsp"/>
+			<forward name="childlistSH" path="/pages/drp/visit/channvisit/ChannvisitSH_MX_List.jsp"/>
+			<forward name="childedit"   path="/pages/drp/visit/channvisit/Channvisit_MX_Edit.jsp"/>
+			<forward name="toedit"      path="/pages/drp/visit/channvisit/Channvisit_Edit.jsp"/>
+			<forward name="toeditT"     path="/pages/drp/visit/channvisit/Channvisit_Edit_T.jsp"/>
+			<forward name="todetail"    path="/pages/drp/visit/channvisit/Channvisit_Detail.jsp"/>    
+		</action>
+		
+		<!-- 门店拜访表维护 -->
+		<action parameter="action"      path="/storevisit" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames"      path="/pages/drp/visit/storevisit/Storevisit_Frame.jsp" />
+			<forward name="framesT"     path="/pages/drp/visit/storevisit/Storevisit_Frame_T.jsp" />
+			<forward name="list"        path="/pages/drp/visit/storevisit/Storevisit_List.jsp" />
+			<forward name="listSH"      path="/pages/drp/visit/storevisit/Storevisit_ListSH.jsp" />
+			<forward name="editFrame"   path="/pages/drp/visit/storevisit/Storevisit_Edit_Frame.jsp"/>
+			<forward name="editFrame_T" path="/pages/drp/visit/storevisit/Storevisit_Edit_Frame_T.jsp"></forward>
+			<forward name="toedit"      path="/pages/drp/visit/storevisit/Storevisit_Edit.jsp"/> 
+			<forward name="childlist"   path="/pages/drp/visit/storevisit/Storevisit_MX_List.jsp"/>
+			<forward name="childlistSH" path="/pages/drp/visit/storevisit/StorevisitSH_MX_List.jsp"/>
+			<forward name="childedit"   path="/pages/drp/visit/storevisit/Storevisit_MX_Edit.jsp"/>
+			<forward name="toedit"      path="/pages/drp/visit/storevisit/Storevisit_Edit.jsp"/>
+			<forward name="toeditT"     path="/pages/drp/visit/storevisit/Storevisit_Edit_T.jsp"/>
+			<forward name="todetail"    path="/pages/drp/visit/storevisit/Storevisit_Detail.jsp"/>    
+		</action>
+		
+	    <!-- 广告投放报销申请单维护 -->
+		<action parameter="action"      path="/advreit" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames"      path="/pages/drp/oamg/advreit/Advreit_Frame.jsp" />
+			<forward name="framesT"     path="/pages/drp/oamg/advreit/Advreit_Frame_T.jsp" />
+			<forward name="list"        path="/pages/drp/oamg/advreit/Advreit_List.jsp" />
+			<forward name="listSH"      path="/pages/drp/oamg/advreit/Advreit_ListSH.jsp" />
+			<forward name="editFrame"   path="/pages/drp/oamg/advreit/Advreit_Edit_Frame.jsp"/>
+			<forward name="editFrame_T" path="/pages/drp/oamg/advreit/Advreit_Edit_Frame_T.jsp"></forward>
+			<forward name="toedit"      path="/pages/drp/oamg/advreit/Advreit_Edit.jsp"/> 
+			<forward name="childlist"   path="/pages/drp/oamg/advreit/Advreit_MX_List.jsp"/>
+			<forward name="childlistSH" path="/pages/drp/oamg/advreit/AdvreitSH_MX_List.jsp"/>
+			<forward name="childedit"   path="/pages/drp/oamg/advreit/Advreit_MX_Edit.jsp"/>
+			<forward name="toedit"      path="/pages/drp/oamg/advreit/Advreit_Edit.jsp"/>
+			<forward name="toeditT"     path="/pages/drp/oamg/advreit/Advreit_Edit_T.jsp"/>
+			<forward name="todetail"    path="/pages/drp/oamg/advreit/Advreit_Detail.jsp"/> 
+			<forward name="detail"      path="/pages/drp/oamg/advreit/Advreit_Detail.jsp"/>   
+		</action>
+		<!-- 我的销售订单 -->
+		<action parameter="action" path="/saleorderview" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale/saleorderview/Saleorderview_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/saleorderview/Saleorderview_List.jsp" />
+			<forward name="todetail" path="/pages/drp/sale/saleorderview/Saleorderview_Detail.jsp" />
+			<forward name="childlist" path="/pages/drp/sale/saleorderview/Saleorderview_List_Chld.jsp"/>
+			<forward name="goodsFrames" path="/pages/drp/sale/saleorderview/SaleorderviewGoods_Frame.jsp"/>
+			<forward name="goodsList" path="/pages/drp/sale/saleorderview/SaleorderviewGoods_List.jsp"/>
+			<forward name="goodsChildlist" path="/pages/drp/sale/saleorderview/SaleorderviewGoods_List_Chld.jsp"/>
+			<forward name="traceList" path="/pages/drp/sale/saleorderview/Saleorderview_List_Trace.jsp"/>
+		</action>
+		
+		<!--报表[销售订单生产状态查询]-->
+		<action parameter="action" path="/drp/report/saleProStatus" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/report/saleProStatus/SaleProStatus_Frame.jsp" />
+			<forward name="list" path="/pages/drp/report/saleProStatus/SaleProStatus_List.jsp" />			
+		</action>
+		
+		<!-- 培训申请单 -->
+		<action parameter="action" path="/trainreq" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/oamg/trainreq/Trainreq_Frame.jsp" />
+			<forward name="list" path="/pages/drp/oamg/trainreq/Trainreq_List.jsp" />
+			<forward name="toedit" path="/pages/drp/oamg/trainreq/Trainreq_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/oamg/trainreq/Trainreq_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/oamg/trainreq/Trainreq_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/oamg/trainreq/Trainreq_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/oamg/trainreq/Trainreq_Edit_Chld.jsp"/>
+		</action>
+		
+		<!-- 广告投放申请单 -->
+		<action parameter="action" path="/advreq" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/adv/advreq/Advreq_Frame.jsp" />
+			<forward name="list" path="/pages/drp/adv/advreq/Advreq_List.jsp" />
+			<forward name="toedit" path="/pages/drp/adv/advreq/Advreq_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/adv/advreq/Advreq_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/adv/advreq/Advreq_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/adv/advreq/Advreq_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/adv/advreq/Advreq_Edit_Chld.jsp"/>
+		</action>
+		
+		<!--待发货预订单-->
+		<action parameter="action" path="/advcgoodslook" scope="request" 
+		   type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale/advcgoodslook/Advcgoodslook_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/advcgoodslook/Advcgoodslook_List.jsp" />
+			<forward name="todetail" path="/pages/drp/sale/advcgoodslook/Advcgoodslook_Detail.jsp" />
+			<forward name="childlist" path="/pages/drp/sale/advcgoodslook/Advcgoodslook_List_Chld.jsp"/>
+		</action>
+		
+		<!--待确认预订单-->
+		<action parameter="action" path="/uncomm" scope="request" 
+		   type="org.springframework.web.struts.DelegatingActionProxy">
+		   	<forward name="frames" path="/pages/drp/sale/uncomm/Uncomm_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/uncomm/Uncomm_List.jsp" />
+			<forward name="todetail" path="/pages/drp/sale/uncomm/Uncomm_Detail.jsp" />
+			<forward name="childlist" path="/pages/drp/sale/uncomm/Uncomm_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/sale/uncomm/Uncomm_Edit_Chld.jsp"/>
+			<forward name="gchildlist" path="/pages/drp/sale/uncomm/Uncomm_List_Gchld.jsp"/>
+			<forward name="editFrame" path="/pages/drp/sale/uncomm/Uncomm_Edit_Frame.jsp"/>
+			<forward name="toedit" path="/pages/drp/sale/uncomm/Uncomm_Edit.jsp" />
+		</action>
+ 
+		
+		<!-- 活动 -->
+		<action parameter="action" path="/promote" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/base/promote/Promote_Frame.jsp" />
+			<forward name="list" path="/pages/drp/base/promote/Promote_List.jsp" />
+			<forward name="toedit" path="/pages/drp/base/promote/Promote_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/base/promote/Promote_Detail.jsp" />
+			<forward name="editFrame" path=""/>
+		</action>
+		
+		<!--门店报表 -->
+		<action parameter="action" path="/storereport" scope="request" 
+		        type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="list" path="/pages/drp/report/storereport/StoreReport_List.jsp" />
+		</action>
+		<!--总部相关报表 -->
+		<action parameter="action" path="/headreport" scope="request" 
+		        type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="list" path="/pages/drp/report/storereport/headReport_List.jsp" />
+		</action>
+		<!--分销查看发运单 -->
+		<action parameter="action" path="/delivershow" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale/delivershow/Delivershow_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/delivershow/Delivershow_List.jsp" />
+			<forward name="todetail" path="/pages/drp/sale/delivershow/Delivershow_Detail.jsp" />
+			<forward name="childlist" path="/pages/drp/sale/delivershow/Delivershow_List_Chld.jsp"/>
+		</action>
+		<!--月结-->
+        <action parameter="action" path="/cw/act" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/finance/account/Act_Frame.jsp" />
+			<forward name="list" path="/pages/drp/finance/account/Act_List.jsp" />
+			<!-- 006 ZHENGYI 20131114 BEGIN -->
+			<!-- forward name="toWCLList" path="/pages/erp/cw/account/WCL_List.jsp" /-->
+			<!-- 006 ZHENGYI 20131114 END -->
+		</action>
+		<!-- 渠道信息 -->
+		<action parameter="action" path="/retalprice" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/base/retalprice/Retalprice_Frame.jsp" />
+			<forward name="list" path="/pages/drp/base/retalprice/Retalprice_List.jsp"/>
+			<forward name="view"   path="/pages/drp/base/retalprice/Retalprice_Detail.jsp" />
+			<forward name="toedit" path="/pages/drp/base/retalprice/Retalprice_Edit.jsp" />
+		</action>
+		<!-- 客户退款单-退货退款 -->
+		<action parameter="action" path="/custrefundorder" scope="request" 
+		        type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/finance/custrefundorder/Custrefundorder_Frame.jsp" />
+			<forward name="list" path="/pages/drp/finance/custrefundorder/Custrefundorder_List.jsp" />
+			<forward name="toedit" path="/pages/drp/finance/custrefundorder/Custrefundorder_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/finance/custrefundorder/Custrefundorder_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/finance/custrefundorder/Custrefundorder_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/finance/custrefundorder/Custrefundorder_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/finance/custrefundorder/Custrefundorder_Edit_Chld.jsp"/>
+		</action>
+		
+	    <!-- 形态转换 -->
+		<action parameter="action" path="/statechange" scope="request" 
+		        type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/store/statechange/StateChange_Frame.jsp" />
+			<forward name="list" path="/pages/drp/store/statechange/StateChange_List.jsp" />
+			<forward name="toedit" path="/pages/drp/store/statechange/StateChange_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/store/statechange/StateChange_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/store/statechange/StateChange_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/store/statechange/StateChange_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/store/statechange/StateChange_Edit_Chld.jsp"/>
+		</action>
+		
+		<!-- 新开门店申请单维护 -->
+		<action parameter="action"   path="/openterminal" scope="request"  type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames"   path="/pages/drp/oamg/openterminal/OpenTerminal_Frame.jsp" />
+			<forward name="list"     path="/pages/drp/oamg/openterminal/OpenTerminal_List.jsp" />
+			<forward name="detail"   path="/pages/drp/oamg/openterminal/OpenTerminal_Detail.jsp" />
+			<forward name="toedit"   path="/pages/drp/oamg/openterminal/OpenTerminal_Edit.jsp" />
+			<forward name="editFrame" path="/pages/drp/oamg/openterminal/OpenTerminal_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/oamg/openterminal/OpenTerminal_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/oamg/openterminal/OpenTerminal_Edit_Chld.jsp"/>
+		</action>
+		<!-- 成本调整单 -->
+		<action parameter="action" path="/costadjust" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale/costadjust/CostAdjust_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/costadjust/CostAdjust_List.jsp" />
+			<forward name="toedit" path="/pages/drp/sale/costadjust/CostAdjust_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/sale/costadjust/CostAdjust_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/sale/costadjust/CostAdjust_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/sale/costadjust/CostAdjust_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/sale/costadjust/CostAdjust_Edit_Chld.jsp"/>
+		</action>
+		<!-- 门店变更申请单维护 -->
+		<action parameter="action"   path="/terminalchange" scope="request"  type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames"   path="/pages/drp/oamg/terminalchange/TerminalChange_Frame.jsp" />
+			<forward name="framesT"  path="/pages/drp/oamg/terminalchange/TerminalChange_Frame_T.jsp" />
+			<forward name="list"     path="/pages/drp/oamg/terminalchange/TerminalChange_List.jsp" />
+			<forward name="detail"   path="/pages/drp/oamg/terminalchange/TerminalChange_Detail.jsp" />
+			<forward name="toedit"   path="/pages/drp/oamg/terminalchange/TerminalChange_Edit.jsp" />
+			<forward name="toedit1"  path="/pages/drp/oamg/terminalchange/TerminalChange_Edit_T.jsp" />
+			<forward name="listSH"   path="/pages/drp/oamg/terminalchange/TerminalChange_ListSH.jsp" /> 
+			<forward name="toedit1"  path="/pages/drp/oamg/terminalchange/TerminalChange_Edit_T.jsp" />
+			<forward name="toshow"   path="/pages/drp/oamg/terminalchange/TerminalChange_Show.jsp" />
+		</action>
+		
+		<!--销售数据上报  -->
+		<action parameter="action" path="/saledateup" scope="request" 
+		type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/oamg/saledateup/SaledateUp_Frame.jsp" />
+			<forward name="list" path="/pages/drp/oamg/saledateup/SaledateUp_List.jsp" />
+			<forward name="toedit" path="/pages/drp/oamg/saledateup/SaledateUp_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/oamg/saledateup/SaledateUp_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/oamg/saledateup/SaledateUp_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/oamg/saledateup/SaledateUp_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/oamg/saledateup/SaledateUp_Edit_Chld.jsp"/>
+			
+		</action>
+		<!-- 预订单开票维护 -->
+		<action parameter="action" path="/advcinvoice" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/finance/advcInvoice/AdvcInvoice_Frame.jsp" />
+			<forward name="list" path="/pages/drp/finance/advcInvoice/AdvcInvoice_List.jsp" />
+			<forward name="todetail" path="/pages/drp/finance/advcInvoice/AdvcInvoice_Detail.jsp" />
+			<forward name="childlist" path="/pages/drp/finance/advcInvoice/AdvcInvoice_List_Chld.jsp"/>
+			<forward name="gchildlist" path="/pages/drp/finance/advcInvoice/AdvcInvoice_List_Gchld.jsp"/>
+			<forward name="traceList" path="/pages/drp/finance/advcInvoice/AdvcInvoice_List_Trace.jsp"/>
+		</action>
+		
+		<!-- 工作计划维护 -->
+		<action parameter="action"  path="/workplanmage" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames"      path="/pages/drp/oamg/workplanmage/WorkplanMage_Frame.jsp" />
+			<forward name="list"        path="/pages/drp/oamg/workplanmage/WorkplanMage_List.jsp" />
+			<forward name="detail"      path="/pages/drp/oamg/workplanmage/WorkplanMage_Detail.jsp" />
+			<forward name="editFrame"   path="/pages/drp/oamg/workplanmage/WorkplanMage_Edit_Frame.jsp"/>
+			<forward name="editFrame_T" path="/pages/drp/oamg/workplanmage/WorkplanMage_Edit_Frame_T.jsp"></forward>
+			<forward name="toedit"      path="/pages/drp/oamg/workplanmage/WorkplanMage_Edit.jsp"/> 
+			<forward name="childlist"   path="/pages/drp/oamg/workplanmage/WorkplanMage_Mx_List.jsp"/>
+			<forward name="childedit"   path="/pages/drp/oamg/workplanmage/WorkplanMage_Mx_Edit.jsp"/>
+			<forward name="childeditT"  path="/pages/drp/oamg/workplanmage/WorkplanMage_Mx_EditT.jsp"/>
+			<forward name="toedit"      path="/pages/drp/oamg/workplanmage/WorkplanMage_Edit.jsp"/>
+			<forward name="toeditT"     path="/pages/drp/oamg/workplanmage/WorkplanMage_Edit_T.jsp"/>
+			<forward name="todetail"    path="/pages/drp/oamg/workplanmage/WorkplanMage_Detail.jsp"/>    
+		</action>
+		<!-- 盈亏单查询 -->
+		<action parameter="action" path="/profiiloss" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/finance/profiiLoss/ProfiiLoss_Frame.jsp" />
+			<forward name="list" path="/pages/drp/finance/profiiLoss/ProfiiLoss_List.jsp" />
+			<forward name="childlist" path="/pages/drp/finance/profiiLoss/ProfiiLoss_List_Chld.jsp"/>
+			<forward name="todetail" path="/pages/drp/finance/profiiLoss/ProfiiLoss_Detail.jsp" />
+		</action>
+		<!-- 零星出库通知单维护 -->
+		<action parameter="action"      path="/storeoutfewnotice" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames"      path="/pages/drp/store/storeoutfewnotice/Storeoutfewnotice_Frame.jsp" />
+			<forward name="list"        path="/pages/drp/store/storeoutfewnotice/Storeoutfewnotice_List.jsp" />
+			<forward name="childlist"   path="/pages/drp/store/storeoutfewnotice/Storeoutfewnotice_List_Chld.jsp"/>
+			<forward name="todetail"    path="/pages/drp/store/storeoutfewnotice/Storeoutfewnotice_Detail.jsp" />
+			<forward name="editFrame"   path="/pages/drp/store/storeoutfewnotice/Storeoutfewnotice_Edit_Frame.jsp"/>
+			<forward name="toedit"      path="/pages/drp/store/storeoutfewnotice/Storeoutfewnotice_Edit.jsp"/>
+			<forward name="childedit"   path="/pages/drp/store/storeoutfewnotice/Storeoutfewnotice_Edit_Chld.jsp"/>
+		</action>
+		
+		<!-- 零星出库处理 -->
+		<action parameter="action" path="/sporadicstoreout" scope="request" 
+		        type="org.springframework.web.struts.DelegatingActionProxy">
+		    <forward name="frames" path="/pages/drp/store/sporadicstoreout/Sporadicstoreout_Frame.jsp" />
+			<forward name="list" path="/pages/drp/store/sporadicstoreout/Sporadicstoreout_List.jsp" />
+			<forward name="childlist" path="/pages/drp/store/sporadicstoreout/Sporadicstoreout_List_Chld.jsp" />
+			<forward name="detail" path="/pages/drp/store/sporadicstoreout/Sporadicstoreout_Detail.jsp" />
+			<forward name="scan" path="/pages/drp/store/sporadicstoreout/Sporadicstoreout_Scan.jsp" />
+		</action>
+		<!-- 活动价格设置 -->
+		<action parameter="action" path="/drppromoteprice" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/base/drppromoteprice/Drppromoteprice_Frame.jsp" />
+			<forward name="list" path="/pages/drp/base/drppromoteprice/Drppromoteprice_List.jsp"/>
+		</action>
+		
+	    <!-- 加盟商门店指标 -->
+		<action parameter="action"   path="/channTermianl" scope="request"  type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames"   path="/pages/drp/oamg/channTermianl/ChannTermianl_Frame.jsp" />
+			<forward name="list"     path="/pages/drp/oamg/channTermianl/ChannTermianl_List.jsp" />
+			<forward name="todetail" path="/pages/drp/oamg/channTermianl/ChannTermianl_Detail.jsp" />
+			<forward name="toedit"   path="/pages/drp/oamg/channTermianl/ChannTermianl_Edit.jsp" />
+		</action>
+		<!--二套帐-->
+        <action parameter="action" path="/cw/acctengi" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/acctengi/AcctEngi_Frame.jsp" />
+			<forward name="list" path="/pages/drp/acctengi/AcctEngi_List.jsp" />
+		</action>
+		<!-- 渠道销售价格设置 -->
+		<action parameter="action" path="/drpsaleprice" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/base/drpsaleprice/Drpsaleprice_Frame.jsp" />
+			<forward name="list" path="/pages/drp/base/drpsaleprice/Drpsaleprice_List.jsp"/>
+			<forward name="view"   path="/pages/drp/base/drpsaleprice/Drpsaleprice_Detail.jsp" />
+			<forward name="toedit" path="/pages/drp/base/drpsaleprice/Drpsaleprice_Edit.jsp" />
+		</action>
+		<!-- 直营办-销售订单 -->
+		<action parameter="action" path="/saleordera" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale/saleordera/Saleordera_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/saleordera/Saleordera_List.jsp" />
+			<forward name="todetail" path="/pages/drp/sale/saleordera/Saleordera_Detail.jsp" />
+			<forward name="childlist" path="/pages/drp/sale/saleordera/Saleordera_List_Chld.jsp"/>
+			<forward name="allPrint" path="/pages/drp/sale/saleordera/Saleordera_List_AllPrint.jsp"/>
+		</action>
+		<!-- 直营办-下级销售出库单 -->
+		<action parameter="action" path="/storeouta" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/store/storeouta/Storeouta_Frame.jsp" />
+			<forward name="list" path="/pages/drp/store/storeouta/Storeouta_List.jsp" />
+			<forward name="todetail" path="/pages/drp/store/storeouta/Storeouta_Detail.jsp" />
+			<forward name="childlist" path="/pages/drp/store/storeouta/Storeouta_List_Chld.jsp"/>
+			<forward name="allPrint" path="/pages/drp/store/storeouta/Storeouta_List_AllPrint.jsp"/>
+		</action>
+		<!-- 门店－销售出库单 -->
+		<action parameter="action" path="/termstoreouta" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale//termstoreouta/Termstoreouta_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale//termstoreouta/Termstoreouta_List.jsp" />
+			<forward name="toedit" path="/pages/drp/sale//termstoreouta/Termstoreouta_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/sale//termstoreouta/Termstoreouta_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/sale//termstoreouta/Termstoreouta_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/sale//termstoreouta/Termstoreouta_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/sale//termstoreouta/Termstoreouta_Edit_Chld.jsp"/>
+		</action>
+		<!-- 直营办-下级退货单 -->
+		<action parameter="action" path="/drpreturna" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale//drpreturna/Drpreturna_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale//drpreturna/Drpreturna_List.jsp" />
+			<forward name="toedit" path="/pages/drp/sale//drpreturna/Drpreturna_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/sale//drpreturna/Drpreturna_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/sale//drpreturna/Drpreturna_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/sale//drpreturna/Drpreturna_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/sale//drpreturna/Drpreturna_Edit_Chld.jsp"/>
+			<forward name="allPrint" path="/pages/drp/sale/drpreturna/Drpreturna_List_AllPrint.jsp"/>
+		</action>
+		<!-- 直营办-下级退货入库单 -->
+		<action parameter="action" path="/drpreturnstorein" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale//drpreturnstorein/Drpreturnstorein_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale//drpreturnstorein/Drpreturnstorein_List.jsp" />
+			<forward name="toedit" path="/pages/drp/sale//drpreturnstorein/Drpreturnstorein_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/sale//drpreturnstorein/Drpreturnstorein_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/sale//drpreturnstorein/Drpreturnstorein_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/sale//drpreturnstorein/Drpreturnstorein_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/sale//drpreturnstorein/Drpreturnstorein_Edit_Chld.jsp"/>
+		</action>
+		<!-- 门店-退货入库单 -->
+		<action parameter="action" path="/termreturnstorein" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale//termreturnstorein/Termreturnstorein_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale//termreturnstorein/Termreturnstorein_List.jsp" />
+			<forward name="toedit" path="/pages/drp/sale//termreturnstorein/Termreturnstorein_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/sale//termreturnstorein/Termreturnstorein_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/sale//termreturnstorein/Termreturnstorein_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/sale//termreturnstorein/Termreturnstorein_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/sale//termreturnstorein/Termreturnstorein_Edit_Chld.jsp"/>
+		</action>
+		<!-- 门店-退货出库单 -->
+		<action parameter="action" path="/termreturnstoreout" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale//termreturnstoreout/Termreturnstoreout_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale//termreturnstoreout/Termreturnstoreout_List.jsp" />
+			<forward name="toedit" path="/pages/drp/sale//termreturnstoreout/Termreturnstoreout_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/sale//termreturnstoreout/Termreturnstoreout_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/sale//termreturnstoreout/Termreturnstoreout_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/sale//termreturnstoreout/Termreturnstoreout_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/sale//termreturnstoreout/Termreturnstoreout_Edit_Chld.jsp"/>
+		</action>
+		<!--直营办报表 -->
+		<action parameter="action" path="/saleareport" scope="request" 
+		        type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="list" path="/pages/drp/report/storereport/saleaReport_List.jsp" />
+		</action>
+		<!-- 预计量上报 -->
+		<action parameter="action" path="/forecasttaskup" scope="request" 
+		        type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale/forecasttaskup/ForecastTaskup_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/forecasttaskup/ForecastTaskup_List.jsp" />
+			<forward name="prdlist" path="/pages/drp/sale/forecasttaskup/ForecastTaskup_prd_List.jsp" />
+			
+		</action>
+		
+		<!-- 营销经理日报 -->
+        <action parameter="action"    path="/mkmdayreport" scope="request" 
+                       type="org.springframework.web.struts.DelegatingActionProxy">
+            <forward name="frames"    path="/pages/drp/oamg/mkmdayreport/MkmDayReport_Frame.jsp" />
+            <forward name="list"      path="/pages/drp/oamg/mkmdayreport/MkmDayReport_List.jsp" />
+            <forward name="toedit"    path="/pages/drp/oamg/mkmdayreport/MkmDayReport_Edit.jsp" />
+            <forward name="todetail"    path="/pages/drp/oamg/mkmdayreport/MkmDayReport_Detail.jsp" />
+            <forward name="editFrame" path="/pages/drp/oamg/mkmdayreport/MkmDayReport_Edit_Frame.jsp"/>
+        </action>
+        <!-- 加盟商营销经理评价 -->
+        <action parameter="action"    path="/channscoremkm" scope="request" 
+                       type="org.springframework.web.struts.DelegatingActionProxy">
+            <forward name="frames"    path="/pages/drp/oamg/channscoremkm/ChannScoreMkm_Frame.jsp" />
+            <forward name="list"      path="/pages/drp/oamg/channscoremkm/ChannScoreMkm_List.jsp" />
+            <forward name="toedit"    path="/pages/drp/oamg/channscoremkm/ChannScoreMkm_Edit.jsp" />
+            <forward name="todetail"  path="/pages/drp/oamg/channscoremkm/ChannScoreMkm_Detail.jsp" />
+            <forward name="editFrame" path="/pages/drp/oamg/channscoremkm/ChannScoreMkm_Edit_Frame.jsp"/>
+        </action>
+		
+		<!-- 分销渠道信息登记 -->
+		<action parameter="action"   path="/distributerReq" scope="request"  type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames"   path="/pages/drp/distributer/distributerreq/DistributerReq_Frame.jsp" />
+			<forward name="list"     path="/pages/drp/distributer/distributerreq/DistributerReq_List.jsp" />
+			<forward name="detail"   path="/pages/drp/distributer/distributerreq/DistributerReq_Detail.jsp" />
+			<forward name="toedit"   path="/pages/drp/distributer/distributerreq/DistributerReq_Edit.jsp" />
+			<forward name="editFrame" path="/pages/drp/distributer/distributerreq/DistributerReq_Edit_Frame.jsp"/>
+			<forward name="detailFrame" path="/pages/drp/distributer/distributerreq/DistributerReq_Detail_Frame.jsp"/>
+		</action>
+		<!-- 分销商购货月报 -->
+		<action parameter="action"   path="/distributerSalerpt" scope="request"  type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames"   path="/pages/drp/distributer/distributersalerpt/DistributerSalerpt_Frame.jsp" />
+			<forward name="list"     path="/pages/drp/distributer/distributersalerpt/DistributerSalerpt_List.jsp" />
+			<forward name="detail"   path="/pages/drp/distributer/distributersalerpt/DistributerSalerpt_Detail.jsp" />
+			<forward name="toedit"   path="/pages/drp/distributer/distributersalerpt/DistributerSalerpt_Edit.jsp" />
+			<forward name="editFrame" path="/pages/drp/distributer/distributersalerpt/DistributerSalerpt_Edit_Frame.jsp"/>
+			<forward name="detailFrame" path="/pages/drp/distributer/distributersalerpt/DistributerSalerpt_Detail_Frame.jsp"/>
+		</action>
+		<!-- 分销渠道信息登记 -->
+		<action parameter="action"   path="/distributerReq" scope="request"  type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames"   path="/pages/drp/distributer/distributerreq/DistributerReq_Frame.jsp" />
+			<forward name="list"     path="/pages/drp/distributer/distributerreq/DistributerReq_List.jsp" />
+			<forward name="detail"   path="/pages/drp/distributer/distributerreq/DistributerReq_Detail.jsp" />
+			<forward name="toedit"   path="/pages/drp/distributer/distributerreq/DistributerReq_Edit.jsp" />
+			<forward name="editFrame" path="/pages/drp/distributer/distributerreq/DistributerReq_Edit_Frame.jsp"/>
+			<forward name="detailFrame" path="/pages/drp/distributer/distributerreq/DistributerReq_Detail_Frame.jsp"/>
+		</action>
+		
+		<action parameter="action"   path="/distributerReqT" scope="request"  type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames"   path="/pages/drp/distributer/distributerreqt/DistributerReqT_Frame.jsp" />
+			<forward name="list"     path="/pages/drp/distributer/distributerreqt/DistributerReqT_List.jsp" />
+			<forward name="detail"   path="/pages/drp/distributer/distributerreqt/DistributerReqT_Detail.jsp" />
+			<forward name="toedit"   path="/pages/drp/distributer/distributerreqt/DistributerReqT_Edit.jsp" />
+			<forward name="editFrame" path="/pages/drp/distributer/distributerreqt/DistributerReqT_Edit_Frame.jsp"/>
+			<forward name="detailFrame" path="/pages/drp/distributer/distributerreqt/DistributerReqT_Detail_Frame.jsp"/>
+		</action>
+		
+		<!-- 加盟商终止合作申请 -->
+		<action parameter="action"   path="/distributerEndReq" scope="request"  type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames"   path="/pages/drp/distributer/distributerendreq/DistributerEndReq_Frame.jsp" />
+			<forward name="list"     path="/pages/drp/distributer/distributerendreq/DistributerEndReq_List.jsp" />
+			<forward name="detail"   path="/pages/drp/distributer/distributerendreq/DistributerEndReq_Detail.jsp" />
+			<forward name="toedit"   path="/pages/drp/distributer/distributerendreq/DistributerEndReq_Edit.jsp" />
+			<forward name="toeditCf"   path="/pages/drp/distributer/distributerendreq/DistributerEndReq_Edit_Confirm.jsp" />
+			<forward name="editFrame" path="/pages/drp/distributer/distributerendreq/DistributerEndReq_Edit_Frame.jsp"/>
+			<forward name="detailFrame" path="/pages/drp/distributer/distributerendreq/DistributerEndReq_Detail_Frame.jsp"/>
+		</action>
+		
+		<!-- 待完善预订单（与龙安接口） -->
+		<action parameter="action" path="/propressadvcorder" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/sale/progressadvc/ProgressAdvcOrder_Frame.jsp" />
+			<forward name="list" path="/pages/drp/sale/progressadvc/ProgressAdvcOrder_List.jsp" />
+			<forward name="toedit" path="/pages/drp/sale/progressadvc/ProgressAdvcOrder_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/sale/progressadvc/ProgressAdvcOrder_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/sale/progressadvc/ProgressAdvcOrder_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/sale/progressadvc/ProgressAdvcOrder_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/sale/progressadvc/ProgressAdvcOrder_Edit_Chld.jsp"/>
+			<forward name="gchildlist" path="/pages/drp/sale/progressadvc/ProgressAdvcOrder_List_Gchld.jsp"/>
+			<forward name="gchildedit" path="/pages/drp/sale/progressadvc/ProgressAdvcOrder_Edit_Gchld.jsp"/>
+		</action>
+		<!-- 预订单出库维护 -->
+		<action parameter="action" path="/dststoreout" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/drp/store//dststoreout/Dststoreout_Frame.jsp" />
+			<forward name="list" path="/pages/drp/store//dststoreout/Dststoreout_List.jsp" />
+			<forward name="toedit" path="/pages/drp/store//dststoreout/Dststoreout_Edit.jsp" />
+			<forward name="todetail" path="/pages/drp/store//dststoreout/Dststoreout_Detail.jsp" />
+			<forward name="editFrame" path="/pages/drp/store//dststoreout/Dststoreout_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/drp/store//dststoreout/Dststoreout_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/drp/store//dststoreout/Dststoreout_Edit_Chld.jsp"/>
+		</action>
+	    <!-- 总部加模块-入库通知单 -->
+		<action parameter="action"    path="/tstoreIn" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+		    <forward name="frames"    path="/pages/drp/oamg/tstoreIn/StroreIn_Frame.jsp" />
+			<forward name="list"      path="/pages/drp/oamg/tstoreIn/StroreIn_List.jsp" />
+			<forward name="toedit"    path="/pages/drp/oamg/tstoreIn/StroreIn_Edit.jsp" />
+			<forward name="editFrame" path="/pages/drp/oamg/tstoreIn/StroreIn_Edit_Frame.jsp"/>
+			<forward name="childedit" path="/pages/drp/oamg/tstoreIn/StroreIn_Edit_Chld.jsp"/>
+			<forward name="todetail"  path="/pages/drp/oamg/tstoreIn/StroreIn_Detail.jsp" />
+			<forward name="childlist" path="/pages/drp/oamg/tstoreIn/StroreIn_List_Chld.jsp" />
+		</action>
+	</action-mappings>
+</struts-config>
+

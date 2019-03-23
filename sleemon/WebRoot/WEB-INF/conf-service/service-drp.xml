@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd"
+	default-autowire="byName">
+	
+	<!-- 分发指令接收-->
+	<bean id = "dstrorderService" parent="IBaseService" class = "com.hoperun.drp.sale.dstrorder.service.impl.DstrorderServiceImpl"/>
+	
+	<!--预订单录入 lyg-->
+	<bean id = "advcorderService" parent="IBaseService" class = "com.hoperun.drp.sale.advcorder.service.impl.AdvcorderServiceImpl"/>
+	
+	<!-- 库房库位信息wdb -->
+	<bean id = "storeService" parent="IBaseService" class = "com.hoperun.drp.base.store.service.impl.StoreServiceImpl"/>
+	
+
+	<!-- 退货申请单维护 add by  wzg >
+	<bean id = "prdreturnService" parent="IBaseService" class = "com.hoperun.drp.sale.prdreturn.service.impl.PrdreturnServiceImpl"/-->
+
+	<!-- 退货申请单维护 add by  wzg -->
+	<bean id = "prdreturnreqService" parent="IBaseService" class = "com.hoperun.drp.sale.prdreturnreq.service.impl.PrdreturnreqServiceImpl"/>
+	
+	<!-- 我的退货单 add by  wzg -->
+	<bean id = "myretrunService" parent="IBaseService" class = "com.hoperun.drp.sale.myretrun.service.impl.MyretrunServiceImpl"/>
+
+	<!--service conf-->
+	<bean id = "storediffService" parent="IBaseService" class = "com.hoperun.drp.store.storediff.service.impl.StorediffServiceImpl"/>
+	
+	<!-- 投诉与建议查询 -->
+	<bean id = "adviseService" parent="IBaseService" class = "com.hoperun.drp.sale.advise.service.impl.AdviseServiceImpl"/>
+	
+		
+	<!--入库通知单维护-->
+	<bean id = "storeinnoticeService" parent="IBaseService" class = "com.hoperun.drp.store.storeinnotice.service.impl.StoreinnoticeServiceImpl"/>
+	<!--终端退货录入-->
+	<bean id = "termreturnService" parent="IBaseService" class = "com.hoperun.drp.sale.termreturn.service.impl.TermreturnServiceImpl"/>
+	<!-- 投诉与建议 -->
+	<bean id = "adviseinitService" parent="IBaseService" class = "com.hoperun.drp.sale.adviseinit.service.impl.AdviseinitServiceImpl"/>
+	<!-- 付款凭证上传 -->
+	<bean id = "paymentupService" parent="IBaseService" class = "com.hoperun.drp.sale.paymentup.service.impl.PaymentupServiceImpl"/>
+	<!-- 分销业务一》人员信息 -->
+	<bean id = "employeeService" parent="IBaseService" class = "com.hoperun.drp.base.employee.service.impl.EmployeeServiceImpl"/>
+	<!--入库单处理-->
+	<bean id = "storeinService" parent="IBaseService" class = "com.hoperun.drp.store.storein.service.impl.StoreinServiceImpl"/>
+	<!--预订单转订货 lyg-->
+	<bean id = "advctoorderService" parent="IBaseService" class = "com.hoperun.drp.sale.advctoorder.service.impl.AdvctoorderServiceImpl"/>
+    
+    <!--转储-->
+    <bean id = "dumpService" parent="IBaseService" class = "com.hoperun.drp.store.dump.service.impl.DumpServiceImpl"/>
+ 
+	<!--调拨申请维护/审核  -->
+	<bean id = "allocateService" parent="IBaseService" class = "com.hoperun.drp.store.allocate.service.impl.AllocateServiceImpl"/>
+	<!--盘点单维护/审核  -->
+ 	<bean id = "inventoryService" parent="IBaseService" class = "com.hoperun.drp.store.inventory.service.impl.InventoryServiceImpl"/>
+    
+    <!--库存储备-->
+    <bean id = "resvstoreService" parent="IBaseService" class = "com.hoperun.drp.base.resvstore.service.impl.ResvstoreServiceImpl"/>
+    
+    <!--分销首页-->
+    <bean id = "drpFirpageService" parent="IBaseService" class = "com.hoperun.drp.main.firpage.service.impl.DrpFirpageServiceImpl"/>
+    <!--我要订货-->
+    <bean id = "myorderService" parent="IBaseService" class = "com.hoperun.drp.main.myorder.service.impl.MyorderServiceImpl"/>
+   
+    <!--订货订单维护-->
+    <bean id = "goodsorderhdService" parent="IBaseService" class = "com.hoperun.drp.sale.goodsorderhd.service.impl.GoodsorderhdServiceImpl"/>
+     <!--销售出库处理-->
+    <bean id = "storeoutService" parent="IBaseService" class = "com.hoperun.drp.store.storeout.service.impl.StoreoutServiceImpl"/>    
+    
+    <!-- 购物车 -->
+    <bean id="shopcarService" parent="IBaseService"  class="com.hoperun.drp.main.shopcar.service.impl.ShopcarServiceImpl"></bean>
+    
+    <!-- 整车计算 -->
+    <bean id="carcalculateService" parent="IBaseService"  class="com.hoperun.drp.main.carcalculate.service.impl.CarcalculateServiceImpl"></bean>
+	<!--预订单发货 lyg-->
+	<bean id = "advctooutService" parent="IBaseService" class = "com.hoperun.drp.sale.advctoout.service.impl.AdvctooutServiceImpl"/>
+
+	<!-- 客户收款单 -->
+	<bean id = "advpaymentService" parent="IBaseService" class = "com.hoperun.drp.finance.advpayment.service.impl.AdvpaymentServiceImpl"/>
+	<!-- 客户退款单 -->
+	<bean id = "custRefundmentService" parent="IBaseService" class = "com.hoperun.drp.finance.custrefundments.service.impl.CustRefundmentServiceImpl"/>
+	<!-- 预定单结算 -->
+	<bean id = "preorderpaymentService" parent="IBaseService" class = "com.hoperun.drp.finance.preorderpayment.service.impl.PreorderpaymentServiceImpl"/>
+	<!--预订单退货-->
+	<bean id = "advcreturnService" parent="IBaseService" class = "com.hoperun.drp.sale.advcreturn.service.impl.AdvcreturnServiceImpl"/>
+	<!-- 客户退货结算 -->
+	<bean id = "restatementsService" parent="IBaseService" class = "com.hoperun.drp.finance.restatements.service.impl.RestatementsServiceImpl"/>
+	<!-- 预订单核销 -->
+	<bean id = "advcverifyService" parent="IBaseService" class = "com.hoperun.drp.finance.advcverify.service.impl.AdvcverifyServiceImpl"/>
+	<!--预订单核价 lyg-->
+	<bean id = "advccheckpriceService" parent="IBaseService" class = "com.hoperun.drp.sale.advccheckprice.service.impl.AdvccheckpriceServiceImpl"/>
+	<!--预订单发货申请-->
+	<bean id = "advcgoodsappService" parent="IBaseService" class = "com.hoperun.drp.sale.advcgoodsapp.service.impl.AdvcgoodsappServiceImpl"/>
+	<!--返修单申请审核 -->
+	<bean id = "repairappService" parent="IBaseService" class = "com.hoperun.drp.sale.repairapp.service.impl.RepairappServiceImpl"/>
+	<!--返修单出库 -->
+	<bean id = "repairStoreoutService" parent="IBaseService" class = "com.hoperun.drp.sale.repairstoreout.service.impl.RepairStoreoutServiceImpl"/>
+	<!--返修收货确认 -->
+	<bean id = "repairrecvService" parent="IBaseService" class = "com.hoperun.drp.sale.repairrecv.service.impl.RepairrecvServiceImpl"/>
+	<!--返修发货 -->
+	<bean id = "repairsendService" parent="IBaseService" class = "com.hoperun.drp.sale.repairsend.service.impl.RepairsendServiceImpl"/>
+	<!--销售收货确认 -->
+	<bean id = "storeoutconfirmService" parent="IBaseService" class = "com.hoperun.drp.store.storeoutconfirm.service.impl.StoreoutconfirmServiceImpl"/>
+	
+	<!--销售收货确认 -->
+	<bean id = "techorderManagerService" parent="IBaseService" class = "com.hoperun.commons.techorder.service.impl.TechorderManagerServiceImpl"/>
+	
+	<!--应收余额查询 -->
+	<bean id = "queryPayMentRepService"  parent="IBaseService" class = "com.hoperun.drp.report.querypaymentrep.service.impl.QuerypaymentrepServiceImpl"/>
+	
+	<!--库存查询 -->
+	<bean id = "querystockService" parent="IBaseService" class = "com.hoperun.drp.report.querystock.service.impl.QuerystockServiceImpl"/> 
+	
+	<!--报表[退货查询 ]-->
+	<bean id = "queryReutrnRepService" parent="IBaseService" class = "com.hoperun.drp.report.queryReutrnRep.service.impl.QueryReutrnRepServiceImpl"/>
+	<!--报表[生产情况查询]-->
+	<bean id = "queryProStatusService" parent="IBaseService" class = "com.hoperun.drp.report.queryProStatus.service.impl.QueryProStatusServiceImpl"/>
+	<!-- 渠道参数设置 -->
+	<bean id = "paramsetService" parent="IBaseService" class = "com.hoperun.drp.base.paramset.service.impl.ParamsetServiceImpl" />
+	<!--预订单变更-->
+	<bean id = "changeadvcorderService" parent="IBaseService" class = "com.hoperun.drp.sale.changeadvcorder.service.impl.ChangeadvcorderServiceImpl"/>
+	<!--预订单发货取消-->
+	<bean id = "advccancelsappService" parent="IBaseService" class = "com.hoperun.drp.sale.advccancelsapp.service.impl.AdvccancelsappServiceImpl"/>
+	<!--分销-区域服务中心-订货订单处理-->
+	<bean id = "sergoodsorderService" parent="IBaseService" class = "com.hoperun.drp.sale.sergoodsorder.service.impl.SergoodsorderServiceImpl"/>
+
+	<!-- 装修申请单维护 -->
+	<bean id = "decorationSQService"  parent="IBaseService" class = "com.hoperun.drp.oamg.decorationapp.service.impl.DecorationSQServiceImpl" />
+     
+    <!-- 装修补贴标准维护 -->
+    <bean id = "decorationalloService"  parent="IBaseService" class = "com.hoperun.drp.oamg.decorationallo.service.impl.DecorationalloServiceImpl" />
+    
+    <!-- 装修验收单维护 -->
+    <bean id="rnvtncheckService"        parent="IBaseService" class = "com.hoperun.drp.oamg.rnvtncheck.service.impl.RnvtncheckServiceImpl" />
+    <!-- 装修整改单维护 -->
+    <bean id="rnvtnreformService"       parent="IBaseService" class = "com.hoperun.drp.oamg.rnvtnreform.service.impl.RnvtnreformServiceImpl" />
+    <!-- 装修整改验收单维护 -->
+    <bean id="rnvtnreformcheckService"  parent="IBaseService" class = "com.hoperun.drp.oamg.rnvtnreformcheck.service.impl.RnvtnreformcheckServiceImpl" />
+	<!-- 总部-入库通知单 -->
+	<bean id="storeInService"           parent="IBaseService" class = "com.hoperun.drp.oamg.tstoreIn.service.impl.StoreInServiceImpl" />
+	<!--分销-区域服务中心-销售订单处理-->
+	<bean id = "sersaleorderService" parent="IBaseService" class = "com.hoperun.drp.sale.sersaleorder.service.impl.SersaleorderServiceImpl"/>
+	<!--分销-区域服务中心-销售订单转订货-->
+	<bean id = "sotoAdvorderService" parent="IBaseService" class = "com.hoperun.drp.areaser.sotoadvorder.service.impl.SotoadvorderServiceImpl"/>
+	
+	<!--专卖店转分销店申请单维护-->
+	<bean id = "storetoretailService" parent="IBaseService" class = "com.hoperun.drp.oamg.storetoretail.service.impl.StoretoretailServiceImpl"/>
+
+	<!--分销-区域服务中心-出库通知管理-销售出库通知单维护-->
+	<bean id = "storeoutnoticeService" parent="IBaseService" class = "com.hoperun.drp.areaser.storeoutnotice.service.impl.StoreoutnoticeServiceImpl"/>
+
+	<!--分销-区域服务中心-退货单审核-->
+	<bean id = "returnpdtrlsService" parent="IBaseService" class = "com.hoperun.drp.areaser.returnpdtrls.service.impl.ReturnpdtrlsServiceImpl"/>
+	<!-- 渠道管理-装修管理-装修报销申请单维护  -->
+	<bean id = "decorationreitService"  parent="IBaseService" class = "com.hoperun.drp.oamg.decorationreit.service.impl.DecorationreitServiceImpl" />
+
+	<!-- 推广费用申请单维护 -->
+	<bean id = "promoexpenService" parent="IBaseService" class = "com.hoperun.drp.oamg.promoexpen.service.impl.PromoexpenServiceImpl"/>
+	<!-- 推广费用报销单维护 -->
+	<bean id = "promoreimService" parent="IBaseService" class = "com.hoperun.drp.oamg.promoreim.service.impl.PromoreimServiceImpl"/>
+	
+	<!-- 开业大礼包申请单维护 -->
+	<bean id = "openbusspkgService" parent="IBaseService" class = "com.hoperun.drp.oamg.openbusspkg.service.impl.OpenbusspkgServiceImpl"/>
+	
+	<!--门店精致化检查结果-->
+	<bean id = "termrefinecheckService" parent="IBaseService" class = "com.hoperun.drp.oamg.termrefinecheck.service.impl.TermrefinecheckServiceImpl"/>
+	
+	<!--检查方案维护-->
+	<bean id = "plancheckService" parent="IBaseService" class = "com.hoperun.drp.oamg.plancheck.service.impl.ChanncheckplanServiceImpl"/>
+	
+	<!--总部直发通知单-->
+	<bean id = "senddirectnoticeService" parent="IBaseService" class = "com.hoperun.drp.areaser.senddirectnotice.service.impl.SenddirectnoticeServiceImpl"/>
+	
+	<!-- 拓展拜访表维护 -->
+    <bean id = "expandvisitService"      parent="IBaseService" class = "com.hoperun.drp.visit.expandvisit.service.impl.ExpandVisitServiceImpl"/>
+	
+	<!-- 加盟商拜访表维护 -->
+    <bean id = "channvisitService"      parent="IBaseService" class = "com.hoperun.drp.visit.channvisit.service.impl.ChannVisitServiceImpl"/>
+	
+	<!-- 门店拜访表维护 -->
+	<bean id = "storevisitService"      parent="IBaseService" class = "com.hoperun.drp.visit.storevisit.service.impl.StoreVisitServiceImpl"/>
+	
+	<!--我的销售订单-->
+	<bean id = "saleorderviewService" parent="IBaseService" class = "com.hoperun.drp.sale.saleorderview.service.impl.SaleorderviewServiceImpl"/>
+	
+	<!--报表[销售订单生产状态查询]-->
+	<bean id = "saleProStatusService" parent="IBaseService" class = "com.hoperun.drp.report.saleProStatus.service.impl.SaleProStatusServiceImpl"/>
+	<!--培训申请单-->
+	<bean id = "trainreqService" parent="IBaseService" class = "com.hoperun.drp.oamg.trainreq.service.impl.TrainreqServiceImpl"/>
+    
+    <!-- 广告投放报销申请单维护 -->
+    <bean id = "advreitService"  parent="IBaseService" class = "com.hoperun.drp.oamg.advreit.service.impl.AdvreitServiceImpl"/>
+	<!--广告投放申请单-->
+	<bean id = "advreqService" parent="IBaseService" class = "com.hoperun.drp.adv.advreq.service.impl.AdvreqServiceImpl"/>
+	
+	<!--待发货预订单-->
+	<bean id = "advcgoodslookService" parent="IBaseService" class = "com.hoperun.drp.sale.advcgoodslook.service.impl.AdvcgoodslookServiceImpl"/>
+	
+	<!--待发货预订单-->
+	<bean id = "uncommService" parent="IBaseService" class = "com.hoperun.drp.sale.uncomm.service.impl.UncommServiceImpl"/>
+	
+	<!--活动-->
+	<bean id = "promoteService" parent="IBaseService" class = "com.hoperun.drp.base.promote.service.impl.PromoteServiceImpl"/>
+	
+	<!--待发货预订单-->
+	<bean id = "storeReportService" parent="IBaseService" class = "com.hoperun.erp.report.storereport.service.impl.StoreReportServiceImpl"/>
+	
+	<!-- 分销查看发运单-->
+	<bean id = "delivershowService" parent="IBaseService" class = "com.hoperun.drp.sale.delivershow.service.impl.DelivershowServiceImpl"/>
+ 	<!-- 月结SQL-->
+	<bean id = "actService" parent="IBaseService" class = "com.hoperun.drp.finance.account.service.impl.ActServiceImpl"/>
+	<!-- 货品零售价设置-->
+	<bean id = "retalpriceService" parent="IBaseService" class = "com.hoperun.drp.base.retalprice.service.impl.RetalpriceServiceImpl"/>
+	<!-- 客户退款单-退货退款-->
+	<bean id = "custRefundorderService" parent="IBaseService" class = "com.hoperun.drp.finance.custrefundorder.service.impl.CustRefundorderServiceImpl"/>
+	<!-- 形态转换-->
+	<bean id = "stateChangeService" parent="IBaseService"  class = "com.hoperun.drp.store.statechange.service.impl.StateChangeServiceImpl"/>
+	<!-- 新开门店申请单 -->
+    <bean id = "openterminalService" parent="IBaseService" class = "com.hoperun.drp.oamg.openterminal.service.impl.OpenTerminalServiceImpl"/>
+	<!-- 成本调整单 -->
+    <bean id = "costAdjustService" parent="IBaseService" class = "com.hoperun.drp.sale.costadjust.service.impl.CostAdjustServiceImpl"/>
+	<!-- 新开门店申请单 -->
+    <bean id = "terminalchangeService" parent="IBaseService" class = "com.hoperun.drp.oamg.terminalchange.service.impl.TerminalChangeServiceImpl"/>
+    <!-- 销售数据上报 -->
+    <bean id = "saledateUpService" parent="IBaseService" class = "com.hoperun.drp.oamg.saledateup.service.impl.SaledateUpServiceImpl"/>
+    <!-- 预订单开票维护 -->
+    <bean id = "advcInvoiceService" parent="IBaseService" class = "com.hoperun.drp.finance.advcInvoice.service.impl.AdvcInvoiceServiceImpl"/>
+    <!-- 工作计划维护-->
+    <bean id = "workplanmageService"   parent="IBaseService" class = "com.hoperun.drp.oamg.workplanmage.service.impl.WorkplanMageServiceImpl"/>
+    <!-- 工作计划维护-->
+    <bean id = "profiiLossService"   parent="IBaseService" class = "com.hoperun.drp.finance.profiiloss.service.impl.ProfiiLossServiceImpl"/>
+    <!-- 零星出库通知单-->
+    <bean id = "storeoutfewnoticeService"   parent="IBaseService" class = "com.hoperun.drp.store.storeoutfewnotice.service.impl.StoreoutfewnoticeServiceImpl"/>  
+    <!-- 活动价格设置-->
+    <bean id = "drppromotepriceService"     parent="IBaseService" class = "com.hoperun.drp.base.drppromoteprice.service.impl.DrppromotepriceServiceImpl"/>
+    <!-- 加盟商门店指标 -->
+    <bean id = "channTerminalQuotaService"  parent="IBaseService" class = "com.hoperun.drp.oamg.channTermianl.service.impl.ChannTerminalQuotaServiceImpl"/>
+    <!-- 二套帐-->
+	<bean id = "acctengiService" parent="IBaseService" class = "com.hoperun.drp.finance.acctengi.service.impl.AcctEngiServiceImpl"/>
+    <!-- 渠道销售价格设置 -->
+    <bean id = "drpsalepriceService"  parent="IBaseService" class = "com.hoperun.drp.base.drpsaleprice.service.impl.DrpsalepriceServiceImpl"/>
+    <!-- 直营办-销售订单 -->
+    <bean id = "saleorderaService"  parent="IBaseService" class = "com.hoperun.drp.sale.saleordera.service.impl.SaleorderaServiceImpl"/>
+     <!-- 直营办-下级销售出库单 -->
+    <bean id = "storeoutaService"  parent="IBaseService" class = "com.hoperun.drp.store.storeouta.service.impl.StoreoutaServiceImpl"/>
+    
+	<!--门店－销售出库单-->
+	<bean id = "termstoreoutaService" parent="IBaseService" class = "com.hoperun.drp.sale.termstoreouta.service.impl.TermstoreoutaServiceImpl"/>
+	<!--直营办-下级退货单-->
+	<bean id = "drpreturnaService" parent="IBaseService" class = "com.hoperun.drp.sale.drpreturna.service.impl.DrpreturnaServiceImpl"/>
+	<!--直营办-下级退货入库单-->
+	<bean id = "drpreturnstoreinService" parent="IBaseService" class = "com.hoperun.drp.sale.drpreturnstorein.service.impl.DrpreturnstoreinServiceImpl"/>
+	<!--门店-退货入库单-->
+	<bean id = "termreturnstoreinService" parent="IBaseService" class = "com.hoperun.drp.sale.termreturnstorein.service.impl.TermreturnstoreinServiceImpl"/>
+	<!--门店-退货出库单-->
+	<bean id = "termreturnstoreoutService" parent="IBaseService" class = "com.hoperun.drp.sale.termreturnstoreout.service.impl.TermreturnstoreoutServiceImpl"/>
+	<!--预计量上报-->
+	<bean id = "forecastTaskupService" parent="IBaseService" class = "com.hoperun.drp.sale.forecasttaskup.service.impl.ForecastTaskupServiceImpl"/>
+	<!-- 营销经理日报 -->
+	<bean id = "mkmDayReportService"    parent="IBaseService" class = "com.hoperun.drp.oamg.mkmdayreport.service.impl.MkmDayReportServiceImpl"/>
+    <!-- 加盟商营销经理评价 -->
+    <bean id = "channScoreMkmService"   parent="IBaseService" class = "com.hoperun.drp.oamg.channscoremkm.service.impl.ChannScoreMkmServiceImpl"/>
+	<!--分销渠道信息登记-->
+	<bean id = "distributerReqService" parent="IBaseService" class = "com.hoperun.drp.distributer.distributerreq.service.impl.DistributerReqServiceImpl"/>
+	<!--分销商购货月报-->
+	<bean id = "distributerSalerptService" parent="IBaseService" class = "com.hoperun.drp.distributer.distributersalerpt.service.impl.DistributerSalerptServiceImpl"/>
+	<!--加盟商终止合作申请-->
+	<bean id = "distributerEndReqService" parent="IBaseService" class = "com.hoperun.drp.distributer.distributerendreq.service.impl.DistributerEndReqServiceImpl"/>
+	<!--待完善预订单（与龙安接口）-->
+	<bean id = "progressAdvcOrderService" parent="IBaseService" class = "com.hoperun.drp.sale.progressadvc.service.impl.ProgressAdvcOrderServiceImpl"/>
+	<!-- 预订单出库维护 -->
+	<bean id = "dststoreoutService" parent="IBaseService" class = "com.hoperun.drp.store.dststoreout.service.impl.DststoreoutServiceImpl"/>
+</beans>
+	 

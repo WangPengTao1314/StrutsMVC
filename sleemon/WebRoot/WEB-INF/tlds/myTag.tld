@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" "web-jsptaglibrary_1_1.dtd" >
+<taglib>
+	<tlibversion>1.0.1</tlibversion>
+	<jspversion>1.1</jspversion>
+	<shortname>hoperun</shortname>
+	<uri>http://www.hoperun.com.cn/project</uri>
+	
+	<tag>
+		<name>dicShow</name>
+		<tagclass>com.hoperun.commons.util.DicSelectTag</tagclass>
+		<bodycontent>empty</bodycontent>
+		<attribute>
+			<name>selId</name>
+			<required>true</required>
+		</attribute>
+		<attribute>
+			<name>property</name>
+			<required>true</required>
+		</attribute>
+		<attribute>
+			<name>key</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>			
+			<name>jues</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>size</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>length</name>
+			<required>false</required>
+		</attribute> 
+		<attribute>
+			<name>keyValue</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>readOnly</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>disabled</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>onchange</name>
+			<required>false</required>
+		</attribute>
+	</tag>
+	
+</taglib>

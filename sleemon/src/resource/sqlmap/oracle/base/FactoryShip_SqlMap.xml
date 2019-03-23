@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="FACTORY_SHIP">
+
+	<!-- 
+		*@module 系统管理
+		*@func 生产基地维护
+		*@version 1.0
+		*@author 王志格
+		*  -->
+	<typeAlias type="com.hoperun.base.factory.model.FactoryShipModel" alias="FactoryShipModel" />
+	
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="FACTORY_SHIP_ID">
+			FACTORY_SHIP_ID = #FACTORY_SHIP_ID#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="FACTORY_ID">
+			FACTORY_ID = #FACTORY_ID#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="SHIP_POINT_ID">
+			SHIP_POINT_ID = #SHIP_POINT_ID#
+		</isNotEmpty>	
+		<isNotEmpty prepend="and" property="DEL_FLAG">
+			DEL_FLAG = #DEL_FLAG#
+		</isNotEmpty>	
+		<isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+		</isNotEmpty>	
+	</sql>
+	
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[  SELECT  FACTORY_SHIP_ID,FACTORY_ID,SHIP_POINT_ID,SHIP_POINT_NO,SHIP_POINT_NAME
+  					FROM ${SYSSCHEMA}.BASE_FACTORY_SHIP 
+		                ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</sql>
+	
+	<!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="FactoryShipModel">
+		<include refid="coreSql" />
+	</select>
+	
+	<!-- 新增 -->
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into  ${SYSSCHEMA}.BASE_FACTORY_SHIP( FACTORY_SHIP_ID,FACTORY_ID,SHIP_POINT_ID,SHIP_POINT_NO,SHIP_POINT_NAME,DEL_FLAG )
+		 values(#FACTORY_SHIP_ID#,#FACTORY_ID#,#SHIP_POINT_ID#,#SHIP_POINT_NO#,#SHIP_POINT_NAME#,0 )
+		]]>
+	</insert>
+	
+	<!-- 根据ID修改 -->
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.BASE_FACTORY_SHIP ]]>
+		<dynamic prepend="set">
+			<isNotNull property="FACTORY_ID" prepend=","><![CDATA[FACTORY_ID = #FACTORY_ID#]]></isNotNull>
+			<isNotNull property="SHIP_POINT_ID" prepend=","><![CDATA[SHIP_POINT_ID = #SHIP_POINT_ID#]]></isNotNull>
+			<isNotNull property="SHIP_POINT_NO" prepend=","><![CDATA[SHIP_POINT_NO = #SHIP_POINT_NO#]]></isNotNull>
+			<isNotNull property="SHIP_POINT_NAME" prepend=","><![CDATA[SHIP_POINT_NAME = #SHIP_POINT_NAME#]]></isNotNull>
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where FACTORY_SHIP_ID = #FACTORY_SHIP_ID# ]]>
+	</update>
+	
+	<select id="loadByIds" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[  
+		 	SELECT  FACTORY_SHIP_ID,FACTORY_ID,SHIP_POINT_ID,SHIP_POINT_NO,SHIP_POINT_NAME
+  			FROM ${SYSSCHEMA}.BASE_FACTORY_SHIP 
+		    where FACTORY_SHIP_ID in ($FACTORY_SHIP_IDS$)]]>
+	</select>
+
+</sqlMap>

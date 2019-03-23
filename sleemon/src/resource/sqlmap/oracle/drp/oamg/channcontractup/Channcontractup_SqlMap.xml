@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ *@module 渠道合同管理
+ *@func 渠道合同上传
+ *@version 1.1
+ *@author 刘曰刚
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Channcontractup">
+	<typeAlias type="com.hoperun.drp.oamg.channcontractup.model.ChanncontractupModel"
+		alias="ChanncontractupModel" />
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="ChanncontractupModel" class="ChanncontractupModel">
+		<result column="CHANN_CONTRACT_ID" property="CHANN_CONTRACT_ID" />
+	</resultMap>
+	<!-- 动态查询 and 列表排序 -->
+	<sql id="queryDynSql"> 
+		<isNotEmpty prepend="and " property="CHANN_CONTRACT_NO">CHANN_CONTRACT_NO like '%'||#CHANN_CONTRACT_NO#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="CHANN_NO">CHANN_NO like '%'||#CHANN_NO#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="CHANN_NAME">CHANN_NAME like '%'||#CHANN_NAME#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="YEAR">YEAR =#YEAR#</isNotEmpty>
+		<isNotEmpty prepend="and " property="STATE">STATE=#STATE#</isNotEmpty>
+		<isNotEmpty prepend="and " property="BEGIN_CRE_TIME">CRE_TIME&gt;= to_date(#BEGIN_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')</isNotEmpty>
+		<isNotEmpty prepend="and " property="END_CRE_TIME">CRE_TIME&lt;= to_date(#END_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')</isNotEmpty>
+		<isNotEmpty prepend="and " property="DEL_FLAG"><![CDATA[DEL_FLAG=#DEL_FLAG#]]></isNotEmpty>
+		<isNotEmpty prepend="and" property="CHANNS_CHARG">
+	     CHANN_ID in $CHANNS_CHARG$
+	  </isNotEmpty>
+	    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	    </isNotEmpty>
+	</sql>
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField"> $orderField$ </isNotEmpty>
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[
+			select u.CHANN_CONTRACT_ID,
+			       u.CHANN_CONTRACT_NO,
+			       u.CHANN_ID,
+			       u.CHANN_NO,
+			       u.CHANN_NAME,
+			       u.CONTRACT_ATT,
+			       u.YEAR,
+			       u.STATE,
+			       u.REMARK,
+			       u.CREATOR,
+			       u.CRE_NAME,
+			       to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS')CRE_TIME,
+			       u.UPDATOR,
+			       u.UPD_NAME,
+			       to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS')UPD_TIME,
+			       u.DEPT_ID,
+			       u.DEPT_NAME,
+			       u.ORG_ID,
+			       u.ORG_NAME,
+			       u.LEDGER_ID,
+			       u.LEDGER_NAME
+			  from ERP_CHANN_CONTRACT_UP u
+		]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[select count(CHANN_CONTRACT_ID) cnt from ${SYSSCHEMA}.ERP_CHANN_CONTRACT_UP ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+	<!-- 根据ID查找 -->
+	<select id="loadById" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+		 select u.CHANN_CONTRACT_ID,
+			       u.CHANN_CONTRACT_NO,
+			       u.CHANN_ID,
+			       u.CHANN_NO,
+			       u.CHANN_NAME,
+			       u.CONTRACT_ATT,
+			       u.YEAR,
+			       u.STATE,
+			       u.REMARK,
+			       u.CREATOR,
+			       u.CRE_NAME,
+			       to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS')CRE_TIME,
+			       u.UPDATOR,
+			       u.UPD_NAME,
+			       to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS')UPD_TIME,
+			       u.DEPT_ID,
+			       u.DEPT_NAME,
+			       u.ORG_ID,
+			       u.ORG_NAME,
+			       u.LEDGER_ID,
+			       u.LEDGER_NAME,
+			       u.YEAR_PLAN_AMOUNT,
+			       u.FIRST_QUARTER_AMOUNT,
+			       u.SECOND_QUARTER_AMOUNT,
+			       u.THIRD_QUARTER_AMOUNT,
+			       u.FOURTH_QUARTER_AMOUNT
+			  from ERP_CHANN_CONTRACT_UP u
+		where CHANN_CONTRACT_ID = #CHANN_CONTRACT_ID# and DEL_FLAG=0]]>
+	</select>
+	<!-- 新增 -->
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ERP_CHANN_CONTRACT_UP(
+		 	CHANN_CONTRACT_ID,
+			CHANN_CONTRACT_NO,
+			CHANN_ID,
+			CHANN_NO,
+			CHANN_NAME,
+			CONTRACT_ATT,
+			YEAR,
+			STATE,
+			REMARK,
+			CREATOR,
+			CRE_NAME,
+			CRE_TIME,
+			DEPT_ID,
+			DEPT_NAME,
+			ORG_ID,
+			ORG_NAME,
+			LEDGER_ID,
+			LEDGER_NAME,
+			DEL_FLAG,
+			YEAR_PLAN_AMOUNT,
+			FIRST_QUARTER_AMOUNT,
+			SECOND_QUARTER_AMOUNT,
+			THIRD_QUARTER_AMOUNT,
+			FOURTH_QUARTER_AMOUNT
+		 )values(
+		 	#CHANN_CONTRACT_ID#,
+			#CHANN_CONTRACT_NO#,
+			#CHANN_ID#,
+			#CHANN_NO#,
+			#CHANN_NAME#,
+			#CONTRACT_ATT#,
+			#YEAR#,
+			#STATE#,
+			#REMARK#,
+			#CREATOR#,
+			#CRE_NAME#,
+			sysdate,
+			#DEPT_ID#,
+			#DEPT_NAME#,
+			#ORG_ID#,
+			#ORG_NAME#,
+			#LEDGER_ID#,
+			#LEDGER_NAME#,
+			#DEL_FLAG#,
+			#YEAR_PLAN_AMOUNT#,
+			#FIRST_QUARTER_AMOUNT#,
+			#SECOND_QUARTER_AMOUNT#,
+			#THIRD_QUARTER_AMOUNT#,
+			#FOURTH_QUARTER_AMOUNT#
+		 )
+		]]>
+	</insert>
+	<!-- 修改 -->
+	<update id="updateById" parameterClass="map">
+		 <![CDATA[ update ${SYSSCHEMA}.ERP_CHANN_CONTRACT_UP ]]>
+		<dynamic prepend="set">
+			<isNotNull property="CHANN_ID" prepend=","><![CDATA[CHANN_ID = #CHANN_ID#]]></isNotNull>
+			<isNotNull property="CHANN_NO" prepend=","><![CDATA[CHANN_NO = #CHANN_NO#]]></isNotNull>
+			<isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME#]]></isNotNull>
+			<isNotNull property="CONTRACT_ATT" prepend=","><![CDATA[CONTRACT_ATT = #CONTRACT_ATT#]]></isNotNull>
+			<isNotNull property="YEAR" prepend=","><![CDATA[YEAR = #YEAR#]]></isNotNull>
+			<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="YEAR_PLAN_AMOUNT" prepend=","><![CDATA[YEAR_PLAN_AMOUNT = #YEAR_PLAN_AMOUNT#]]></isNotNull>
+			<isNotNull property="FIRST_QUARTER_AMOUNT" prepend=","><![CDATA[FIRST_QUARTER_AMOUNT = #FIRST_QUARTER_AMOUNT#]]></isNotNull>
+			<isNotNull property="SECOND_QUARTER_AMOUNT" prepend=","><![CDATA[SECOND_QUARTER_AMOUNT = #SECOND_QUARTER_AMOUNT#]]></isNotNull>
+			<isNotNull property="THIRD_QUARTER_AMOUNT" prepend=","><![CDATA[THIRD_QUARTER_AMOUNT = #THIRD_QUARTER_AMOUNT#]]></isNotNull>
+			<isNotNull property="FOURTH_QUARTER_AMOUNT" prepend=","><![CDATA[FOURTH_QUARTER_AMOUNT = #FOURTH_QUARTER_AMOUNT#]]></isNotNull>
+			
+		</dynamic>
+		<![CDATA[ where CHANN_CONTRACT_ID = #CHANN_CONTRACT_ID# ]]>
+	</update>
+	<!-- 软删除 -->
+	<delete id="delete" parameterClass="map">
+	<![CDATA[ update ${SYSSCHEMA}.ERP_CHANN_CONTRACT_UP ]]>
+		<dynamic prepend="set">
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where CHANN_CONTRACT_ID=#CHANN_CONTRACT_ID# ]]>		
+	</delete>
+	<select id="checkRepeatYear" resultClass="int">
+		select count(1) cnt from (select a.CHANN_ID from ERP_CHANN_CONTRACT_UP a
+			where a.DEL_FLAG=0
+			group by a.CHANN_ID,a.YEAR
+			having count(a.CHANN_ID)>1)
+	</select>
+</sqlMap>

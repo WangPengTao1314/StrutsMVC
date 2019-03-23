@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="CREDIT">
+	<!-- 
+		*@module 销售管理
+		*@func 信用额度设定
+		*@version 1.1
+		*@author 郭利伟
+	-->
+	<typeAlias type="com.hoperun.erp.sale.credit.model.CreditModel" alias="CreditModel" />
+
+	<!-- 使用CREDIT装载结果集 -->
+	<resultMap id="CreditModel" class="CreditModel">
+		<result column="CHANN_ID" property="CHANN_ID" />
+	</resultMap>
+
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+	   <isNotEmpty prepend="and" property="CHANN_CHARG">
+			CHANN_ID in $CHANN_CHARG$
+		</isNotEmpty>
+		
+		<isNotEmpty prepend="and" property="CHANN_ID">
+			CHANN_ID = #CHANN_ID#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CHANN_NO">
+			CHANN_NO like '%'||#CHANN_NO#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CHANN_NAME">
+			CHANN_NAME like '%'||#CHANN_NAME#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CHANN_TYPE">
+			CHANN_TYPE = #CHANN_TYPE#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CHAA_LVL">
+			CHAA_LVL = #CHAA_LVL#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="AREA_NO">
+			AREA_NO = #AREA_NO#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="AREA_NAME">
+			AREA_NAME like '%'||#AREA_NAME#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CREDIT_CRE_TIME_FROM">
+			<![CDATA[CRE_TIME >= to_date(#CREDIT_CRE_TIME_FROM#,'yyyy-MM-DD HH24:MI:SS')]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CREDIT_CRE_TIME_TO">
+			<![CDATA[CRE_TIME <= to_date(#CREDIT_CRE_TIME_TO#,'yyyy-MM-DD HH24:MI:SS')]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="UPD_TIME_BEGIN">
+			<![CDATA[CREDIT_CRE_TIME >= to_date(#UPD_TIME_BEGIN#,'yyyy-MM-DD HH24:MI:SS')]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="UPD_TIME_END">
+			<![CDATA[CREDIT_CRE_TIME <= to_date(#UPD_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+		</isNotEmpty>
+		
+		<isNotEmpty prepend="and" property="CREDIT_CRE_NAME">
+			CREDIT_CRE_NAME like '%'||#CREDIT_CRE_NAME#||'%'
+		</isNotEmpty>	
+		<isNotEmpty prepend="and" property="DEL_FLAG">
+			DEL_FLAG = #DEL_FLAG#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="QXJBCON">
+			$QXJBCON$
+		</isNotEmpty>				
+	</sql>
+
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField">
+			$orderField$
+		</isNotEmpty>
+	</sql>
+
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[SELECT 
+					CHANN_ID,
+					CHANN_NO,
+					CHANN_NAME,
+					CHANN_ABBR,
+					CHANN_TYPE,
+					CHAA_LVL,
+					AREA_NO,
+					AREA_NAME,
+					LEDGER_NAME,
+					CREDIT_CRE_NAME,
+					CREDIT_CURRT,
+					INI_CREDIT,
+					to_char(CREDIT_CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CREDIT_CRE_TIME,
+					DEL_FLAG					
+				FROM 
+					${SYSSCHEMA}.BASE_CHANN
+		]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql" />
+		</dynamic>
+	</sql>
+
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT 
+					count(1) cnt 
+				FROM 
+					${SYSSCHEMA}.BASE_CHANN
+		]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+
+	<!-- 查询 -->
+	<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	
+	<!-- 根据ID查找 -->
+	<select id="loadById" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[SELECT 
+					CHANN_ID,
+					CHANN_NO,
+					CHANN_NAME,
+					CHANN_ABBR,
+					CHANN_TYPE,
+					CHAA_LVL,
+					AREA_NO,
+					AREA_NAME,
+					LEDGER_NAME,
+					CREDIT_CRE_NAME,
+					CREDIT_CURRT,
+					INI_CREDIT,
+					to_char(CREDIT_CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CREDIT_CRE_TIME,
+					DEL_FLAG
+				FROM 
+					${SYSSCHEMA}.BASE_CHANN
+				WHERE
+					CHANN_ID = #CHANN_ID#
+		]]>
+	</select>
+	
+	<!-- 根据ID修改 -->
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.BASE_CHANN ]]>
+		<!-- CHANAME, CHADES,CHADATE,CHASTU     -->
+		<dynamic prepend="set">
+			<isNotNull property="CREDIT_CRE_NAME" prepend=","><![CDATA[CREDIT_CRE_NAME = #CREDIT_CRE_NAME#]]></isNotNull>
+			<isNotNull property="CREDIT_CRE_NAME" prepend=","><![CDATA[CREDIT_CRE_TIME = sysdate]]></isNotNull>
+<!--			<isNotNull property="DIFF_CREDIT" prepend=","><![CDATA[CREDIT_CURRT = CREDIT_CURRT+#DIFF_CREDIT#]]></isNotNull>-->
+			<isNotNull property="INI_CREDIT" prepend=","><![CDATA[INI_CREDIT = #INI_CREDIT#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where CHANN_ID = #CHANN_ID# ]]>
+	</update>
+	
+</sqlMap>
+

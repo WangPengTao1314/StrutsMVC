@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+  *@module 系统模块 
+  *@func 系统模块 
+  *@version 1.1
+  *@author zhuxw  
+ -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Common">
+<!-- 获取编码规则 -->
+<select id="select001_T_SYS_BMGZ" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+  	<![CDATA[
+		select A.dt,A.Dlx,A.bc,A.nys,B.Sequencemc from ${SYSSCHEMA}.T_SYS_BMGZMX A
+		inner join ${SYSSCHEMA}.T_SYS_BMGZ B on A.BMGZID = B.BMGZID
+		where B.bmdx = '$bmdx$' and A.Delflag = 0 and B.Delflag = 0 and B.State = '$state$'
+		ORDER BY dlx asc
+	]]>
+</select>
+
+<select id="select002_T_SYS_BMGZ" parameterClass="java.lang.String" resultClass="java.lang.String">
+  	<![CDATA[
+		SELECT $sequencemc$.NEXTVAL AS seq FROM dual
+	]]>
+</select>
+<!-- 根据用户信息获取动态列 -->
+<typeAlias type="com.hoperun.commons.inter.dyncolumn.model.DynColumnModel" alias="DynColumnModel" />
+<select id="queryDynColumn" parameterClass="map" resultClass="DynColumnModel">
+ 	
+	SELECT A.COLPHYSICSNAME, A.COLLOGICNAME,A.TABNAME, A.ISEDIT,ISNULL(B.ISDISPLAY,A.ISDISPLAY)ISDISPLAY,A.ALIGN, ISNULL(B.COLORDER,A.DEFORDER) COLORDER
+	  FROM T_SYS_TABCOLDETAIL A
+	  LEFT JOIN T_SYS_USERCOLSHOW B
+	    ON A.TABNO = B.TABNO
+	   AND A.COLPHYSICSNAME = B.COLPHYSICSNAME
+	   AND B.XTYHID = #xtyhId#
+	 WHERE A.TABNO = #confNo#
+	   <isNotEmpty prepend=" and " property="isEdit">
+             A.ISEDIT =1
+        </isNotEmpty>
+	 ORDER BY B.COLORDER ASC, COLORDER ASC 
+</select>
+
+<delete id="delCustomizedColumn" parameterClass="map">
+	<![CDATA[	
+		delete from t_sys_usercolshow where xtyhid=#xtyhId# and tabno=#confNo#
+	]]>
+</delete>
+
+<insert id="insertCustomizedColumn" parameterClass="DynColumnModel">
+	<![CDATA[	
+		insert into T_SYS_USERCOLSHOW(USERCOLSHOWID,XTYHID,TABNO,TABNAME,COLPHYSICSNAME,COLLOGICNAME,COLORDER,ISDISPLAY)
+		values(#USERCOLSHOWID#,#XTYHID#,#TABNO#,#TABNAME#,#COLPHYSICSNAME#,#COLLOGICNAME#,#COLORDER#,#ISDISPLAY#)
+	     ]]>
+</insert>
+
+<insert id="insert" parameterClass="java.lang.String">
+	<![CDATA[$insertSql$ ]]>
+</insert>
+<update id="update" parameterClass="java.lang.String">
+	<![CDATA[$updateSql$ ]]>
+</update>
+<select id="queryForInt" parameterClass="java.lang.String" resultClass="int">
+	<![CDATA[$queryForIntSql$ ]]>
+</select>
+<select id="query" parameterClass="java.lang.String" remapResults="true" resultClass="java.util.HashMap">
+	<![CDATA[$querySql$ ]]>
+</select>
+</sqlMap>

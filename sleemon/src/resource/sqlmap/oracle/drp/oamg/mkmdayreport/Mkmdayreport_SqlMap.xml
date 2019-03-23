@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zcx
+@function 
+@version 2014-11-06 10:49:05
+-->
+<sqlMap  namespace="mkmdayreport">
+<typeAlias type="com.hoperun.drp.oamg.mkmdayreport.model.MkmDayReportModel" alias="MkmDayReportModel"/>
+<!-- 使用Promoreim装载结果集 -->
+<resultMap id="MkmDayReportModel" class="MkmDayReportModel">
+    <result column="MKM_DAY_RPT_ID" property="MKM_DAY_RPT_ID" />
+</resultMap>
+<!-- 动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  m.DEL_FLAG = 0 
+  <isNotEmpty prepend="" property="MKM_DAY_RPT_NO">
+       <![CDATA[ and m.MKM_DAY_RPT_NO like '%'||#MKM_DAY_RPT_NO#||'%']]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="WAREA_NAME">
+       <![CDATA[ and m.WAREA_NAME = #WAREA_NAME#]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="MKM_NAME_SQL">
+       <![CDATA[ $MKM_NAME_SQL$ ]]>
+  </isNotEmpty>
+  <isNotEmpty  prepend="" property="STATE">
+    and  m.STATE = #STATE#
+  </isNotEmpty>
+   
+  <isNotEmpty prepend="" property="REPORT_DATE_BEG">
+       <![CDATA[ and m.REPORT_DATE >=to_date(#REPORT_DATE_BEG#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="REPORT_DATE_END">
+       <![CDATA[ and m.REPORT_DATE <=to_date(#REPORT_DATE_END#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+   
+  <isNotEmpty prepend="" property="VST_DATE_BEG">
+       <![CDATA[ and m.VST_DATE >=to_date(#VST_DATE_BEG#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="VST_DATE_END">
+       <![CDATA[ and m.VST_DATE <=to_date(#VST_DATE_END#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="QXJBCON">
+	  and   $QXJBCON$  
+  </isNotEmpty>
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+	   m.MKM_DAY_RPT_ID,
+       m.MKM_DAY_RPT_NO,
+       m.MKM_ID,
+       m.MKM_NAME,
+       m.WAREA_NAME,
+       m.REPORT_DATE,
+       m.VST_DATE,
+       m.ON_TRIP,
+       m.CORP_BUSS_DEAL,
+       m.WAKE_OFF,
+       m.STATE,
+       m.REMARK,
+       m.CRE_NAME
+       from DRP_MKM_DAY_REPORT m
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+
+<sql id="coreSqlReport">
+  <![CDATA[ 
+	select 
+	   DISTINCT
+       m.MKM_NAME
+       from DRP_MKM_DAY_REPORT m
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+<!-- 分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+</select>
+
+<select id="pageQueryReort" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSqlReport" />
+		<include refid="public.pageEnd" />
+</select>
+
+<select id="pageQueryT" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+</select>
+ 
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt 
+              from DRP_MKM_DAY_REPORT m
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+
+<select id="pageCountReport" parameterClass="map" resultClass="int">
+	<![CDATA[
+	    SELECT COUNT(DISTINCT m.MKM_NAME) cnt  from DRP_MKM_DAY_REPORT m
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+ 
+<!-- 查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+
+<select id="queryChildById" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<![CDATA[ 
+	       SELECT    t.CHANN_VISIT_DTL_ID,
+					 t.CHANN_VISIT_ID,
+					 t.VISIT_DATE,
+			         t.PRO_NAME,
+			         t.MAIN_TYPE,
+			         t.SUB_TYPE,
+			         t.SIT_ANALYSIS,
+			         t.ACTION_PLAN,
+			         t.COMPLETE_TIME,
+			         t.OTHER_INFO
+                     FROM ERP_CHANN_VISIT_DTL t  
+                     where 
+		             t.DEL_FLAG='0' AND t.CHANN_VISIT_ID = #CHANN_VISIT_ID#  
+	]]>
+</select>
+
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_MKM_DAY_REPORT(
+					 MKM_DAY_RPT_ID,
+					 MKM_DAY_RPT_NO,
+					 MKM_ID,
+					 MKM_NAME,
+					 WAREA_ID,
+					 WAREA_NO,
+					 WAREA_NAME,
+					 REPORT_DATE,
+					 VST_DATE,
+					 ON_TRIP,
+					 CORP_BUSS_DEAL,
+					 WAKE_OFF,
+					 STATE,
+					 REMARK,
+					 CREATOR,
+					 CRE_NAME,
+					 CRE_TIME,
+					 DEPT_ID,
+					 DEPT_NAME,
+					 ORG_ID,
+					 ORG_NAME,
+					 LEDGER_ID,
+					 LEDGER_NAME,
+					 DEL_FLAG
+				   )values(
+				     #MKM_DAY_RPT_ID#,
+					 #MKM_DAY_RPT_NO#,
+					 #MKM_ID#,
+					 #MKM_NAME#,
+					 #WAREA_ID#,
+					 #WAREA_NO#,
+					 #WAREA_NAME#,
+					 to_date(#REPORT_DATE#,'yyyy-MM-DD'),
+					 to_date(#VST_DATE#,'yyyy-MM-DD'),
+					 #ON_TRIP#,
+					 #CORP_BUSS_DEAL#,
+					 #WAKE_OFF#,
+					 #STATE#,
+					 #REMARK#,
+					 #CREATOR#,
+					 #CRE_NAME#,
+					 sysdate,
+					 #DEPT_ID#,
+					 #DEPT_NAME#,
+					 #ORG_ID#,
+					 #ORG_NAME#,
+					 #LEDGER_ID#,
+					 #LEDGER_NAME#,
+					 #DEL_FLAG#
+					)
+   ]]>
+</insert> 
+
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update DRP_MKM_DAY_REPORT ]]>
+	<dynamic prepend="set">
+    <isNotNull property="MKM_ID"       prepend=","><![CDATA[MKM_ID = #MKM_ID# ]]></isNotNull>
+    <isNotNull property="MKM_NAME"     prepend=","><![CDATA[MKM_NAME   = #MKM_NAME# ]]></isNotNull>
+    <isNotNull property="WAREA_ID"     prepend=","><![CDATA[WAREA_ID   = #WAREA_ID# ]]></isNotNull>
+    <isNotNull property="WAREA_NO"     prepend=","><![CDATA[WAREA_NO   = #WAREA_NO# ]]></isNotNull>
+    <isNotNull property="WAREA_NAME"   prepend=","><![CDATA[WAREA_NAME = #WAREA_NAME# ]]></isNotNull>
+    <isNotNull property="REPORT_DATE"    prepend=","><![CDATA[REPORT_DATE = to_date(#REPORT_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+    <isNotNull property="VST_DATE"       prepend=","><![CDATA[VST_DATE    = to_date(#VST_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+    <isNotNull property="ON_TRIP"        prepend=","><![CDATA[ON_TRIP = #ON_TRIP# ]]></isNotNull>
+    <isNotNull property="CORP_BUSS_DEAL" prepend=","><![CDATA[CORP_BUSS_DEAL = #CORP_BUSS_DEAL# ]]></isNotNull>
+    <isNotNull property="WAKE_OFF"       prepend=","><![CDATA[WAKE_OFF = #WAKE_OFF# ]]></isNotNull>
+    <isNotNull property="TERM_VERSION" prepend=","><![CDATA[TERM_VERSION = #TERM_VERSION# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    <isNotNull property="LEDGER_ID" prepend=","><![CDATA[LEDGER_ID = #LEDGER_ID# ]]></isNotNull>
+    <isNotNull property="LEDGER_NAME" prepend=","><![CDATA[LEDGER_NAME = #LEDGER_NAME# ]]></isNotNull>
+    <isNotNull property="UPD_NAME"        prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPDATOR"     prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+    <isNotNull property="UPD_TIME"    prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where MKM_DAY_RPT_ID = #MKM_DAY_RPT_ID#]]>
+</update>
+
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	    select 
+		   u.MKM_DAY_RPT_ID,
+	       u.MKM_DAY_RPT_NO,
+	       u.MKM_ID,
+	       u.MKM_NAME,
+	       u.WAREA_NAME,
+	       u.REPORT_DATE,
+	       u.VST_DATE,
+	       u.ON_TRIP,
+	       u.CORP_BUSS_DEAL,
+	       u.WAKE_OFF,
+	       u.STATE,
+	       u.REMARK,
+	       u.CRE_NAME,
+           to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME
+	       from DRP_MKM_DAY_REPORT u
+	       where 
+		   u.MKM_DAY_RPT_ID = #MKM_DAY_RPT_ID#
+	]]>
+</select>
+
+<select id="loadByAMId" parameterClass="map" resultClass="java.util.HashMap">
+<![CDATA[
+	    select s.RYXXID,s.RYBH,s.XM RYMC,t.BMXXID,t.BMBH,t.BMMC from T_SYS_BMXX t  
+         left join T_SYS_RYXX s on s.bmxxid = t.bmxxid WHERE
+         t.DELFLAG = 0 AND t.BMZT = '启用'and s.DELFLAG=0 
+         and s.DELFLAG = 0 AND s.RYZT='启用'
+         and s.RYXXID = #RYYXXID#
+]]>
+</select>
+
+<select id="queryMkmdayreport" parameterClass="map" resultClass="MkmDayReportModel">
+	<![CDATA[  
+	 	  SELECT 
+		   m.MKM_DAY_RPT_ID,
+		   m.MKM_NAME,
+		   to_char(m.VST_DATE,'yyyy-MM-DD') VST_DATE
+		   FROM  DRP_MKM_DAY_REPORT m
+	]]>
+	<dynamic prepend="where">
+	  <include refid="queryDynSql"/>
+	</dynamic>
+</select>
+
+<select id="getCountMkm" parameterClass="map" resultClass="int">
+	   SELECT count(*)
+		  FROM DRP_MKM_DAY_REPORT m
+	<dynamic prepend="where">
+	  <include refid="queryDynSql"/>
+	</dynamic>
+</select>
+
+<select id="queryReportInfo" parameterClass="map" resultClass="String">
+	<![CDATA[ 
+	    select u.MKM_DAY_RPT_ID
+	       from  DRP_MKM_DAY_REPORT  u
+	       where  to_char(u.VST_DATE, 'yyyy-MM-DD') = #VST_DATE# 
+	       and u.MKM_NAME = #MKM_NAME# 
+	]]>
+</select>
+
+<select id="paramsCount" parameterClass="map" resultClass="int">
+      <![CDATA[ 
+         SELECT count(*) FROM DRP_MKM_DAY_REPORT u 
+             where u.MKM_NAME = #MKM_NAME#
+             AND to_char(u.VST_DATE,'yyyy-MM-DD') = #VST_DATE#
+             AND u.DEL_FLAG= 0
+      ]]>
+</select>
+
+<!-- 删除 -->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update DRP_MKM_DAY_REPORT ]]>
+	<dynamic prepend="set">
+		<isNotNull property="DEL_FLAG"><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+	</dynamic>
+	<![CDATA[ where MKM_DAY_RPT_ID = #MKM_DAY_RPT_ID# ]]>
+</delete>
+
+</sqlMap>

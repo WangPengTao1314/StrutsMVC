@@ -1,0 +1,358 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zzb
+@function 上报任务填报
+@version 2013-10-12 13:52:19
+-->
+<sqlMap  namespace="ForecastTaskup">
+<typeAlias type="com.hoperun.erp.sale.forecasttask.model.ForecastTaskModel" alias="ForecastTaskModel"/>
+<!-- 使用ForecastTaskModel装载结果集 -->
+<resultMap id="ForecastTaskModel" class="ForecastTaskModel">
+    <result column="ADVC_RPT_JOB_ID" property="ADVC_RPT_JOB_ID" />
+</resultMap>
+ 
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <!-- 渠道分管 -->
+  <isNotEmpty prepend="and" property="CHANNS_CHARG">
+     u.CHANN_ID in $CHANNS_CHARG$
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="ADVC_RPT_JOB_NO">
+    b.ADVC_RPT_JOB_NO like '%'||#ADVC_RPT_JOB_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="YEAR">
+    u.YEAR = #YEAR#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="MONTH">
+    u.MONTH = #MONTH#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="SENDER_TIME_BEG">
+	  <![CDATA[  b.SENDER_TIME >= to_date(#SENDER_TIME_BEG#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="SENDER_TIME_END">
+	  <![CDATA[  b.SENDER_TIME <= to_date(#SENDER_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="CRE_TIME_BEGIN">
+	  <![CDATA[  b.CRE_TIME >= to_date(#CRE_TIME_BEGIN#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+	  <![CDATA[  b.CRE_TIME <= to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="STATE">
+	  <![CDATA[ u.STATE=#STATE# ]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and " property="QXJBCON">
+	$QXJBCON$
+  </isNotEmpty>
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+ select b.ADVC_RPT_JOB_ID,
+        b.ADVC_RPT_JOB_NO,
+        b.YEAR,
+        b.MONTH,
+        b.SENDER_ID,
+        b.SENDER_NAME,
+        to_char(u.SENDER_TIME, 'yyyy-MM-DD HH24:MI:SS') SENDER_TIME,
+        b.REMARK,
+        b.CRE_NAME,
+        b.CREATOR,
+        to_char(b.CRE_TIME, 'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+        b.DEL_FLAG,
+        u.RPT_JOB_CHANN_ID,
+        u.CHANN_ID,
+        u.CHANN_NO,
+        u.CHANN_NAME,
+        u.AREA_ID,
+        u.AREA_NO,
+        u.AREA_NAME,
+        u.IS_RPTED_FLAG,
+        u.RPTOR_ID,
+        u.RPTOR_NAME,
+        u.RPTOR_TIME,
+        u.STATE ,
+        b.STATE JOB_STATE,
+        decode(u.STATE,'未填报',1,'撤销',1,2) DISADLED1,
+        decode(u.STATE,'撤销',1,'未填报',1,2) DISADLED2,
+        decode(u.STATE,'提交',1,2) DISADLED3
+    from ERP_RPT_JOB_CHANN u
+   left join ERP_ADVC_RPT_JOB b
+     on u.ADVC_RPT_JOB_ID = b.ADVC_RPT_JOB_ID
+       and b.DEL_FlAG=0 
+       where  1=1 
+    
+   ]]>
+    <dynamic prepend="and">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+    <![CDATA[ 
+       select count(0)cnt   from  ERP_RPT_JOB_CHANN u,
+          ERP_ADVC_RPT_JOB b
+     where u.ADVC_RPT_JOB_ID = b.ADVC_RPT_JOB_ID
+       and b.DEL_FlAG=0 and  1=1
+    ]]>
+	<dynamic prepend="and">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+ 
+
+<update id="updateJobChannById" parameterClass="map">
+	<![CDATA[ update ERP_RPT_JOB_CHANN ]]>
+	<dynamic prepend="set">
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where RPT_JOB_CHANN_ID = #RPT_JOB_CHANN_ID#]]>
+</update>
+
+
+<!-- 查询货品范围 -->
+<select id="queryJobPrd" parameterClass="map" resultClass="java.util.HashMap">
+<![CDATA[  select u.RPT_JOB_PRD_ID,
+       u.ADVC_RPT_JOB_ID,
+       u.YEAR,
+       u.MONTH,
+       u.PRD_ID,
+       u.PRD_NO,
+       u.PRD_NAME,
+       u.PRD_SPEC,
+       u.BRAND,
+       u.PAR_PRD_NAME,
+       j.ADVC_RPT_CHANN_DTL_ID,
+       j.ADVC_RPT_NUM,
+       j.ADVC_RPT_AMOUNT,
+       p.PRVD_PRICE,
+       NVL(sto.STORE_NUM, 0) STORE_NUM,
+       NVL(wayi.WAY_NUM, 0) WAY_NUM,
+       NVL(re.NOTICE_NUM, 0) NOTICE_NUM,
+       NVL(sj.ORDER_NUM, 0) LAST_ORDER_NUM,
+       NVL(b.ADVC_RPT_NUM, 0) LAST_ADVC_RPT_NUM
+  from ERP_RPT_JOB_PRD u
+  left join BASE_PRODUCT p
+   on u.PRD_ID = p.PRD_ID
+  left join ERP_ADVC_RPT_CHANN_DTL b
+    on u.PRD_ID = b.PRD_ID
+   and b.YEAR = #YEAR#
+   and b.MONTH = #LAST_MONTH#
+   and b.CHANN_ID = #CHANN_ID#
+    left join ERP_ADVC_RPT_CHANN_DTL j
+    on u.PRD_ID = j.PRD_ID
+    and j.RPT_JOB_CHANN_ID= #RPT_JOB_CHANN_ID#
+  left join (select acct.PRD_ID, sum(NVL(acct.STORE_NUM,0))STORE_NUM
+               from DRP_STORE_ACCT acct
+              where acct.LEDGER_ID = #CHANN_ID# and acct.STORE_ID not like '%-RT'
+               group by acct.PRD_ID) sto
+    on sto.PRD_ID = u.PRD_ID
+  left join
+ (select d.PRD_ID,
+         sum(NVL(d.ORDER_NUM, 0)) ORDER_NUM,
+         sum(NVL(d.SENDED_NUM, 0)) SENDED_NUM,
+         (sum(NVL(d.ORDER_NUM, 0)) - sum(NVL(d.SENDED_NUM, 0))) WAY_NUM
+    from ERP_SALE_ORDER c, ERP_SALE_ORDER_DTL d
+   where c.SALE_ORDER_ID = d.SALE_ORDER_ID
+     and c.ORDER_CHANN_ID = #CHANN_ID#
+     and c.STATE in ('审核通过', '待发货', '已发货')
+     and d.DEL_FLAG = 0
+     and d.CANCEL_FLAG = 0
+   group by d.PRD_ID) wayi
+    on wayi.PRD_ID = u.PRD_ID
+  left join (select t.PRD_ID,  SUM(t.STOREOUT_NUM) NOTICE_NUM
+             from ERP_STOREOUT s ,ERP_STOREOUT_PRD_DTL t
+              where s.STOREOUT_ID = t.storeout_id 
+                and s.BILL_TYPE = '正常销售'
+                and s.STATE in ('已处理')
+                and (to_char(s.STOREOUT_TIME, 'yyyy-mm') >=  #BEGIN_DATE#  and
+                    to_char(s.STOREOUT_TIME, 'yyyy-mm') <= #CUUR_DATE#)
+                and s.DEL_FLAG = 0
+                and s.ORDER_CHANN_ID = #CHANN_ID#
+              group by t.PRD_ID) re
+    on re.PRD_ID = u.PRD_ID
+  left join (select d.PRD_ID, sum(NVL(d.ORDER_NUM, 0)) ORDER_NUM
+               from ERP_SALE_ORDER c, ERP_SALE_ORDER_DTL d
+              where c.SALE_ORDER_ID = d.SALE_ORDER_ID
+                and c.ORDER_CHANN_ID = #CHANN_ID#
+                and c.STATE in ('审核通过', '待发货', '已发货')
+                and to_char(c.ORDER_DATE, 'yyyy-MM') = #LAST_DATE#
+                and d.DEL_FLAG = 0
+                and d.CANCEL_FLAG = 0
+              group by d.PRD_ID) sj
+    on sj.PRD_ID = u.PRD_ID
+    where u.ADVC_RPT_JOB_ID = #ADVC_RPT_JOB_ID#
+  ]]>
+  
+   <isNotEmpty prepend="and" property="PRD_NO">
+	  <![CDATA[  u.PRD_NO like '%'||#PRD_NO#||'%' ]]>
+  </isNotEmpty> 
+   <isNotEmpty prepend="and" property="PRD_NAME">
+	  <![CDATA[  u.PRD_NAME like '%'||#PRD_NAME#||'%' ]]>
+  </isNotEmpty> 
+   <isNotEmpty prepend="and" property="PRD_SPEC">
+	  <![CDATA[  u.PRD_SPEC like '%'||#PRD_SPEC#||'%' ]]>
+  </isNotEmpty>
+  order by PAR_PRD_NAME DESC,PRD_NAME DESC 
+</select> 
+ 
+ <update id="updateStateById" parameterClass="map">
+	<![CDATA[ update ERP_ADVC_RPT_JOB u set u.STATE=#STATE# where ADVC_RPT_JOB_ID = #ADVC_RPT_JOB_ID#]]>
+</update>
+
+
+<delete id="deleteJobchann" parameterClass="map">
+  delete from ERP_RPT_JOB_CHANN where ADVC_RPT_JOB_ID = #ADVC_RPT_JOB_ID#
+</delete>
+<delete id="deleteJobprd" parameterClass="map">
+  delete from ERP_RPT_JOB_PRD where ADVC_RPT_JOB_ID = #ADVC_RPT_JOB_ID#
+</delete>
+ 
+<select id="queryJobChann" parameterClass="map" resultClass="java.util.HashMap">
+ select 
+        u.RPT_JOB_CHANN_ID,
+        u.CHANN_ID,
+        u.CHANN_NO,
+        u.CHANN_NAME,
+        u.AREA_ID,
+		u.AREA_NO,
+		u.AREA_NAME,
+		u.SENDER_ID,
+		u.SENDER_NAME,
+		u.YEAR,
+		u.MONTH,
+		to_char(u.SENDER_TIME,'yyyy-MM-DD HH24:MI:SS')SENDER_TIME,
+		u.STATE
+ from ERP_RPT_JOB_CHANN u 
+ where u.ADVC_RPT_JOB_ID=#ADVC_RPT_JOB_ID#
+ and u.CHANN_ID=#CHANN_ID#
+</select>
+
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	select 
+	    u.RPT_JOB_CHANN_ID,
+        u.CHANN_ID,
+        u.CHANN_NO,
+        u.CHANN_NAME,
+        u.AREA_ID,
+        u.AREA_NO,
+        u.AREA_NAME,
+        u.IS_RPTED_FLAG,
+        u.RPTOR_ID,
+        u.RPTOR_NAME,
+        u.RPTOR_TIME,
+        u.STATE,
+        u.YEAR,
+        u.MONTH
+      from ERP_RPT_JOB_CHANN u
+      where u.RPT_JOB_CHANN_ID = #RPT_JOB_CHANN_ID#
+	]]>
+</select>
+ 
+
+
+<!-- 预计量上报明细-->
+<insert id="insertRptChannDtl" parameterClass="map">
+	insert into ERP_ADVC_RPT_CHANN_DTL(
+		ADVC_RPT_CHANN_DTL_ID,
+		RPT_JOB_CHANN_ID,
+		CHANN_ID,
+		CHANN_NO,
+		CHANN_NAME,
+		YEAR,
+		MONTH,
+		PRD_ID,
+		PRD_NO,
+		PRD_NAME,
+		PRD_SPEC,
+		BRAND,
+		PAR_PRD_NAME,
+		PRVD_PRICE,
+		ADVC_RPT_NUM,
+		ADVC_RPT_AMOUNT,
+		SHIP_POINT_ID,
+		SHIP_POINT_NAME,
+		DEL_FLAG
+	   )values(
+	    #ADVC_RPT_CHANN_DTL_ID#,
+		#RPT_JOB_CHANN_ID#,
+		#CHANN_ID#,
+		#CHANN_NO#,
+		#CHANN_NAME#,
+		#YEAR#,
+		#MONTH#,
+		#PRD_ID#,
+		#PRD_NO#,
+		#PRD_NAME#,
+		#PRD_SPEC#,
+		#BRAND#,
+		#PAR_PRD_NAME#,
+		#PRVD_PRICE#,
+		#ADVC_RPT_NUM#,
+		#ADVC_RPT_AMOUNT#,
+		#SHIP_POINT_ID#,
+		#SHIP_POINT_NAME#,
+		#DEL_FLAG#
+	)
+	 
+</insert>
+
+<select id="queryDtlId" parameterClass="map" resultClass="String">
+	<![CDATA[ 
+	    select u.ADVC_RPT_CHANN_DTL_ID
+	    from  ERP_ADVC_RPT_CHANN_DTL  u
+	    where u.CHANN_NO = #CHANN_NO#
+	    and u.PRD_NO = #PRD_NO#
+	    and u.YEAR = #YEAR#
+	    AND u.MONTH = #MONTH#
+	]]>
+</select>
+
+
+<update id="updateRptChannDtl" parameterClass="map">
+	<![CDATA[ update ERP_ADVC_RPT_CHANN_DTL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="PRVD_PRICE" prepend=","><![CDATA[PRVD_PRICE = #PRVD_PRICE# ]]></isNotNull>
+    <isNotNull property="ADVC_RPT_NUM" prepend=","><![CDATA[ADVC_RPT_NUM = #ADVC_RPT_NUM# ]]></isNotNull>
+    <isNotNull property="ADVC_RPT_AMOUNT" prepend=","><![CDATA[ADVC_RPT_AMOUNT = #ADVC_RPT_AMOUNT# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where ADVC_RPT_CHANN_DTL_ID = #ADVC_RPT_CHANN_DTL_ID#]]>
+</update>
+
+<update id="updateRptChannState" parameterClass="map">
+  update ERP_RPT_JOB_CHANN 
+    set STATE='已填报'
+   where CHANN_ID=#CHANN_ID#
+   and RPT_JOB_CHANN_ID = #RPT_JOB_CHANN_ID# 
+</update>
+
+<update id="updateRptChann" parameterClass="map">
+  update ERP_RPT_JOB_CHANN 
+    set STATE=#STATE#,
+    SUBMIT_ID=#SUBMIT_ID#,
+    SUBMIT_NAME = #SUBMIT_NAME#,
+    SUBMIT_TIME = sysdate
+    where RPT_JOB_CHANN_ID = #RPT_JOB_CHANN_ID#
+</update>
+<select id="getDate" resultClass="string">
+	select to_char(sysdate,'yyyy-mm-dd') from dual
+</select>
+</sqlMap>

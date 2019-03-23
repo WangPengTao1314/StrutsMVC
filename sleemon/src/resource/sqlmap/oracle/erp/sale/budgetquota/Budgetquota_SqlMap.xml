@@ -1,0 +1,515 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+	<!--
+		*@module 预算额度设置  
+		*@func  
+		*@version 1.1 
+		*@author  
+	-->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Budgetquota">
+
+	<typeAlias type="com.hoperun.erp.sale.budgetquota.model.BudgetquotaModel"
+		alias="BudgetquotaModel" />
+
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="BudgetquotaModel" class="BudgetquotaModel">
+		<result column="BUDGET_QUOTA_ID" property="BUDGET_QUOTA_ID" />
+	</resultMap>
+
+<!-- 动态查询 and 列表排序 -->
+<sql id="queryDynSql">
+<isNotEmpty prepend=" and " property="BUDGET_ITEM_ID">
+<![CDATA[ u.BUDGET_ITEM_ID=#BUDGET_ITEM_ID#]]>
+</isNotEmpty>
+<isNotEmpty prepend=" and " property="STATE">
+<![CDATA[ u.STATE=#STATE#]]>
+</isNotEmpty>
+<isNotEmpty prepend=" and " property="BUDGET_ITEM_NO">
+<![CDATA[ u.BUDGET_ITEM_NO like '%'||#BUDGET_ITEM_NO#||'%']]>
+</isNotEmpty>
+
+<isNotEmpty prepend=" and " property="BUDGET_ITEM_NAME">
+<![CDATA[ u.BUDGET_ITEM_NAME like '%'||#BUDGET_ITEM_NAME#||'%']]>
+</isNotEmpty>
+
+<isNotEmpty prepend=" and " property="PAR_BUDGET_ITEM_NO">
+<![CDATA[ u.PAR_BUDGET_ITEM_NO like '%'||#PAR_BUDGET_ITEM_NO#||'%']]>
+</isNotEmpty>
+
+<isNotEmpty prepend=" and " property="PAR_BUDGET_ITEM_NAME">
+<![CDATA[ u.PAR_BUDGET_ITEM_NAME like '%'||#PAR_BUDGET_ITEM_NAME#||'%']]>
+</isNotEmpty>
+
+<isNotEmpty prepend=" and " property="BUDGET_ITEM_TYPE">
+<![CDATA[ u.BUDGET_ITEM_TYPE = #BUDGET_ITEM_TYPE# ]]>
+</isNotEmpty>
+
+<isNotEmpty prepend=" and " property="BEGIN_CRE_TIME">
+ <![CDATA[  u.CRE_TIME >= to_date(#BEGIN_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')]]>
+</isNotEmpty>
+<isNotEmpty prepend=" and " property="END_CRE_TIME">
+ <![CDATA[  u.CRE_TIME <= to_date(#END_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')]]>
+</isNotEmpty>
+ <isNotEmpty prepend=" and " property="BUDGET_DEPT_NO">
+ <![CDATA[  u.BUDGET_DEPT_NO = #BUDGET_DEPT_NO#]]>
+</isNotEmpty>
+<isNotEmpty prepend=" and " property="BUDGET_DEPT_NAME">
+ <![CDATA[  u.BUDGET_DEPT_NAME = #BUDGET_DEPT_NAME#]]>
+</isNotEmpty>
+<isNotEmpty prepend=" and " property="RELATE_AREA_NAME">
+<![CDATA[ u.RELATE_AREA_NAME like '%'||#RELATE_AREA_NAME#||'%']]>
+</isNotEmpty>
+<isNotEmpty prepend=" and " property="RELATE_AREA_NO">
+<![CDATA[ u.RELATE_AREA_NO like '%'||#RELATE_AREA_NO#||'%']]>
+</isNotEmpty>
+
+ 
+<isNotEmpty prepend=" and " property="QUARTER">
+ <![CDATA[  u.QUARTER = #QUARTER#]]>
+</isNotEmpty>
+
+<isNotEmpty prepend=" and " property="YEAR">
+ <![CDATA[  u.YEAR = #YEAR#]]>
+</isNotEmpty>
+<isNotEmpty prepend=" and " property="MONTH">
+ <![CDATA[  u.MONTH = #MONTH#]]>
+</isNotEmpty>
+
+
+<isNotEmpty prepend=" and " property="DEL_FLAG">
+	u.DEL_FLAG = #DEL_FLAG#
+</isNotEmpty>
+
+<isNotEmpty prepend=" and " property="QXJBCON">
+	$QXJBCON$
+</isNotEmpty>
+</sql>
+<sql id="orderSql">
+	<isNotEmpty prepend=" " property="orderField"> $orderField$</isNotEmpty>
+</sql>
+<!-- 查询SQL -->
+<sql id="coreSql">
+<![CDATA[ 
+   select 
+        u.BUDGET_QUOTA_ID,
+        u.BUDGET_ITEM_ID,
+	    u.BUDGET_ITEM_NO,
+	    u.BUDGET_ITEM_NAME,
+	    u.BUDGET_ITEM_TYPE,
+	    u.PAR_BUDGET_ITEM_ID,
+	    u.PAR_BUDGET_ITEM_NO,
+	    u.PAR_BUDGET_ITEM_NAME,
+	    u.MONTH,
+	    u.YEAR,
+	    u.QUARTER,
+	    u.BUDGET_QUOTA,
+	    u.FREEZE_BUDGET_QUOTA,
+	    u.USE_BUDGET_QUOTA,
+	    u.BUDGET_DEPT_ID,
+	    u.BUDGET_DEPT_NO,
+	    u.BUDGET_DEPT_NAME,
+	    u.RELATE_AREA_ID,
+	    u.RELATE_AREA_NO,
+	    u.RELATE_AREA_NAME,
+		u.STATE,
+		u.CREATOR,
+		u.CRE_NAME,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPDATOR,
+		u.UPD_NAME,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.DEL_FLAG,
+		u.LEDGER_ID,
+	    u.LEDGER_NAME
+   from ERP_BUDGET_QUOTA u
+]]>
+<dynamic prepend="where">
+	<include refid="queryDynSql" />
+</dynamic>
+<dynamic prepend="order by ">
+	<include refid="orderSql" />
+</dynamic>
+</sql>
+
+<!-- 分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="public.pageBegin" />
+	<include refid="coreSql" />
+	<include refid="public.pageEnd" />
+</select>
+
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+	<![CDATA[SELECT count(0) cnt FROM ERP_BUDGET_QUOTA u ]]>
+	<dynamic prepend="where">
+		<include refid="queryDynSql" />
+	</dynamic>
+</select>
+
+<!-- 查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<!-- 根据ID查找 -->
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[
+	SELECT
+	    BUDGET_QUOTA_ID,
+        BUDGET_ITEM_ID,
+	    BUDGET_ITEM_NO,
+	    BUDGET_ITEM_NAME,
+	    BUDGET_ITEM_TYPE,
+	    PAR_BUDGET_ITEM_ID,
+	    PAR_BUDGET_ITEM_NO,
+	    PAR_BUDGET_ITEM_NAME,
+		MONTH,
+	    YEAR,
+	    QUARTER,
+	    BUDGET_QUOTA,
+	    FREEZE_BUDGET_QUOTA,
+	    USE_BUDGET_QUOTA,
+	    BUDGET_DEPT_ID,
+	    BUDGET_DEPT_NO,
+	    BUDGET_DEPT_NAME,
+	    RELATE_AREA_ID,
+	    RELATE_AREA_NO,
+	    RELATE_AREA_NAME,
+		STATE,
+		CREATOR,
+		CRE_NAME,
+		to_char(CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		UPDATOR,
+		UPD_NAME,
+		to_char(UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		DEPT_ID,
+		DEPT_NAME,
+		ORG_ID,
+		ORG_NAME,
+		DEL_FLAG,
+		LEDGER_ID,
+	    LEDGER_NAME
+		 FROM ERP_BUDGET_QUOTA  where BUDGET_QUOTA_ID=#BUDGET_QUOTA_ID#
+ ]]>
+</select>
+
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ERP_BUDGET_QUOTA(
+		 BUDGET_QUOTA_ID,
+		 BUDGET_ITEM_ID,
+		 BUDGET_ITEM_NO,
+		 BUDGET_ITEM_NAME,
+		 BUDGET_ITEM_TYPE,
+		 PAR_BUDGET_ITEM_ID,
+		 PAR_BUDGET_ITEM_NO,
+		 PAR_BUDGET_ITEM_NAME,
+		 MONTH,
+	     YEAR,
+	     QUARTER,
+	     BUDGET_QUOTA,
+	     FREEZE_BUDGET_QUOTA,
+	     USE_BUDGET_QUOTA,
+	     BUDGET_DEPT_ID,
+	     BUDGET_DEPT_NO,
+	     BUDGET_DEPT_NAME,
+	     RELATE_AREA_ID,
+	     RELATE_AREA_NO,
+	     RELATE_AREA_NAME,
+		 STATE,
+		 CREATOR,
+		 CRE_NAME,
+		 CRE_TIME,
+		 DEPT_ID,
+		 DEPT_NAME,
+		 ORG_ID,
+		 ORG_NAME,
+		 DEL_FLAG,
+		 LEDGER_ID,
+		 LEDGER_NAME
+		 )values(
+		 #BUDGET_QUOTA_ID#,
+		 #BUDGET_ITEM_ID#,
+		 #BUDGET_ITEM_NO#,
+		 #BUDGET_ITEM_NAME#,
+		 #BUDGET_ITEM_TYPE#,
+		 #PAR_BUDGET_ITEM_ID#,
+		 #PAR_BUDGET_ITEM_NO#,
+		 #PAR_BUDGET_ITEM_NAME#,
+		 #MONTH#,
+	     #YEAR#,
+	     #QUARTER#,
+	     #BUDGET_QUOTA#,
+	     #FREEZE_BUDGET_QUOTA#,
+	     #USE_BUDGET_QUOTA#,
+	     #BUDGET_DEPT_ID#,
+	     #BUDGET_DEPT_NO#,
+	     #BUDGET_DEPT_NAME#,
+	     #RELATE_AREA_ID#,
+	     #RELATE_AREA_NO#,
+	     #RELATE_AREA_NAME#,
+		 #STATE#,
+		 #CREATOR#,
+		 #CRE_NAME#,
+		 sysdate,
+		 #DEPT_ID#,
+		 #DEPT_NAME#,
+		 #ORG_ID#,
+		 #ORG_NAME#,
+		 #DEL_FLAG#,
+		 #LEDGER_ID#,
+		 #LEDGER_NAME#
+	 
+		 )
+		]]>
+	</insert>
+ 
+
+<update id="updateById" parameterClass="map">
+	 <![CDATA[ update ERP_BUDGET_QUOTA]]>
+	<dynamic prepend="set">
+	
+	    <isNotNull property="BUDGET_ITEM_ID" prepend=","><![CDATA[BUDGET_ITEM_ID = #BUDGET_ITEM_ID#]]></isNotNull>
+		<isNotNull property="BUDGET_ITEM_NO" prepend=","><![CDATA[BUDGET_ITEM_NO = #BUDGET_ITEM_NO#]]></isNotNull>
+		<isNotNull property="BUDGET_ITEM_NAME" prepend=","><![CDATA[BUDGET_ITEM_NAME = #BUDGET_ITEM_NAME#]]></isNotNull>
+		<isNotNull property="BUDGET_ITEM_TYPE" prepend=","><![CDATA[BUDGET_ITEM_TYPE = #BUDGET_ITEM_TYPE#]]></isNotNull>
+		<isNotNull property="PAR_BUDGET_ITEM_ID" prepend=","><![CDATA[PAR_BUDGET_ITEM_ID = #PAR_BUDGET_ITEM_ID#]]></isNotNull>
+		<isNotNull property="PAR_BUDGET_ITEM_NO" prepend=","><![CDATA[PAR_BUDGET_ITEM_NO = #PAR_BUDGET_ITEM_NO#]]></isNotNull>
+		<isNotNull property="PAR_BUDGET_ITEM_NAME" prepend=","><![CDATA[PAR_BUDGET_ITEM_NAME = #PAR_BUDGET_ITEM_NAME#]]></isNotNull>
+		<isNotNull property="MONTH" prepend=","><![CDATA[MONTH = #MONTH#]]></isNotNull>
+		<isNotNull property="YEAR" prepend=","><![CDATA[YEAR = #YEAR#]]></isNotNull>
+		<isNotNull property="QUARTER" prepend=","><![CDATA[QUARTER = #QUARTER#]]></isNotNull>
+		<isNotNull property="BUDGET_QUOTA" prepend=","><![CDATA[BUDGET_QUOTA = #BUDGET_QUOTA#]]></isNotNull>
+		<isNotNull property="FREEZE_BUDGET_QUOTA" prepend=","><![CDATA[FREEZE_BUDGET_QUOTA = #FREEZE_BUDGET_QUOTA#]]></isNotNull>
+		<isNotNull property="USE_BUDGET_QUOTA" prepend=","><![CDATA[USE_BUDGET_QUOTA = #USE_BUDGET_QUOTA#]]></isNotNull>
+		<isNotNull property="BUDGET_DEPT_ID" prepend=","><![CDATA[BUDGET_DEPT_ID = #BUDGET_DEPT_ID#]]></isNotNull>
+		<isNotNull property="BUDGET_DEPT_NO" prepend=","><![CDATA[BUDGET_DEPT_NO = #BUDGET_DEPT_NO#]]></isNotNull>
+		<isNotNull property="BUDGET_DEPT_NAME" prepend=","><![CDATA[BUDGET_DEPT_NAME = #BUDGET_DEPT_NAME#]]></isNotNull>
+		<isNotNull property="RELATE_AREA_ID" prepend=","><![CDATA[RELATE_AREA_ID = #RELATE_AREA_ID#]]></isNotNull>
+		<isNotNull property="RELATE_AREA_NO" prepend=","><![CDATA[RELATE_AREA_NO = #RELATE_AREA_NO#]]></isNotNull>
+		<isNotNull property="RELATE_AREA_NAME" prepend=","><![CDATA[RELATE_AREA_NAME = #RELATE_AREA_NAME#]]></isNotNull>
+		<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+		<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK#]]></isNotNull>
+		<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+		<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+		<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME=sysdate]]></isNotNull>
+	</dynamic>
+	<![CDATA[ where BUDGET_QUOTA_ID = #BUDGET_QUOTA_ID# ]]>
+</update>
+
+<!-- 软删除 -->
+<update id="delete" parameterClass="map">	
+	<![CDATA[ update  ERP_BUDGET_QUOTA set DEL_FLAG=#DEL_FLAG#
+	    where BUDGET_QUOTA_ID=#BUDGET_QUOTA_ID# 
+	]]>
+</update>
+
+<!-- 修改状态 -->
+<update id="updateStateById" parameterClass="map">	
+	<![CDATA[ update  ERP_BUDGET_QUOTA ]]>
+	<dynamic prepend="set">
+		<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+		<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+		<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+		<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME=sysdate]]></isNotNull>
+	</dynamic>
+	<![CDATA[ where BUDGET_QUOTA_ID=#BUDGET_QUOTA_ID#  ]]>
+</update>
+
+
+<!-- 查询树 -->
+<select id="queryTree" parameterClass="String" resultClass="com.hoperun.erp.sale.budgetquota.model.BudgetquotaTree">
+<![CDATA[
+   
+select null as pid, u.YEAR name,u.YEAR||'-0' id from (select YEAR ,DEL_FLAG from ERP_BUDGET_QUOTA  where DEL_FLAG=0 order by YEAR asc) u where u.DEL_FLAG=0 
+group by u.YEAR  
+
+union all
+   select  u.YEAR||'-0' pid,u.BUDGET_DEPT_NAME name,u.YEAR||'-'||u.BUDGET_DEPT_ID||'-1' id from ERP_BUDGET_QUOTA u where u.DEL_FLAG=0
+ group by u.YEAR,u.BUDGET_DEPT_NAME,u.BUDGET_DEPT_ID
+ 
+ union all
+   
+   select t.pid,t.name,t.id from(
+ select temp.pid,temp.name,temp.id ,
+  (case when temp.name ='一季度' then 1
+   when temp.name ='二季度' then 2
+   when temp.name ='三季度' then 3
+   when temp.name ='四季度' then 4
+   end )ORDER_COLUMN
+   from 
+   ( select u.YEAR||'-'||u.BUDGET_DEPT_ID||'-1'  pid,u.QUARTER name,
+	    ( case when u.QUARTER is null 
+		  then ( 
+		       case when u.PAR_BUDGET_ITEM_ID is null then  u.BUDGET_ITEM_ID||'-'||u.BUDGET_QUOTA_ID||'-4'
+		       else u.YEAR||'-'||u.BUDGET_DEPT_ID||'-'||u.QUARTER||'-'|| u.PAR_BUDGET_ITEM_ID  ||'-'||u.BUDGET_QUOTA_ID||'-3'  
+		       end
+		       )
+		  else      
+		     u.YEAR||'-'||u.BUDGET_DEPT_ID||'-'|| u.QUARTER ||'-2' 
+		  end
+		  ) id 
+	  from ERP_BUDGET_QUOTA u where u.DEL_FLAG=0) temp
+     group by temp.pid,temp.name,temp.id order by ORDER_COLUMN)t
+ 
+  union all
+  select t3.pid,t3.name,t3.id from( select  
+   case when u.QUARTER is null then u.YEAR||'-'||u.BUDGET_DEPT_ID||'-1'
+     else u.YEAR||'-'||u.BUDGET_DEPT_ID||'-'|| u.QUARTER ||'-2' end
+   pid, 
+   (case when u.PAR_BUDGET_ITEM_NAME is null then u.BUDGET_ITEM_NAME else
+   u.PAR_BUDGET_ITEM_NAME  end) name,
+  (  case when u.PAR_BUDGET_ITEM_ID is null then  u.BUDGET_ITEM_ID||'-'||u.BUDGET_QUOTA_ID||'-4'
+     else  u.YEAR||'-'||u.BUDGET_DEPT_ID||'-'||u.QUARTER||'-'|| u.PAR_BUDGET_ITEM_ID ||'-3'  end)id
+   from ERP_BUDGET_QUOTA u where u.DEL_FLAG=0
+   group by u.YEAR, u.QUARTER,u.BUDGET_ITEM_NAME,u.BUDGET_DEPT_ID,u.PAR_BUDGET_ITEM_NAME,u.PAR_BUDGET_ITEM_ID,u.BUDGET_QUOTA_ID,u.BUDGET_ITEM_ID
+   )t3 group by t3.id,t3.name,t3.pid
+   
+ union all
+  select   u.YEAR||'-'||u.BUDGET_DEPT_ID||'-'||u.QUARTER||'-'||case when u.PAR_BUDGET_ITEM_ID is null then u.BUDGET_ITEM_ID ||'-'||u.BUDGET_QUOTA_ID else u.PAR_BUDGET_ITEM_ID end ||'-3' pid,
+   u.BUDGET_ITEM_NAME name,
+   u.BUDGET_ITEM_ID||'-'||u.BUDGET_QUOTA_ID||'-4' id
+    from ERP_BUDGET_QUOTA u where u.DEL_FLAG=0
+ group by u.YEAR, u.QUARTER,u.BUDGET_ITEM_NAME,u.BUDGET_DEPT_ID,
+ u.PAR_BUDGET_ITEM_NAME,u.PAR_BUDGET_ITEM_ID,u.BUDGET_ITEM_ID,u.BUDGET_ITEM_NAME,u.BUDGET_QUOTA_ID 
+           
+   
+]]>
+</select>
+
+<select id="isRepeat" parameterClass="map" resultClass="int">
+<![CDATA[
+  select count(1) from ERP_BUDGET_ITEM u where u.BUDGET_ITEM_NO=#BUDGET_ITEM_NO# and u.DEL_FLAG=0
+]]>
+</select>	 
+	 
+<!-- 同一个预算科目下 同一种类型不能重复 -->
+<select id="isRepeatBudgetItem" parameterClass="map" resultClass="int">
+<![CDATA[
+select count(1) from ERP_BUDGET_QUOTA u where u.BUDGET_ITEM_ID=#BUDGET_ITEM_ID#
+and u.BUDGET_DEPT_ID=#BUDGET_DEPT_ID#
+   $PARAM_COLUMN$
+   and u.YEAR=#YEAR# and u.DEL_FLAG=0
+]]>
+<isNotEmpty prepend=" and " property="BUDGET_QUOTA_ID">
+ <![CDATA[   u.BUDGET_QUOTA_ID != #BUDGET_QUOTA_ID# ]]>
+</isNotEmpty>
+
+</select>	 
+
+<select id="qyeryQuotaAmount" parameterClass="map" resultClass="BudgetquotaModel">
+	 SELECT e.BUDGET_QUOTA, e.FREEZE_BUDGET_QUOTA, e.USE_BUDGET_QUOTA,
+	  r.REAL_REIT_AMOUNT
+	  FROM DRP_RNVTN_REIT_REQ r
+	  LEFT JOIN ERP_BUDGET_QUOTA e
+      on r.budget_quota_id = e.budget_quota_id
+      where r.RNVTN_REIT_REQ_ID = #RNVTN_REIT_REQ_ID#
+</select>
+
+<select id="qyeryQuotaAmountByPrmt" parameterClass="map" resultClass="BudgetquotaModel">
+	SELECT e.BUDGET_QUOTA, e.FREEZE_BUDGET_QUOTA, e.USE_BUDGET_QUOTA,
+	    r.BUDGET_AMOUNT
+	    FROM ERP_PRMT_COST_REQ  r
+	    LEFT JOIN ERP_BUDGET_QUOTA e
+        on r.budget_quota_id = e.budget_quota_id
+        where r.PRMT_COST_REQ_ID = #PRMT_COST_REQ_ID#
+</select>
+
+<!-- 批量维护 -->
+<select id="loadBatchById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[
+	SELECT
+	    u.BUDGET_QUOTA_ID,
+        u.BUDGET_ITEM_ID,
+	    u.BUDGET_ITEM_NO,
+	    u.BUDGET_ITEM_NAME,
+	    u.BUDGET_ITEM_TYPE,
+	    u.PAR_BUDGET_ITEM_ID,
+	    u.PAR_BUDGET_ITEM_NO,
+	    u.PAR_BUDGET_ITEM_NAME,
+		u.MONTH,
+	    u.YEAR,
+	    u.QUARTER,
+	    u.BUDGET_QUOTA,
+	    u.FREEZE_BUDGET_QUOTA,
+	    u.USE_BUDGET_QUOTA,
+	    u.BUDGET_DEPT_ID,
+	    u.BUDGET_DEPT_NO,
+	    u.BUDGET_DEPT_NAME,
+	    u.RELATE_AREA_ID,
+	    u.RELATE_AREA_NO,
+	    u.RELATE_AREA_NAME,
+		u.STATE,
+		u.CREATOR,
+		u.CRE_NAME,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPDATOR,
+		u.UPD_NAME,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.DEL_FLAG,
+		u.LEDGER_ID,
+	    u.LEDGER_NAME,
+	    to_char((select wmsys.wm_concat(t.year||'-'||t.quarter||'-'||t.month||'-'||t.BUDGET_QUOTA||'-'||t.BUDGET_QUOTA_ID ) from ERP_BUDGET_QUOTA t 
+		    where t.BUDGET_DEPT_ID =u.BUDGET_DEPT_ID 
+		    and t.BUDGET_ITEM_ID=u.BUDGET_ITEM_ID
+		     and t.YEAR=u.YEAR 
+		     and t.DEL_FLAG=0
+		     ))QUARTER_BATCH
+     
+		 FROM ERP_BUDGET_QUOTA u where u.BUDGET_QUOTA_ID=#BUDGET_QUOTA_ID#
+ ]]>
+</select>
+
+
+<!-- 批量维护 -->
+<select id="queryBatchBudget" parameterClass="map" resultClass="java.util.HashMap">
+<![CDATA[
+	select t.BUDGET_QUOTA_ID
+          from ERP_BUDGET_QUOTA t
+         where t.BUDGET_DEPT_ID = #BUDGET_DEPT_ID#
+           and t.BUDGET_ITEM_ID = #BUDGET_ITEM_ID#
+           and t.BUDGET_ITEM_TYPE = #BUDGET_ITEM_TYPE#
+           and t.YEAR = #YEAR#
+           and t.DEL_FLAG = 0    
+]]>
+<isNotEmpty prepend=" and " property="QUARTER">
+ <![CDATA[  t.QUARTER = #QUARTER#]]>
+</isNotEmpty>
+<isNotEmpty prepend=" and " property="MONTH">
+ <![CDATA[  t.MONTH = #MONTH#]]>
+</isNotEmpty>
+</select>
+
+
+
+<!-- 修改战区的预算额度  是下面区域额度的和 -->
+<update id="updateParItemQuota" parameterClass="map">	
+<![CDATA[  
+        update ERP_BUDGET_QUOTA u
+           set u.BUDGET_QUOTA =NVL(
+               (select SUM(NVL(b.BUDGET_QUOTA,0)) BUDGET_QUOTA
+                   from ERP_BUDGET_QUOTA b
+                   where b.BUDGET_ITEM_ID = u.BUDGET_ITEM_ID
+                   and b.BUDGET_DEPT_ID = u.BUDGET_DEPT_ID
+                   and b.YEAR = u.YEAR
+                   and b.BUDGET_ITEM_TYPE = u.BUDGET_ITEM_TYPE
+                   and b.DEL_FLAG = 0 ),0)
+         where u.RELATE_AREA_ID = #RELATE_AREA_ID#
+               AND u.DEL_FLAG = 0
+]]>
+</update>
+
+<select id="selectBrothersByQuota" parameterClass="map" resultClass="BudgetquotaModel">
+	<![CDATA[
+	     SELECT u.BUDGET_QUOTA,u.USE_BUDGET_QUOTA,u.FREEZE_BUDGET_QUOTA FROM ERP_BUDGET_QUOTA u
+	      WHERE u.BUDGET_QUOTA_ID = #BUDGET_QUOTA_ID# AND u.DEL_FLAG = 0
+	]]>
+</select>
+</sqlMap>

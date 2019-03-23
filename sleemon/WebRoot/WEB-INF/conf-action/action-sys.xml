@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  
+/**
+ * @module 系统管理
+ * @fuc 系统管理信息
+ * @version 1.1
+ * @author zhuxw
+ */
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd"
+	default-autowire="byName"> 
+	
+	<bean name="/login" class="com.hoperun.sys.action.SysLoginAction" scope="singleton">
+	</bean>
+	<bean name="/firstPage" class="com.hoperun.sys.action.FirstPageAction" scope="singleton">
+	</bean>
+	<bean name="/system/readxml" class="com.hoperun.sys.action.QXGLAction" scope="singleton">
+		<property name="qxglBeanService" ref="qxglBeanService"></property>
+	</bean>
+	<bean name="/system/menu" class="com.hoperun.sys.action.MenuAction" scope="singleton">
+	</bean>
+    <bean name="/fileuploadhelper" class="com.hoperun.commons.util.FileUploadHelper" scope="singleton">
+	</bean>
+	<bean name="/system/flow" class="com.hoperun.sys.action.FlowAction" scope="singleton">
+	</bean>
+	<bean name="/system/jgxx" class="com.hoperun.sys.action.JGXXAction" scope="singleton">
+		<property name="jgxxService" ref="jgxxService"></property>
+	</bean>	
+	
+	<bean name="/system/bmxx" class="com.hoperun.sys.action.BMXXAction" scope="singleton">
+		<property name="bmxxService" ref="bmxxService"></property>
+	</bean>
+	
+	<bean name="/system/ztxx" class="com.hoperun.sys.action.ZTWHAction" scope="singleton">
+		<property name="ztwhService" ref="ztwhService"></property>
+	</bean>
+	
+	<bean name="/system/ryxx" class="com.hoperun.sys.action.RYXXAction" scope="singleton">
+		<property name="ryxxService" ref="ryxxService"></property>
+	</bean>
+	<bean name="/system/xtyh" class="com.hoperun.sys.action.XTYHAction" scope="singleton">
+		<property name="xtyhService" ref="xtyhService"></property>
+		<property name="xtsqService" ref="xtsqService"></property>
+	</bean>
+	<bean name="/system/xtjs" class="com.hoperun.sys.action.XTJSAction" scope="singleton">
+		<property name="xtjsService" ref="xtjsService"></property>
+	</bean>
+	<bean name="/system/gzzxx" class="com.hoperun.sys.action.GZZXXAction" scope="singleton">
+		<property name="gzzxxService" ref="gzzxxService"></property>
+	</bean>
+	<bean name="/system/dicselect" class="com.hoperun.sys.action.DicSelectAction" scope="singleton">
+		<property name="dictService" ref="dictService"></property>
+	</bean>
+	<bean name="/system/sjzd" class="com.hoperun.sys.action.SJZDAction" scope="singleton">
+		<property name="sjzdService" ref="sjzdService"></property>
+	</bean>
+	<bean name="/system/bmgz" class="com.hoperun.sys.action.BmgzAction" scope="singleton">
+		<property name="bmgzService" ref="bmgzService"></property>
+	</bean>
+	<bean name="/common/select" class="com.hoperun.commons.select.action.SelectCommon" scope="singleton"/>
+	<!-- 公告信息 -->
+	<bean name="/sys/notice" class="com.hoperun.sys.action.NoticeAction" scope="singleton">
+		<property name="noticeService" ref="noticeService"></property>
+	</bean>
+	<!-- 样式管理 -->
+	<bean name="/system/ysgl" class="com.hoperun.sys.action.YSGLAction" scope="singleton">
+		<property name="ysglService" ref="ysglService"></property>
+	</bean>
+	<!-- 项目数据字典维护 -->
+	<bean name="/system/xmsjzdwh" class="com.hoperun.sys.action.XMSJZDWHAction" scope="singleton">
+	    <property name="sjzdwhService" ref="sjzdwhService"></property>
+	</bean>
+	
+	
+	<bean name="/system/numformat" class="com.hoperun.sys.action.NumformatAction" scope="singleton">
+		<property name="numformatService" ref="numformatService"></property>
+	</bean>
+
+	<!-- 自定义查询 -->
+	<bean name="/system/customQuery" class="com.hoperun.sys.action.CustQueryAction" scope="singleton">
+		<property name="custQueryService" ref="custQueryService"></property>
+	</bean>
+	
+	<bean name="/wap" class="com.hoperun.drp.main.wap.action.SysWapLoginAction" scope="singleton">
+	   <property name="sysWapLoginService" ref="sysWapLoginService"></property>
+	</bean>
+
+</beans>

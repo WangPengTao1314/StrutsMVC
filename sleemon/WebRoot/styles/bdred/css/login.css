@@ -1,0 +1,17 @@
+BODY {
+	margin: 0px;
+	font-size: 12px;
+	overflow:hidden;
+	background-color: #f6d3d4;
+}
+img,image{
+	border: 0;
+}
+form{
+	margin:0;border: 0;
+}
+.label{
+	padding:3px 1px;
+	font-size: 12px;
+	color: #000;	
+}

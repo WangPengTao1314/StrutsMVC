@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="OrganInfo">
+
+	<typeAlias type="com.hoperun.commons.model.system.Organ"
+		alias="organinfo" />
+
+	<resultMap id="organ-info" class="organinfo">
+		<result column="ORG_ID" property="orgId" />
+		<result column="ORG_NAME" property="orgName" />
+		<result column="ORG_LVL" property="orgLvl" />
+		<result column="ORG_PAR_ID" property="orgParId" />
+		<result column="ORG_STUS" property="orgStus" />
+		<result column="ORG_DESC" property="orgDesc" />
+	</resultMap>
+
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="orgId">
+			o.ORG_ID = #orgId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="orgName">
+			o.ORG_NAME like '%$orgName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="orgLvl">
+			o.ORG_LVL = #orgLvl#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="orgParId">
+			o.ORG_PAR_ID = #orgParId#
+		</isNotEmpty>
+	</sql>
+
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[ select o.*,p.org_name as par_org_name,ROW_NUMBER() OVER(ORDER BY o.org_id) AS rn from ${YTPUB}.organ o
+					left join ${YTPUB}.organ p on p.org_id = o.org_par_id ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic> 
+	</sql>
+
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(org_id) cnt FROM ${YTPUB}.organ o ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+
+	<!-- 查询所有 -->
+	<select id="findAll" parameterClass="string"
+		resultMap="organ-info">
+		<![CDATA[ select * from ${YTPUB}.organ order by ORG_ID ]]>
+	</select>
+ 
+	<select id="loadById" parameterClass="string"
+		resultMap="organ-info">
+		<![CDATA[ select * from ${YTPUB}.organ  where ORG_ID = #orgId:VARCHAR# ]]>
+	</select>
+	
+	<select id="findChildren" parameterClass="String"
+		resultMap="organ-info">
+		<![CDATA[ select o.* from ${YTPUB}.organ  o  
+			WHERE ORG_PAR_ID = #orgId:VARCHAR# and ORG_STUS='1'  
+			order by o.ORG_ID 
+		]]>
+	</select>
+
+</sqlMap>
+

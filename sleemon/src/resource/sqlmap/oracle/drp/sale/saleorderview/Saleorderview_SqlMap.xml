@@ -1,0 +1,247 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author chenj
+@function 
+@version 2013-11-03 16:25:12
+-->
+<sqlMap  namespace="Saleorderview">
+	<!--主表动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="SALE_ORDER_NO">
+		    upper(a.SALE_ORDER_NO) like upper('%'||#SALE_ORDER_NO#||'%')
+		 </isNotEmpty>
+		<isNotEmpty prepend="and" property="ORDER_DATE_BEGIN">
+	  		<![CDATA[  a.ORDER_DATE >= to_date(#ORDER_DATE_BEGIN#,'yyyy-MM-DD HH24:MI:SS')]]>
+	  	</isNotEmpty> 
+	  	<isNotEmpty prepend="and" property="ORDER_DATE_END">
+		  <![CDATA[  a.ORDER_DATE <= to_date(#ORDER_DATE_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+	  	</isNotEmpty> 
+	  	<isNotEmpty prepend="and" property="STATE">
+		    a.STATE = #STATE#
+		 </isNotEmpty>
+		 <isNotEmpty prepend="and" property="ORDER_CHANN_ID">
+		    a.ORDER_CHANN_ID = #ORDER_CHANN_ID#
+		 </isNotEmpty>
+		 <isNotEmpty prepend="and" property="AREA_NO">
+		    a.AREA_NO like '%'||#AREA_NO#||'%'
+		 </isNotEmpty>
+		 <isNotEmpty prepend="and" property="AREA_NAME">
+		    a.AREA_NAME like '%'||#AREA_NAME#||'%'
+		 </isNotEmpty>
+		 <isNotEmpty prepend="and" property="DEL_FLAG">
+		    a.DEL_FLAG =#DEL_FLAG#
+		 </isNotEmpty>
+		 <isNotEmpty prepend="and" property="CRE_TIME_BEGIN">
+			  <![CDATA[  a.CRE_TIME >= to_date(#CRE_TIME_BEGIN#,'yyyy-MM-DD HH24:MI:SS')]]>
+		</isNotEmpty> 
+		<isNotEmpty prepend="and" property="CRE_TIME_END">
+			  <![CDATA[  a.CRE_TIME <= to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+		</isNotEmpty> 
+		<isNotEmpty prepend="and " property="IS_CANCELED_FLAG">
+			a.SALE_ORDER_ID in( select distinct d.SALE_ORDER_ID from ERP_SALE_ORDER_DTL d where d.IS_CANCELED_FLAG=1)
+		</isNotEmpty>
+  
+	</sql>
+	<sql id="orderSql">
+	   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+	</sql>
+	<!-- 主表查询SQL -->
+	<sql id="coreSql">
+	  <![CDATA[ 
+	  	select 
+	  		a.SALE_ORDER_ID,
+			a.SALE_ORDER_NO,
+			a.ORDER_CHANN_NO,
+			a.ORDER_CHANN_NAME,
+			a.ORDER_DATE,
+			a.AREA_NAME,
+			a.PERSON_CON,
+			a.TEL,
+			a.SHIP_POINT_NAME,
+			a.AUDIT_NAME,
+			to_char(a.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+			a.BILL_TYPE,
+			(select sum(NVL(b.ORDER_AMOUNT,0)) from ERP_SALE_ORDER_DTL b where b.SALE_ORDER_ID=a.SALE_ORDER_ID and b.DEL_FLAG=0) TOTL_AMOUNT,
+			a.STATE,
+			a.CRE_NAME,
+		    a.CREATOR,
+		    to_char(a.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME
+			from ERP_SALE_ORDER a 
+	   ]]>
+	    <dynamic prepend="where">
+		   <include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+		   <include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	<!-- 主表分页查询 -->
+	<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+	      <![CDATA[select count(0) cnt FROM ERP_SALE_ORDER a ]]>
+		<dynamic prepend="where">
+				<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+	<!-- 主表查询 -->
+	<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[ 
+			select 
+				a.SALE_ORDER_ID,
+				a.SALE_ORDER_NO,
+				a.BILL_TYPE,
+				a.FROM_BILL_ID,
+				a.FROM_BILL_NO,
+				a.ORDER_CHANN_ID,
+				a.ORDER_CHANN_NO,
+				a.ORDER_CHANN_NAME,
+				a.SEND_CHANN_ID,
+				a.SEND_CHANN_NO,
+				a.SEND_CHANN_NAME,
+				a.IS_USE_REBATE,
+				a.RECV_CHANN_ID,
+				a.RECV_CHANN_NO,
+				a.RECV_CHANN_NAME,
+				a.PERSON_CON,
+				a.TEL,
+				a.RECV_ADDR,
+				a.SHIP_POINT_ID,
+				a.SHIP_POINT_NAME,
+				a.STATE,
+				a.REMARK,
+				a.CREATOR,
+				a.CRE_NAME,
+				to_char(a.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+				a.UPDATOR,
+				a.UPD_NAME,
+				to_char(a.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+				a.AUDIT_ID,
+				a.AUDIT_NAME,
+				to_char(a.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+				a.DEPT_ID,
+				a.DEPT_NAME,
+				a.ORG_ID,
+				a.ORG_NAME,
+				a.LEDGER_ID,
+				a.LEDGER_NAME,
+				a.DEL_FLAG,
+				a.ORDER_DATE,
+				a.AREA_ID,
+				a.AREA_NO,
+				a.AREA_NAME,
+				a.RECV_ADDR_NO,
+				(select sum(NVL(b.ORDER_AMOUNT,0)) from ERP_SALE_ORDER_DTL b where b.SALE_ORDER_ID=a.SALE_ORDER_ID) TOTL_AMOUNT
+			from ERP_SALE_ORDER a
+			where SALE_ORDER_ID=#SALE_ORDER_ID#
+		]]>
+	</select>
+	<!-- 明细操作开始-->
+	<!--明细查询条件定义 -->
+	<sql id="queryDynSqlChld">
+	  <isNotEmpty prepend="and" property="DEL_FLAG">
+	     a.DEL_FLAG=#DEL_FLAG#
+	  </isNotEmpty>
+	</sql>  
+	<!-- 查询SQL -->
+	<sql id="orderSqlChld">
+		 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+	</sql>
+	<sql id="coreSqlChld">
+		<![CDATA[ 
+			select 
+				a.PRD_NO,
+				a.PRD_NAME,
+				a.PRD_SPEC,
+				a.PRD_COLOR,
+				a.BRAND,
+				a.STD_UNIT,
+				a.PRICE,
+				a.DECT_RATE,
+				a.DECT_PRICE,
+				a.ORDER_NUM,
+				a.ORDER_AMOUNT,
+				NVL(a.PLANED_NUM,0) PLANED_NUM,
+				NVL(a.SENDED_NUM,0) SENDED_NUM,
+				NVL(a.OLD_PRICE,0) OLD_PRICE,
+				a.SPCL_TECH_ID,
+				b.SPCL_TECH_FLAG,
+				a.IS_CANCELED_FLAG,
+				a.CANCEL_FLAG,
+				a.OLD_ORDER_NUM,
+				b.DM_SPCL_TECH_NO
+			from ERP_SALE_ORDER_DTL a 
+			left join DRP_SPCL_TECH b on a.SPCL_TECH_ID=b.SPCL_TECH_ID and USE_FLAG=#USE_FLAG#
+	   ]]>
+	</sql>
+	 <!-- 根据主表ID查询明细 -->
+	  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+		  <include refid="coreSqlChld"/>
+		  <dynamic prepend="where">
+				a.SALE_ORDER_ID=#SALE_ORDER_ID#
+		  </dynamic>
+		  <dynamic prepend="and">
+		   <include refid="queryDynSqlChld" />
+		  </dynamic>
+		  <isNotNull prepend=" order by " property="orderField">
+				<include refid="orderSqlChld"/>
+		  </isNotNull>
+		   order by a.ADVC_SEND_DATE
+	  </select>
+	  <!-- 查询生命周期表 -->
+		<sql id="coreSqlTrace">
+			<![CDATA[ 
+		     select 
+				u.GOODS_ORDER_TRACE_ID,
+				u.GOODS_ORDER_ID,
+				u.SALE_ORDER_ID,
+				u.BILL_NO,
+				u.BILL_TYPE,
+				u.ACTION_NAME,
+				u.TRACE_URL,
+				u.DEAL_PSON_NAME,
+				to_char(u.DEAL_TIME,'yyyy-MM-DD HH24:MI:SS') DEAL_TIME,
+				u.STATE
+		       from DRP_GOODS_ORDER_TRACE u 
+		   ]]>
+		</sql>
+		 <!-- 根据销售订单ID查询生命周期 -->
+	  <select id="queryTraceByFkId" parameterClass="map" resultClass="java.util.HashMap">
+		  <include refid="coreSqlTrace"/>
+		  <dynamic prepend="where">
+				u.GOODS_ORDER_ID is null and u.SALE_ORDER_ID=#SALE_ORDER_ID#
+		  </dynamic>
+		   order by u.DEAL_TIME
+	  </select>
+	  <select id="qrySaleOrderExp" parameterClass="map" resultClass="java.util.HashMap">
+      <![CDATA[ 
+	 select 
+   a.SALE_ORDER_NO,a.BILL_TYPE,a.ORDER_CHANN_NO,a.ORDER_CHANN_NAME,decode(a.IS_USE_REBATE,1,'是','否')IS_USE_REBATE,a.RECV_CHANN_NO,a.RECV_CHANN_NAME,
+a.PERSON_CON,a.TEL,a.SHIP_POINT_NAME,a.RECV_ADDR_NO,b.PRD_NO,b.PRD_NAME,b.PRD_SPEC,b.BRAND,b.STD_UNIT,decode(b.IS_BACKUP_FLAG,1,'是','否')IS_BACKUP_FLAG,
+decode(b.IS_NO_STAND_FLAG,1,'是','否')IS_NO_STAND_FLAG,d.SPCL_DTL_REMARK SPCL_SPEC_REMARK,decode(b.IS_FREE_FLAG,1,'是','否')IS_FREE_FLAG,b.PRICE,b.DECT_RATE,
+b.DECT_PRICE,b.ORDER_NUM,b.ORDER_AMOUNT,b.VOLUME,b.REMARK REMARKDTL,c.AREA_NAME,a.CRE_NAME,a.LEDGER_NAME,a.RECV_ADDR,c.AREA_MANAGE_NAME,c.AREA_MANAGE_TEL,a.REMARK,
+c.AREA_SER_NO,a.STATE,c.AREA_SER_NAME,(case  when NVL(b.ORDER_NUM,0)>NVL(b.SENDED_NUM,0) then '待发货' when NVL(b.ORDER_NUM,0)=NVL(b.SENDED_NUM,0) then '已发货' end)STATEDTL,
+NVL(b.SENDED_NUM,0)SENDED_NUM
+   from
+       ERP_SALE_ORDER a,ERP_SALE_ORDER_DTL b left join DRP_SPCL_TECH d on b.Spcl_Tech_Id=d.spcl_tech_id
+       
+       ,BASE_CHANN c 
+  where a.SALE_ORDER_ID=b.SALE_ORDER_ID
+  and  a.order_chann_id=c.chann_id
+      ]]>
+	 <dynamic prepend="and">
+	   <include refid="queryDynSql" />
+	</dynamic> 
+	<![CDATA[  
+	   order by a.SALE_ORDER_NO asc ,b.PRD_NO asc
+      ]]>
+</select>
+</sqlMap>

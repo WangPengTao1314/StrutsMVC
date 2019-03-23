@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zcx
+@function  渠道参数设置
+@version 2014-05-20 11:13:12
+-->
+<sqlMap  namespace="Paramset">
+<typeAlias type="com.hoperun.drp.base.paramset.model.ParamsetModel" alias="ParamsetModel"/>
+<!-- 使用Resvstore装载结果集 -->
+<resultMap id="ParamsetModel" class="ParamsetModel">
+    <result column="DATA_CONF_ID" property="DATA_CONF_ID" />
+</resultMap>
+<!-- 动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+   
+   <isNotEmpty prepend="and" property="DATA_TYPE">
+   u.DATA_TYPE = #DATA_TYPE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+      u.DEL_FLAG = #DEL_FLAG#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="LEDGER_ID">
+      u.LEDGER_ID = #LEDGER_ID#
+  </isNotEmpty>
+  
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.DATA_CONF_ID,
+		u.DATA_TYPE,
+		u.DATA_VAL,
+		u.LEDGER_ID,
+		u.DEL_FLAG,
+		u.DATA_NAME,
+		u.IS_DEAL_FLAG
+        from DRP_DATA_CONF u 
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt 
+            from DRP_DATA_CONF u 
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+ <!-- 查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_DATA_CONF(
+		 DATA_CONF_ID,
+		 DATA_TYPE,
+         DATA_VAL,
+         LEDGER_ID,
+         DEL_FLAG,
+         DATA_NAME,
+         IS_DEAL_FLAG
+	   )values(
+		#DATA_CONF_ID#,
+		#DATA_TYPE#,
+        #DATA_VAL#,
+        #LEDGER_ID#,
+        #DEL_FLAG#,
+        #DATA_NAME#,
+        #IS_DEAL_FLAG# 
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update DRP_DATA_CONF ]]>
+	<dynamic prepend="set">
+    <isNotNull property="DATA_TYPE" prepend=","><![CDATA[DATA_TYPE = #DATA_TYPE# ]]></isNotNull>
+    <isNotNull property="DATA_NAME" prepend=","><![CDATA[DATA_NAME = #DATA_NAME# ]]></isNotNull>
+    <isNotNull property="DATA_VAL"  prepend=","><![CDATA[DATA_VAL  = #DATA_VAL# ]]></isNotNull>
+    <isNotNull property="LEDGER_ID" prepend=","><![CDATA[LEDGER_ID = #LEDGER_ID# ]]></isNotNull>
+    <isNotNull property="DEL_FLAG"  prepend=","><![CDATA[DEL_FLAG  = #DEL_FLAG# ]]></isNotNull>
+    <isNotNull property="IS_DEAL_FLAG"  prepend=","><![CDATA[IS_DEAL_FLAG  = #IS_DEAL_FLAG# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where DATA_CONF_ID = #DATA_CONF_ID#]]>
+</update>
+ 
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.DATA_CONF_ID,
+		u.DATA_TYPE,
+		u.DATA_VAL,
+		u.LEDGER_ID,
+		u.DEL_FLAG,
+		u.IS_DEAL_FLAG
+            from DRP_DATA_CONF u 
+	  where 
+		u.LEDGER_ID = #LEDGER_ID#
+	]]>
+</select>
+
+<select id="loadType" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		distinct u.DATA_TYPE
+            from DRP_DATA_CONF u 
+	  where 
+		u.LEDGER_ID = #LEDGER_ID#
+		 and u.DEL_FLAG = #DEL_FLAG#
+	]]>
+</select>
+
+<select id="queryParamsByType" parameterClass="map" resultClass="ParamsetModel">
+	<![CDATA[ 
+	  select 
+		u.DATA_CONF_ID,
+		u.DATA_TYPE,
+		u.DATA_VAL,
+		u.LEDGER_ID,
+		u.DEL_FLAG,
+		u.DATA_NAME,
+		u.IS_DEAL_FLAG
+        from DRP_DATA_CONF u 
+        where  1=1
+        and u.LEDGER_ID = #LEDGER_ID#
+        and u.DEL_FLAG = #DEL_FLAG#
+	]]>
+	<isNotEmpty prepend="and" property="DATA_TYPE">
+      u.DATA_TYPE = #DATA_TYPE#
+   </isNotEmpty>
+</select>
+
+<select id="loadByConfId" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.DATA_CONF_ID,
+		u.DATA_TYPE,
+		u.DATA_VAL,
+		u.DATA_NAME,
+		u.LEDGER_ID,
+		u.DEL_FLAG
+            from DRP_DATA_CONF u 
+	  where 
+		u.DATA_CONF_ID = #DATA_CONF_ID#
+	]]>
+</select>
+
+<!--启用/停用-->
+<update id="updStusById" parameterClass="map">	
+     <![CDATA[ 
+	  update DRP_DATA_CONF
+	         set DATA_TYPE = #DATA_TYPE#
+              ,DATA_VAL =#DATA_VAL#
+              ,LEDGER_ID=#LEDGER_ID#
+              ,DEL_FLAG=#DEL_FLAG#
+ 	  where 
+	     DATA_CONF_ID = #DATA_CONF_ID:VARCHAR# 
+    ]]>
+</update>
+
+ <!-- 修改最大冻结天数 -->
+<update id="upFreenDaysById" parameterClass="map">
+	<![CDATA[ update BASE_CHANN	]]>	
+	<dynamic prepend="set">
+		 <isNotNull prepend="," property="MAX_FREEZE_DAYS">
+		 	MAX_FREEZE_DAYS = #MAX_FREEZE_DAYS#
+		 </isNotNull>
+		 <isNotNull prepend="," property="INIT_YEAR">
+		 	INIT_YEAR = #INIT_YEAR#
+		 </isNotNull>	
+		 <isNotNull prepend="," property="INIT_MONTH">
+		 	INIT_MONTH = #INIT_MONTH#
+		 </isNotNull>
+		 <isNotNull prepend="," property="TAX_RATE">
+		 	TAX_RATE = #TAX_RATE#
+		 </isNotNull>
+		 <isNotNull prepend="," property="COST_TYPE">
+		 	COST_TYPE = #COST_TYPE#
+		 </isNotNull>
+		 <isNotNull prepend="," property="ADVC_SCOPE_DAYS">
+		 	ADVC_SCOPE_DAYS = #ADVC_SCOPE_DAYS#
+		 </isNotNull>
+		 <isNotNull prepend="," property="IS_RETURN_SALE_AUD_FLAG">
+		 	IS_RETURN_SALE_AUD_FLAG = NVL(#IS_RETURN_SALE_AUD_FLAG#,0)
+		 </isNotNull>
+		 <isNotNull prepend="," property="CHANN_SALE_RATE">
+		 	CHANN_SALE_RATE = #CHANN_SALE_RATE#
+		 </isNotNull>
+		 <isNotNull prepend="," property="IS_SPEC_TECH_ENABLE">
+		 	IS_SPEC_TECH_ENABLE = #IS_SPEC_TECH_ENABLE#
+		 </isNotNull>
+	</dynamic>
+	 <![CDATA[ where  CHANN_ID = #CHANN_ID# ]]>	
+</update>
+
+<!-- 查询重复 -->
+<select id="queryBhForInt" parameterClass="map" resultClass="int">
+   select count(u.PRD_ID) from DRP_DATA_CONF u 
+     where u.LEDGER_ID=#LEDGER_ID#
+     and u.DATA_TYPE =#DATA_TYPE#
+     and u.DATA_VAL = #DATA_VAL#
+     and u.DEL_FLAG=#DEL_FLAG#
+     <isNotEmpty prepend="and" property="DATA_CONF_ID">
+        u.DATA_CONF_ID != #DATA_CONF_ID#
+     </isNotEmpty>
+     
+</select>
+
+<!-- 删除 -->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update DRP_DATA_CONF ]]>
+	<dynamic prepend="set">
+		<isNotNull property="DEL_FLAG"><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+	</dynamic>
+	<![CDATA[ where DATA_CONF_ID in ($DATA_CONF_IDS$)]]>
+</delete>
+
+
+<!-- 查询名称、类型、值信息 -->
+<delete id="queryParams" parameterClass="map">
+	 select count(0)
+     from DRP_DATA_CONF u 
+     where 1=1   
+     <isNotEmpty prepend="and" property="DATA_NAME">
+        u.DATA_NAME != #DATA_NAME#
+     </isNotEmpty>
+      <isNotEmpty prepend="and" property="DATA_TYPE">
+        u.DATA_TYPE != #DATA_TYPE#
+     </isNotEmpty>
+      <isNotEmpty prepend="and" property="DATA_VAL">
+        u.DATA_VAL != #DATA_VAL#
+     </isNotEmpty>
+</delete>
+
+<!-- 渠道信息 -->
+<select id="getChannInfo" parameterClass="string" resultClass="java.util.HashMap">
+		<![CDATA[
+			select 
+				CHANN_ID,
+				CHANN_NO,
+				CHANN_NAME,
+				CHANN_TYPE,
+				CHAA_LVL,
+				AREA_ID,
+				AREA_NO,
+				AREA_NAME,
+				CREDIT_CURRT,
+				TEMP_CREDIT,
+				REBATE_CURRT,
+				PERSON_CON,
+				TEL,
+				ADDRESS,
+				MAX_FREEZE_DAYS,
+				INIT_YEAR,
+				INIT_MONTH,
+				TAX_RATE,
+				COST_TYPE,
+				CHANN_SALE_RATE,
+				IS_RETURN_SALE_AUD_FLAG,
+				ADVC_SCOPE_DAYS,
+				IS_SPEC_TECH_ENABLE
+			from BASE_CHANN where CHANN_ID=#CHANN_ID#
+		]]>
+</select>
+
+<select id="isHaveParamset" parameterClass="map" resultClass="ParamsetModel">
+		<![CDATA[select u.DATA_CONF_ID from DRP_DATA_CONF u where u.DATA_NAME =#DATA_NAME# and u.DATA_TYPE =#DATA_TYPE# and  u.DATA_VAL =#DATA_VAL#]]>
+</select>
+
+</sqlMap>

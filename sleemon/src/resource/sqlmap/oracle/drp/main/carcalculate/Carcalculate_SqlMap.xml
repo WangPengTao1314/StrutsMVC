@@ -1,0 +1,241 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zzb
+@function 
+@version 2013-09-15 10:35:10
+-->
+<sqlMap  namespace="Carcalculate">
+<!-- 定义GoodsorderhdModel,GoodsorderhdModelChld -->
+<typeAlias type="com.hoperun.drp.sale.goodsorderhd.model.GoodsorderhdModel" alias="GoodsorderhdModel"/>
+<typeAlias type="com.hoperun.drp.sale.goodsorderhd.model.GoodsorderhdModelChld" alias="GoodsorderhdModelChld" />
+<!-- 使用GoodsorderhdModel装载结果集 -->
+<resultMap id="GoodsorderhdModel" class="GoodsorderhdModel">
+    <result column="GOODS_ORDER_ID" property="GOODS_ORDER_ID" />
+</resultMap>
+<!-- 使用GoodsorderhdModelChld装载结果集 -->
+<resultMap id="GoodsorderhdModelChld" class="GoodsorderhdModelChld">
+    <result column="GOODS_ORDER_DTL_ID" property="GOODS_ORDER_DTL_ID" />
+</resultMap>
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="ORDER_CHANN_NO">
+    ORDER_CHANN_NO like '%'||#ORDER_CHANN_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CHANN_NAME">
+    ORDER_CHANN_NAME like '%'||#CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="GOODS_ORDER_NO">
+    GOODS_ORDER_NO like '%'||#GOODS_ORDER_NO#||'%'
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and" property="STATES">
+     STATE in ($STATES$)
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="ORDER_CHANN_ID">
+     ORDER_CHANN_ID = #ORDER_CHANN_ID#
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+    DEL_FLAG = #DEL_FLAG#
+  </isNotEmpty>
+   <isNotEmpty prepend="and" property="DEL_FLAG">
+     HAVE_NUM >0
+   </isNotEmpty>
+  <isNotEmpty prepend="and" property="STATE">
+      STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="SEND_TYPE">
+     SEND_TYPE = #SEND_TYPE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="QXJBCON">
+        $QXJBCON$
+  </isNotEmpty>
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+     select ORDER_CHANN_ID,ORDER_CHANN_NO,ORDER_CHANN_NAME,GOODS_ORDER_NO,PRD_NO, 
+     PRD_NAME,PRD_SPEC,PRD_COLOR,BRAND,STD_UNIT,PRICE,HAVE_NUM,VOLUME,STATE,ORDER_NUM,
+     SENDED_NUM,LEDGER_ID,SEND_TYPE,DEL_FLAG
+   from 
+   (select goods.GOODS_ORDER_NO,goods.ORDER_CHANN_ID,goods.ORDER_CHANN_NO, goods.ORDER_CHANN_NAME,
+       dtl.PRD_NO,
+       dtl.PRD_NAME,
+       dtl.PRD_SPEC,
+       dtl.PRD_COLOR,
+       dtl.BRAND,
+       dtl.STD_UNIT,
+       dtl.PRICE,
+       (NVL(dtl.ORDER_NUM,0) - NVL(dtl.SENDED_NUM,0)) HAVE_NUM,
+       dtl.VOLUME,
+       goods.STATE,
+       dtl.ORDER_NUM,
+       NVL(dtl.SENDED_NUM,0)SENDED_NUM,
+       goods.LEDGER_ID,
+       goods.DEL_FLAG,
+        (case when goods.STATE='未处理'  then '总部未发' 
+        when goods.STATE='制作' or goods.STATE='总部退回' or goods.STATE='区域服务中心退回' then '计划订货' end )SEND_TYPE
+     from DRP_GOODS_ORDER_DTL dtl
+     left join  DRP_GOODS_ORDER goods on goods.GOODS_ORDER_ID = dtl.GOODS_ORDER_ID) 
+ 
+      
+   ]]>
+    <dynamic prepend="where ">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+    <![CDATA[
+    SELECT count(0) cnt FROM 
+    (
+    select goods.GOODS_ORDER_NO,goods.ORDER_CHANN_ID,goods.ORDER_CHANN_NO, goods.ORDER_CHANN_NAME,
+       dtl.PRD_NO,
+       dtl.PRD_NAME,
+       dtl.PRD_SPEC,
+       dtl.PRD_COLOR,
+       dtl.BRAND,
+       dtl.STD_UNIT,
+       dtl.PRICE,
+       (NVL(dtl.ORDER_NUM,0) - NVL(dtl.SENDED_NUM,0)) HAVE_NUM,
+       dtl.VOLUME,
+       goods.STATE,
+       dtl.ORDER_NUM,
+       NVL(dtl.SENDED_NUM,0)SENDED_NUM,
+       goods.LEDGER_ID,
+       goods.DEL_FLAG,
+       (case when goods.STATE='未处理'  then '总部未发' 
+        when goods.STATE='制作' or goods.STATE='总部退回' or goods.STATE='区域服务中心退回' then '计划订货' end )SEND_TYPE
+     from DRP_GOODS_ORDER_DTL dtl
+     left join  DRP_GOODS_ORDER goods on goods.GOODS_ORDER_ID = dtl.GOODS_ORDER_ID
+    )  
+      
+    ]]>
+	<dynamic prepend="where">
+	  <include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select> 
+ 
+ 
+<!-- 明细操作开始-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+     select 
+		u.GOODS_ORDER_DTL_ID,
+		u.GOODS_ORDER_ID,
+		u.PRD_ID,
+		u.PRD_NO,
+		u.PRD_NAME,
+		u.PRD_SPEC,
+		u.PRD_COLOR,
+		u.BRAND,
+		u.STD_UNIT,
+		u.SPCL_TECH_FLAG,
+		u.PRICE,
+		u.DECT_RATE,
+		u.DECT_PRICE,
+		u.ORDER_NUM,
+		u.ORDER_AMOUNT,
+		u.REMARK,
+		u.SESSION_ID,
+		u.TECH_PRICE_MULT,
+		u.DEL_FLAG
+       from DRP_GOODS_ORDER_DTL u 
+   ]]>
+</sql>
+ 
+ 
+<!--明细表插入 -->
+<insert id="insertChld" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_GOODS_ORDER_DTL(
+		 GOODS_ORDER_DTL_ID,
+		 GOODS_ORDER_ID,
+         PRD_ID,
+         PRD_NO,
+         PRD_NAME,
+         PRD_SPEC,
+         PRD_COLOR,
+         BRAND,
+         STD_UNIT,
+         SPCL_TECH_FLAG,
+         PRICE,
+         DECT_RATE,
+         DECT_PRICE,
+         ORDER_NUM,
+         ORDER_AMOUNT,
+         DEL_FLAG
+	   )values(
+		#GOODS_ORDER_DTL_ID#,
+		#GOODS_ORDER_ID#,
+        #PRD_ID#,
+        #PRD_NO#,
+        #PRD_NAME#,
+        #PRD_SPEC#,
+        #PRD_COLOR#,
+        #BRAND#,
+        #STD_UNIT#,
+        #SPCL_TECH_FLAG#,
+        #PRICE#,
+        #DECT_RATE#,
+        #DECT_PRICE#,
+        #ORDER_NUM#,
+        #ORDER_AMOUNT#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+ 
+<!--根据明细ID删除明细 -->
+<delete id="deleteChldById" parameterClass="map">
+	<![CDATA[ update DRP_GOODS_ORDER_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      GOODS_ORDER_DTL_ID = (#GOODS_ORDER_DTL_IDS#)
+    ]]>
+</delete>
+ 
+
+<select id="queryCar" parameterClass="map"  resultClass="java.util.HashMap">
+<![CDATA[ select row_.*, rownum rownum_
+	  from ( select t.TRUCK_ID,t.PRVD_ID,t.TRUCK_TYPE,t.VOLUME ,t.MIN_VOLUME,t.MAX_VOLUME from BASE_TRUCK t
+	           where t.TRUCK_TYPE = #TRUCK_TYPE#
+	           and t.DEL_FLAG=0
+	           order by t.VOLUME desc
+	  ) row_
+	 where rownum <= 1
+ ]]>
+</select>
+ 
+
+
+ 
+ 
+</sqlMap>

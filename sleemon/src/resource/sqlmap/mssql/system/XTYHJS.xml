@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="XTYHJS">
+
+	<typeAlias type="com.hoperun.sys.model.XTYHJSBean"
+		alias="XTYHJSBean" />
+
+	<!-- 使用UserInfo装载结果集 -->
+	<resultMap id="XTYHJSBean" class="XTYHJSBean">
+		<result column="XTJSID" property="XTJSID"/>
+	</resultMap>
+
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		
+		<isNotEmpty prepend="and" property="XTYHID">
+			u.XTYHID = #XTYHID#
+		</isNotEmpty>
+		
+	</sql>
+
+	<!-- 查询SQL -->
+	<!-- 
+	<sql id="coreSql">
+		<![CDATA[  select  u.*, ROW_NUMBER() OVER(ORDER BY XTYHJSID) AS rn from ${SYSSCHEMA}.V_XTYH_XTYHJS_XTJS_JGXX u  ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</sql> -->
+	<sql id="coreSql">
+	   <![CDATA[select c.XTYHJSID ,c.XTJSID ,d.YHBH ,d. YHM 
+                from (select b.xtyhjsid,b.xtjsid,b.xtyhid
+                      from T_SYS_XTYHjs b
+                      where 
+                       b.xtjsid=#XTYHID#
+                      and b.delflag=0) c,T_SYS_XTYH d
+                where c.xtyhid=d.xtyhid
+                ]]>
+	</sql>
+    <sql id="SQLFORLOGIN">
+	   <![CDATA[ select distinct a.XTJSID,a.JSBH,a.JSMC   from T_SYS_XTYHJS u,T_SYS_XTJS a where u.XTJSID=a.XTJSID and u.XTYHID=#XTYHID# and a.STATE='启用' and a.DELFLAG=0 and u.DELFLAG=0 ]]>
+	</sql>
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(XTYHJSID) cnt FROM ${SYSSCHEMA}.T_SYS_XTYHJS u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+
+   <!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+   <!-- 查询 -->
+	<select id="queryFORLOGIN" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="SQLFORLOGIN" />
+	</select>
+   <insert id="insertChild" parameterClass="map">
+       insert into T_SYS_XTYHjs(XTYHJSID,XTJSID,XTYHID,DELFLAG) values(#XTYHJSID#,#XTJSID#,#XTYHID#,#DELFLAG#)
+   </insert>
+   
+   <select id="loadByIds" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[  
+		select C.XTYHJSID,C.XTJSID,D.YHBH,D.YHM                 
+        FROM (SELECT B.XTYHJSID,B.XTJSID,B.XTYHID                       
+              FROM T_SYS_XTYHJS B                      
+              WHERE  B.XTYHJSID IN ($xtjsids$)) c,T_SYS_XTYH d                
+        WHERE C.XTYHID=D.XTYHID 
+                ]]>
+	</select>
+	
+	<!-- delete from T_SYS_XTYHjs where xtyhjsid in ($xtyhjsids$)  -->
+	<delete id="deleteChildByIds" parameterClass="String">
+	   delete from T_SYS_XTYHjs
+	   where xtyhjsid in ($xtyhjsids$)
+	</delete>
+	<insert id="insertXTYHJS" parameterClass="map">
+	    insert into ${SYSSCHEMA}.t_sys_datarecycle(DATARECYCLEID,DELETOR,DELTIME,BUSINESSTYPE,DF1,DF2,DF3,DF4,DF5)
+	    select #DATARECYCLEID#+convert(varchar,row_number() over(order by xtyhjsid)),#DELETOR#,convert(varchar, getdate(), 20),'角色用户信息维护', XTYHJSID,XTJSID,XTYHID,STATE,DELFLAG
+        from ${SYSSCHEMA}.T_SYS_XTYHjs where xtyhjsid in ($xtyhjsids$)
+	</insert>
+	<!-- delete from T_SYS_XTYHjs where xtjsid=#xtjsID# -->
+	<update id="deleteChild" parameterClass="String">
+	   update T_SYS_XTYHjs
+	   set delflag=1
+	   where xtjsid=#xtjsID#
+	  
+	</update>
+	
+	<update id="updateChild" parameterClass="java.util.HashMap">
+	  update T_SYS_XTYHjs set xtjsid=#XTJSID#,xtyhid=#XTYHID#
+	  where xtyhjsid=#XTYHJSID#
+	</update>
+	
+	<select id="getYHBHList" parameterClass="String" resultClass="XTYHJSBean">
+	   select XTYHJSID,XTYHID from T_SYS_XTYHjs where xtjsid=#XTJSID# and delflag=0
+	</select>
+	
+	
+</sqlMap>

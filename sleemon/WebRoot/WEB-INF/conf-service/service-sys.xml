@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  
+/**
+ * @module 系统管理
+ * @fuc service配置
+ * @version 1.1
+ * @author zhuxw
+ */
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd"
+	default-autowire="byName">
+	<bean id="sysLoginService" class="com.hoperun.sys.service.SysLoginService" />
+	<bean id="qxglBeanService" class="com.hoperun.sys.service.QXGLBeanService"/>
+	<bean id="menuService" class="com.hoperun.sys.service.MenuService"/>
+	<bean id = "firstPageService" parent="IBaseService" class="com.hoperun.sys.service.impl.FirstPageServiceImpl" />
+	<bean id="firstPageHandle" class="com.hoperun.commons.util.MessTimerTask">
+		<property name="firstPageService" ref="firstPageService"></property>
+	</bean>
+	<bean id = "jgxxService" parent="IBaseService" class = "com.hoperun.sys.service.impl.JGXXServiceImpl"/>
+	
+	<bean id = "bmxxService" parent="IBaseService" class = "com.hoperun.sys.service.impl.BMXXServiceImpl"/>
+	<bean id = "sjzdService" parent="IBaseService" class = "com.hoperun.sys.service.impl.SJZDServiceImpl"/>
+	<bean id="ztwhService" parent="IBaseService" class="com.hoperun.sys.service.impl.ZTWHServiceImpl"></bean>
+	<bean id = "ryxxService" parent="IBaseService" class = "com.hoperun.sys.service.impl.RYXXServiceImpl"/>
+	<bean id = "xtyhService" parent="IBaseService" class = "com.hoperun.sys.service.impl.XTYHServiceImpl"/>
+	<bean id = "xtjsService" parent="IBaseService" class = "com.hoperun.sys.service.impl.XTJSServiceImpl"/>
+	<bean id = "gzzxxService" parent="IBaseService" class = "com.hoperun.sys.service.impl.GZZXXServiceImpl"/>
+	<bean id = "flowService" parent="IBaseService" class = "com.hoperun.sys.service.impl.FlowServiceImpl"/>
+	<bean id="selectService" class="com.hoperun.commons.select.service.SelectService"/>
+	<bean id="dictService" class="com.hoperun.sys.service.DictService"/>
+	<!-- 编码规则 -->
+	<bean id = "bmgzService" parent="IBaseService" class = "com.hoperun.sys.service.impl.BmgzServiceImpl"/>
+	<bean id = "numformatService" parent="IBaseService" class = "com.hoperun.sys.service.impl.NumformatServiceImpl"/>
+	<!-- 系统授权 -->
+	<bean id="xtsqService" parent="IBaseService" class="com.hoperun.sys.service.impl.XTSQServiceImpl"/>
+	<!-- 公告信息维护 -->
+	<bean id = "noticeService" parent="IBaseService" class = "com.hoperun.sys.service.impl.NoticeServiceImpl"/>
+	<bean id = "ysglService" parent="IBaseService" class = "com.hoperun.sys.service.impl.YsglServiceImpl"/>
+	
+	<bean id="SpringContextUtil" class="com.hoperun.commons.util.SpringContextUtil"/>
+	<!-- 编码规则 -->
+	<bean id="commonBMGZService" class="com.hoperun.commons.inter.service.CommonBMGZService" />
+	<bean id="bmgzHelper" class="com.hoperun.commons.util.BmgzHelper">
+		<property name="commonBMGZService" ref="commonBMGZService"></property>
+	</bean>
+	<!-- 获取动态列 -->
+	<bean id="dynColumnService" class="com.hoperun.commons.inter.dyncolumn.service.impl.DynColumnServiceImpl" />
+	<bean id="dynColumnHandle" name="/customized" class="com.hoperun.commons.inter.dyncolumn.DynColumnHandle">
+		<property name="dynColumnService" ref="dynColumnService"></property>
+	</bean>
+	<!-- 自定义查询 -->
+	<bean id = "custQueryService" parent="IBaseService" class = "com.hoperun.sys.service.impl.CustQueryServiceImpl"/>
+	<!-- 接口Service -->
+	<bean id = "logicUtilService" parent="IBaseService" class = "com.hoperun.commons.util.impl.LogicUtilServiceImpl"/>
+	<!-- 操作数据库 -->
+	<bean id = "baseService" parent="IBaseService" class = "com.hoperun.commons.service.BaseService"/>
+	<!-- 新接口service -->
+	<bean id = "newInterImpl" parent="IBaseService" class = "com.hoperun.commons.util.NewInterImpl"/>
+	
+	<!-- job控制器 -->
+	<bean id = "jobService" parent="IBaseService" class = "com.hoperun.commons.job.service.impl.JobServiceImpl"/>
+	 <bean id="SpringTimer" class="com.hoperun.commons.job.service.impl.JobTimer"/>
+    <bean id="SpringTimeTask" class= "org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">    
+	    <property name="targetObject" ref="SpringTimer"/>    
+	    <property name="targetMethod" value="doTask"/>    
+	    <property name="concurrent" value="false" />    
+    </bean>
+    <bean id="cronTrigger1" class="org.springframework.scheduling.quartz.CronTriggerBean">  
+	    <property name="jobDetail" ref="SpringTimeTask" />
+	    <property name="cronExpression" value="6 * * * * ?" />   
+    </bean>
+    <bean class= "org.springframework.scheduling.quartz.SchedulerFactoryBean">
+    	<property name="triggers">
+	    	<list>
+	    		<ref bean="cronTrigger1" />
+	    	</list>
+    	</property>
+    </bean>
+    
+    <!-- 项目数据字典维护 -->
+	<bean id = "sjzdwhService" parent="IBaseService" class = "com.hoperun.sys.service.impl.XMSJZDWHServiceImpl"/>
+	<!-- 初使化信用流水账-->
+	<bean id = "InitCreditUtilService" parent="IBaseService" class = "com.hoperun.commons.service.impl.InitJournalCreditAcctServiceImpl"/>
+	<!-- 初使化库存流水账-->
+	<bean id = "InitStoreUtilService" parent="IBaseService" class = "com.hoperun.commons.service.impl.InitJournalStoreAcctServiceImpl"/>
+	<!-- 初使化库存流水账-->
+	<bean id = "interfaceService" parent="IBaseService" class = "com.hoperun.commons.service.impl.InterfaceInvokeServiceImpl"/>
+	<!-- 冻结信用-->
+	<bean id = "CreditCtrlService" parent="IBaseService" class = "com.hoperun.commons.service.impl.CreditCtrlServiceImpl"/>
+	
+	<!-- wap登陆service-->
+	<bean id = "sysWapLoginService" parent="IBaseService" class = "com.hoperun.drp.main.wap.service.SysWapLoginService"/>
+	
+	
+
+</beans>

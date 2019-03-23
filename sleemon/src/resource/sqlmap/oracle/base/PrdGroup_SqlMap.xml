@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ *@module 基础数据
+ *@func  货品组信息
+ *@version 1.1
+ *@author  
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="PrdGroup">
+
+    <!-- 通过typeAlias使得我们在下面使用ProGroupModel实体类的时候不需要写包名 -->
+	<typeAlias alias="PrdGroupModel"  type="com.hoperun.base.prdgroup.model.PrdGroupModel" />
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="PrdGroupModel" class="PrdGroupModel">
+		<result column="PRD_GROUP_ID" property="PRD_GROUP_ID" /> 
+	</resultMap>
+	
+	
+	  <!-- 通过typeAlias使得我们在下面使用ProGroupModel实体类的时候不需要写包名 -->
+	<typeAlias alias="PrdGroupDtlModel"  type="com.hoperun.base.prdgroup.model.PrdGroupDtlModel" />
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="PrdGroupDtlModel" class="PrdGroupDtlModel">
+		<result column="PRD_GROUP_DTL_ID" property="PRD_GROUP_DTL_ID" /> 
+	</resultMap>
+	
+		 	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[select u.PRD_GROUP_ID,u.PRD_GROUP_NO,u.PRD_GROUP_NAME,u.STATE,u.REMARK,u.CREATOR,
+		 u.CRE_NAME, 
+		 to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		 u.UPDATOR,u.UPD_NAME,
+		 to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		 u.DEPT_ID,u.DEPT_NAME,u.ORG_ID,u.ORG_NAME,u.DEL_FLAG 
+		 from ${SYSSCHEMA}.BASE_PRD_GROUP u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	   	<dynamic prepend="order by ">
+			<include refid="orderSql" />
+		</dynamic> 
+	</sql>
+	
+	   <!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="CRE_TIME_BEGIN">
+			u.CRE_TIME &gt;= to_date(#CRE_TIME_BEGIN#,'yyyy-MM-DD HH24:MI:SS')
+		</isNotEmpty> 
+		<isNotEmpty prepend="and" property="CRE_TIME_END">
+			u.CRE_TIME &lt;= to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')
+		</isNotEmpty> 
+	   <isNotEmpty prepend="and" property="STATE">
+			u.STATE = #STATE#
+	   </isNotEmpty> 
+	   <isNotEmpty prepend="and" property="DEL_FLAG">
+			u.DEL_FLAG = #DEL_FLAG#
+	   </isNotEmpty> 
+	   <isNotEmpty prepend=" " property="PRD_GROUP_NOQuery">
+			$PRD_GROUP_NOQuery$
+		</isNotEmpty> 
+		<isNotEmpty prepend=" " property="PRD_GROUP_NAMEQuery">
+			$PRD_GROUP_NAMEQuery$
+		</isNotEmpty> 
+	    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	  </isNotEmpty>
+	</sql>
+	
+	<sql id="orderSql">
+	   <isNotEmpty prepend=" " property="orderField">
+			$orderField$,
+		</isNotEmpty>
+		u.CRE_TIME desc
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(u.PRD_GROUP_ID) cnt FROM ${SYSSCHEMA}.BASE_PRD_GROUP u]]>
+		 <dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+	
+	
+   <select id="loadById" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[  select u.PRD_GROUP_ID,u.PRD_GROUP_NO,u.PRD_GROUP_NAME,u.STATE,u.REMARK,u.CREATOR,
+					 u.CRE_NAME, to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,u.UPDATOR,u.UPD_NAME,
+					 to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+					 u.DEPT_ID,u.DEPT_NAME,u.ORG_ID,u.ORG_NAME,u.DEL_FLAG 
+					from ${SYSSCHEMA}.BASE_PRD_GROUP u
+					where u.PRD_GROUP_ID = #PRD_GROUP_ID#]]>
+	</select>
+	
+	<!-- 查询编号是否重复 -->
+	<select id="queryBhForInt" parameterClass="map" resultClass="int">
+			select count(PRD_GROUP_NO) from ${SYSSCHEMA}.BASE_PRD_GROUP where PRD_GROUP_NO=#PRD_GROUP_NO# 
+			<isNotEmpty prepend="and" property="PRD_GROUP_ID">
+				<![CDATA[PRD_GROUP_ID != #PRD_GROUP_ID#]]>
+			</isNotEmpty>
+	</select>
+
+	
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.BASE_PRD_GROUP(PRD_GROUP_ID,PRD_GROUP_NO,PRD_GROUP_NAME,STATE,REMARK,CREATOR,
+		 CRE_NAME,CRE_TIME,UPDATOR,UPD_NAME,UPD_TIME,DEPT_ID,DEPT_NAME,ORG_ID,ORG_NAME,DEL_FLAG)
+		 values(#PRD_GROUP_ID#,#PRD_GROUP_NO#,#PRD_GROUP_NAME#,#STATE#,#REMARK#,#CREATOR#,#CRE_NAME#,sysdate,
+		 #UPDATOR#,#UPD_NAME#,#UPD_TIME#,#DEPT_ID#,#DEPT_NAME#,#ORG_ID#,#ORG_NAME#,#DEL_FLAG#)
+		]]>
+	</insert>
+
+	<update id="updateById" parameterClass="map">
+		 <![CDATA[ update ${SYSSCHEMA}.BASE_PRD_GROUP ]]>
+		<dynamic prepend="set">
+			<isNotNull property="PRD_GROUP_NO" prepend=","><![CDATA[PRD_GROUP_NO = #PRD_GROUP_NO#]]></isNotNull>
+			<isNotNull property="PRD_GROUP_NAME" prepend=","><![CDATA[PRD_GROUP_NAME = #PRD_GROUP_NAME#]]></isNotNull>
+			<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK#]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ , UPD_TIME = sysdate]]>
+		<![CDATA[ where PRD_GROUP_ID = #PRD_GROUP_ID# ]]>
+	</update>
+	
+	
+	<!-- 跟新状态 以及 软删除 -->
+	<update id="updateStateById" parameterClass="map">	
+		<![CDATA[ update ${SYSSCHEMA}.BASE_PRD_GROUP ]]>
+		<dynamic prepend="set">
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+		</dynamic>
+		<![CDATA[,UPD_TIME = sysdate]]>
+		<![CDATA[ where PRD_GROUP_ID = #PRD_GROUP_ID#]]>	
+	</update>
+	
+    <!-- =======================================子表sql================================================== -->	
+    <!-- 子表新增 -->
+    <insert id="insertChld" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.BASE_PRD_GROUP_DTL(PRD_GROUP_DTL_ID,PRD_GROUP_ID,PRD_ID,PRD_NO,PRD_NAME,PRD_SPEC,
+		 PRD_COLOR,BRAND,STD_UNIT,DEL_FLAG)
+		 values(#PRD_GROUP_DTL_ID#,#PRD_GROUP_ID#,#PRD_ID#,#PRD_NO#,#PRD_NAME#,#PRD_SPEC#,
+		 #PRD_COLOR#,#BRAND#,#STD_UNIT#,#DEL_FLAG#)
+		]]>
+	</insert>
+	
+	<!-- 根据主表ID批量查询子表 -->
+	<select id="loadChldByMainId" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[  
+		 	select u.PRD_GROUP_DTL_ID,u.PRD_GROUP_ID,u.PRD_ID,u.PRD_NO,u.PRD_NAME,u.PRD_SPEC,
+		 u.PRD_COLOR,u.BRAND,u.STD_UNIT,u.DEL_FLAG
+	          from ${SYSSCHEMA}.BASE_PRD_GROUP_DTL u where u.PRD_GROUP_ID = #PRD_GROUP_ID# and u.DEL_FLAG=#DEL_FLAG#]]>
+	</select>
+	
+	
+	<!-- 批量查询子表 -->
+	<select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[  
+		 	select u.PRD_GROUP_DTL_ID,u.PRD_GROUP_ID,u.PRD_ID,u.PRD_NO,u.PRD_NAME,u.PRD_SPEC,
+		 u.PRD_COLOR,u.BRAND,u.STD_UNIT,u.DEL_FLAG 
+	          from ${SYSSCHEMA}.BASE_PRD_GROUP_DTL u where PRD_GROUP_DTL_ID in ($MXIDS$)]]>
+	</select>
+	
+	<!-- 更新子表 -->
+	<update id="updateChldById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.BASE_PRD_GROUP_DTL ]]>
+		<dynamic prepend="set">
+			<isNotNull property="PRD_NO" prepend=","><![CDATA[PRD_NO = #PRD_NO#]]></isNotNull>
+			<isNotNull property="PRD_NAME" prepend=","><![CDATA[PRD_NAME = #PRD_NAME#]]></isNotNull>
+			<isNotNull property="PRD_SPEC" prepend=","><![CDATA[PRD_SPEC = #PRD_SPEC#]]></isNotNull>
+			<isNotNull property="STD_UNIT" prepend=","><![CDATA[STD_UNIT = #STD_UNIT#]]></isNotNull>
+			<isNotNull property="PRD_COLOR" prepend=","><![CDATA[PRD_COLOR = #PRD_COLOR#]]></isNotNull>
+			<isNotNull property="BRAND" prepend=","><![CDATA[BRAND = #BRAND#]]></isNotNull>
+			
+		</dynamic>
+		<![CDATA[ where PRD_GROUP_DTL_ID = #PRD_GROUP_DTL_ID# ]]>
+	</update>	
+	
+	 <!--根据主表ID软删除子表 -->
+	<update id="updateChldDelMainId" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.BASE_PRD_GROUP_DTL 
+		               set DEL_FLAG = 1 
+	 	  where 
+		      PRD_GROUP_ID = ($id$)
+	    ]]>
+	</update>
+	 
+	 <!--根据明细IDs删除明细 -->
+	<update id="deleteChldByIds" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.BASE_PRD_GROUP_DTL 
+		               set DEL_FLAG = #DEL_FLAG#	 
+	 	  where 
+		      PRD_GROUP_DTL_ID in ($IDS$)
+	    ]]>
+	</update>
+
+		<!-- 查重 -->
+	<select id="findRepeat" parameterClass="map" resultClass="PrdGroupDtlModel">
+	    SELECT t.PRD_GROUP_DTL_ID FROM BASE_PRD_GROUP_DTL t where t.DEL_FLAG=0 and t.PRD_GROUP_ID = #PRD_GROUP_ID# and t.PRD_NO in ($PRDNOS$)
+	    <dynamic prepend=" and ">
+		 <isNotEmpty property="CHILDIDS" prepend=","><![CDATA[PRD_GROUP_DTL_ID not in ($CHILDIDS$)]]></isNotEmpty>
+		</dynamic>
+	</select>
+	 
+	
+</sqlMap>
+

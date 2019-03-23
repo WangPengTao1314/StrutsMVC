@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ *@module 信用管理
+ *@func 临时额度调整申请
+ *@version 1.1
+ *@author 刘曰刚
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Erprebatechangereq">
+	<typeAlias type="com.hoperun.erp.sale.erprebatechangereq.model.ErprebatechangereqModel"
+		alias="ErprebatechangereqModel" />
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="ErprebatechangereqModel" class="ErprebatechangereqModel">
+		<result column="REBATE_CHANGE_REQ_ID" property="REBATE_CHANGE_REQ_ID" />
+	</resultMap>
+	<!-- 动态查询 and 列表排序 -->
+	<sql id="queryDynSql"> 
+		<isNotEmpty prepend="and " property="DEL_FLAG"><![CDATA[DEL_FLAG=#DEL_FLAG#]]></isNotEmpty>
+		<isNotEmpty prepend="and" property="REBATE_CHANGE_REQ_NO">
+		    u.REBATE_CHANGE_REQ_NO like '%'||#REBATE_CHANGE_REQ_NO#||'%'
+		  </isNotEmpty>
+		  <isNotEmpty prepend="and" property="CHANN_NO">
+		    u.CHANN_NO like '%'||#CHANN_NO#||'%'
+		  </isNotEmpty>
+		  <isNotEmpty prepend="and" property="CHANN_NAME">
+		    u.CHANN_NAME like '%'||#CHANN_NAME#||'%'
+		  </isNotEmpty>
+		  <isNotEmpty prepend="and" property="BILL_TYPE">
+		    u.BILL_TYPE =#BILL_TYPE#
+		  </isNotEmpty>
+		  <isNotEmpty prepend="and" property="STATE">
+		    u.STATE in ($STATE$)
+		  </isNotEmpty>		
+		  <isNotEmpty prepend="and" property="REBATE_TYPE">
+		    u.REBATE_TYPE = #REBATE_TYPE#
+		  </isNotEmpty>			    
+		  <isNotEmpty prepend="and" property="REQ_PSON_NAME">
+		    u.REQ_PSON_NAME like '%'||#REQ_PSON_NAME#||'%'
+		  </isNotEmpty>
+		   <isNotEmpty prepend="and" property="BEGIN_CRE_TIME">
+     <![CDATA[u.CRE_TIME>=to_date(#BEGIN_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="END_CRE_TIME">
+     <![CDATA[u.CRE_TIME<=to_date(#END_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+		<isNotEmpty prepend="and" property="CHANNS_CHARG">
+	     CHANN_ID in $CHANNS_CHARG$
+	  </isNotEmpty>
+	    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	    </isNotEmpty>
+	</sql>
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField"> $orderField$ </isNotEmpty>
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[
+		select 
+			u.REBATE_CHANGE_REQ_ID,
+			u.REBATE_CHANGE_REQ_NO,
+			u.BILL_TYPE,
+			u.REQ_PSON_ID,
+			u.REQ_PSON_NAME,
+			u.CHANGE_REBATE,
+			u.STATE,
+			u.REMARK,
+			u.CREATOR,
+			u.CRE_NAME,
+			to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+			u.UPDATOR,
+			u.UPD_NAME,
+			to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+			u.AUDIT_ID,
+			u.AUDIT_NAME,
+			to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+			u.DEPT_ID,
+			u.DEPT_NAME,
+			u.ORG_ID,
+			u.ORG_NAME,
+			u.LEDGER_ID,
+			u.LEDGER_NAME,
+			u.DEL_FLAG,
+			u.CHANN_ID,
+			u.CHANN_NO,
+			u.CHANN_NAME,
+			u.CHANN_TYPE,
+			u.CHANGE_REBATE_OLD,
+			u.CHANGE_REBATE_NEW,
+			u.REBATE_TYPE
+		from ERP_REBATE_CHANGE_REQ u
+		]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[select count(u.REBATE_CHANGE_REQ_ID) cnt from ERP_REBATE_CHANGE_REQ u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+	<!-- 根据ID查找 -->
+	<select id="loadById" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+		 select 
+			u.REBATE_CHANGE_REQ_ID,
+			u.REBATE_CHANGE_REQ_NO,
+			u.BILL_TYPE,
+			u.REQ_PSON_ID,
+			u.REQ_PSON_NAME,
+			u.CHANGE_REBATE,
+			u.STATE,
+			u.REMARK,
+			u.CREATOR,
+			u.CRE_NAME,
+			to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+			u.UPDATOR,
+			u.UPD_NAME,
+			to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+			u.AUDIT_ID,
+			u.AUDIT_NAME,
+			to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+			u.DEPT_ID,
+			u.DEPT_NAME,
+			u.ORG_ID,
+			u.ORG_NAME,
+			u.LEDGER_ID,
+			u.LEDGER_NAME,
+			u.DEL_FLAG,
+			u.CHANN_ID,
+			u.CHANN_NO,
+			u.CHANN_NAME,
+			u.CHANN_TYPE,
+			u.CHANGE_REBATE_OLD,
+			u.CHANGE_REBATE_NEW,
+			u.REBATE_TYPE
+		from ERP_REBATE_CHANGE_REQ u
+		where REBATE_CHANGE_REQ_ID = #REBATE_CHANGE_REQ_ID# and DEL_FLAG=0
+		]]>
+	</select>
+	<!-- 新增 -->
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ERP_REBATE_CHANGE_REQ(
+		 	REBATE_CHANGE_REQ_ID,
+			REBATE_CHANGE_REQ_NO,
+			BILL_TYPE,
+			REQ_PSON_ID,
+			REQ_PSON_NAME,
+			CHANGE_REBATE,
+			STATE,
+			REMARK,
+			CREATOR,
+			CRE_NAME,
+			CRE_TIME,
+			DEPT_ID,
+			DEPT_NAME,
+			ORG_ID,
+			ORG_NAME,
+			LEDGER_ID,
+			LEDGER_NAME,
+			DEL_FLAG,
+			CHANN_ID,
+			CHANN_NO,
+			CHANN_NAME,
+			CHANN_TYPE,
+			REBATE_TYPE
+		 	)
+		 values(
+			#REBATE_CHANGE_REQ_ID#,
+			#REBATE_CHANGE_REQ_NO#,
+			#BILL_TYPE#,
+			#REQ_PSON_ID#,
+			#REQ_PSON_NAME#,
+			#CHANGE_REBATE#,
+			#STATE#,
+			#REMARK#,
+			#CREATOR#,
+			#CRE_NAME#,
+			sysdate,
+			#DEPT_ID#,
+			#DEPT_NAME#,
+			#ORG_ID#,
+			#ORG_NAME#,
+			#LEDGER_ID#,
+			#LEDGER_NAME#,
+			#DEL_FLAG#,
+			#CHANN_ID#,
+			#CHANN_NO#,
+			#CHANN_NAME#,
+			#CHANN_TYPE#,
+			#REBATE_TYPE#
+		 )
+		]]>
+	</insert>
+	<!-- 修改 -->
+	<update id="updateById" parameterClass="map">
+		 <![CDATA[ update ERP_REBATE_CHANGE_REQ ]]>
+		<dynamic prepend="set">
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="BILL_TYPE" prepend=","><![CDATA[BILL_TYPE = #BILL_TYPE#]]></isNotNull>
+			<isNotNull property="REQ_PSON_ID" prepend=","><![CDATA[REQ_PSON_ID = #REQ_PSON_ID#]]></isNotNull>
+			<isNotNull property="REQ_PSON_NAME" prepend=","><![CDATA[REQ_PSON_NAME = #REQ_PSON_NAME#]]></isNotNull>
+			<isNotNull property="CHANGE_REBATE" prepend=","><![CDATA[CHANGE_REBATE = #CHANGE_REBATE#]]></isNotNull>
+			<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK#]]></isNotNull>
+			<isNotNull property="CHANN_ID" prepend=","><![CDATA[CHANN_ID = #CHANN_ID#]]></isNotNull>
+			<isNotNull property="CHANN_NO" prepend=","><![CDATA[CHANN_NO = #CHANN_NO#]]></isNotNull>
+			<isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME#]]></isNotNull>
+			<isNotNull property="CHANN_TYPE" prepend=","><![CDATA[CHANN_TYPE = #CHANN_TYPE#]]></isNotNull>
+			<isNotNull property="REBATE_TYPE" prepend=","><![CDATA[REBATE_TYPE = #REBATE_TYPE#]]></isNotNull>
+			
+		</dynamic>
+		<![CDATA[ where REBATE_CHANGE_REQ_ID = #REBATE_CHANGE_REQ_ID# ]]>
+	</update>
+	<!-- 软删除 -->
+	<delete id="delete" parameterClass="map">
+	<![CDATA[ update ERP_REBATE_CHANGE_REQ ]]>
+		<dynamic prepend="set">
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where REBATE_CHANGE_REQ_ID=#REBATE_CHANGE_REQ_ID# ]]>		
+	</delete>
+	<select id="getRebate" resultClass="java.util.HashMap" parameterClass="string">
+		select CHANN_NAME,NVL(REBATE_CURRT,0)REBATE_CURRT from BASE_CHANN where CHANN_ID=#CHANN_ID#
+	</select>
+	<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<!-- 查询返利变更是否用审批量 -->
+<select id="getFlowState" resultClass="string" parameterClass="java.util.HashMap">
+		select f.MODELSTATE from T_SYS_FLOWMODEL f where f.BUSINESSTYPE = #BUSINESSTYPE#
+</select>
+<!-- 查询返利变更单是否有已审核通过的单据 -->
+<select id="isExsitRls" resultClass="string" parameterClass="java.util.HashMap">
+		select wm_concat(r.REBATE_CHANGE_REQ_NO)REBATE_CHANGE_REQ_NO from ERP_REBATE_CHANGE_REQ r where r.STATE = '审核通过' 
+		and r.REBATE_CHANGE_REQ_ID in ($REBATE_CHANGE_REQ_IDS$)
+</select>
+<!-- 查询返利变更单是否有已审核通过的单据 -->
+<select id="checkStats" resultClass="string" parameterClass="java.util.HashMap">
+		select r.STATE from ERP_REBATE_CHANGE_REQ r where  r.REBATE_CHANGE_REQ_ID in ($REBATE_CHANGE_REQ_IDS$)
+</select>
+
+ <!-- 子表更新的时候 同步更新主表的 销售卡券总额 -->
+<update id="updateRebateChangeByCancel" parameterClass="java.util.HashMap">
+ <![CDATA[ update ERP_REBATE_CHANGE_REQ ]]>
+		<dynamic prepend="set">
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ ,CHANGE_REBATE_OLD = null,CHANGE_REBATE_NEW = null where REBATE_CHANGE_REQ_ID = #REBATE_CHANGE_REQ_ID# ]]>
+</update>
+	<insert id="copyRebateRecord" parameterClass="map">
+		<![CDATA[
+		 insert into ERP_REBATE_CHANGE_REQ(
+		 	REBATE_CHANGE_REQ_ID,
+			REBATE_CHANGE_REQ_NO,
+			BILL_TYPE,
+			REQ_PSON_ID,
+			REQ_PSON_NAME,
+			CHANGE_REBATE,
+			STATE,
+			REMARK,
+			CREATOR,
+			CRE_NAME,
+			CRE_TIME,
+			DEPT_ID,
+			DEPT_NAME,
+			ORG_ID,
+			ORG_NAME,
+			LEDGER_ID,
+			LEDGER_NAME,
+			DEL_FLAG,
+			CHANN_ID,
+			CHANN_NO,
+			CHANN_NAME,
+			CHANN_TYPE,
+			REBATE_TYPE
+		 	)SELECT 
+		 	RAWTOHEX(SYS_GUID()) AS UUID, 
+		 	#REBATE_CHANGE_REQ_NO#,
+		 	BILL_TYPE,
+		    #REQ_PSON_ID#,
+		    #REQ_PSON_NAME#,
+		    CHANGE_REBATE,
+		    #STATE#,
+		    REMARK,
+		    #CREATOR#,
+			#CRE_NAME#,
+			sysdate,
+			DEPT_ID,
+			DEPT_NAME,
+			ORG_ID,
+			ORG_NAME,
+			LEDGER_ID,
+			LEDGER_NAME,
+			0,
+			CHANN_ID,
+			CHANN_NO,
+			CHANN_NAME,
+			CHANN_TYPE,
+			REBATE_TYPE 
+			from ERP_REBATE_CHANGE_REQ r where r.REBATE_CHANGE_REQ_ID = #REBATE_CHANGE_REQ_ID#   
+		]]>
+	</insert>
+ 
+</sqlMap>

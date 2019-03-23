@@ -1,0 +1,546 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author lyg
+@function 
+@version 2013-10-12 18:31:07
+-->
+<sqlMap  namespace="Techorder">
+<!-- 定义TechorderModel,TechorderModelChld,TechorderModelSpecial -->
+<typeAlias type="com.hoperun.erp.sale.techorder.model.TechorderModel" alias="TechorderModel"/>
+<typeAlias type="com.hoperun.erp.sale.techorder.model.TechorderModelChld" alias="TechorderModelChld" />
+<!-- 使用TechorderModel装载结果集 -->
+<resultMap id="TechorderModel" class="TechorderModel">
+    <result column="TECH_ORDER_ID" property="TECH_ORDER_ID" />
+</resultMap>
+<!-- 使用TechorderModelChld装载结果集 -->
+<resultMap id="TechorderModelChld" class="TechorderModelChld">
+    <result column="TECH_ORDER_DTL_ID" property="TECH_ORDER_DTL_ID" />
+</resultMap>
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="TECH_ORDER_NO">
+    upper(u.TECH_ORDER_NO) like upper('%'||#TECH_ORDER_NO#||'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="ORDER_CHANN_NO">
+    u.ORDER_CHANN_NO like '%'||#ORDER_CHANN_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="ORDER_CHANN_NAME">
+    u.ORDER_CHANN_NAME like '%'||#ORDER_CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="ORDER_DATE_BEG">
+     <![CDATA[u.ORDER_DATE>=to_date(#ORDER_DATE_BEG#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="ORDER_DATE_END">
+     <![CDATA[u.ORDER_DATE<=to_date(#ORDER_DATE_END#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="FROM_BILL_NO">
+    upper(u.FROM_BILL_NO) like upper('%'||#FROM_BILL_NO#||'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE =#STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STATES">
+    u.STATE in ($STATES$)
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="searchSTATE">
+    u.STATE =#searchSTATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="PRD_NO">
+    u.TECH_ORDER_ID in (select a.TECH_ORDER_ID from ERP_TECH_ORDER_DTL a where upper(a.PRD_NO) like upper('%'||#PRD_NO#||'%') and a.DEL_FLAG=0)
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="PRD_NAME">
+    u.TECH_ORDER_ID in (select a.TECH_ORDER_ID from ERP_TECH_ORDER_DTL a where upper(a.PRD_NAME) like upper('%'||#PRD_NAME#||'%') and a.DEL_FLAG=0)
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="PRD_SPEC">
+    u.TECH_ORDER_ID in (select a.TECH_ORDER_ID from ERP_TECH_ORDER_DTL a where upper(a.PRD_SPEC) like upper('%'||#PRD_SPEC#||'%') and a.DEL_FLAG=0)
+  </isNotEmpty>
+	<isNotEmpty prepend="and " property="DEL_FLAG">
+	        u.DEL_FLAG=#DEL_FLAG#
+	</isNotEmpty>
+    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	</isNotEmpty>
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.TECH_ORDER_ID,
+		u.TECH_ORDER_NO,
+		u.FROM_BILL_ID,
+		u.FROM_BILL_NO,
+		u.ORDER_CHANN_ID,
+		u.ORDER_CHANN_NO,
+		u.ORDER_CHANN_NAME,
+		to_char(u.ORDER_DATE,'yyyy-MM-DD') ORDER_DATE,
+		u.REMARK,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG
+      from ERP_TECH_ORDER u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM ERP_TECH_ORDER u ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_TECH_ORDER(
+		 TECH_ORDER_ID,
+         CRE_NAME,
+         CREATOR,
+         CRE_TIME,
+         UPD_NAME,
+         UPDATOR,
+         UPD_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         STATE,
+         DEL_FLAG
+	   )values(
+		#TECH_ORDER_ID#,
+        #CRE_NAME#,
+        #CREATOR#,
+	    sysdate, 
+        #UPD_NAME#,
+        #UPDATOR#,
+		sysdate, 
+        #DEPT_ID#,
+        #DEPT_NAME#,
+        #ORG_ID#,
+        #ORG_NAME#,
+        #LEDGER_ID#,
+        #LEDGER_NAME#,
+        #STATE#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update ERP_TECH_ORDER ]]>
+	<dynamic prepend="set">
+    <isNotNull property="AUDIT_ID" prepend=","><![CDATA[AUDIT_ID = #AUDIT_ID# ]]></isNotNull>
+    <isNotNull property="AUDIT_NAME" prepend=","><![CDATA[AUDIT_NAME = #AUDIT_NAME# ]]></isNotNull>
+     <isNotNull property="AUDIT_TIME" prepend=","><![CDATA[AUDIT_TIME = sysdate ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    <isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG# ]]></isNotNull>
+    <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+    <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where TECH_ORDER_ID = #TECH_ORDER_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update ERP_TECH_ORDER 
+	               set DEL_FLAG = #DEL_FLAG#
+                      ,UPD_NAME=#UPD_NAME#
+                     ,UPDATOR=#UPDATOR#
+                      ,UPD_TIME=sysdate
+ 	  where 
+	     TECH_ORDER_ID = #TECH_ORDER_ID:VARCHAR# 
+    ]]>
+</delete>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.TECH_ORDER_ID,
+		u.TECH_ORDER_NO,
+		u.FROM_BILL_ID,
+		u.FROM_BILL_NO,
+		u.ORDER_CHANN_ID,
+		u.ORDER_CHANN_NO,
+		u.ORDER_CHANN_NAME,
+		to_char(u.ORDER_DATE,'yyyy-MM-DD') ORDER_DATE,
+		u.REMARK,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG
+	  from
+       ERP_TECH_ORDER u 
+	  where 
+		u.TECH_ORDER_ID = #TECH_ORDER_ID#
+	]]>
+</select>
+<!-- 明细操作开始-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+     select 
+		u.TECH_ORDER_DTL_ID,
+		u.TECH_ORDER_ID,
+		u.PRD_ID,
+		u.PRD_NO,
+		u.PRD_NAME,
+		u.PRD_SPEC,
+		u.PRD_COLOR,
+		u.BRAND,
+		u.STD_UNIT,
+		a.SPCL_TECH_FLAG,
+		u.PRICE,
+		u.DECT_RATE,
+		u.DECT_PRICE,
+		u.ORDER_NUM,
+		u.REMARK,
+		u.IS_CAN_PRD_FLAG,
+		u.PRICE_DECIDE,
+		u.NEW_PRD_ID,
+		u.NEW_PRD_NO,
+		u.NEW_PRD_NAME,
+		u.NEW_PRD_SPEC,
+		u.DEL_FLAG,
+		u.SPCL_TECH_ID,
+		att.ATT_ID,
+		att.ATT_PATH
+       from ERP_TECH_ORDER_DTL u 
+       	left join DRP_SPCL_TECH a on a.SPCL_TECH_ID = u.SPCL_TECH_ID and a.USE_FLAG=1
+       	left join BASE_ATT att on att.FROM_BILL_ID = u.TECH_ORDER_DTL_ID
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.TECH_ORDER_ID=#TECH_ORDER_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+	        u.TECH_ORDER_DTL_ID in ($TECH_ORDER_DTL_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+<!--明细表插入 -->
+<insert id="insertChld" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_TECH_ORDER_DTL(
+		 TECH_ORDER_DTL_ID,
+		 TECH_ORDER_ID,
+         PRD_ID,
+         PRD_NO,
+         PRD_NAME,
+         PRD_SPEC,
+         PRD_COLOR,
+         BRAND,
+         STD_UNIT,
+         SPCL_TECH_FLAG,
+         NEW_PRD_ID,
+         NEW_PRD_NO,
+         NEW_PRD_NAME,
+         NEW_PRD_SPEC,
+         DEL_FLAG
+	   )values(
+		#TECH_ORDER_DTL_ID#,
+		#TECH_ORDER_ID#,
+        #PRD_ID#,
+        #PRD_NO#,
+        #PRD_NAME#,
+        #PRD_SPEC#,
+        #PRD_COLOR#,
+        #BRAND#,
+        #STD_UNIT#,
+        #SPCL_TECH_FLAG#,
+        #NEW_PRD_ID#,
+        #NEW_PRD_NO#,
+        #NEW_PRD_NAME#,
+        #NEW_PRD_SPEC#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+<!--明细表更新 -->
+<update id="updateChldById" parameterClass="map">
+	<![CDATA[ update ERP_TECH_ORDER_DTL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="PRD_ID" prepend=","><![CDATA[PRD_ID = #PRD_ID# ]]></isNotNull>
+    <isNotNull property="PRD_NO" prepend=","><![CDATA[PRD_NO = #PRD_NO# ]]></isNotNull>
+    <isNotNull property="PRD_NAME" prepend=","><![CDATA[PRD_NAME = #PRD_NAME# ]]></isNotNull>
+    <isNotNull property="PRD_SPEC" prepend=","><![CDATA[PRD_SPEC = #PRD_SPEC# ]]></isNotNull>
+    <isNotNull property="PRD_COLOR" prepend=","><![CDATA[PRD_COLOR = #PRD_COLOR# ]]></isNotNull>
+    <isNotNull property="BRAND" prepend=","><![CDATA[BRAND = #BRAND# ]]></isNotNull>
+    <isNotNull property="STD_UNIT" prepend=","><![CDATA[STD_UNIT = #STD_UNIT# ]]></isNotNull>
+    <isNotNull property="SPCL_TECH_FLAG" prepend=","><![CDATA[SPCL_TECH_FLAG = #SPCL_TECH_FLAG# ]]></isNotNull>
+    <isNotNull property="NEW_PRD_ID" prepend=","><![CDATA[NEW_PRD_ID = #NEW_PRD_ID# ]]></isNotNull>
+    <isNotNull property="NEW_PRD_NO" prepend=","><![CDATA[NEW_PRD_NO = #NEW_PRD_NO# ]]></isNotNull>
+    <isNotNull property="NEW_PRD_NAME" prepend=","><![CDATA[NEW_PRD_NAME = #NEW_PRD_NAME# ]]></isNotNull>
+    <isNotNull property="NEW_PRD_SPEC" prepend=","><![CDATA[NEW_PRD_SPEC = #NEW_PRD_SPEC# ]]></isNotNull>
+    <isNotNull property="IS_CAN_PRD_FLAG" prepend=","><![CDATA[IS_CAN_PRD_FLAG = #IS_CAN_PRD_FLAG# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where TECH_ORDER_DTL_ID = #TECH_ORDER_DTL_ID#]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteChldByIds" parameterClass="map">
+	<![CDATA[ update ERP_TECH_ORDER_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      TECH_ORDER_DTL_ID in ($TECH_ORDER_DTL_IDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细 -->
+<delete id="delChldByFkId" parameterClass="map">
+	<![CDATA[ update ERP_TECH_ORDER_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      TECH_ORDER_ID = #TECH_ORDER_ID:VARCHAR#
+    ]]>
+</delete>
+<!-- 根据主表id查找不可生产并且未被删除的工艺单明细来源单据id -->
+<select id="getTechDtl" parameterClass="map" resultClass="string" >
+	select FROM_BILL_DTL_ID from ERP_TECH_ORDER_DTL where TECH_ORDER_ID=#TECH_ORDER_ID# and DEL_FLAG=#DEL_FLAG# and IS_CAN_PRD_FLAG=#IS_CAN_PRD_FLAG#
+</select>
+<!--  -->
+<update id="upSale" parameterClass="map">
+	<![CDATA[ update ERP_SALE_ORDER_DTL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="IS_CAN_PRD_FLAG" prepend=","><![CDATA[IS_CAN_PRD_FLAG = #IS_CAN_PRD_FLAG# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where SALE_ORDER_DTL_ID in (select FROM_BILL_DTL_ID from ERP_TECH_ORDER_DTL where TECH_ORDER_DTL_ID in ($TECH_ORDER_DTL_IDS$) and IS_CAN_PRD_FLAG=#IS_CAN_PRD_FLAG# )]]>
+</update>
+<!-- 按工艺单id查找明细可生产工艺数量 -->
+<select id="countId" parameterClass="map" resultClass="int">
+	select count(TECH_ORDER_DTL_ID) from ERP_TECH_ORDER_DTL where TECH_ORDER_ID=#TECH_ORDER_ID# and DEL_FLAG=#DEL_FLAG# and IS_CAN_PRD_FLAG=#IS_CAN_PRD_FLAG#
+</select>
+
+<!-- 插入附件表 -->
+<insert id="insertFileUpload" parameterClass="map">
+    insert into BASE_ATT(ATT_ID,ATT_PATH,FROM_BILL_ID,CREATOR,CRE_NAME,CRE_TIME,DEL_FLAG)values(
+     #ATT_ID#,#ATT_PATH#,#FROM_BILL_ID#,#CREATOR#,#CRE_NAME#,
+     to_date(#CRE_TIME#,'yyyy-MM-DD HH24:MI:SS'),
+     #DEL_FLAG#
+    )
+</insert>
+
+<select id="queryUploadFile" parameterClass="map" resultClass="java.util.HashMap">
+  select ATT_ID,ATT_PATH,FROM_BILL_ID from BASE_ATT where FROM_BILL_ID=#FROM_BILL_ID#
+</select>
+
+
+<update id="updateFileUpload" parameterClass="map">
+	<![CDATA[ update BASE_ATT ]]>
+	<dynamic prepend="set">
+    <isNotNull property="ATT_PATH" prepend=","><![CDATA[ATT_PATH = #ATT_PATH# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where FROM_BILL_ID = #FROM_BILL_ID#]]>
+</update>
+
+
+
+
+
+<sql id="queryDynSqlChldEdit">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+      b.DEL_FLAG=#DEL_FLAG#  and u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="INIT_STATE">
+       u.STATE=#INIT_STATE#  
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and" property="TECH_ORDER_NO">
+      upper(b.TECH_ORDER_NO) like upper('%'||#TECH_ORDER_NO#||'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="FROM_BILL_NO">
+      upper(b.FROM_BILL_NO) like upper('%'||#FROM_BILL_NO#||'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="ORDER_CHANN_NO">
+      b.ORDER_CHANN_NO = #ORDER_CHANN_NO#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="ORDER_CHANN_NAME">
+      b.ORDER_CHANN_NAME = #ORDER_CHANN_NAME# 
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STATE">
+      u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_NAME">
+      b.CRE_NAME like '%'||#CRE_NAME#||'%'
+  </isNotEmpty>  
+  
+  
+  <isNotEmpty prepend="and" property="PRD_NO">
+    u.TECH_ORDER_DTL_ID in (select a.TECH_ORDER_DTL_ID from ERP_TECH_ORDER_DTL a where upper(a.PRD_NO) like upper('%'||#PRD_NO#||'%') and a.DEL_FLAG=0)
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="PRD_NAME">
+    u.TECH_ORDER_DTL_ID in (select a.TECH_ORDER_DTL_ID from ERP_TECH_ORDER_DTL a where upper(a.PRD_NAME) like upper('%'||#PRD_NAME#||'%') and a.DEL_FLAG=0)
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="PRD_SPEC">
+    u.TECH_ORDER_DTL_ID in (select a.TECH_ORDER_DTL_ID from ERP_TECH_ORDER_DTL a where upper(a.PRD_SPEC) like upper('%'||#PRD_SPEC#||'%') and a.DEL_FLAG=0)
+  </isNotEmpty>
+  
+  
+  <isNotEmpty prepend="and" property="XTYHID">
+  	u.PRD_ID in (select c.PRD_ID from BASE_PRODUCT c left join BASE_USER_CHARG_PRD d on c.PAR_PRD_ID=d.PRD_ID and c.DEL_FLAG=0 and c.FINAL_NODE_FLAG=1 where d.XTYHID=#XTYHID#)
+  </isNotEmpty>
+</sql> 
+
+<sql id="coreSqlChldEdit">
+	<![CDATA[ 
+     select 
+		u.TECH_ORDER_DTL_ID,
+		u.TECH_ORDER_ID,
+		b.TECH_ORDER_NO,
+		b.FROM_BILL_NO,
+		u.PRD_ID,
+		u.PRD_NO,
+		u.PRD_NAME,
+		u.PRD_SPEC,
+		u.PRD_COLOR,
+		u.BRAND,
+		u.STD_UNIT,
+		a.SPCL_TECH_FLAG,
+		u.PRICE,
+		u.DECT_RATE,
+		u.DECT_PRICE,
+		u.ORDER_NUM,
+		u.REMARK,
+		u.IS_CAN_PRD_FLAG,
+		u.PRICE_DECIDE,
+		u.NEW_PRD_ID,
+		u.NEW_PRD_NO,
+		u.NEW_PRD_NAME,
+		u.NEW_PRD_SPEC,
+		u.DEL_FLAG,
+		u.SPCL_TECH_ID,
+		att.ATT_ID,
+		att.ATT_PATH,
+		b.CRE_NAME,
+		b.ORDER_CHANN_NAME,
+		u.STATE
+       from ERP_TECH_ORDER b
+        left join  ERP_TECH_ORDER_DTL u on b.TECH_ORDER_ID=u.TECH_ORDER_ID 
+       	left join DRP_SPCL_TECH a on a.SPCL_TECH_ID = u.SPCL_TECH_ID and a.USE_FLAG=1
+       	left join BASE_ATT att on att.FROM_BILL_ID = u.TECH_ORDER_DTL_ID
+   ]]>
+   <dynamic prepend="where">
+			<include refid="queryDynSqlChldEdit"/>
+		</dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+</sql>
+
+
+
+
+<!-- 主表分页查询 -->
+<select id="pageChildQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSqlChldEdit" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageChildCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt  from ERP_TECH_ORDER b
+        left join  ERP_TECH_ORDER_DTL u on b.TECH_ORDER_ID=u.TECH_ORDER_ID 
+       	left join DRP_SPCL_TECH a on a.SPCL_TECH_ID = u.SPCL_TECH_ID and a.USE_FLAG=1
+       	left join BASE_ATT att on att.FROM_BILL_ID = u.TECH_ORDER_DTL_ID ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSqlChldEdit"/>
+	</dynamic>
+</select>
+
+<select id="checkChild" parameterClass="string" resultClass="int">
+	select count(0) from ERP_TECH_ORDER_DTL where TECH_ORDER_DTL_ID in ($TECH_ORDER_DTL_IDS$) and DEL_FLAG=0 and IS_CAN_PRD_FLAG=1 and NEW_PRD_ID is null
+</select>
+<update id="upChldByIDS" parameterClass="map">
+	update ERP_TECH_ORDER_DTL set STATE=#STATE# where TECH_ORDER_DTL_ID in ($TECH_ORDER_DTL_IDS$)
+</update>
+<update id="updateByIDS" parameterClass="map">
+	update ERP_TECH_ORDER set STATE=#STATE# where TECH_ORDER_ID in (select a.TECH_ORDER_ID from ERP_TECH_ORDER_DTL a left join ERP_TECH_ORDER_DTL b on a.TECH_ORDER_ID=b.TECH_ORDER_ID and b.DEL_FLAG=0 where b.TECH_ORDER_DTL_ID in ($TECH_ORDER_DTL_IDS$)  and b.STATE!='提交')
+</update>
+<update id="updateStateById" parameterClass="map">
+	update  ERP_TECH_ORDER b  set b.STATE =(case when (select count(*) from  ERP_TECH_ORDER_DTL  a where STATE='提交'  and  a.TECH_ORDER_ID=b.TECH_ORDER_ID  and a.DEL_FLAG=0)=0 then '待核价' else '提交' end) 
+where
+  b.TECH_ORDER_ID in (select  TECH_ORDER_ID from  ERP_TECH_ORDER_DTL where TECH_ORDER_DTL_ID in ($TECH_ORDER_DTL_IDS$)  and DEL_FLAG=0 )
+	
+</update>
+<update id="updateMainStateByIDS" parameterClass="map">
+	update  ERP_TECH_ORDER b  set b.STATE =(case when (select count(*) from  ERP_TECH_ORDER_DTL  a where IS_CAN_PRD_FLAG=1  and  a.TECH_ORDER_ID=b.TECH_ORDER_ID and a.DEL_FLAG=0)=0 then '已核价' else '待核价' end) 
+where
+  b.TECH_ORDER_ID in (select  TECH_ORDER_ID from  ERP_TECH_ORDER_DTL where TECH_ORDER_DTL_ID in ($TECH_ORDER_DTL_IDS$)  and DEL_FLAG=0 )
+ and  STATE='待核价'
+</update>
+<update id="upStateByChldIDS" parameterClass="map">
+	update ERP_TECH_ORDER set STATE=#STATE# where TECH_ORDER_ID in (select TECH_ORDER_ID from ERP_TECH_ORDER_DTL where TECH_ORDER_DTL_ID in ($TECH_ORDER_DTL_IDS$) and DEL_FLAG=0)
+</update>
+</sqlMap>

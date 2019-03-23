@@ -1,0 +1,272 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author lyg
+@function 
+@version 2013-08-11 17:38:52
+-->
+<sqlMap  namespace="Storeouta">
+<!-- 定义AdvctoorderModel,AdvctoorderModelChld,AdvctoorderModelGchld -->
+<typeAlias type="com.hoperun.drp.store.storeouta.model.StoreoutaModel" alias="StoreoutaModel"/>
+<typeAlias type="com.hoperun.drp.store.storeouta.model.StoreoutaModelChld" alias="StoreoutaModelChld" />
+<!-- 使用SaleorderaModel装载结果集 -->
+<resultMap id="StoreoutaModel" class="StoreoutaModel">
+    <result column="STOREOUT_ID" property="STOREOUT_ID" />
+</resultMap>
+<!-- 使用SaleorderaModelChld装载结果集 -->
+<resultMap id="StoreoutaModelChld" class="StoreoutaModelChld">
+    <result column="STOREOUT_DTL_ID" property="STOREOUT_DTL_ID" />
+</resultMap>
+<!--主表动态查询 and 列表分页 -->
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="STOREOUT_NO">
+    u.STOREOUT_NO like '%'||#STOREOUT_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STOREOUT_STORE_NO">
+    u.STOREOUT_STORE_NO like '%'||#STOREOUT_STORE_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STOREOUT_STORE_NAME">
+    u.STOREOUT_STORE_NAME like '%'||#STOREOUT_STORE_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="FROM_BILL_NO">
+    u.FROM_BILL_NO like '%'||#FROM_BILL_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="LEDGER_ID">
+  	u.LEDGER_ID=#LEDGER_ID#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="RECV_CHANN_NO">
+  	u.RECV_CHANN_NO like '%'||#RECV_CHANN_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="RECV_CHANN_NAME">
+  	u.RECV_CHANN_NAME like '%'||#RECV_CHANN_NAME#||'%'
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and" property="SALE_DATE_BEG">
+     <![CDATA[u.SALE_DATE>=to_date(#SALE_DATE_BEG#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="SALE_DATE_END">
+     <![CDATA[u.SALE_DATE<=to_date(#SALE_DATE_END#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="BEGIN_CRE_TIME">
+     <![CDATA[u.CRE_TIME>=to_date(#BEGIN_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="END_CRE_TIME">
+     <![CDATA[u.CRE_TIME<=to_date(#END_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  
+   <isNotEmpty prepend="and" property="DEAL_TIME_BEG">
+     <![CDATA[to_char(u.DEAL_TIME,'yyyy-mm-dd')>=#DEAL_TIME_BEG#]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="DEAL_TIME_END">
+     <![CDATA[to_char(u.DEAL_TIME,'yyyy-mm-dd')<=#DEAL_TIME_END#]]>
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE =#STATE#
+  </isNotEmpty>
+	<isNotEmpty prepend="and " property="DEL_FLAG">
+	        u.DEL_FLAG=#DEL_FLAG#
+	</isNotEmpty>
+    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	  	select STOREOUT_ID,
+	       STOREOUT_NO,
+	       FROM_BILL_ID,
+	       FROM_BILL_NO,
+	       STOREOUT_STORE_ID,
+	       STOREOUT_STORE_NO,
+	       STOREOUT_STORE_NAME,
+	       RECV_CHANN_ID,
+	       RECV_CHANN_NO,
+	       RECV_CHANN_NAME,
+	       to_char(SALE_DATE, 'yyyy-mm-dd') SALE_DATE,
+	       RECV_ADDR,
+	       STOREOUT_AMOUNT,
+	       STATE,
+	       REMARK,
+	       CREATOR,
+	       CRE_NAME,
+	       to_char(CRE_TIME, 'yyyy-mm-dd HH24:MI:SS') CRE_TIME,
+	       UPDATOR,
+	       UPD_NAME,
+	       to_char(UPD_TIME, 'yyyy-mm-dd HH24:MI:SS') UPD_TIME,
+	       to_char(DEAL_TIME, 'yyyy-mm-dd HH24:MI:SS') DEAL_TIME,
+	       DEPT_ID,
+	       DEPT_NAME,
+	       ORG_ID,
+	       ORG_NAME,
+	       LEDGER_ID,
+	       LEDGER_NAME,
+	       DEL_FLAG,
+	       RSP_NAME
+	  from DRP_STOREOUT_A u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt from DRP_STOREOUT_A u  ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+		select STOREOUT_ID,
+	       STOREOUT_NO,
+	       FROM_BILL_ID,
+	       FROM_BILL_NO,
+	       STOREOUT_STORE_ID,
+	       STOREOUT_STORE_NO,
+	       STOREOUT_STORE_NAME,
+	       RECV_CHANN_ID,
+	       RECV_CHANN_NO,
+	       RECV_CHANN_NAME,
+	       to_char(SALE_DATE, 'yyyy-mm-dd') SALE_DATE,
+	       RECV_ADDR,
+	       STOREOUT_AMOUNT,
+	       STATE,
+	       REMARK,
+	       CREATOR,
+	       CRE_NAME,
+	       to_char(CRE_TIME, 'yyyy-mm-dd HH24:MI:SS') CRE_TIME,
+	       UPDATOR,
+	       UPD_NAME,
+	       to_char(UPD_TIME, 'yyyy-mm-dd HH24:MI:SS') UPD_TIME,
+	       DEPT_ID,
+	       DEPT_NAME,
+	       ORG_ID,
+	       ORG_NAME,
+	       LEDGER_ID,
+	       LEDGER_NAME,
+	       DEL_FLAG,
+	       to_char(DEAL_TIME,'yyyy-mm-dd HH24:MI:SS')DEAL_TIME,
+	       RSP_NAME
+	  from DRP_STOREOUT_A u
+	  where STOREOUT_ID=#STOREOUT_ID#
+	]]>
+</select>
+<!-- 明细操作开始-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     a.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+		select a.STOREOUT_DTL_ID,
+		       a.STOREOUT_ID,
+		       a.PRD_ID,
+		       a.PRD_NO,
+		       a.PRD_NAME,
+		       a.PRD_SPEC,
+		       a.PRD_COLOR,
+		       a.BRAND,
+		       a.STD_UNIT,
+		       a.NOTICE_NUM,
+		       a.PRICE,
+		       a.DECT_RATE,
+		       a.DECT_PRICE,
+		       a.DECT_AMOUNT,
+		       a.REMARK,
+		       a.DEL_FLAG,
+		       a.FROM_BILL_DTL_ID,
+		       a.REAL_NUM,
+		       b.SPCL_SPEC_REMARK,
+				b.DM_SPCL_TECH_NO,
+				b.SPCL_TECH_ID,
+		        b.SPCL_TECH_FLAG
+		  from DRP_STOREOUT_DTL_A a
+		  left join DRP_SPCL_TECH b on a.SPCL_TECH_ID=b.SPCL_TECH_ID and b.USE_FLAG=1
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			a.STOREOUT_ID=#STOREOUT_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+<select id="downGetById" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+		select u.STOREOUT_NO,
+		       u.FROM_BILL_NO,
+		       u.STOREOUT_STORE_NO,
+		       u.STOREOUT_STORE_NAME,
+		       u.RECV_CHANN_NO,
+		       u.RECV_CHANN_NAME,
+		       to_char(u.SALE_DATE,'yyyy-mm-dd')SALE_DATE,
+		       u.RECV_ADDR,
+		       u.STOREOUT_AMOUNT,
+		       u.STATE,
+		       u.REMARK,
+		       u.CRE_NAME,
+		       to_char(u.CRE_TIME,'yyyy-mm-dd HH24:MI:SS')CRE_TIME,
+		       u.UPD_NAME,
+		       to_char(u.UPD_TIME,'yyyy-mm-dd HH24:MI:SS')UPD_TIME,
+		       u.DEPT_NAME,
+		       u.ORG_NAME,
+		       b.PRD_NO,
+		       b.PRD_NAME,
+		       b.PRD_SPEC,
+		       b.PRD_COLOR,
+		       b.BRAND,
+		       b.STD_UNIT,
+		       b.NOTICE_NUM,
+		       b.PRICE,
+		       b.DECT_RATE,
+		       b.DECT_PRICE,
+		       b.DECT_AMOUNT,
+		       b.REMARK DTLREMARK,
+		       b.REAL_NUM,
+		       c.SPCL_DTL_REMARK,
+		       u.RSP_NAME
+		  from DRP_STOREOUT_A u
+		  left join DRP_STOREOUT_DTL_A b
+		    on u.STOREOUT_ID=b.STOREOUT_ID
+		  left join DRP_SPCL_TECH c on b.SPCL_TECH_ID=c.SPCL_TECH_ID
+				   and c.USE_FLAG = 1
+				
+	]]>
+   <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+</select>
+</sqlMap>

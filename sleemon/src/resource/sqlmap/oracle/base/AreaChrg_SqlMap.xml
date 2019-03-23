@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ *@module 基础数据
+ *@func  区域分管信息
+ *@version 1.1
+ *@author  
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="AreaChrg">
+
+    <!-- 通过typeAlias使得我们在下面使用AreaChrgModel实体类的时候不需要写包名 -->
+	<typeAlias alias="AreaChrgModel"  type="com.hoperun.base.area.model.AreaChrgModel"
+		 />
+
+	<!-- 使用LLGL装载结果集 -->
+	
+	<resultMap id="AreaChrgModel" class="AreaChrgModel">
+              <result column="AREA_CHRG_ID" property="AREA_CHRG_ID" />
+	</resultMap>
+	
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[select u.AREA_ID,u.AREA_NO,u.AREA_NAME ,u.AREA_ID_P,u.AREA_NO_P,u.AREA_NAME_P,
+		 u.STATE,u.CREATOR,u.CRE_NAME,
+		 to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,u.UPDATOR,u.UPD_NAME,
+		 to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,u.DEPT_ID,u.DEPT_NAME,u.ORG_ID,u.ORG_NAME,
+		 u.LEDGER_ID,u.LEDGER_NAME,u.DEL_FLAG  from ${SYSSCHEMA}.BASE_AREA u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		 
+	   <dynamic prepend="order by ">
+			<include refid="orderSql" />
+	</dynamic>
+	</sql>
+	
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+	    <isNotEmpty prepend="and" property="AREA_ID">
+			(u.AREA_ID = #AREA_ID# OR u.AREA_ID_P = #AREA_ID#)
+		</isNotEmpty> 
+        <isNotEmpty prepend="and" property="AREA_NO">
+			u.AREA_NO= #AREA_NO#
+		</isNotEmpty> 
+		<isNotEmpty prepend="and" property="AREA_NAME">
+			u.AREA_NAME like '%'|| #AREA_NAME# ||'%'
+		</isNotEmpty> 
+		<isNotEmpty prepend="and" property="AREA_NO_P">
+			u.AREA_NO_P like '%'|| #AREA_NO_P# ||'%'
+		</isNotEmpty> 
+		<isNotEmpty prepend="and" property="AREA_NAME_P">
+			u.AREA_NAME_P like '%'|| #AREA_NAME_P# ||'%'
+		</isNotEmpty> 
+	    <isNotEmpty prepend="and" property="STATE">
+			u.STATE = #STATE#
+		</isNotEmpty> 
+		 <isNotEmpty prepend="and" property="DEL_FLAG">
+			u.DEL_FLAG = #DEL_FLAG#
+		</isNotEmpty> 
+	  <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	  </isNotEmpty>
+	</sql>
+	<sql id="orderSql">
+	   <isNotEmpty prepend=" " property="orderField">
+			$orderField$
+		</isNotEmpty>
+	</sql>
+	
+	<!-- AREA 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	 
+
+	
+	<!-- AREA分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(u.AREA_ID) cnt FROM ${SYSSCHEMA}.BASE_AREA u]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+	
+	<!-- 区域树 -->
+	<select id="queryTree" parameterClass="String" resultClass="com.hoperun.base.area.model.AreaTree">
+ 		<![CDATA[
+		select AREA_ID id,AREA_NO||'('||AREA_NAME||')' name ,AREA_ID_P pid from BASE_AREA 
+		]]>
+	</select>
+	
+	
+    <select id="loadById" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[  select u.AREA_CHRG_ID,u.AREA_ID,u.CHRG_TYPE,u.CHRG_NO,u.CHRG_NAME,u.JOB,u.CHRG_ID,u.DEL_FLAG from ${SYSSCHEMA}.BASE_AREA_CHRG u
+					where u.AREA_CHRG_ID = #AREA_CHRG_ID#]]>
+	</select>
+	
+	
+	<!-- 根据区域ID查询 分管明细信息 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<![CDATA[ select u.AREA_CHRG_ID,u.AREA_ID,u.CHRG_TYPE,u.CHRG_NO,u.CHRG_NAME,u.JOB,u.CHRG_ID,u.DEL_FLAG from ${SYSSCHEMA}.BASE_AREA_CHRG u where u.AREA_ID=#AREA_ID# and DEL_FLAG=0]]>
+	</select>
+	
+	<select id="loadByIds" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[  
+		 	select u.AREA_CHRG_ID,u.AREA_ID,u.CHRG_TYPE,u.CHRG_NO,u.CHRG_NAME,u.JOB,u.CHRG_ID,u.DEL_FLAG
+	          from ${SYSSCHEMA}.BASE_AREA_CHRG u where u.AREA_CHRG_ID in ($IDs$)]]>
+	</select>
+	
+	
+    <insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.BASE_AREA_CHRG(AREA_CHRG_ID,AREA_ID,CHRG_TYPE,CHRG_NO,CHRG_NAME,JOB,CHRG_ID,DEL_FLAG)
+		 values(#AREA_CHRG_ID#,#AREA_ID#,#CHRG_TYPE#,#CHRG_NO#,#CHRG_NAME#,#JOB#,#CHRG_ID#,#DEL_FLAG#)
+		]]>
+	</insert>
+	
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.BASE_AREA_CHRG ]]>
+		<!-- CHANAME, CHADES,CHADATE,CHASTU -->
+		<dynamic prepend="set">
+			<isNotNull property="CHRG_TYPE" prepend=","><![CDATA[CHRG_TYPE = #CHRG_TYPE#]]></isNotNull>
+			<isNotNull property="CHRG_NAME" prepend=","><![CDATA[CHRG_NAME = #CHRG_NAME#]]></isNotNull>
+			<isNotNull property="CHRG_NO" prepend=","><![CDATA[CHRG_NO = #CHRG_NO#]]></isNotNull>
+			<isNotNull property="CHRG_ID" prepend=","><![CDATA[CHRG_ID = #CHRG_ID#]]></isNotNull>
+			<isNotNull property="JOB" prepend=","><![CDATA[JOB = #JOB#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where AREA_CHRG_ID = #AREA_CHRG_ID# ]]>
+	</update>	
+	
+	 
+    
+	
+	<!-- 批量删除  -->
+	<delete id="deleteByIds" parameterClass="String">
+		<![CDATA[delete from  ${SYSSCHEMA}.BASE_AREA_CHRG t where AREA_CHRG_ID in ($areaChrgIDs$) ]]>
+	</delete>
+	
+	<!-- 批量删除  软删除-->
+	<update id="updateDELByIds" parameterClass="String">
+		<![CDATA[update ${SYSSCHEMA}.BASE_AREA_CHRG t set t.DEL_FLAG=1 where AREA_CHRG_ID in ($areaChrgIDs$) ]]>
+	</update>
+	
+	<!-- 批量删除  软删除 根据areaID-->
+	<update id="updateDELByAreaId" parameterClass="String">
+		<![CDATA[update ${SYSSCHEMA}.BASE_AREA_CHRG t set t.DEL_FLAG=1 where AREA_ID = ($areaId$) ]]>
+	</update>
+	
+	
+	<select id="queryBhForInt" parameterClass="map" resultClass="int">
+			select count(AREA_NO) from ${SYSSCHEMA}.BASE_AREA where AREA_NO=#AREA_NO# 
+	</select>
+
+	<select id="loadQUXXZT" parameterClass="String" resultClass="String">
+		<![CDATA[ select STATE from ${SYSSCHEMA}.BASE_AREA WHERE AREA_ID = #AREA_ID_P#]]>
+	</select>
+	
+	<!-- 查重 -->
+	<select id="findRepeat" parameterClass="map" resultClass="AreaChrgModel">
+	    SELECT u.AREA_CHRG_ID,u.AREA_ID,u.CHRG_TYPE,u.CHRG_NO,u.CHRG_NAME,u.JOB,u.DEL_FLAG FROM BASE_AREA_CHRG u where u.DEL_FLAG=0 and u.AREA_ID = #AREA_ID# and u.CHRG_NO in ($CHRGNOS$)
+	    <dynamic prepend=" and ">
+		 <isNotEmpty property="AREACHRGIDS" prepend=","><![CDATA[AREA_CHRG_ID not in ($AREACHRGIDS$)]]></isNotEmpty>
+		</dynamic>
+	</select>
+	 
+
+	 
+	
+	
+	 
+	<delete id="delete" parameterClass="String">
+	<![CDATA[delete from ${SYSSCHEMA}.BASE_AREA 
+							where AREA_ID in(select AREA_ID from T_SYS_JGXX
+                              start with AREA_ID = #AREA_ID#
+                              connect by prior AREA_ID = AREA_ID_P)
+     ]]>
+	</delete>
+	
+	
+ 
+	
+	
+	<update id="startById" parameterClass="map">	
+	 
+	</update>
+	
+</sqlMap>
+

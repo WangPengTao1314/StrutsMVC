@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zzb
+@function 意向客户拜访
+@version  
+-->
+<sqlMap  namespace="Intentionvisit">
+<typeAlias type="com.hoperun.erp.visit.intentionvisit.model.IntentionVisitModel" alias="IntentionVisitModel"/>
+<!-- 使用IntentionVisitModel装载结果集 -->
+<resultMap id="IntentionVisitModel" class="IntentionVisitModel">
+    <result column="INTE_CHANN_ID" property="INTE_CHANN_ID" />
+</resultMap>
+
+
+<!-- 动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="INTE_CHANN_NO">
+        u.INTE_CHANN_NO  like '%'||#INTE_CHANN_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="APPLY_PERSON_NAME">
+        u.APPLY_PERSON_NAME like '%'||#APPLY_PERSON_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="APPLY_DEP">
+        u.APPLY_DEP like '%'||#APPLY_DEP#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="TEL">
+        u.TEL like '%'||#TEL#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CITY">
+        u.CITY like '%'||#CITY#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STATE">
+        u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+      u.DEL_FLAG = #DEL_FLAG#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="APPLY_DATE_BEG">
+       <![CDATA[  u.APPLY_DATE>=to_date(#APPLY_DATE_BEG#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="APPLY_DATE_END">
+       <![CDATA[  u.APPLY_DATE<=to_date(#APPLY_DATE_END#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="QXJBCON">
+	    $QXJBCON$  
+  </isNotEmpty>
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.INTE_CHANN_ID,
+		u.INTE_CHANN_NO,
+		u.APPLY_PERSON_ID,
+		u.APPLY_PERSON_NAME,
+		u.APPLY_DEP,
+		u.APPLY_DATE,
+		u.CITY,
+		u.CITY_TYPE,
+		u.AREA_CODE,
+		u.CITY_LEVEL,
+		u.INTE_CHANN_NAME,
+		u.INTE_CUSTOMER_NAME,
+		u.TEL,
+		u.SEX,
+		u.AGE,
+		u.EDUCATION,
+		u.ADDRESS,
+		u.EXIST_STORE_NAME,
+		u.EXIST_STORE_ADDR,
+		u.EXIST_STORE_AREA,
+		u.EXIST_STORE_RANGE,
+		u.EXIST_STORE_COMPETITION,
+		u.NEW_STORE_NAME,
+		u.NEW_STORE_ADDR,
+		u.NEW_STORE_AREA,
+		u.NEW_STORE_RANGE,
+		u.NEW_STORE_DATE,
+		u.SHIP_POINT_ID,
+		u.SHIP_POINT_NAME,
+		u.AREA_SER_FLG,
+		u.AREA_SER_ID,
+		u.AREA_SER_NO,
+		u.AREA_SER_NAME,
+		u.DOCUMENTS,
+		u.VISIT_TYPE,
+		u.VISIT_REMARK,
+		u.BUSS_SCOPE,
+		u.STORE_NAME,
+		u.INTE_STORE_VSION,
+		u.INTE_STORE_AREA,
+		to_char(u.INTE_STORE_DATE,'yyyy-MM-DD')INTE_STORE_DATE,
+		u.IS_CONTRACT,
+		u.IS_PAY_INTEAMOUNT,
+		u.IS_FIRST_SENTPDT,
+		u.CHANN_REMARK,
+		u.SOLUTION,
+		u.COMPETITION_INFO,
+		u.SUPPORT_DEMAND,
+		u.ADVANTAGES,
+		u.STATE,
+		u.CREATOR,
+		u.CRE_NAME,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPDATOR,
+		u.UPD_NAME,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.DEL_FLAG
+        from ERP_INTENTION_CHANN u 
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+ 
+
+
+<!-- 分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+</select>
+ 
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt from ERP_INTENTION_CHANN u
+	   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+
+    
+	
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_INTENTION_CHANN(
+		INTE_CHANN_ID,
+		INTE_CHANN_NO,
+		APPLY_PERSON_ID,
+		APPLY_PERSON_NAME,
+		APPLY_DEP,
+		APPLY_DATE,
+		CITY,
+		CITY_TYPE,
+		AREA_CODE,
+		CITY_LEVEL,
+		INTE_CHANN_NAME,
+		INTE_CUSTOMER_NAME,
+		TEL,
+		SEX,
+		AGE,
+		EDUCATION,
+		ADDRESS,
+		EXIST_STORE_NAME,
+		EXIST_STORE_ADDR,
+		EXIST_STORE_AREA,
+		EXIST_STORE_RANGE,
+		EXIST_STORE_COMPETITION,
+		NEW_STORE_NAME,
+		NEW_STORE_ADDR,
+		NEW_STORE_AREA,
+		NEW_STORE_RANGE,
+		NEW_STORE_DATE,
+		SHIP_POINT_ID,
+		SHIP_POINT_NAME,
+		AREA_SER_FLG,
+		AREA_SER_ID,
+		AREA_SER_NO,
+		AREA_SER_NAME,
+		DOCUMENTS,
+		VISIT_TYPE,
+		VISIT_REMARK,
+		BUSS_SCOPE,
+		STORE_NAME,
+		INTE_STORE_VSION,
+		INTE_STORE_AREA,
+		INTE_STORE_DATE,
+		IS_CONTRACT,
+		IS_PAY_INTEAMOUNT,
+		IS_FIRST_SENTPDT,
+		CHANN_REMARK,
+		SOLUTION,
+		COMPETITION_INFO,
+		SUPPORT_DEMAND,
+		ADVANTAGES,
+		STATE,
+		CREATOR,
+		CRE_NAME,
+		CRE_TIME,
+		DEPT_ID,
+		DEPT_NAME,
+		ORG_ID,
+		ORG_NAME,
+		LEDGER_ID,
+		LEDGER_NAME,
+		DEL_FLAG
+	   )values(
+		#INTE_CHANN_ID#,
+		#INTE_CHANN_NO#,
+		#APPLY_PERSON_ID#,
+		#APPLY_PERSON_NAME#,
+		#APPLY_DEP#,
+		to_date(#APPLY_DATE#,'yyyy-MM-DD'),
+		#CITY#,
+		#CITY_TYPE#,
+		#AREA_CODE#,
+		#CITY_LEVEL#,
+		#INTE_CHANN_NAME#,
+		#INTE_CUSTOMER_NAME#,
+		#TEL#,
+		#SEX#,
+		#AGE#,
+		#EDUCATION#,
+		#ADDRESS#,
+		#EXIST_STORE_NAME#,
+		#EXIST_STORE_ADDR#,
+		#EXIST_STORE_AREA#,
+		#EXIST_STORE_RANGE#,
+		#EXIST_STORE_COMPETITION#,
+		#NEW_STORE_NAME#,
+		#NEW_STORE_ADDR#,
+		#NEW_STORE_AREA#,
+		#NEW_STORE_RANGE#,
+		#NEW_STORE_DATE#,
+		#SHIP_POINT_ID#,
+		#SHIP_POINT_NAME#,
+		#AREA_SER_FLG#,
+		#AREA_SER_ID#,
+		#AREA_SER_NO#,
+		#AREA_SER_NAME#,
+		#DOCUMENTS#,
+		#VISIT_TYPE#,
+		#VISIT_REMARK#,
+		#BUSS_SCOPE#,
+		#STORE_NAME#,
+		#INTE_STORE_VSION#,
+		#INTE_STORE_AREA#,
+		to_date(#INTE_STORE_DATE#,'yyyy-MM-DD'),
+		#IS_CONTRACT#,
+		#IS_PAY_INTEAMOUNT#,
+		#IS_FIRST_SENTPDT#,
+		#CHANN_REMARK#,
+		#SOLUTION#,
+		#COMPETITION_INFO#,
+		#SUPPORT_DEMAND#,
+		#ADVANTAGES#,
+		#STATE#,
+		#CREATOR#,
+		#CRE_NAME#,
+		sysdate,
+		#DEPT_ID#,
+		#DEPT_NAME#,
+		#ORG_ID#,
+		#ORG_NAME#,
+		#LEDGER_ID#,
+		#LEDGER_NAME#,
+		#DEL_FLAG#
+	   )
+   ]]>
+</insert>
+
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+<![CDATA[ 
+      select 
+		u.INTE_CHANN_ID,
+		u.INTE_CHANN_NO,
+		u.APPLY_PERSON_ID,
+		u.APPLY_PERSON_NAME,
+		u.APPLY_DEP,
+		u.APPLY_DATE,
+		u.CITY,
+		u.CITY_TYPE,
+		u.AREA_CODE,
+		u.CITY_LEVEL,
+		u.INTE_CHANN_NAME,
+		u.INTE_CUSTOMER_NAME,
+		u.TEL,
+		u.SEX,
+		u.AGE,
+		u.EDUCATION,
+		u.ADDRESS,
+		u.EXIST_STORE_NAME,
+		u.EXIST_STORE_ADDR,
+		u.EXIST_STORE_AREA,
+		u.EXIST_STORE_RANGE,
+		u.EXIST_STORE_COMPETITION,
+		u.NEW_STORE_NAME,
+		u.NEW_STORE_ADDR,
+		u.NEW_STORE_AREA,
+		u.NEW_STORE_RANGE,
+		u.NEW_STORE_DATE,
+		u.SHIP_POINT_ID,
+		u.SHIP_POINT_NAME,
+		u.AREA_SER_FLG,
+		u.AREA_SER_ID,
+		u.AREA_SER_NO,
+		u.AREA_SER_NAME,
+		u.DOCUMENTS,
+		u.VISIT_TYPE,
+		u.VISIT_REMARK,
+		u.BUSS_SCOPE,
+		u.STORE_NAME,
+		u.INTE_STORE_VSION,
+		u.INTE_STORE_AREA,
+		to_char(u.INTE_STORE_DATE,'yyyy-MM-DD')INTE_STORE_DATE,
+		u.IS_CONTRACT,
+		u.IS_PAY_INTEAMOUNT,
+		u.IS_FIRST_SENTPDT,
+		u.CHANN_REMARK,
+		u.SOLUTION,
+		u.COMPETITION_INFO,
+		u.SUPPORT_DEMAND,
+		u.ADVANTAGES,
+		u.STATE,
+		u.CREATOR,
+		u.CRE_NAME,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPDATOR,
+		u.UPD_NAME,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		att.ATT_PATH DOC_PATH,
+		u.DEL_FLAG
+        from ERP_INTENTION_CHANN u 
+        left join BASE_ATT att on att.FROM_BILL_ID = u.INTE_CHANN_ID and att.DEL_FLAG=0
+        where u.INTE_CHANN_ID = #INTE_CHANN_ID#
+
+]]>
+</select>
+
+
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update ERP_INTENTION_CHANN ]]>
+	<dynamic prepend="set">
+	    <isNotNull property="APPLY_PERSON_ID" prepend=","><![CDATA[APPLY_PERSON_ID = #APPLY_PERSON_ID# ]]></isNotNull>
+	    <isNotNull property="APPLY_PERSON_NAME" prepend=","><![CDATA[APPLY_PERSON_NAME = #APPLY_PERSON_NAME# ]]></isNotNull>
+	    <isNotNull property="APPLY_DEP" prepend=","><![CDATA[APPLY_DEP = #APPLY_DEP# ]]></isNotNull>
+	    <isNotNull property="APPLY_DATE" prepend=","><![CDATA[APPLY_DATE = to_date(#APPLY_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+	    <isNotNull property="CITY" prepend=","><![CDATA[CITY = #CITY# ]]></isNotNull>
+	    <isNotNull property="CITY_TYPE" prepend=","><![CDATA[CITY_TYPE = #CITY_TYPE# ]]></isNotNull>
+	    <isNotNull property="AREA_CODE" prepend=","><![CDATA[AREA_CODE = #AREA_CODE# ]]></isNotNull>
+	    <isNotNull property="CITY_LEVEL" prepend=","><![CDATA[CITY_LEVEL = #CITY_LEVEL# ]]></isNotNull>
+	    <isNotNull property="INTE_CHANN_NAME" prepend=","><![CDATA[INTE_CHANN_NAME = #INTE_CHANN_NAME# ]]></isNotNull>
+	    <isNotNull property="INTE_CUSTOMER_NAME" prepend=","><![CDATA[INTE_CUSTOMER_NAME = #INTE_CUSTOMER_NAME# ]]></isNotNull>
+	    <isNotNull property="TEL" prepend=","><![CDATA[TEL = #TEL# ]]></isNotNull>
+	    <isNotNull property="SEX" prepend=","><![CDATA[SEX = #SEX# ]]></isNotNull>
+	    <isNotNull property="AGE" prepend=","><![CDATA[AGE = #AGE# ]]></isNotNull>
+	    <isNotNull property="EDUCATION" prepend=","><![CDATA[EDUCATION = #EDUCATION# ]]></isNotNull>
+	    <isNotNull property="ADDRESS" prepend=","><![CDATA[ADDRESS = #ADDRESS# ]]></isNotNull>
+	    <isNotNull property="EXIST_STORE_NAME" prepend=","><![CDATA[EXIST_STORE_NAME = #EXIST_STORE_NAME# ]]></isNotNull>
+	    <isNotNull property="EXIST_STORE_ADDR" prepend=","><![CDATA[EXIST_STORE_ADDR = #EXIST_STORE_ADDR# ]]></isNotNull>
+	    <isNotNull property="EXIST_STORE_AREA" prepend=","><![CDATA[EXIST_STORE_AREA = #EXIST_STORE_AREA# ]]></isNotNull>
+	    <isNotNull property="EXIST_STORE_RANGE" prepend=","><![CDATA[EXIST_STORE_RANGE = #EXIST_STORE_RANGE# ]]></isNotNull>
+	    <isNotNull property="EXIST_STORE_COMPETITION" prepend=","><![CDATA[EXIST_STORE_COMPETITION = #EXIST_STORE_COMPETITION# ]]></isNotNull>
+	    <isNotNull property="NEW_STORE_NAME" prepend=","><![CDATA[NEW_STORE_NAME = #NEW_STORE_NAME# ]]></isNotNull>
+	    <isNotNull property="NEW_STORE_ADDR" prepend=","><![CDATA[NEW_STORE_ADDR = #NEW_STORE_ADDR# ]]></isNotNull>
+	    <isNotNull property="NEW_STORE_AREA" prepend=","><![CDATA[NEW_STORE_AREA = #NEW_STORE_AREA# ]]></isNotNull>
+	    <isNotNull property="NEW_STORE_RANGE" prepend=","><![CDATA[NEW_STORE_RANGE = #NEW_STORE_RANGE# ]]></isNotNull>
+	    <isNotNull property="NEW_STORE_DATE" prepend=","><![CDATA[NEW_STORE_DATE = #NEW_STORE_DATE# ]]></isNotNull>
+	    <isNotNull property="SHIP_POINT_ID" prepend=","><![CDATA[SHIP_POINT_ID = #SHIP_POINT_ID# ]]></isNotNull>
+	    <isNotNull property="SHIP_POINT_NAME" prepend=","><![CDATA[SHIP_POINT_NAME = #SHIP_POINT_NAME# ]]></isNotNull>
+	    <isNotNull property="AREA_SER_FLG" prepend=","><![CDATA[AREA_SER_FLG = #AREA_SER_FLG# ]]></isNotNull>
+	    <isNotNull property="AREA_SER_ID" prepend=","><![CDATA[AREA_SER_ID = #AREA_SER_ID# ]]></isNotNull>
+	    <isNotNull property="AREA_SER_NO" prepend=","><![CDATA[AREA_SER_NO = #AREA_SER_NO# ]]></isNotNull>
+	    <isNotNull property="AREA_SER_NAME" prepend=","><![CDATA[AREA_SER_NAME = #AREA_SER_NAME# ]]></isNotNull>
+	    <isNotNull property="DOCUMENTS" prepend=","><![CDATA[DOCUMENTS = #DOCUMENTS# ]]></isNotNull>
+	    <isNotNull property="VISIT_TYPE" prepend=","><![CDATA[VISIT_TYPE = #VISIT_TYPE# ]]></isNotNull>
+	    <isNotNull property="VISIT_REMARK" prepend=","><![CDATA[VISIT_REMARK = #VISIT_REMARK# ]]></isNotNull>
+	    <isNotNull property="BUSS_SCOPE" prepend=","><![CDATA[BUSS_SCOPE = #BUSS_SCOPE# ]]></isNotNull>
+	    <isNotNull property="STORE_NAME" prepend=","><![CDATA[STORE_NAME = #STORE_NAME# ]]></isNotNull>
+	    <isNotNull property="INTE_STORE_VSION" prepend=","><![CDATA[INTE_STORE_VSION = #INTE_STORE_VSION# ]]></isNotNull>
+	    <isNotNull property="INTE_STORE_AREA" prepend=","><![CDATA[INTE_STORE_AREA = #INTE_STORE_AREA# ]]></isNotNull>
+	    <isNotNull property="INTE_STORE_DATE" prepend=","><![CDATA[INTE_STORE_DATE = to_date(#INTE_STORE_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+	    <isNotNull property="IS_CONTRACT" prepend=","><![CDATA[IS_CONTRACT = #IS_CONTRACT# ]]></isNotNull>
+	    <isNotNull property="IS_PAY_INTEAMOUNT" prepend=","><![CDATA[IS_PAY_INTEAMOUNT = #IS_PAY_INTEAMOUNT# ]]></isNotNull>
+	    <isNotNull property="IS_FIRST_SENTPDT" prepend=","><![CDATA[IS_FIRST_SENTPDT = #IS_FIRST_SENTPDT# ]]></isNotNull>
+	    <isNotNull property="CHANN_REMARK" prepend=","><![CDATA[CHANN_REMARK = #CHANN_REMARK# ]]></isNotNull>
+	    <isNotNull property="SOLUTION" prepend=","><![CDATA[SOLUTION = #SOLUTION# ]]></isNotNull>
+	    <isNotNull property="COMPETITION_INFO" prepend=","><![CDATA[COMPETITION_INFO = #COMPETITION_INFO# ]]></isNotNull>
+	    <isNotNull property="SUPPORT_DEMAND" prepend=","><![CDATA[SUPPORT_DEMAND = #SUPPORT_DEMAND# ]]></isNotNull>
+	    <isNotNull property="ADVANTAGES" prepend=","><![CDATA[ADVANTAGES = #ADVANTAGES# ]]></isNotNull>
+	    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+	    <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+	    <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+   </dynamic>
+	<![CDATA[ where INTE_CHANN_ID = #INTE_CHANN_ID#]]>
+</update>
+
+
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update ERP_INTENTION_CHANN
+	               set DEL_FLAG = #DEL_FLAG#
+ 	          where 
+	          INTE_CHANN_ID = #INTE_CHANN_ID# 
+    ]]>
+</delete>
+
+ 
+ 
+ 
+<update id="updStusById" parameterClass="map">	
+     <![CDATA[ 
+	  update ERP_INTENTION_CHANN 
+	       set STATE = #STATE#
+              ,UPD_NAME=#UPD_NAME#
+              ,UPDATOR=#UPDATOR#
+              ,UPD_TIME=sysdate
+ 	  where 
+	     INTE_CHANN_ID = #INTE_CHANN_ID# 
+    ]]>
+</update>
+
+
+
+</sqlMap>

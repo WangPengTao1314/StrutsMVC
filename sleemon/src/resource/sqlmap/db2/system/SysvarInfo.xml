@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="SysvarInfo">
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="varName">
+			v.VAR_NAME like '%$varName$%'
+		</isNotEmpty> 
+		<isNotEmpty prepend="and" property="varType">
+			v.VAR_TYPE = #varType#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="varId">
+			v.VAR_ID = #varId#
+		</isNotEmpty>
+	</sql>
+
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[ select v.* ,ROW_NUMBER() OVER(ORDER BY VAR_ID) AS rn from ${PUB}.SYS_VAR v ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<![CDATA[ order by v.VAR_ID ]]>
+	</sql>
+
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(var_id) cnt FROM ${PUB}.SYS_VAR v ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+
+	<!-- 增加 -->
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${PUB}.SYS_VAR (VAR_ID, VAR_NAME, VAR_TYPE, VALUE, VAR_DESC)
+		 values(#varId#, #varName#,#varType:VARCHAR:NULL#, #value:VARCHAR:NULL#, #varDesc:VARCHAR:NULL#)
+		]]>
+	</insert>
+
+    <!-- 载入 -->
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${PUB}.SYS_VAR ]]>
+		<!-- VAR_NAME, VAR_TYPE, VALUE, VAR_DESC -->
+		<dynamic prepend="set">
+			<isNotNull property="varName" prepend=","><![CDATA[VAR_NAME = #varName#]]></isNotNull>
+			<isNotNull property="varType" prepend=","><![CDATA[VAR_TYPE = #varType#]]></isNotNull>
+			<isNotNull property="value" prepend=","><![CDATA[VALUE = #value#]]></isNotNull>
+			<isNotNull property="varDesc" prepend=","><![CDATA[VAR_DESC = #varDesc#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where VAR_ID = #varId# ]]>
+	</update>
+
+	<!-- 加载 -->
+	<select id="loadById" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[ select * from ${PUB}.SYS_VAR s where VAR_ID = #varId:VARCHAR# ]]>
+	</select>
+
+	<!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select> 
+	
+	<!-- 按参数类别查找参数 -->
+	<select id="findByVarType" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[ select * from ${PUB}.SYS_VAR s where VAR_TYPE = #varType# ]]>
+	</select>
+	
+	<!-- 删除 -->
+	<delete id="delete" parameterClass="map">
+		<![CDATA[ delete from ${PUB}.SYS_VAR v ]]>
+		<![CDATA[ where VAR_ID = #varId# ]]>
+	</delete> 
+</sqlMap>
+

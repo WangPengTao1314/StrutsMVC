@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.4"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+	<!-- Struts Action Mapping-->
+	<servlet>
+		<servlet-name>action</servlet-name>
+		<servlet-class>
+			org.apache.struts.action.ActionServlet
+		</servlet-class>
+		<init-param>
+			<param-name>config</param-name>
+			<param-value>
+				/WEB-INF/struts-config.xml,  
+				/WEB-INF/conf-struts/struts-sample.xml,
+				/WEB-INF/conf-struts/struts-sys.xml,
+				/WEB-INF/conf-struts/struts-report.xml,
+				/WEB-INF/conf-struts/struts-base.xml,
+				/WEB-INF/conf-struts/struts-erp.xml,
+				/WEB-INF/conf-struts/struts-drp.xml
+			</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>action</servlet-name>
+		<url-pattern>*.shtml</url-pattern>
+	</servlet-mapping>
+
+  <!--快逸报表服务器-->
+   <servlet>
+    <servlet-name>SetContextServlet</servlet-name>
+    <servlet-class>com.runqian.util.webutil.SetContextServlet</servlet-class>
+    <load-on-startup>2</load-on-startup>
+  </servlet>
+   <servlet>
+		<servlet-name>reportServlet</servlet-name>
+		<servlet-class>com.runqian.report4.view.ReportServlet</servlet-class>
+		<init-param>
+		<param-name>configFile</param-name>
+		<param-value>/WEB-INF/runqian/reportConfig.xml</param-value>
+		</init-param>
+	    <load-on-startup>2</load-on-startup>
+    </servlet>
+	<servlet-mapping>
+	    <servlet-name>reportServlet</servlet-name>
+	    <url-pattern>/reportServlet</url-pattern>
+	</servlet-mapping>
+  <jsp-config>
+    	 <taglib>
+		    <taglib-uri>/WEB-INF/runqianReport4.tld</taglib-uri>
+		    <taglib-location>/WEB-INF/runqian/runqianReport4.tld</taglib-location>
+		  </taglib>
+    </jsp-config>
+  <!--快逸end-->
+  <!--短消息 -->
+  <!-- servlet>
+	  <servlet-name>TimerTask</servlet-name>
+	  <servlet-class>com.hoperun.commons.util.TimerTask</servlet-class>
+	   <load-on-startup>3</load-on-startup>
+ 	</servlet>
+   <servlet>
+     <servlet-name>CommWebServiceStart</servlet-name>
+     <servlet-class>com.hoperun.commons.webservice.CommWebServiceStart</servlet-class>
+     <load-on-startup>3</load-on-startup>
+   </servlet-->
+	<!-- Character Encoding filter -->
+	<filter>
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>
+			org.springframework.web.filter.CharacterEncodingFilter
+		</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<!--User Session Validate-->
+	<filter>
+		<filter-name>UrlFilter</filter-name>
+		<filter-class>
+			com.hoperun.commons.filter.SessionFilter
+		</filter-class>
+		<init-param>
+			<param-name>forwardTo</param-name>
+			<param-value>/pages/index/logout.jsp</param-value>
+		</init-param>
+		<init-param>
+			<param-name>checkedSessionAttribute</param-name>
+			<param-value>UserBean</param-value>
+		</init-param>
+		<init-param>
+			<param-name>openedURL</param-name>
+			<param-value>
+				/index.jsp,/pages/index/index.jsp,/pages/index/login.jsp,/pages/index/logout.jsp,/login.shtml
+			</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>UrlFilter</filter-name>
+		<url-pattern>*.jsp</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>UrlFilter</filter-name>
+		<url-pattern>*.shtml</url-pattern>
+	</filter-mapping>
+	
+    <!-- SessionFilter -->
+    <listener> 
+		<listener-class>com.hoperun.commons.filter.MySessionFilter</listener-class> 
+	</listener> 
+
+	<!-- session超时定义,单位为分钟 -->
+	<session-config>
+		<session-timeout>30</session-timeout>
+	</session-config>
+    <!-- 默认首页定义 --> 
+	<welcome-file-list>
+		<welcome-file>/pages/index/login.jsp</welcome-file>
+	</welcome-file-list>
+ 	<error-page>
+      <error-code>500</error-code>
+     <location>/pages/common/errpage.jsp</location>
+    </error-page>
+    <error-page>
+    <error-code>404</error-code>
+     <location>/pages/common/errpage.jsp</location>
+    </error-page>
+    
+	<!--listener>
+        <listener-class>com.hoperun.commons.servlet.ContextServlet</listener-class>
+    </listener--> 
+</web-app>
+

@@ -1,0 +1,293 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author lyg
+@function 
+@version 2013-08-11 17:38:52
+-->
+<sqlMap  namespace="Saleordera">
+<!-- 定义AdvctoorderModel,AdvctoorderModelChld,AdvctoorderModelGchld -->
+<typeAlias type="com.hoperun.drp.sale.saleordera.model.SaleorderaModel" alias="SaleorderaModel"/>
+<typeAlias type="com.hoperun.drp.sale.saleordera.model.SaleorderaModelChld" alias="SaleorderaModelChld" />
+<!-- 使用SaleorderaModel装载结果集 -->
+<resultMap id="SaleorderaModel" class="SaleorderaModel">
+    <result column="SALE_ORDER_ID" property="SALE_ORDER_ID" />
+</resultMap>
+<!-- 使用SaleorderaModelChld装载结果集 -->
+<resultMap id="SaleorderaModelChld" class="SaleorderaModelChld">
+    <result column="SALE_ORDER_DTL_ID" property="SALE_ORDER_DTL_ID" />
+</resultMap>
+<!--主表动态查询 and 列表分页 -->
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="SALE_ORDER_NO">
+    u.SALE_ORDER_NO like '%'||#SALE_ORDER_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="BILL_TYPE">
+    u.BILL_TYPE=#BILL_TYPE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="FROM_BILL_NO">
+    u.FROM_BILL_NO like '%'||#FROM_BILL_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="LEDGER_ID">
+  	u.LEDGER_ID=#LEDGER_ID#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="ORDER_CHANN_NO">
+  	u.ORDER_CHANN_NO like '%'||#ORDER_CHANN_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="ORDER_CHANN_NAME">
+  	u.ORDER_CHANN_NAME like '%'||#ORDER_CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="PERSON_CON">
+  	u.PERSON_CON like '%'||#PERSON_CON#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="TEL">
+  	u.TEL like '%'||#TEL#||'%'
+  </isNotEmpty>
+  
+  
+  <isNotEmpty prepend="and" property="ORDER_DATE_BEG">
+     <![CDATA[u.ORDER_DATE>=to_date(#ORDER_DATE_BEG#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="ORDER_DATE_END">
+     <![CDATA[u.ORDER_DATE<=to_date(#ORDER_DATE_END#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="BEGIN_CRE_TIME">
+     <![CDATA[u.CRE_TIME>=to_date(#BEGIN_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="END_CRE_TIME">
+     <![CDATA[u.CRE_TIME<=to_date(#END_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE =#STATE#
+  </isNotEmpty>
+	<isNotEmpty prepend="and " property="DEL_FLAG">
+	        u.DEL_FLAG=#DEL_FLAG#
+	</isNotEmpty>
+    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	  	select u.SALE_ORDER_ID,
+	       u.SALE_ORDER_NO,
+	       u.BILL_TYPE,
+	       u.FROM_BILL_ID,
+	       u.FROM_BILL_NO,
+	       u.ORDER_CHANN_ID,
+	       u.ORDER_CHANN_NO,
+	       u.ORDER_CHANN_NAME,
+	       to_char(u.ORDER_DATE,'yyyy-mm-dd')ORDER_DATE,
+	       u.PERSON_CON,
+	       u.TEL,
+	       u.RECV_ADDR,
+	       u.STATE,
+	       u.REMARK,
+	       u.CREATOR,
+	       u.CRE_NAME,
+	       to_char(u.CRE_TIME,'yyyy-mm-dd HH24:MI:SS')CRE_TIME,
+	       u.UPDATOR,
+	       u.UPD_NAME,
+	       u.UPD_TIME,
+	       u.AUDIT_ID,
+	       u.AUDIT_NAME,
+	       u.AUDIT_TIME,
+	       u.DEPT_ID,
+	       u.DEPT_NAME,
+	       u.ORG_ID,
+	       u.ORG_NAME,
+	       u.LEDGER_ID,
+	       u.LEDGER_NAME,
+	       u.DEL_FLAG,
+	       u.AREA_ID,
+	       u.AREA_NO,
+	       u.AREA_NAME,
+	       u.RECV_ADDR_NO,
+	       u.RSP_NAME
+	  from DRP_SALE_ORDER_A u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt from DRP_SALE_ORDER_A u  left join BASE_TERMINAL a on a.DEL_FLAG=0 and a.TERM_ID=u.ORDER_CHANN_ID ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+		select u.SALE_ORDER_ID,
+	       u.SALE_ORDER_NO,
+	       u.BILL_TYPE,
+	       u.FROM_BILL_ID,
+	       u.FROM_BILL_NO,
+	       u.ORDER_CHANN_ID,
+	       u.ORDER_CHANN_NO,
+	       u.ORDER_CHANN_NAME,
+	       to_char(u.ORDER_DATE,'yyyy-mm-dd')ORDER_DATE,
+	       u.PERSON_CON,
+	       u.TEL,
+	       u.RECV_ADDR,
+	       u.STATE,
+	       u.REMARK,
+	       u.CREATOR,
+	       u.CRE_NAME,
+	       to_char(u.CRE_TIME,'yyyy-mm-dd HH24:MI:SS')CRE_TIME,
+	       u.UPDATOR,
+	       u.UPD_NAME,
+	       to_char(u.UPD_TIME,'yyyy-mm-dd HH24:MI:SS')UPD_TIME,
+	       u.AUDIT_ID,
+	       u.AUDIT_NAME,
+	       to_char(u.AUDIT_TIME,'yyyy-mm-dd HH24:MI:SS')AUDIT_TIME,
+	       u.DEPT_ID,
+	       u.DEPT_NAME,
+	       u.ORG_ID,
+	       u.ORG_NAME,
+	       u.LEDGER_ID,
+	       u.LEDGER_NAME,
+	       u.DEL_FLAG,
+	       u.AREA_ID,
+	       u.AREA_NO,
+	       u.AREA_NAME,
+	       u.RECV_ADDR_NO,
+	       u.RSP_NAME
+	  from DRP_SALE_ORDER_A u
+	  where u.SALE_ORDER_ID=#SALE_ORDER_ID#
+	]]>
+</select>
+<!-- 明细操作开始-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     a.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+		select a.SALE_ORDER_DTL_ID,
+       a.SALE_ORDER_ID,
+       a.PRD_ID,
+       a.PRD_NO,
+       a.PRD_NAME,
+       a.PRD_SPEC,
+       a.BRAND,
+       a.STD_UNIT,
+       (case when NVL(b.SPCL_TECH_FLAG,0)=2 then '是' else '否' end)IS_NO_STAND_FLAG,
+       a.PRICE,
+       a.DECT_RATE,
+       a.DECT_PRICE,
+       a.ORDER_NUM,
+       a.ORDER_AMOUNT,
+       a.SENDED_NUM,
+       a.CANCLE_NUM,
+       to_char(a.ADVC_SEND_DATE,'yyyy-mm-dd')ADVC_SEND_DATE,
+       a.REMARK,
+       a.DEL_FLAG,
+       a.FROM_BILL_DTL_ID,
+       a.CANCEL_FLAG,
+       a.YEAR_MONTH,
+	   a.PRD_TYPE,
+	   b.SPCL_SPEC_REMARK,
+	   b.DM_SPCL_TECH_NO,
+	   b.SPCL_TECH_ID,
+       b.SPCL_TECH_FLAG
+  from DRP_SALE_ORDER_DTL_A a
+  left join DRP_SPCL_TECH b on a.SPCL_TECH_ID=b.SPCL_TECH_ID and b.USE_FLAG=1
+		
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			a.SALE_ORDER_ID=#SALE_ORDER_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+<select id="downGetById" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+		select u.SALE_ORDER_NO,
+		       u.BILL_TYPE,
+		       u.FROM_BILL_NO,
+		       u.ORDER_CHANN_NO,
+		       u.ORDER_CHANN_NAME,
+		       to_char(u.ORDER_DATE,'yyyy-mm-dd')ORDER_DATE,
+		       u.PERSON_CON,
+		       u.TEL,
+		       u.RECV_ADDR,
+		       u.STATE,
+		       u.REMARK,
+		       u.CRE_NAME,
+		       to_char(u.CRE_TIME,'yyyy-mm-dd HH24:MI:SS')ORDER_DATE,
+		       u.UPD_NAME,
+		       to_char(u.UPD_TIME,'yyyy-mm-dd HH24:MI:SS')UPD_TIME,
+		       u.AUDIT_NAME,
+		       to_char(u.AUDIT_TIME,'yyyy-mm-dd HH24:MI:SS')AUDIT_TIME,
+		       u.DEPT_NAME,
+		       u.ORG_NAME,
+		       u.AREA_NO,
+		       u.AREA_NAME,
+		       u.RECV_ADDR_NO,
+		       b.PRD_NO,
+		       b.PRD_NAME,
+		       b.PRD_SPEC,
+		       b.BRAND,
+		       b.STD_UNIT,
+		       (case when NVL(c.SPCL_TECH_FLAG,0)=2 then '是' else '否' end)IS_NO_STAND_FLAG,
+		       b.PRICE,
+		       b.DECT_RATE,
+		       b.DECT_PRICE,
+		       b.ORDER_NUM,
+		       b.ORDER_AMOUNT,
+		       b.SENDED_NUM,
+		       b.CANCLE_NUM,
+		       to_char(b.ADVC_SEND_DATE,'yyyy-mm-dd')ADVC_SEND_DATE,
+		       b.REMARK DTLREMARK,
+		       (case when NVL(b.CANCEL_FLAG,0)=0 then '否' else '是' end)CANCEL_FLAG,
+		       c.SPCL_DTL_REMARK,
+		       u.RSP_NAME
+		  from DRP_SALE_ORDER_A u
+		  left join DRP_SALE_ORDER_DTL_A b
+		    on u.SALE_ORDER_ID = b.SALE_ORDER_ID
+		   and b.DEL_FLAG = 0
+		  left join DRP_SPCL_TECH c
+		    on c.SPCL_TECH_ID = b.SPCL_TECH_ID
+		   and c.USE_FLAG = 1
+	]]>
+   <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+</select>
+</sqlMap>

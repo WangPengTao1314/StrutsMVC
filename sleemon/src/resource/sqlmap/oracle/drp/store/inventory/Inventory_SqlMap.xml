@@ -1,0 +1,1132 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author lyg
+@function 
+@version 2013-09-07 09:54:59
+-->
+<sqlMap  namespace="Inventory">
+<!-- 定义InventoryModel,InventoryModelChld -->
+<typeAlias type="com.hoperun.drp.store.inventory.model.InventoryModel" alias="InventoryModel"/>
+<typeAlias type="com.hoperun.drp.store.inventory.model.InventoryModelChld" alias="InventoryModelChld" />
+<!-- 使用InventoryModel装载结果集 -->
+<resultMap id="InventoryModel" class="InventoryModel">
+    <result column="PRD_INV_ID" property="PRD_INV_ID" />
+</resultMap>
+<!-- 使用InventoryModelChld装载结果集 -->
+<resultMap id="InventoryModelChld" class="InventoryModelChld">
+    <result column="PRD_INV_DTL_ID" property="PRD_INV_DTL_ID" />
+</resultMap>
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="PRD_INV_NO">
+    u.PRD_INV_NO like '%'||#PRD_INV_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="INV_TYPE">
+    u.INV_TYPE like '%'||#INV_TYPE#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STORE_NO">
+    u.STORE_NO like '%'||#STORE_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STORE_NAME">
+    u.STORE_NAME like '%'||#STORE_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="INV_RANGE">
+    u.INV_RANGE like '%'||#INV_RANGE#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STORG_NO">
+    u.STORG_NO like '%'||#STORG_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="LEDGER_ID">
+    u.LEDGER_ID =#LEDGER_ID#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STORG_NAME">
+    u.STORG_NAME like '%'||#STORG_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="PRD_NO">
+    u.PRD_NO like '%'||#PRD_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="PRD_NAME">
+    u.PRD_NAME like '%'||#PRD_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_BEG">
+     <![CDATA[u.CRE_TIME >=to_date(#CRE_TIME_BEG#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+     <![CDATA[u.CRE_TIME <=  to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE =#STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="whSTATE">
+    u.STATE in ($whSTATE$)
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="shSTATE">
+    u.STATE =#shSTATE#
+  </isNotEmpty>
+	<isNotEmpty prepend="and " property="DEL_FLAG">
+	        u.DEL_FLAG=#DEL_FLAG#
+	</isNotEmpty>
+    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	</isNotEmpty>
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.PRD_INV_ID,
+		u.PRD_INV_NO,
+		u.INV_TYPE,
+		u.STORE_ID,
+		u.STORE_NO,
+		u.STORE_NAME,
+		u.STORAGE_FLAG,
+		u.INV_RANGE,
+		u.STORG_ID,
+		u.STORG_NO,
+		u.STORG_NAME,
+		u.PRD_ID,
+		u.PRD_NO,
+		u.PRD_NAME,
+		u.INV_PSON_ID,
+		u.INV_PSON_NO,
+		u.INV_PSON_NAME,
+		u.REMARK,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG
+      from DRP_PRD_INV u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM DRP_PRD_INV u ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_PRD_INV(
+		 PRD_INV_ID,
+         STORE_ID,
+         STORG_ID,
+         REMARK,
+         PRD_ID,
+         PRD_INV_NO,
+         INV_TYPE,
+         STORE_NO,
+         STORE_NAME,
+         STORAGE_FLAG,
+         INV_RANGE,
+         STORG_NO,
+         STORG_NAME,
+         PRD_NO,
+         PRD_NAME,
+         INV_PSON_ID,
+		 INV_PSON_NO,
+	     INV_PSON_NAME,
+         CRE_NAME,
+         CREATOR,
+         CRE_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         STATE,
+         DEL_FLAG
+	   )values(
+		#PRD_INV_ID#,
+        #STORE_ID#,
+        #STORG_ID#,
+        #REMARK#,
+        #PRD_ID#,
+        #PRD_INV_NO#,
+        #INV_TYPE#,
+        #STORE_NO#,
+        #STORE_NAME#,
+        #STORAGE_FLAG#,
+        #INV_RANGE#,
+        #STORG_NO#,
+        #STORG_NAME#,
+        #PRD_NO#,
+        #PRD_NAME#,
+        #INV_PSON_ID#,
+		#INV_PSON_NO#,
+	    #INV_PSON_NAME#,
+        #CRE_NAME#,
+        #CREATOR#,
+	    sysdate, 
+        #DEPT_ID#,
+        #DEPT_NAME#,
+        #ORG_ID#,
+        #ORG_NAME#,
+        #LEDGER_ID#,
+        #LEDGER_NAME#,
+        #STATE#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update DRP_PRD_INV ]]>
+	<dynamic prepend="set">
+    <isNotNull property="STORE_ID" prepend=","><![CDATA[STORE_ID = #STORE_ID# ]]></isNotNull>
+    <isNotNull property="STORG_ID" prepend=","><![CDATA[STORG_ID = #STORG_ID# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    <isNotNull property="PRD_ID" prepend=","><![CDATA[PRD_ID = #PRD_ID# ]]></isNotNull>
+    <isNotNull property="PRD_INV_NO" prepend=","><![CDATA[PRD_INV_NO = #PRD_INV_NO# ]]></isNotNull>
+    <isNotNull property="INV_TYPE" prepend=","><![CDATA[INV_TYPE = #INV_TYPE# ]]></isNotNull>
+    <isNotNull property="STORE_NO" prepend=","><![CDATA[STORE_NO = #STORE_NO# ]]></isNotNull>
+    <isNotNull property="STORE_NAME" prepend=","><![CDATA[STORE_NAME = #STORE_NAME# ]]></isNotNull>
+    <isNotNull property="STORAGE_FLAG" prepend=","><![CDATA[STORAGE_FLAG = #STORAGE_FLAG# ]]></isNotNull>
+    <isNotNull property="INV_PSON_ID" prepend=","><![CDATA[INV_PSON_ID = #INV_PSON_ID# ]]></isNotNull>
+    <isNotNull property="INV_PSON_NO" prepend=","><![CDATA[INV_PSON_NO = #INV_PSON_NO# ]]></isNotNull>
+    <isNotNull property="INV_PSON_NAME" prepend=","><![CDATA[INV_PSON_NAME = #INV_PSON_NAME# ]]></isNotNull>
+    <isNotNull property="INV_RANGE" prepend=","><![CDATA[INV_RANGE = #INV_RANGE# ]]></isNotNull>
+    <isNotNull property="STORG_NO" prepend=","><![CDATA[STORG_NO = #STORG_NO# ]]></isNotNull>
+    <isNotNull property="STORG_NAME" prepend=","><![CDATA[STORG_NAME = #STORG_NAME# ]]></isNotNull>
+    <isNotNull property="PRD_NO" prepend=","><![CDATA[PRD_NO = #PRD_NO# ]]></isNotNull>
+    <isNotNull property="PRD_NAME" prepend=","><![CDATA[PRD_NAME = #PRD_NAME# ]]></isNotNull>
+    <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+     <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where PRD_INV_ID = #PRD_INV_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update DRP_PRD_INV 
+	               set DEL_FLAG = #DEL_FLAG#
+                      ,UPD_NAME=#UPD_NAME#
+                     ,UPDATOR=#UPDATOR#
+                      ,UPD_TIME=sysdate
+ 	  where 
+	     PRD_INV_ID = #PRD_INV_ID:VARCHAR# 
+    ]]>
+</delete>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.PRD_INV_ID,
+		u.PRD_INV_NO,
+		u.INV_TYPE,
+		u.STORE_ID,
+		u.STORE_NO,
+		u.STORE_NAME,
+		u.STORAGE_FLAG,
+		u.INV_RANGE,
+		u.STORG_ID,
+		u.STORG_NO,
+		u.STORG_NAME,
+		u.PRD_ID,
+		u.PRD_NO,
+		u.PRD_NAME,
+		u.INV_PSON_ID,
+		u.INV_PSON_NO,
+		u.INV_PSON_NAME,
+		u.REMARK,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG
+	  from
+       DRP_PRD_INV u 
+	  where 
+		u.PRD_INV_ID = #PRD_INV_ID#
+	]]>
+</select>
+<!-- 明细操作开始-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+     select 
+		u.PRD_INV_DTL_ID,
+		u.PRD_INV_ID,
+		u.STORG_ID,
+		u.STORG_NO,
+		u.STORG_NAME,
+		u.PRD_ID,
+		u.PRD_NO,
+		u.PRD_NAME,
+		u.PRD_SPEC,
+		u.PRD_COLOR,
+		u.BRAND,
+		u.STD_UNIT,
+		u.INV_NUM,
+		u.ACCT_NUM,
+		u.DIFF_NUM,
+		u.INS_FLAG,
+		u.DEL_FLAG,
+		u.SPCL_TECH_ID,
+		c.SPCL_TECH_FLAG,
+		c.SPCL_SPEC_REMARK,
+		c.SPCL_DTL_REMARK,
+		c.DM_SPCL_TECH_NO,
+		d.PAR_PRD_NAME
+       from DRP_PRD_INV_DTL u 
+       left join DRP_SPCL_TECH c on c.SPCL_TECH_ID = u.SPCL_TECH_ID and USE_FLAG = 1
+       left join BASE_PRODUCT d on d.PRD_ID=u.PRD_ID and d.DEL_FLAG=0
+   ]]>
+</sql>
+	<!-- 根据主表ID查询明细 -->
+  <sql id="queryChldByFkIdPage" >
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.PRD_INV_ID=#PRD_INV_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <![CDATA[
+	  	order by u.PRD_NO
+	  ]]>
+<!--	  <isNotNull prepend=" order by " property="orderField">-->
+<!--			<include refid="orderSqlChld"/>-->
+<!--	  </isNotNull>-->
+  </sql>
+<select id="pageQueryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="queryChldByFkIdPage" />
+		<include refid="public.pageEnd" />
+	</select>
+
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.PRD_INV_ID=#PRD_INV_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+  <select id="queryChldByFkIdCount" parameterClass="map" resultClass="int">
+  		select count(0) 
+  		from DRP_PRD_INV_DTL u 
+       left join DRP_SPCL_TECH c on c.SPCL_TECH_ID = u.SPCL_TECH_ID and USE_FLAG = 1
+  	<dynamic prepend="where">
+			u.PRD_INV_ID=#PRD_INV_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+	        u.PRD_INV_DTL_ID in ($PRD_INV_DTL_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+<!--明细表插入 -->
+<insert id="insertChld" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_PRD_INV_DTL(
+		 PRD_INV_DTL_ID,
+		 PRD_INV_ID,
+         STORG_ID,
+         PRD_ID,
+         INV_NUM,
+         STORG_NO,
+         STORG_NAME,
+         PRD_NO,
+         PRD_NAME,
+         PRD_SPEC,
+         PRD_COLOR,
+         BRAND,
+         STD_UNIT,
+         ACCT_NUM,
+         DIFF_NUM,
+         DEL_FLAG,
+         INS_FLAG,
+         SPCL_TECH_ID
+	   )values(
+		#PRD_INV_DTL_ID#,
+		#PRD_INV_ID#,
+        #STORG_ID#,
+        #PRD_ID#,
+        #INV_NUM#,
+        #STORG_NO#,
+        #STORG_NAME#,
+        #PRD_NO#,
+        #PRD_NAME#,
+        #PRD_SPEC#,
+        #PRD_COLOR#,
+        #BRAND#,
+        #STD_UNIT#,
+        #ACCT_NUM#,
+        #DIFF_NUM#,
+		#DEL_FLAG#,
+		#INS_FLAG#,
+		#SPCL_TECH_ID#
+		)
+   ]]>
+</insert>
+<!--明细表更新 -->
+<update id="updateChldById" parameterClass="map">
+	<![CDATA[ update DRP_PRD_INV_DTL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="STORG_ID" prepend=","><![CDATA[STORG_ID = #STORG_ID# ]]></isNotNull>
+    <isNotNull property="PRD_ID" prepend=","><![CDATA[PRD_ID = #PRD_ID# ]]></isNotNull>
+    <isNotNull property="INV_NUM" prepend=","><![CDATA[INV_NUM = #INV_NUM# ]]></isNotNull>
+    <isNotNull property="STORG_NO" prepend=","><![CDATA[STORG_NO = #STORG_NO# ]]></isNotNull>
+    <isNotNull property="STORG_NAME" prepend=","><![CDATA[STORG_NAME = #STORG_NAME# ]]></isNotNull>
+    <isNotNull property="PRD_NO" prepend=","><![CDATA[PRD_NO = #PRD_NO# ]]></isNotNull>
+    <isNotNull property="PRD_NAME" prepend=","><![CDATA[PRD_NAME = #PRD_NAME# ]]></isNotNull>
+    <isNotNull property="PRD_SPEC" prepend=","><![CDATA[PRD_SPEC = #PRD_SPEC# ]]></isNotNull>
+    <isNotNull property="PRD_COLOR" prepend=","><![CDATA[PRD_COLOR = #PRD_COLOR# ]]></isNotNull>
+    <isNotNull property="BRAND" prepend=","><![CDATA[BRAND = #BRAND# ]]></isNotNull>
+    <isNotNull property="STD_UNIT" prepend=","><![CDATA[STD_UNIT = #STD_UNIT# ]]></isNotNull>
+    <isNotNull property="ACCT_NUM" prepend=","><![CDATA[ACCT_NUM = #ACCT_NUM# ]]></isNotNull>
+    <isNotNull property="DIFF_NUM" prepend=","><![CDATA[DIFF_NUM = #DIFF_NUM# ]]></isNotNull>
+    <isNotNull property="SPCL_TECH_ID" prepend=","><![CDATA[SPCL_TECH_ID = #SPCL_TECH_ID# ]]></isNotNull>
+    <isNotNull property="upDIFF_NUM" prepend=","><![CDATA[DIFF_NUM=NVL(#INV_NUM#,0)-NVL(ACCT_NUM,0) ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where PRD_INV_DTL_ID = #PRD_INV_DTL_ID#]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteChldByIds" parameterClass="map">
+	<![CDATA[ update DRP_PRD_INV_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      PRD_INV_DTL_ID in ($PRD_INV_DTL_IDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细 -->
+<delete id="delChldByFkId" parameterClass="map">
+	<![CDATA[ update DRP_PRD_INV_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      PRD_INV_ID = #PRD_INV_ID:VARCHAR#
+    ]]>
+</delete>
+<!-- 根据库房，库位，货品id查询货品信息 -->
+<select id="getPrdById" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+		select 
+			pdt.PRD_ID,
+			pdt.PRD_NO,
+			pdt.PRD_NAME,
+			pdt.PRD_SPEC,
+			pdt.BRAND,
+			pdt.PRD_COLOR,
+			pdt.STD_UNIT,
+			acct.STORE_NUM as ACCT_NUM ,
+			acct.SPCL_TECH_ID,
+			(select SPCL_TECH_FLAG from DRP_SPCL_TECH where SPCL_TECH_ID = acct.SPCL_TECH_ID and USE_FLAG = 1) SPCL_TECH_FLAG,
+			1 as FLAG ,
+			a.STORG_ID,
+	        a.STORG_NO,
+	        a.STORG_NAME
+			from DRP_STORE_ACCT acct 
+	    left join DRP_STORE stor on acct.STORE_ID = stor.STORE_ID
+	    left join BASE_PRODUCT pdt on acct.PRD_ID =  pdt.PRD_ID   
+	    left join DRP_STORAGE a on stor.STORE_ID=a.STORE_ID and acct.STORG_ID=a.STORG_ID
+	]]>
+	<dynamic prepend="where">
+		<isNotEmpty prepend="and" property="STATE">
+		    acct.STATE =#STATE# 
+		 </isNotEmpty>
+		 <isNotEmpty prepend="and" property="STORE_ID">
+		    acct.STORE_ID =#STORE_ID#
+		 </isNotEmpty>
+		 <isNotEmpty prepend="and" property="STORG_ID">
+		    acct.STORG_ID =#STORG_ID#
+		 </isNotEmpty>
+		 <isNotEmpty prepend="and" property="PRD_IDS">
+		    acct.PRD_ID in ($PRD_IDS$)
+		 </isNotEmpty>
+	</dynamic>
+</select>
+<select id="getINV_RANGE" parameterClass="string" resultClass="string">
+	<![CDATA[
+		select INV_RANGE from DRP_PRD_INV where PRD_INV_ID=#PRD_INV_ID#
+	]]>
+</select>
+<!-- 修改库房信息 -->
+<update id="updateDRP_STOREById" parameterClass="map">
+	<![CDATA[ update DRP_STORE ]]>
+	<dynamic prepend="set">
+    <isNotNull property="FREEZE_FLAG" prepend=","><![CDATA[FREEZE_FLAG = #FREEZE_FLAG# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where STORE_ID = #STORE_ID#]]>
+</update>
+<select id="getACCT_NUMByid" parameterClass="string" resultClass="int">
+	select ACCT_NUM from DRP_PRD_INV_DTL where PRD_INV_DTL_ID=#PRD_INV_DTL_ID#
+</select>
+<select id="findPrdIdgetPrdInfo" resultClass="java.util.HashMap" parameterClass="map">
+	<![CDATA[
+		select PRD_ID,PRD_NO,PRD_NAME,PRD_SPEC,BRAND,STD_UNIT,PRD_COLOR from BASE_PRODUCT
+	]]>
+	<dynamic prepend="where">
+		<isNotEmpty prepend="and" property="PRD_NO">
+		    PRD_NO =#PRD_NO#
+		 </isNotEmpty>
+		 <isNotEmpty prepend="and" property="PRD_NAME">
+		    PRD_NAME =#PRD_NAME#
+		 </isNotEmpty>
+		 <isNotEmpty prepend="and" property="PRD_SPEC">
+		    PRD_SPEC =#PRD_SPEC#
+		 </isNotEmpty>
+		 <isNotEmpty prepend="and" property="BRAND">
+		    BRAND =#BRAND#
+		 </isNotEmpty>
+		 <isNotEmpty prepend="and" property="STD_UNIT">
+		    STD_UNIT =#STD_UNIT#
+		 </isNotEmpty>
+		 <isNotEmpty prepend="and" property="PRD_COLOR">
+		    PRD_COLOR =#PRD_COLOR#
+		 </isNotEmpty>
+	</dynamic>
+</select>
+<delete id="delChld" parameterClass="string">
+	<![CDATA[
+		update DRP_PRD_INV_DTL set DEL_FLAG=1 where PRD_INV_ID=#PRD_INV_ID#
+	]]>
+</delete>
+<select id="checkRepeat" parameterClass="string" resultClass="java.util.HashMap">
+		select PRD_NO 
+	  from DRP_PRD_INV_DTL
+	 where PRD_INV_ID = #PRD_INV_ID#
+	   and DEL_FLAG = 0
+	 group by SPCL_TECH_ID, PRD_NO
+	having count(PRD_NO) > 1
+</select>
+<select id="getStoreNo" parameterClass="string" resultClass="string">
+	select STORE_NO from DRP_PRD_INV where PRD_INV_ID=#PRD_INV_ID#
+</select>
+<insert id="insertTempChld" parameterClass="map">
+	<![CDATA[
+		insert into DRP_TEMP_PRD_INV_DTL(
+			TEMP_PRD_INV_DTL_ID,
+			STORE_NO,
+			PRD_ID,
+			PRD_NO,
+			PRD_NAME,
+			INV_NUM,
+			SESSION_ID,
+			INV_PRICE,
+			SPCL_TECH_NO
+		)values(
+			#TEMP_PRD_INV_DTL_ID#,
+			ltrim(rtrim(#STORE_NO#)),
+			ltrim(rtrim(#PRD_ID#)),
+			ltrim(rtrim(#PRD_NO#)),
+			ltrim(rtrim(#PRD_NAME#)),
+			ltrim(rtrim(#INV_NUM#)),
+			ltrim(rtrim(#SESSION_ID#)),
+			ltrim(rtrim(#PRICE#)),
+			ltrim(rtrim(#SPCL_TECH_NO#))
+		)
+	]]>
+</insert>
+<!-- 检查是是否有重记录-->
+<select id="checkPdtRepeat" parameterClass="string" resultClass="java.util.HashMap">
+ select PRD_NO, STORE_NO,NVL(SPCL_TECH_NO,'null')
+   from DRP_TEMP_PRD_INV_DTL
+  where SESSION_ID = #SESSION_ID#
+  group by PRD_NO, STORE_NO,NVL(SPCL_TECH_NO,'null')
+ having count(PRD_NO) > 1
+</select>
+<!-- 检查是在货品表中没有的货品-->
+<select id="checkPdtNotExsit" parameterClass="string" resultClass="java.util.HashMap">
+SELECT d.PRD_NO
+  FROM DRP_TEMP_PRD_INV_DTL d
+ WHERE d.SESSION_ID = #SESSION_ID#
+   and NOT EXISTS (SELECT p.PRD_NO
+          FROM BASE_PRODUCT p
+         WHERE p.DEL_FLAG = 0
+           and p.STATE in ('启用','停用')
+           and d.PRD_NO = p.PRD_NO)
+</select>
+<!-- 检查盘点货品和特殊工艺编号是否对应-->
+<select id="checkPdtAndSpclNotExsit" parameterClass="String" resultClass="java.util.HashMap">
+	select a.PRD_NO,a.SPCL_TECH_NO
+	from DRP_TEMP_PRD_INV_DTL a 
+	where a.SESSION_ID = #SESSION_ID#
+	and NVL(a.SPCL_TECH_NO,'null') !='null'
+	and NOT EXISTS (SELECT b.PRD_NO,b.DM_SPCL_TECH_NO SPCL_TECH_NO
+          FROM DRP_SPCL_TECH b
+         WHERE b.PRD_NO=a.PRD_NO
+           and NVL(b.DM_SPCL_TECH_NO,'NONL') = NVL(a.SPCL_TECH_NO,'NONL')
+           and USE_FLAG=1
+           )
+</select>
+<!-- 检查是不存在的库房-->
+<select id="checkStoretExsit" parameterClass="map" resultClass="java.util.HashMap">
+  SELECT D.STORE_NO
+    FROM DRP_TEMP_PRD_INV_DTL D
+   WHERE 
+   D.SESSION_ID = #SESSION_ID# AND
+   NOT EXISTS (SELECT S.STORE_NO
+            FROM DRP_STORE S
+           WHERE S.DEL_FLAG = 0
+             AND S.LEDGER_ID = #LEDGER_ID#
+             AND S.STATE = '启用'
+             AND S.STORE_NO = D.STORE_NO)
+   GROUP BY D.STORE_NO
+</select>
+<!-- 检查渠道是否维护初始化年份月份-->
+<select id="checkChannInitYearAndMonth" parameterClass="map" resultClass="java.util.HashMap">
+  SELECT B.INIT_YEAR, B.INIT_MONTH 
+  FROM BASE_CHANN B
+ WHERE B.CHANN_ID = #CHANN_ID#
+</select>
+<!-- 备份要删除的库房账数据到临时表-->
+<insert id="insertStoreAcctTemp" parameterClass="map">
+	<![CDATA[
+insert into DRP_STORE_ACCT_TEMP
+  (STORE_ACCT_ID,
+   STORE_ID,
+   STORG_ID,
+   SPCL_TECH_ID,
+   PRD_ID,
+   STD_UNIT,
+   MEAS_UNIT,
+   STORE_NUM,
+   FREEZE_NUM,
+   MEAS_STORE_NUM,
+   LEDGER_ID,
+   STATE,
+   CREATOR,
+   CRE_NAME,
+   CRE_TIME)
+  SELECT STORE_ACCT_ID,
+         STORE_ID,
+         STORG_ID,
+         SPCL_TECH_ID,
+         PRD_ID,
+         STD_UNIT,
+         MEAS_UNIT,
+         STORE_NUM,
+         FREEZE_NUM,
+         MEAS_STORE_NUM,
+         LEDGER_ID,
+         STATE,
+         #CREATOR#,
+         #CRE_NAME#,
+         sysdate
+    FROM DRP_STORE_ACCT T
+   WHERE T.STORE_ID IN (SELECT (SELECT STORE_ID
+                                  FROM DRP_STORE S
+                                 WHERE S.STORE_NO = T.STORE_NO) STORE_ID
+                          FROM DRP_TEMP_PRD_INV_DTL T
+                         WHERE T.SESSION_ID = #SESSION_ID#
+                         GROUP BY T.STORE_NO)
+	]]>
+</insert>
+<!-- 删除库房账数据-->
+<delete id="deleteStoreAcct" parameterClass="map">
+	<![CDATA[
+		DELETE FROM DRP_STORE_ACCT A
+		  WHERE A.LEDGER_ID = #LEDGER_ID#
+		    AND A.STORE_ID IN
+		        (SELECT (SELECT STORE_ID FROM DRP_STORE S WHERE S.STORE_NO=T.STORE_NO) STORE_ID
+		           FROM DRP_TEMP_PRD_INV_DTL T
+		           WHERE  T.SESSION_ID = #SESSION_ID#
+		          GROUP BY T.STORE_NO)
+    ]]>
+</delete>
+<!-- 删除成本单价表-->
+<delete id="deleteCostPrice" parameterClass="map">
+	<![CDATA[
+		DELETE FROM DRP_COST_PRICE A
+		  WHERE A.LEDGER_ID = #LEDGER_ID#
+		  AND YEAR = #YEAR#
+		  AND MONTH = #MONTH#
+    ]]>
+</delete>
+<!-- 删除进销存账-->
+<delete id="deleteInvocAcct" parameterClass="map">
+	<![CDATA[
+		DELETE FROM DRP_INVOC_ACCT A
+		  WHERE A.LEDGER_ID = #LEDGER_ID#
+		   AND A.STORE_ID IN
+		   (SELECT (SELECT STORE_ID FROM DRP_STORE S WHERE S.STORE_NO=T.STORE_NO) STORE_ID
+		      FROM DRP_TEMP_PRD_INV_DTL T
+		           WHERE  T.SESSION_ID = #SESSION_ID#
+		          GROUP BY T.STORE_NO)
+		  AND YEAR = #YEAR#
+		  AND MONTH = #MONTH#
+    ]]>
+</delete>
+<!--明细表插入 -->
+<insert id="insertStoreAcct" parameterClass="map">
+  <![CDATA[
+  insert into DRP_STORE_ACCT
+  (STORE_ACCT_ID, STORE_ID, PRD_ID, SPCL_TECH_ID,STD_UNIT, STORE_NUM, LEDGER_ID, STATE)
+  select rawtohex(sys_guid()) as UUID,
+         (select store_id from drp_store s where s.store_no = t.store_no) store_id,
+         (SELECT PRD_ID FROM BASE_PRODUCT b WHERE b.PRD_NO = t.PRD_NO) PRD_ID,
+		 (SELECT MAX(SPCL_TECH_ID)
+		                    FROM DRP_SPCL_TECH h
+		                   WHERE h.PRD_NO = t.PRD_NO
+		                     and NVL(h.DM_SPCL_TECH_NO,'NONL') = NVL(t.SPCL_TECH_NO,'NONL')) SPCL_TECH_ID,            
+         t.std_unit,
+         t.inv_num,
+         #LEDGER_ID# as LEDGER_ID,
+         '0' stats
+    from DRP_TEMP_PRD_INV_DTL t
+    WHERE SESSION_ID = #SESSION_ID#
+   ]]>
+</insert>
+<!-- 删除库房账数据-->
+<delete id="deleteTempInv" parameterClass="map">
+	<![CDATA[
+	delete from DRP_TEMP_PRD_INV_DTL d where d.SESSION_ID = #SESSION_ID#
+    ]]>
+</delete>
+<!--成本表里的没有 插入成本单价-->
+<insert id="insertCostPrice" parameterClass="map">
+  <![CDATA[
+INSERT INTO DRP_COST_PRICE
+  (COST_PRICE_ID,
+   PRD_ID,
+   SPCL_TECH_ID,
+   MONTH,
+   YEAR,
+   COST_PRICE,
+   LEDGER_ID)
+  SELECT rawtohex(sys_guid()) as UUID,
+         t.PRD_ID,
+         t.SPCL_TECH_ID,
+         t.MONTH,
+         t.YEAR,
+         t.CUR_END_PRICE,
+         t.LEDGER_ID
+    from DRP_INVOC_ACCT t
+   where t.LEDGER_ID =  #LEDGER_ID#
+   and t.MONTH = #MONTH#
+   and t.YEAR = #YEAR#
+   and t.store_id in (select s.store_id from drp_store s where s.store_no in (select distinct d.store_no from DRP_TEMP_PRD_INV_DTL d where d.session_id = #SESSION_ID#))
+   ]]>
+</insert>
+<!-- 库存进销售存帐-->
+<insert id="insertIvocAcct" parameterClass="map">
+  <![CDATA[
+INSERT INTO DRP_INVOC_ACCT
+  (INVOC_ACCT_ID,
+   PRD_ID,
+   SPCL_TECH_ID,
+   CUR_END_NUM,
+   STORE_ID,
+   CUR_END_PRICE,
+   CUR_END_AMOUNT,
+   MONTH,
+   YEAR,
+   LEDGER_ID)
+  SELECT rawtohex(sys_guid()) as UUID,
+         (SELECT PRD_ID FROM BASE_PRODUCT b WHERE b.PRD_NO = t.PRD_NO) PRD_ID,
+         (SELECT MAX(SPCL_TECH_ID)
+            FROM DRP_SPCL_TECH h
+           WHERE h.PRD_NO = t.PRD_NO
+             and NVL(h.DM_SPCL_TECH_NO,'NONL') = NVL(t.SPCL_TECH_NO,'NONL')) SPCL_TECH_ID,
+         t.inv_num,
+         (select store_id from drp_store s where s.store_no = t.store_no) store_id,
+         t.inv_price,
+         NVL(t.inv_price, 0) * NVL(t.inv_num, 0),
+         #MONTH# MONTH,
+         #YEAR# YEAR,
+         #LEDGER_ID# LEDGER_ID
+    from DRP_TEMP_PRD_INV_DTL t
+   where t.SESSION_ID =  #SESSION_ID#
+   ]]>
+</insert>
+<!-- 检查必填字段-->
+<select id="checkMustFld" parameterClass="String" resultClass="java.util.HashMap">
+ SELECT T.STORE_NO,
+        T.PRD_NO,
+        T.INV_NUM,
+        T.INV_PRICE
+   FROM DRP_TEMP_PRD_INV_DTL T
+  WHERE (T.STORE_NO IS NULL OR T.STORE_NO = '')
+     OR (T.PRD_NO IS NULL OR T.PRD_NO = '')
+     OR (T.INV_NUM IS NULL OR T.INV_NUM = '')
+     OR (T.INV_PRICE IS NULL OR T.INV_PRICE = '')
+     AND T.SESSION_ID = #SESSION_ID#
+</select>
+<!-- 初始化盘点插盘点主表-->
+<insert id="insertPRDINV" parameterClass="map">
+  <![CDATA[
+INSERT INTO DRP_PRD_INV
+  (PRD_INV_ID,
+   PRD_INV_NO,
+   INV_TYPE,
+   STORE_ID,
+   STORE_NO,
+   STORE_NAME,
+   STORAGE_FLAG,
+   INV_RANGE,
+   STATE,
+   CREATOR,
+   CRE_NAME,
+   CRE_TIME,
+   DEPT_ID,
+   DEPT_NAME,
+   ORG_ID,
+   ORG_NAME,
+   LEDGER_ID,
+   LEDGER_NAME,
+   DEL_FLAG)
+  SELECT #PRD_INV_ID#,
+         #PRD_INV_NO#,
+         #INV_TYPE#,
+         (SELECT STORE_ID FROM DRP_STORE S WHERE S.STORE_NO = T.STORE_NO) STORE_ID,
+         T.STORE_NO,
+         (SELECT STORE_NAME FROM DRP_STORE S WHERE S.STORE_NO = T.STORE_NO) STORE_NAME,
+         0,
+         #INV_RANGE#,
+         #STATE#,
+         #CREATOR#,
+         #CRE_NAME#,
+         to_date(#CRE_TIME#,'yyyy-MM-DD HH24:MI:SS'),
+		 #DEPT_ID#,
+		 #DEPT_NAME#,
+		 #ORG_ID#,
+		 #ORG_NAME#,
+         #LEDGER_ID# LEDGER_ID,
+         #LEDGER_NAME# LEDGER_NAME,
+         0
+    FROM DRP_TEMP_PRD_INV_DTL T
+   WHERE T.SESSION_ID = #SESSION_ID#
+     AND T.STORE_NO = #STORE_NO#
+     AND  rownum=1
+   ]]>
+</insert>
+<!-- 初始化盘点插盘点明细 -->
+<insert id="insertPrdInvDtl" parameterClass="map">
+  <![CDATA[
+INSERT INTO DRP_PRD_INV_DTL
+  (PRD_INV_DTL_ID,
+   PRD_INV_ID,
+   PRD_ID,
+   PRD_NO,
+   PRD_NAME,
+   PRD_SPEC,
+   PRD_COLOR,
+   BRAND,
+   STD_UNIT,
+   INV_NUM,
+   DIFF_NUM,
+   DEL_FLAG,
+   INS_FLAG,
+   SPCL_TECH_ID,
+   DECT_PRICE)
+  SELECT RAWTOHEX(SYS_GUID()) AS UUID,
+         #PRD_INV_ID#,
+         B.PRD_ID,
+         T.PRD_NO,
+         B.PRD_NAME,
+         B.PRD_SPEC,
+         B.PRD_COLOR,
+         B.BRAND,
+         B.STD_UNIT,
+         T.INV_NUM,
+         T.INV_NUM,
+         #DEL_FLAG#,
+         #INS_FLAG#,
+       (SELECT MAX(SPCL_TECH_ID)
+            FROM DRP_SPCL_TECH H
+           WHERE H.PRD_NO = T.PRD_NO
+             AND H.DM_SPCL_TECH_NO = T.SPCL_TECH_NO) SPCL_TECH_ID,
+         T.INV_PRICE
+    FROM DRP_TEMP_PRD_INV_DTL T LEFT JOIN BASE_PRODUCT B ON T.PRD_NO = B.PRD_NO
+   WHERE T.SESSION_ID = #SESSION_ID#
+     AND T.STORE_NO = #STORE_NO#
+   ]]>
+</insert>
+<!-- 查询盘点单临时表按库房分组 -->
+<select id="queryInvcTemp" parameterClass="String" resultClass="java.util.HashMap">
+  SELECT D.STORE_NO
+    FROM DRP_TEMP_PRD_INV_DTL D
+   WHERE 
+   D.SESSION_ID = #SESSION_ID# 
+   GROUP BY D.STORE_NO
+</select>
+<!-- 初始化盘点的CHECK -->
+<select id="initCheckInv" parameterClass="String" resultClass="java.util.HashMap">
+SELECT COUNT(T.PRD_INV_ID) ALL_NUM
+  FROM DRP_PRD_INV T
+ WHERE T.STATE IN ('提交', '未提交','开始盘点','结束盘点','撤销','否决')
+   AND T.DEL_FLAG = 0
+   AND T.LEDGER_ID = #LEDGER_ID#
+</select>
+<!-- 封仓盘点的CHECK ,不能存在未处理完的初始化盘点 -->
+<select id="initCheckInitInv" parameterClass="String" resultClass="java.util.HashMap">
+SELECT COUNT(T.PRD_INV_ID) ALL_NUM
+  FROM DRP_PRD_INV T
+ WHERE T.STATE IN ('提交', '未提交','开始盘点','结束盘点','撤销','否决')
+   AND T.DEL_FLAG = 0
+   AND T.INV_TYPE = '初始化盘点'
+   AND T.LEDGER_ID = #LEDGER_ID#
+</select>
+<insert id="insertChldById" parameterClass="map">
+	<![CDATA[
+		insert into DRP_PRD_INV_DTL(
+			PRD_INV_DTL_ID,
+			PRD_INV_ID,
+			PRD_ID,
+			PRD_NO,
+			PRD_NAME,
+			PRD_SPEC,
+			PRD_COLOR,
+			BRAND,
+			STD_UNIT,
+			INV_NUM,
+			ACCT_NUM,
+			DIFF_NUM,
+			DEL_FLAG,
+			INS_FLAG,
+			SPCL_TECH_ID
+		)
+		select 
+			RAWTOHEX(SYS_GUID()) AS UUID,
+			#PRD_INV_ID#,
+			pdt.PRD_ID,
+			pdt.PRD_NO,
+			pdt.PRD_NAME,
+			pdt.PRD_SPEC,
+			pdt.PRD_COLOR,
+			pdt.BRAND,
+			pdt.STD_UNIT,
+			NVL(acct.STORE_NUM,0),
+			NVL(acct.STORE_NUM,0),
+			0,
+			#DEL_FLAG#,
+			1,
+			acct.SPCL_TECH_ID
+			from DRP_STORE_ACCT acct 
+	    left join DRP_STORE stor on acct.STORE_ID = stor.STORE_ID
+	    left join BASE_PRODUCT pdt on acct.PRD_ID =  pdt.PRD_ID 
+	]]>
+	<dynamic prepend="where">
+		 <isNotEmpty prepend="and" property="STORE_ID">
+		    acct.STORE_ID =#STORE_ID#
+		 </isNotEmpty>
+		 <isNotEmpty prepend="and" property="LEDGER_ID">
+		   acct.LEDGER_ID = #LEDGER_ID#
+		 </isNotEmpty>
+	</dynamic>
+</insert>
+<insert id="insertPrdChldById" parameterClass="map">
+	<![CDATA[
+		insert into DRP_PRD_INV_DTL(
+			PRD_INV_DTL_ID,
+			PRD_INV_ID,
+			PRD_ID,
+			PRD_NO,
+			PRD_NAME,
+			PRD_SPEC,
+			PRD_COLOR,
+			BRAND,
+			STD_UNIT,
+			INV_NUM,
+			ACCT_NUM,
+			DIFF_NUM,
+			DEL_FLAG,
+			INS_FLAG,
+			SPCL_TECH_ID
+		)
+		select 
+			RAWTOHEX(SYS_GUID()) AS UUID,
+			#PRD_INV_ID#,
+			pdt.PRD_ID,
+			pdt.PRD_NO,
+			pdt.PRD_NAME,
+			pdt.PRD_SPEC,
+			pdt.PRD_COLOR,
+			pdt.BRAND,
+			pdt.STD_UNIT,
+			NVL(acct.STORE_NUM,0),
+			NVL(acct.STORE_NUM,0),
+			0,
+			#DEL_FLAG#,
+			1,
+			acct.SPCL_TECH_ID
+			from  BASE_PRODUCT pdt
+	    left join DRP_STORE_ACCT acct on acct.PRD_ID =  pdt.PRD_ID  and acct.STORE_ID =#STORE_ID# and acct.LEDGER_ID = #LEDGER_ID#
+	    where pdt.PRD_ID in ($PRD_IDS$)
+	]]>
+</insert>
+<update id="updateChldUp" parameterClass="map">
+   update DRP_PRD_INV_DTL a set  INV_NUM =NVL(( 
+       select INV_NUM 
+            from
+	        DRP_TEMP_PRD_INV_DTL b  
+		     left join DRP_SPCL_TECH c  on  b.PRD_NO=c.PRD_NO and b.SPCL_TECH_NO=c.DM_SPCL_TECH_NO
+         where   b.SESSION_ID=#SESSION_ID#
+            and  a.PRD_NO=b.PRD_NO
+            and  NVL(a.SPCL_TECH_ID,'null')=NVL(c.SPCL_TECH_ID,'null') 
+     ),0)
+  where a.PRD_INV_ID=#PRD_INV_ID# and a.DEL_FLAG=#DEL_FLAG# 
+</update>
+<update id="updateChldDiffNum" parameterClass="map">
+ update DRP_PRD_INV_DTL a set DIFF_NUM= NVL(a.INV_NUM,0) -NVL(a.ACCT_NUM,0)
+    where a.PRD_INV_ID=#PRD_INV_ID# and a.DEL_FLAG=#DEL_FLAG# 
+</update>
+<insert id="inserChldUp" parameterClass="map">
+	insert into DRP_PRD_INV_DTL(
+		PRD_INV_DTL_ID,
+		PRD_INV_ID,
+		PRD_ID,
+		PRD_NO,
+		PRD_NAME,
+		PRD_SPEC,
+		PRD_COLOR,
+		BRAND,
+		STD_UNIT,
+		INV_NUM,
+		ACCT_NUM,
+		DIFF_NUM,
+		DEL_FLAG,
+		INS_FLAG,
+		SPCL_TECH_ID
+	)
+		select
+			RAWTOHEX(SYS_GUID()) AS UUID,
+			#PRD_INV_ID#,
+			d.PRD_ID,
+			b.PRD_NO,
+			d.PRD_NAME,
+			d.PRD_SPEC,
+			d.PRD_COLOR,
+			d.BRAND,
+			d.STD_UNIT,
+			NVL(b.INV_NUM,0),
+			NVL(e.STORE_NUM，0),
+			NVL((NVL(b.INV_NUM,0)-NVL(e.STORE_NUM,0)),0),
+			#DEL_FLAG#,
+			#INS_FLAG#,
+			f.SPCL_TECH_ID
+		from  DRP_TEMP_PRD_INV_DTL b
+		left join DRP_STORE c on c.STORE_NO = b.STORE_NO and c.DEL_FLAG=0
+	    left join BASE_PRODUCT d on d.PRD_NO =  b.PRD_NO and d.DEL_FLAG=0
+	    left join DRP_SPCL_TECH f on f.PRD_NO=b.PRD_NO and f.DM_SPCL_TECH_NO=b.SPCL_TECH_NO 
+        left join DRP_STORE_ACCT e on e.PRD_ID=d.PRD_ID and e.STORE_ID=c.STORE_ID  and NVL(e.SPCL_TECH_ID,'null')=NVL(f.SPCL_TECH_ID,'null')
+	    where b.SESSION_ID=#SESSION_ID#
+	     AND not exists 
+      (
+		  select 1
+		    from drp_prd_inv_dtl ac
+		    left join DRP_SPCL_TECH spl
+		      on NVL(ac.SPCL_TECH_ID, 'null') = NVL(spl.SPCL_TECH_ID, 'null')
+		   where ac.PRD_INV_ID = #PRD_INV_ID#
+		     and ac.DEL_FLAG = 0
+		     and ac.PRD_NO = b.PRD_NO
+		     and NVL(spl.DM_SPCL_TECH_NO, 'null') = NVL(b.SPCL_TECH_NO, 'null')
+	      )
+
+</insert>
+<update id="txUpSpclEditFlag" parameterClass="map">
+	update DRP_SPCL_TECH set TECH_NO_EDIT_FLAG=#TECH_NO_EDIT_FLAG# 
+	where SPCL_TECH_ID in (select SPCL_TECH_ID from DRP_PRD_INV_DTL where DEL_FLAG=#DEL_FLAG# and PRD_INV_ID=#PRD_INV_ID# and SPCL_TECH_ID is not null)
+	and USE_FLAG=#USE_FLAG#
+</update>
+<update id="txUpSpclEditFlagBySessId" parameterClass="map">
+	update DRP_SPCL_TECH
+	   set TECH_NO_EDIT_FLAG = #TECH_NO_EDIT_FLAG#
+	 where SPCL_TECH_ID in
+	       (select b.SPCL_TECH_ID
+	          from DRP_TEMP_PRD_INV_DTL a
+	          left join DRP_SPCL_TECH b on a.SPCL_TECH_NO = b.DM_SPCL_TECH_NO
+	         where a.SESSION_ID = #SESSION_ID#)
+	   and USE_FLAG = #USE_FLAG#
+</update>
+<select id="getChannMonth" resultClass="string" parameterClass="string">
+<![CDATA[
+	select to_char(last_day(trunc((select to_date(a.INIT_YEAR || '-' || a.INIT_MONTH, 'yyyy-mm')
+               from BASE_CHANN a
+              where a.INIT_YEAR is not null
+                and a.INIT_MONTH is not null
+                and a.CHANN_ID = #CHANN_ID#
+                and a.DEL_FLAG = 0
+                and rownum < 2),
+             'month')),'yyyy-MM-DD HH24:MI:SS') INITDATA
+  from dual
+  ]]>
+</select>
+<select id="getAllNum" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+		select sum(NVL(u.INV_NUM,0)) INV_NUM,sum(NVL(u.ACCT_NUM,0)) ACCT_NUM,sum(NVL(u.DIFF_NUM,0)) DIFF_NUM
+  		from DRP_PRD_INV_DTL u 
+	]]>
+	<dynamic prepend="where">
+			u.PRD_INV_ID=#PRD_INV_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+</select>
+</sqlMap>

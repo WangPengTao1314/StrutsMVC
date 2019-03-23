@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd"
+	default-autowire="byName">
+	
+ 	<!-- 个人工作计划 -->
+    <bean id ="grgzjhService" parent="IBaseService" class ="com.hoperun.base.grgzjh.service.impl.GrgzjhServiceImpl"/>
+	
+	<!-- 信用额度变更申请信息 -->
+    <bean id ="creditReqService" parent="IBaseService" class ="com.hoperun.erp.sale.creditreq.service.impl.CreditReqServiceImpl"/>
+    
+ 
+	 <!-- 区域折扣信息 add by wzg -->
+    <bean id = "AreaDsctService" parent="IBaseService" class = "com.hoperun.erp.sale.dsct.service.impl.AreaDsctServiceImpl"/>
+
+	 <!-- 临时额度调整申请 add by lyg-->
+    <bean id = "tempCreditReqService" parent="IBaseService" class = "com.hoperun.erp.sale.tempcreditreq.service.impl.TempCreditReqServiceImpl"/>
+
+    
+     <!-- 信用额度设定 -->
+    <bean id = "CreditService" parent="IBaseService" class = "com.hoperun.erp.sale.credit.service.impl.CreditServiceImpl"/>
+	
+     <!-- 返利登记 -->
+    <bean id = "rebateService" parent="IBaseService" class = "com.hoperun.erp.sale.rebate.service.impl.RebateServiceImpl"/>
+	
+	<!-- 客户付款单 -->
+	<bean id = "paymentService" parent="IBaseService" class = "com.hoperun.erp.sale.payment.service.impl.PaymentServiceImpl"/>
+	
+	<!-- 退货单维护 -->
+	<bean id = "prdreturnService" parent="IBaseService" class = "com.hoperun.erp.sale.prdreturn.service.impl.PrdreturnServiceImpl"/>
+	
+	<!-- 投诉与建议处理 -->
+	<bean id = "advisehdService" parent="IBaseService" class = "com.hoperun.erp.sale.advisehd.service.impl.AdvisehdServiceImpl"/>
+	<!-- 付款凭证确认 -->
+	<bean id = "paymentcmtService" parent="IBaseService" class = "com.hoperun.erp.sale.paymentcmt.service.impl.PaymentcmtServiceImpl"/>
+	<!--service 推广促销方案-->
+    <bean id = "prmtplanService" parent="IBaseService" class = "com.hoperun.erp.sale.prmtplan.service.impl.PrmtplanServiceImpl"/>
+	<!--促销品发放-->
+	<bean id = "prmtexitService" parent="IBaseService" class = "com.hoperun.erp.sale.prmtexit.service.impl.PrmtexitServiceImpl"/>
+	<!-- 订货订单处理 -->
+   <bean id = "goodsorderService" parent="IBaseService" class = "com.hoperun.erp.sale.goodsorder.service.impl.GoodsorderServiceImpl"/>
+   <!--工艺单审核-->
+    <bean id = "techorderService" parent="IBaseService" class = "com.hoperun.erp.sale.techorder.service.impl.TechorderServiceImpl"/>
+ 
+   <!-- 标准订单-->
+   <bean id = "saleorderService" parent="IBaseService" class = "com.hoperun.erp.sale.saleorder.service.impl.SaleorderServiceImpl"/>
+   <!-- 非标订单-->
+   <bean id = "saleorderspService" parent="IBaseService" class = "com.hoperun.erp.sale.saleordersp.service.impl.SaleorderspServiceImpl"/>
+	
+   <!--工艺单核价-->
+   <bean id = "techorderPriceService" parent="IBaseService" class = "com.hoperun.erp.sale.techorderprice.service.impl.TechorderPriceServiceImpl"/>
+ 
+   <!--销售订单  审核-->
+   <bean id = "saleorderrlsService" parent="IBaseService" class = "com.hoperun.erp.sale.saleorderrls.service.impl.SaleorderrlsServiceImpl"/>
+    <!--销售补单查询-->
+   <bean id = "saleorderqueService" parent="IBaseService" class = "com.hoperun.erp.sale.saleorderque.service.impl.SaleorderqueServiceImpl"/>
+  
+   <!--工艺单维护-->
+   <bean id = "techorderShowService" parent="IBaseService" class = "com.hoperun.erp.sale.techordershow.service.impl.TechorderShowServiceImpl"/>
+	<!-- 渠道惩罚设定 add by lyg -->
+    <bean id = "channpunishService" parent="IBaseService" class = "com.hoperun.erp.sale.channpunish.service.impl.ChannpunishServiceImpl"/>
+	
+   <!--制定交付计划-->
+   <bean id = "turnoverplanService" parent="IBaseService" class = "com.hoperun.erp.sale.turnoverplan.service.impl.TurnoverplanServiceImpl"/>
+
+   <!--交付计划维护-->
+   <bean id = "turnoverhdService" parent="IBaseService" class = "com.hoperun.erp.sale.turnoverhd.service.impl.TurnoverhdServiceImpl"/>
+	
+	 <!--退货单财务核价-->
+   <bean id = "prdreturnfinService" parent="IBaseService" class = "com.hoperun.erp.sale.prdreturnfin.service.impl.PrdreturnfinServiceImpl"/>
+   
+   <!--出库差异确认-->
+  <bean id = "storediffaffService" parent="IBaseService" class = "com.hoperun.erp.sale.storediffaff.service.impl.StorediffaffServiceImpl"/>
+  
+  <!--货品发运-->
+  <bean id = "pdtdeliverService" parent="IBaseService" class = "com.hoperun.erp.sale.pdtdeliver.service.impl.PdtdeliverServiceImpl"/>
+  <!--发运确认-->
+  <bean id = "deliverconfmService" parent="IBaseService" class = "com.hoperun.erp.sale.deliverconfm.service.impl.DeliverconfmServiceImpl"/>
+  
+  <!-- 付款凭证关闭 -->
+  <bean id = "paymentcloseService" parent="IBaseService" class = "com.hoperun.erp.sale.paymentclose.service.impl.PaymentcloseServiceImpl"/>
+	
+  <!-- 专卖店撤店及终止申请单 -->
+  <bean id = "storecloseService" parent="IBaseService" class = "com.hoperun.erp.oamg.storeclose.service.impl.StorecloseServiceImpl"/>
+	
+	<!-- 渠道折扣 -->
+  <bean id = "channDiscountService" parent="IBaseService" class = "com.hoperun.erp.sale.channdiscount.service.impl.ChannDiscountServiceImpl"/>
+  
+  <!-- 报表抄送 -->
+  <bean id = "reptShareViewService" parent="IBaseService" class = "com.hoperun.erp.report.reptshareview.service.impl.ReptShareViewServiceImpl"/>
+
+ <!-- 销售报表 -->
+  <bean id = "saleReportService" parent="IBaseService" class = "com.hoperun.erp.report.salereport.service.impl.SaleReportServiceImpl"/>
+
+  <!-- 培训课程维护 -->
+  <bean id = "traincourseService" parent="IBaseService" class = "com.hoperun.erp.oamg.traincourse.service.impl.TraincourseServiceImpl"/>
+
+  <!-- 渠道培训结果反馈 -->
+  <bean id = "trainresultService" parent="IBaseService" class = "com.hoperun.erp.oamg.trainresult.service.impl.TrainresultServiceImpl"/>
+
+  <!-- 总部首页 -->
+  <bean id = "erpFirpageService" parent="IBaseService" class = "com.hoperun.erp.main.firpage.service.impl.ErpFirpageServiceImpl"/>
+  <!-- 总部出库单 -->
+  <bean id = "erpStoreoutService" parent="IBaseService" class = "com.hoperun.erp.sale.storeout.service.impl.ErpStoreoutServiceImpl"/>
+  <!-- 销售订单处理-->
+  <bean id = "saleordermgeService" parent="IBaseService" class = "com.hoperun.erp.sale.saleordermge.service.impl.SaleordermgeServiceImpl"/>
+	
+  <!-- 出货计划维护-->
+  <bean id = "deliveryhdService" parent="IBaseService" class = "com.hoperun.erp.sale.deliveryhd.service.impl.DeliveryhdServiceImpl"/>
+	
+  <!-- 销售计划维护-->
+  <bean id = "saleplanService"       parent="IBaseService" class = "com.hoperun.erp.sale.saleplan.service.impl.SaleplanServiceImpl"/>
+
+  <!-- 区域销售指标设定-->
+  <bean id = "areasaleplanService"   parent="IBaseService" class = "com.hoperun.erp.sale.areasaleplan.service.impl.AreasaleplanServiceImpl"/>
+  <!-- 月度拜访计划维护-->
+  <bean id = "monthvisitService"     parent="IBaseService" class = "com.hoperun.erp.oamg.monthVisit.service.impl.MonthVisitServiceImpl"/>
+  <!-- 总部促销价格设置-->
+  <bean id = "erpprmtpriceService"     parent="IBaseService" class = "com.hoperun.erp.sale.erpprmtprice.service.impl.ErpprmtpriceServiceImpl"/>
+  
+  <!-- 月度拜访工作计划达成率 -->
+  <bean id = "monthvisitreqService" parent="IBaseService" class = "com.hoperun.erp.oamg.monthvisitreport.service.impl.MonthvisitReqServiceImpl"/>
+  <!-- 营销活动-->
+  <bean id = "marketActivitiyService"   parent="IBaseService" class = "com.hoperun.erp.sale.marketing.service.impl.MarketActivitiyServiceImpl"/>
+  <!-- 会员信息-->
+  <bean id = "memberService"   parent="IBaseService" class = "com.hoperun.erp.sale.member.service.impl.MemberServiceImpl"/>
+  <!-- 给加盟商分配卡券-->
+  <bean id = "allotChannCardService"   parent="IBaseService" class = "com.hoperun.erp.sale.allotchanncard.service.impl.AllotChannCardServiceImpl"/>
+  <!-- 预算科目-->
+  <bean id = "budgetitemService"   parent="IBaseService" class = "com.hoperun.erp.sale.budgetitem.service.impl.BudgetitemServiceImpl"/>
+  <!-- 预算额度设置-->
+  <bean id = "budgetquotaService"   parent="IBaseService" class = "com.hoperun.erp.sale.budgetquota.service.impl.BudgetquotaServiceImpl"/>
+  <!-- 费用报销单-->
+  <bean id = "expenseorderService"   parent="IBaseService" class = "com.hoperun.erp.sale.expenseorder.service.impl.ExpenseorderServiceImpl"/>
+  <!-- 返利额度变更申请单-->
+  <bean id = "erprebatechangereqService"   parent="IBaseService" class = "com.hoperun.erp.sale.erprebatechangereq.service.impl.ErprebatechangereqServiceImpl"/>         
+  <!-- 总部预订单-->
+  <bean id = "erpAdvcorderService"   parent="IBaseService" class = "com.hoperun.erp.sale.erpadvcorder.service.impl.ErpAdvcorderServiceImpl"/>
+  <!-- 总部结算单-->
+  <bean id = "erpAdvcorderStatementsService"   parent="IBaseService" class = "com.hoperun.erp.sale.erpadvcorderstatements.service.impl.ErpAdvcorderStatementsServiceImpl"/>
+  <!-- 卡券销售-->
+  <bean id = "marketcardSaleService"   parent="IBaseService" class = "com.hoperun.erp.sale.marketcardsale.service.impl.MarketcardSaleServiceImpl"/>
+  <!-- 渠道合同上传-->
+  <bean id = "channcontractupService"   parent="IBaseService" class = "com.hoperun.drp.oamg.channcontractup.service.impl.ChanncontractupServiceImpl"/>
+  <!-- 顾客现场签到-->
+  <bean id = "cusRegistService"   parent="IBaseService" class = "com.hoperun.erp.sale.cusregist.service.impl.CusRegistServiceImpl"/>
+  <!-- 返利年结-->
+  <bean id = "annualClosingService"   parent="IBaseService" class = "com.hoperun.erp.sale.annualClosing.service.impl.AnnualClosingServiceImpl"/>
+  <!-- 意向客户拜访-->
+  <bean id = "intentionVisitService"   parent="IBaseService" class = "com.hoperun.erp.visit.intentionvisit.service.impl.IntentionVisitServiceImpl"/>
+  <!-- 预计量上报 货品设置-->
+  <bean id = "forecastPrdService"   parent="IBaseService" class = "com.hoperun.erp.sale.forecastprd.service.impl.ForecastPrdServiceImpl"/>
+  <!-- 预计量上报 渠道设置-->
+  <bean id = "forecastchannService"   parent="IBaseService" class = "com.hoperun.erp.sale.forecastchann.service.impl.ForecastchannServiceImpl"/>
+  <!-- 预计量上报 上报任务发布-->
+  <bean id = "forecastTaskService"   parent="IBaseService" class = "com.hoperun.erp.sale.forecasttask.service.impl.ForecastTaskServiceImpl"/>
+  <!-- 预计量上报货品填报审核-->
+  <bean id = "forecastTaskupAuditService"   parent="IBaseService" class = "com.hoperun.erp.sale.forecasttaskup.service.impl.ForecastTaskupAuditServiceImpl"/>
+  
+  
+</beans>
+	 

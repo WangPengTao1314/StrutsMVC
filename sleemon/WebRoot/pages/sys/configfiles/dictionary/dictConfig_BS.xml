@@ -1,0 +1,1385 @@
+<?xml version="1.0" encoding="gb2312"?>
+	<!--
+		注意：请将旧文件中的配置文件拷贝过来，每个人在添加table的时候必须注明添加的时间、
+		使用的模块、添加人，修改时需注明修改时间和修改人，否则追究责任。在添加之前请仔细 检查，是否有可以借用的配置，尽量不要重复添加。
+	-->
+<tables>
+	<!--
+		<table id="0" pyName="T_SYS_BMXX" lgName="部门信息" isDbTable="T"
+		orderName="BMBH" orderType="ASC" checkCondition=""> <field
+		lgName="部门名称" pyName="BMMC"/> <field lgName="部门编号" pyName="BMBH"/>
+		</table>
+	-->
+	<table id="0" lgName="帐套类型" desc="帐套信息" selectFlag="F">
+		<field text="内部帐套" value="内部帐套" />
+		<field text="独立帐套" value="独立帐套" />
+	</table>
+	<table id="1" lgName="性别" desc="人员信息、系统用户" selectFlag="F">
+		<field text="男" value="男" />
+		<field text="女" value="女" />
+	</table>
+
+	<table id="2" lgName="单位类型" desc="单位信息维护" selectFlag="F">
+		<field text="数量单位" value="数量单位" />
+		<field text="计量单位" value="计量单位" />
+		<field text="长度单位" value="长度单位" />
+		<field text="重量单位" value="重量单位" />
+		<field text="面积单位" value="面积单位" />
+		<field text="体积单位" value="体积单位" />
+	</table>
+
+	<table id="3" lgName="单位类型" desc="物料的单位信息维护" selectFlag="F">
+		<field text="标准" value="标准" />
+		<field text="计量" value="计量" />
+	</table>
+
+	<table id="4" lgName="职位" desc="区域信息" selectFlag="F">
+		<field text="销售总监" value="销售总监" />
+		<field text="区域总监" value="区域总监" />
+		<field text="区域经理" value="区域经理" />
+		<field text="客服" value="客服" />
+		<field text="其他" value="其他" />
+	</table>
+
+	<table id="5" lgName="分管对象类型" desc="区域信息" selectFlag="F">
+		<field text="工作组" value="工作组" />
+		<field text="用户" value="用户" />
+	</table>
+	<!--Type: Added by zhang_tao On: 2013-12-13  -->
+	<table id="6" lgName="花号" desc="货品信息" selectFlag="F">
+		<field text="米黄" value="米黄" />
+		<field text="白色" value="白色" />
+		<field text="黄色" value="黄色" />
+		<field text="红色" value="红色" />
+		<field text="水蓝" value="水蓝" />
+	</table>
+
+	<!--Type: Added by wang_zhige On: 2013-12-17  -->
+	<table id="7"  lgName="折扣类型" desc="折扣类型" selectFlag="F">
+		<field text="正常折扣" value="正常折扣" />
+		<field text="返利折扣" value="返利折扣" />
+		<field text="惩罚折扣" value="惩罚折扣" />
+		<field text="赠品折扣" value="赠品折扣" />
+	</table>
+
+	<!--Type: Added by wamh_zhige On: 2013-12-20  -->
+	<table id="8" lgName="登记类型" desc="返利登记" selectFlag="F">
+		<field text="全部" value="全部" />
+		<field text="已登记" value="已登记" />
+		<field text="未登记" value="未登记" />
+	</table>
+	<!--Type: Added by cheng_jian On: 2013-12-23  -->
+	<table id="9" lgName="订单数据状态" desc="预订单录入" selectFlag="F">
+		<field text="未提交" value="未提交" />
+		<field text="待核价" value="待核价" />
+		<field text="提交" value="提交" />
+		<field text="待结算" value="待结算" />
+		<field text="已结算" value="已结算" />
+		<field text="部分发货" value="部分发货" />
+		<field text="已发货" value="已发货" />
+		<field text="已收货" value="已收货" />
+		<field text="待确认" value="待确认" />
+		<field text="退回" value="退回" />
+		<field text="审核通过" value="审核通过" />
+		<field text="关闭" value="关闭" />
+	</table>
+	<!--Type: Added by cheng_jian On: 2013-12-23  -->
+	<table id="10" lgName="退货申请单单据类型" desc="退货申请单" selectFlag="F">
+		<field text="售后退货" value="售后退货" />
+		<field text="关店退货" value="关店退货" />
+	</table>
+	<!--Type: Added by cheng_jian On: 2013-12-23  -->
+	<table id="11"
+		pyName="(select a.sjxmc,a.sjxz
+						  from T_SYS_SJZD u
+						  left join T_SYS_SJZDMX a
+						  on u.sjzdid = a.sjzdid
+						where u.delflag=0
+						and a.delflag = 0
+						and u.state='启用'
+						and u.sjzdmc='付款方式'  
+            and sjgl='1')"
+		lgName="付款方式" isDbTable="T" orderName="SJXZ" desc="付款方式" orderType="ASC"
+		checkCondition="">
+		<field lgName="数据项值" pyName="SJXZ" />
+		<field lgName="数据项名称" pyName="SJXMC" />
+	</table>
+	<!--Type: Added by cheng_jian On: 2013-12-24  -->
+	<table id="12" lgName="退货原因归类" desc="退货单" selectFlag="F">
+		<field text="质量问题" value="质量问题" />
+		<field text="规格问题" value="规格问题" />
+		<field text="花号问题" value="花号问题" />
+	</table>
+	<!--Type: Added by cheng_jian On: 2013-12-25  -->
+	<table id="13" lgName="投诉与建议状态" desc="投诉与建议" selectFlag="F">
+		<field text="已反馈" value="已反馈" />
+		<field text="未反馈" value="未反馈" />
+		<field text="重提" value="重提" />
+		<field text="退回" value="退回" />
+	</table>
+	<!--Type: Added by cheng_jian On: 2013-12-26  -->
+	<table id="14" lgName="单据类型" desc="入库通知单" selectFlag="F">
+		<field text="订货入库" value="订货入库" />
+		<field text="返修入库" value="返修入库" />
+		<field text="调拨入库" value="调拨入库" />
+		<field text="下级退货入库" value="下级退货入库" />
+		<field text="手工新增" value="手工新增" />
+		<field text="下级入库" value="下级入库" />
+	</table>
+	<!--Type: Added by cheng_jian On: 2013-12-26  -->
+	<table id="15" lgName="服务投诉对象" desc="投诉与建议" selectFlag="F">
+		<field text="区域经理" value="区域经理" />
+		<field text="客服部" value="客服部" />
+		<field text="仓库" value="仓库" />
+		<field text="其他" value="其他" />
+	</table>
+	<!--Type: Added by cheng_jian On: 2013-12-26  -->
+	<table id="16" lgName="建议类型" desc="投诉与建议" selectFlag="F">
+		<field text="产品建议" value="产品建议" />
+		<field text="服务建议" value="服务建议" />
+	</table>
+	
+	<table id="17" lgName="产品投诉类型" pyName="(select a.sjxmc,a.sjxz
+						  from T_SYS_SJZD u
+						  left join T_SYS_SJZDMX a
+						  on u.sjzdid = a.sjzdid
+						where u.delflag=0
+						and a.delflag = 0
+						and u.state='启用'
+						and u.SJZDBH='DRP_CMPL_ADVS_PRD_PRO_TYPE'  
+           )"  desc="投诉与建议" isDbTable="T" orderName="SJXZ" checkCondition="" selectFlag="F">
+       <field lgName="数据项值" pyName="SJXZ" />
+		<field lgName="数据项名称" pyName="SJXMC" />    
+	</table>
+	<!--Type: Added by cheng_jian On: 2013-12-30  -->
+	<table id="18" lgName="终端退货状态" desc="终端退货录入" selectFlag="F">
+		<field text="未提交" value="未提交" />
+		<field text="提交" value="提交" />
+		<field text="退回" value="退回" />
+		<field text="待退货" value="待退货" />
+		<field text="已入库" value="已入库" />
+		<field text="已结算" value="已结算" />
+		<field text="已退货" value="已退货" />
+	</table>
+	<!--Type: Added by cheng_jian On: 2013-12-31  -->
+	<table id="19" lgName="付款凭证状态" desc="付款凭证状态" selectFlag="F">
+		<field text="确认" value="确认" />
+		<field text="提交" value="提交" />
+		<field text="退回" value="退回" />
+		<field text="关闭" value="关闭" />
+	</table>
+	<table id="20" lgName="退货单单据类型" desc="退货单" selectFlag="F">
+		<!--<field text="质量退货" value="质量退货" />
+		<field text="关店退货" value="关店退货" />
+		<field text="运损退货" value="运损退货" />
+		<field text="手工新增" value="手工新增" />
+		<field text="少发退货" value="少发退货" />-->
+		<field text="手工新增" value="手工新增" />
+		<field text="关店退货" value="关店退货" />
+		<field text="售后退货" value="售后退货" />
+	</table>
+	<table id="21" lgName="退货单状态" desc="退货单状态" selectFlag="F">
+		<field text="未提交" value="未提交" />
+		<field text="提交" value="提交" />
+		<field text="撤销" value="撤销" />
+		<field text="审核" value="审核" />
+		<field text="否决" value="否决" />
+		<field text="审核通过" value="审核通过" />
+		<field text="提交厂家处理" value="提交厂家处理" />
+	</table>
+	<!--Type: Added by lyg On: 2014-1-2  -->
+	<table id="22" lgName="付款凭证确认状态" desc="付款凭证确认" selectFlag="F">
+		<field text="提交" value="提交" />
+		<field text="退回" value="退回" />
+		<field text="确认" value="确认" />
+	</table>
+
+	<!--Type: Added by zzb On: 2014-1-2  -->
+	<table id="23" lgName="促销类型" desc="推广促销方案维护" selectFlag="F">
+		<field text="商品促销" value="商品促销" />
+		<field text="新品推广" value="新品推广" />
+	</table>
+
+	<!--Type: Added by zzb On: 2014-1-2  -->
+	<table id="24" lgName="状态" desc="推广促销方案发布" selectFlag="F">
+		<field text="审核通过" value="审核通过" />
+		<field text="已发布" value="已发布" />
+		<field text="已终止" value="已终止" />
+	</table>
+	<!--Type: Added by cheng_jian On: 2014-1-3  -->
+	<table id="25" lgName="单据类型" desc="入库单处理" selectFlag="F">
+		<field text="订货入库" value="订货入库" />
+<!--		<field text="分发入库" value="分发入库" />-->
+		<field text="调拨入库" value="调拨入库" />
+		<field text="转储入库" value="转储入库" />
+		<field text="返修入库" value="返修入库" />
+		<field text="终端退货" value="终端退货" />
+		<field text="下级入库" value="下级入库" />
+		<field text="手工新增" value="手工新增" />
+	</table>
+	<!--Type: Added by wang_zhige On: 2014-1-6  -->
+	<table id="26" lgName="退货单鉴定状态" desc="退货单鉴定" selectFlag="F">
+		<field text="审核通过" value="审核通过" />
+		<field text="退回" value="退回" />
+		<field text="已鉴定" value="已鉴定" />
+	</table>
+	<!--Type: Added by lyg On: 2014-1-7  -->
+	<table id="27" lgName="预订单转订货状态" desc="预订单转订货" selectFlag="F">
+		<field text="已处理" value="已处理" />
+		<field text="待处理" value="待处理" />
+	</table>
+	<table id="28" lgName="入库差异状态" desc="入库差异确认" selectFlag="F">
+		<field text="未提交" value="未提交" />
+		<field text="待发货方确认" value="待发货方确认" />
+		<field text="退回" value="退回" />
+		<field text="待入库方确认" value="待入库方确认" />
+		<field text="入库方打回" value="入库方打回" />
+		<field text="完成" value="完成" />
+	</table>
+	<table id="29" lgName="单据类型" desc="入库差异确认" selectFlag="F">
+		<field text="入库差异" value="入库差异" />
+	</table>
+	<table id="30" lgName="差异原因" desc="入库差异确认" selectFlag="F">
+		<field text="少发货" value="少发货" />
+		<field text="运输破损" value="运输破损" />
+	</table>
+	<table id="31" lgName="处理方式" desc="入库差异确认" selectFlag="F">
+		<field text="补单" value="补单" />
+		<field text="换货" value="换货" />
+	</table>
+	<table id="32" lgName="单据类型" desc="调拨单维护" selectFlag="F">
+		<field text="加盟商间调拨" value="加盟商间调拨" />
+	</table>
+	<table id="33" lgName="盘点范围1" desc="盘点单维护" selectFlag="F">
+		<field text="库房盘点" value="库房盘点" />
+		<field text="货品盘点" value="货品盘点" />
+	</table>
+	<table id="34" lgName="盘点状态" desc="盘点单维护" selectFlag="F">
+		<field text="未提交" value="未提交" />
+		<field text="提交" value="提交" />
+		<field text="审核通过" value="审核通过" />
+		<field text="否决" value="否决" />
+		<field text="撤销" value="撤销" />
+		<field text="开始盘点" value="开始盘点" />
+		<field text="结束盘点" value="结束盘点" />
+	</table>
+	<table id="35" lgName="订货订单状态" desc="订货订单" selectFlag="F">
+		<field text="制作" value="制作" />
+		<field text="提交" value="提交" />
+		<field text="审核通过" value="审核通过" />
+		<field text="否决" value="否决" />
+		<field text="撤销" value="撤销" /> 
+	</table>
+	<table id="36" lgName="盘点范围2" desc="盘点单维护" selectFlag="F">
+		<field text="库房盘点" value="库房盘点" />
+		<field text="货品盘点" value="货品盘点" />
+	</table>
+	<!--Type: Added by lyg On: 2014-1-27  -->
+	<table id="37" lgName="预订单转订货状态" desc="预订单转订货" selectFlag="F">
+		<field text="已处理" value="1" />
+		<field text="未处理" value="0" />
+		<field text="退回" value="2" />
+	</table>
+	<!--Type: Added by chu_jian1 On: 2014-1-27  -->
+	<table id="38" lgName="单据类型" desc="出库单处理" selectFlag="F">
+		<field text="销售出库" value="销售出库" />
+		<field text="退货出库" value="退货出库" />
+		<field text="调拨出库" value="调拨出库" />
+		<field text="分发出库" value="分发出库" />
+	</table>
+	<!--Type: Added by chengjian On: 2014-1-27  -->
+	<table id="39" lgName="库房类型" desc="库房库位定义" selectFlag="F">
+		<field text="正品仓" value="正品仓" />
+		<field text="次品仓" value="次品仓" />
+		<field text="二次销售仓" value="二次销售仓" />		    
+	</table>
+	<!-- Type: Added by chuzhijun On: 2014-2-12 -->
+	<table id="40" lgName="客户预付款状态" desc="客户预付款状态" selectFlag="F">
+		<field text="未提交" value="未提交" />
+		<field text="已结算" value="已结算" />
+		<field text="已核销" value="已核销" />
+	</table>
+	
+	<table id="41" lgName="收款类型" desc="收款类型" selectFlag="F">
+		<field text="订金" value="订金" />
+		<field text="正常收款" value="正常收款" />
+		<field text="预付款" value="预付款" />
+	</table>
+	
+	<table id="42" lgName="结算单状态" desc="结算单状态" selectFlag="F">
+		<field text="未提交" value="未提交" />
+		<field text="已结算" value="已结算" />
+	</table>
+	<table id="43" lgName="工艺单状态" desc="工艺单状态" selectFlag="F">
+		<field text="提交" value="提交" />
+		<field text="待核价" value="待核价" />
+		<field text="已核价" value="已核价" />
+		
+	</table>
+	
+	<!-- add by zzb  -->
+	<table id="44" lgName="分销-订货订单维护状态" desc="订货订单维护状态" selectFlag="F">
+	    <field text="制作" value="制作" />
+	    <field text="提交" value="提交" />
+	    <field text="撤销" value="撤销" />
+	    <field text="否决" value="否决" />
+		<field text="已处理" value="已处理" />
+		<field text="未处理" value="未处理" />
+		<field text="总部退回" value="总部退回" />
+		<field text="区域服务中心退回" value="区域服务中心退回" />
+	</table>
+	
+	<table id="45" pyName="(select a.sjxmc,a.sjxz
+						  from T_SYS_SJZD u
+						  left join T_SYS_SJZDMX a
+						  on u.sjzdid = a.sjzdid
+						where u.delflag=0
+						and a.delflag = 0
+						and u.state='启用'
+						and u.sjzdmc='付款方式'  
+            and sjgl='1')"
+		lgName="付款方式" isDbTable="T" orderName="SJXZ" desc="付款方式" orderType="ASC"
+		checkCondition="">
+		<field lgName="数据项值" pyName="SJXZ" />
+		<field lgName="数据项名称" pyName="SJXMC" />
+	</table>
+	<!-- add by zzb  -->
+    <table id="46" lgName="预订单核销" desc="预订单核销" selectFlag="F">
+	    <!--
+	    <field text="已结算" value="已结算" />
+		-->
+		<field text="未核销" value="未核销" />
+		<field text="已核销" value="已核销" />
+	</table>
+	<!--Type: Added by zzb On: 2014-4-5  -->
+	<table id="47" lgName="订货订单处理" desc="总部-订货订单处理" selectFlag="F">
+		<field text="已处理" value="已处理" />
+		<field text="未处理" value="未处理" />
+		<field text="总部退回" value="总部退回" />
+		<field text="区域服务中心退回" value="区域服务中心退回" />
+	</table>
+	<!-- add by huangru  2014-3-6-->
+    <table id="48" lgName="调价类型" desc="调价类型" selectFlag="F">
+	    <field text="倍率加价" value="倍率加价" />
+		<field text="值加价" value="值加价" />
+	</table>
+	
+	<table id="49" lgName="退款类型" desc="退款类型" selectFlag="F">
+	   <!-- <field text="其它退款" value="其它退款" />-->
+	    <field text="销售退款" value="销售退款" />
+		<field text="终端退货退款" value="终端退货退款" />
+	</table>
+ 
+	<table id="50" lgName="退货单财务核价状态" desc="退货单财务核价" selectFlag="F">
+	    <field text="已鉴定" value="已鉴定" />
+	    <field text="退回" value="退回" />
+		<field text="已提交工厂" value="已提交工厂" />
+	</table>
+	<table id="51" lgName="出库差异确认单据类型" desc="出库差异确认单据类型" selectFlag="F">
+	    <!--<field text="赊账订单" value="赊账订单" />
+		<field text="现款现货" value="现款现货" />
+		<field text="异型订单" value="异型订单" />
+	-->
+	<field text="入库差异" value="入库差异" />
+	</table>
+	<table id="52" lgName="出库差异确认状态" desc="出库差异确认状态" selectFlag="F">
+	    <field text="待出库方确认" value="待出库方确认" />
+		<field text="退回" value="退回" />
+		<field text="待入库方确认" value="待入库方确认" />
+	</table>
+	<table id="53" lgName="预订单录入货品类型" desc="预订单录入" selectFlag="F">
+	    <field text="销售货品" value="销售货品" />
+		<field text="赠品" value="赠品" />
+	</table>
+	
+	<table id="54" lgName="发货方式" desc="发货方式" selectFlag="F">
+	    <field text="整车发运" value="整车发运" />
+		<field text="托运" value="托运" />
+		<field text="自提" value="自提" />
+	</table>
+	<table id="55" lgName="发货方类型" desc="预订单发货申请" selectFlag="F">
+	    <field text="终端发货" value="终端发货" />
+		<field text="渠道发货" value="渠道发货" />
+	</table>
+	
+	<table id="56" lgName="剩余货品处理方式" desc="剩余货品处理方式" selectFlag="F">
+	    <!-- modify by zzb(cj) 2014-7-8 
+	    <field text="纳入下次交付计划" value="纳入下次交付计划" />
+		--><field text="纳入下次发货" value="纳入下次发货" />
+		<field text="托运" value="托运" />
+		<field text="自提" value="自提" />
+	</table>
+	<!-- 57条作废   lyg -->
+	<table id="57" lgName="货品发运状态" desc="货品发运状态" selectFlag="F">
+	    <field text="已提交生产" value="已提交生产" />
+		<field text="已提交库房" value="已提交库房" /><!--
+		<field text="已通知库房" value="已通知库房" />
+		<field text="发货延迟" value="发货延迟" />
+		-->
+		<field text="已发货" value="已发货" />
+		<field text="待收货" value="待收货" />
+		<field text="已收货" value="已收货" />
+		<field text="未提交" value="未提交" />
+	</table>
+ 
+    <table id="58" lgName="发货类型" desc="发货类型" selectFlag="F">
+	    <field text="区域代发" value="区域代发" />
+		<field text="基地发货" value="基地发货" />
+	</table>
+	<table id="59" lgName="销售收货确认状态" desc="状态" selectFlag="F">
+	    <field text="已确认" value="1" />
+		<field text="未确认" value="0" />
+	</table>
+	<table id="60" lgName="制定交付计划状态" desc="状态" selectFlag="F">
+	    <field text="审核通过" value="审核通过" />
+<!--		<field text="退回" value="退回" />-->
+	</table>
+	<!-- 61条作废   lyg -->
+	<table id="61" lgName="交付计划维护状态" desc="状态" selectFlag="F">
+	    <field text="未提交" value="未提交" />
+		<field text="已提交生产" value="已提交生产" />
+	</table>
+	<table id="62" lgName="发运确认状态" desc="状态" selectFlag="F">
+		<field text="未提交" value="未提交" />
+		<field text="已提交生产" value="已提交生产" />
+		<field text="已提交库房" value="已提交库房" />
+	    <field text="已发货" value="已发货" />
+	    <field text="待收货" value="待收货" />
+	    <field text="部分发货" value="部分发货" />
+		<field text="已收货" value="已收货" />
+	</table>
+	<table id="63" lgName="销售补单状态" desc="状态" selectFlag="F">
+	    <field text="已发货未付款" value="已发货未付款" />
+		<field text="已付款未发货 " value="已付款未发货 " />
+	</table>
+	<table id="64" lgName="返修管理返修申请状态" desc="状态" selectFlag="F">
+		<field text="提交" value="提交" />
+		<field text="关闭" value="关闭" />
+		<field text="未提交" value="未提交" />
+		<field text="审核通过" value="审核通过" />
+		<field text="待发货" value="待发货" />
+		<field text="已发货" value="已发货" />
+		<field text="总部收货确认" value="总部收货确认" />
+		<field text="总部已发货" value="总部已发货" />
+	</table>
+	<table id="65" lgName="返修管理返修审核状态" desc="状态" selectFlag="F">
+		<field text="提交" value="提交" />
+		<field text="审核通过" value="审核通过" />
+	</table>
+	<table id="66" lgName="返修管理返修出库状态" desc="状态" selectFlag="F">
+		<field text="审核通过" value="审核通过" />
+		<field text="关闭" value="关闭" />
+		<field text="待发货" value="待发货" />
+	</table>
+	<table id="67" lgName="返修管理返修收货确认状态" desc="状态" selectFlag="F">
+		<field text="已发货" value="已发货" />
+		<field text="总部收货确认" value="总部收货确认" />
+	</table>
+	<table id="68" lgName="返修管理返修发货状态" desc="状态" selectFlag="F">
+		<field text="总部收货确认" value="总部收货确认" />
+		<field text="总部已发货" value="总部已发货" />
+	</table>
+	<table id="69" lgName="预订单发货" desc="状态" selectFlag="F">
+		<field text="未提交" value="未提交" />
+		<field text="提交" value="提交" />
+		<field text="退回" value="退回" />
+		<field text="已发货" value="已发货" />
+		<field text="已取消" value="已取消" />
+		<field text="审核通过" value="审核通过" />
+	</table>
+	<table id="70" lgName="货品尺寸调整" desc="货品尺寸调整" selectFlag="F">
+		<field text="长度" value="长度" />
+		<field text="高度" value="高度" />
+		<field text="宽度" value="宽度" />
+	</table>	
+	<table id="71" lgName="调价类型" desc="调价类型" selectFlag="F">
+		<field text="倍率加价" value="倍率加价" />
+		<field text="值加价" value="值加价" />
+		<field text="单位费用" value="单位费用" />
+	</table>
+	<table id="72" lgName="部件替换类型" desc="部件替换类型" selectFlag="F">
+		<field text="面料" value="面料" />
+		<field text="整分体" value="整分体" />
+	</table>
+ 
+	<table id="73" lgName="部件增加类型" desc="部件增加类型" selectFlag="F">
+		<field text="气动床" value="气动床" />
+		<field text="床头柜" value="床头柜" />
+	</table>
+	<table id="74" lgName="预订单类型" desc="预订单类型" selectFlag="F">
+		<field text="终端退货" value="终端退货" />
+		<field text="终端销售" value="终端销售" />
+	</table>
+	<table id="75" lgName="收款类型" desc="收款类型" selectFlag="F">
+		<field text="订金" value="订金" />
+		<field text="正常收款" value="正常收款" />
+		<field text="其它退款" value="其它退款" />
+		<field text="终端退货退款" value="终端退货退款" />
+	</table>
+	<table id="76" lgName="紧急程度" desc="紧急程度" selectFlag="F">
+		<field text="紧急" value="紧急" />
+		<field text="正常" value="正常" />
+	</table>
+	<table id="77" lgName="发运单类型" desc="发运单类型" selectFlag="F">
+		<field text="销售发运" value="销售发运" />
+		<field text="返修发运" value="返修发运" />
+		<field text="促销品发运" value="促销品发运" />
+	</table>
+	<table id="78" lgName="返修发运-剩余货品处理方式" desc="返修发运-剩余货品处理方式" selectFlag="F">
+		<field text="纳入下次发货" value="纳入下次发货" />
+		<field text="托运" value="托运" />
+	</table>
+	<table id="79" lgName="付款凭证关闭" desc="付款凭证关闭" selectFlag="F">
+		<field text="确认" value="确认" />
+		<field text="关闭" value="关闭" />
+	</table>
+	<table id="80" lgName="人员类别" desc="人员类别" selectFlag="F">
+		<field text="本部" value="本部" />
+		<field text="门店" value="门店" />
+	</table>
+	<table id="81" lgName="人员岗位" desc="人员岗位" selectFlag="F">
+		<field text="门店_店长" value="门店_店长" />
+		<field text="门店_导购员" value="门店_导购员" />
+		<field text="门店_收银员" value="门店_收银员" />
+	</table>
+	<!--Type: Added by guhongxiu On: 2014-4-30  -->
+	<table id="82" lgName="调用类型" desc="调用类型" selectFlag="F">
+		<field text="调用" value="调用" />
+		<field text="被调用" value="被调用" />
+	</table>
+	<!--Type: Added by zzb On: 2014-5-12  -->
+	<table id="83" lgName="销售订单状态" desc="销售订单状态" selectFlag="F">
+		<field text="未提交" value="未提交" />
+		<field text="已取消" value="已取消" />
+		<field text="审核通过" value="审核通过" />
+		<field text="已完成" value="已完成" />
+		<field text="退回" value="退回" />
+	</table>
+	
+	<table id="84" lgName="业务数据状态" desc="全局通用" selectFlag="F">
+		<field text="未提交" value="未提交" />
+		<field text="提交" value="提交" />
+		<field text="撤销" value="撤销" />
+		<field text="否决" value="否决" />
+		<field text="已鉴定" value="已鉴定" />
+		<field text="审核通过" value="审核通过" />
+	</table>
+	
+	<table id="85" lgName="销售出库状态" desc="销售出库状态" selectFlag="F">
+		<field text="已处理" value="已处理" />
+		<field text="未处理" value="未处理" />
+		<field text="已取消" value="已取消" />
+	</table>
+	
+	<table id="86" pyName="(select b.DATA_DTL_NAME,b.DATA_DTL_CODE from project_data_dictionary a 
+       left join project_data_dictionary_dtl b on a.data_id=b.data_id
+       and b.delflag=0 and a.delflag=0 
+       where a.data_name='商场位置类别' order by b.data_dtl_id desc )" isDbTable="T" desc="商场位置类别" selectFlag="F">
+        <field lgName="数据项值" pyName="DATA_DTL_NAME" />
+	    <field lgName="数据项名称" pyName="DATA_DTL_CODE" />
+	</table>
+	
+    <table id="87" pyName="(select b.DATA_DTL_NAME,b.DATA_DTL_CODE from project_data_dictionary a 
+       left join project_data_dictionary_dtl b on a.data_id=b.data_id
+       and b.delflag=0 and a.delflag=0 
+       where a.data_name='装修性质' order by b.data_dtl_id asc )" isDbTable="T" desc="装修性质" selectFlag="F">
+	   <field lgName="数据项值" pyName="DATA_DTL_NAME" />
+	   <field lgName="数据项名称" pyName="DATA_DTL_CODE" />
+	</table>
+	<!--
+	<table id="88" pyName="(select b.DATA_DTL_NAME,b.DATA_DTL_CODE from project_data_dictionary a 
+       left join project_data_dictionary_dtl b on a.data_id=b.data_id
+       and b.delflag=0 and a.delflag=0 
+       where a.data_name='经营品牌' order by b.data_dtl_id asc )" isDbTable="T" desc="经营品牌" selectFlag="F">
+        <field lgName="数据项值" pyName="DATA_DTL_NAME" />
+	    <field lgName="数据项名称" pyName="DATA_DTL_CODE" />
+	</table>
+	-->
+	<table id="88" pyName="(select b.DATA_DTL_NAME,b.DATA_DTL_CODE from project_data_dictionary a 
+       left join project_data_dictionary_dtl b on a.data_id=b.data_id
+       and b.delflag=0 and a.delflag=0 
+       where a.data_name='经营品牌' order by b.data_dtl_id asc )" isDbTable="T" desc="经营品牌" selectFlag="F">
+        <field lgName="数据项值" pyName="DATA_DTL_NAME" />
+	    <field lgName="数据项名称" pyName="DATA_DTL_CODE" />
+	</table>
+	
+	
+	<table id="89" lgName="一场多店信息" desc="一场多店信息" selectFlag="F" >
+		<field text="单一商场内新增第一家品牌店" value="1"/>
+	    <field text="单一商场内新增第二家品牌店" value="2"/>
+	    <field text="单一商场内新增第三家品牌店" value="3"/>
+	    <field text="单一商场内新增第四家及以上品牌店" value="4"/>
+	</table>
+	
+	<table id="90" lgName="报销政策" desc="报销政策" selectFlag="F">
+	    <field text="常规政策" value="常规政策" />
+		<field text="特殊政策" value="特殊政策" />
+	</table>
+	
+	<table id="91" pyName="(select b.DATA_DTL_NAME,DATA_DTL_CODE from project_data_dictionary a 
+       left join project_data_dictionary_dtl b on a.data_id=b.data_id
+       where a.data_name='转撤店类型')" isDbTable="T" desc="撤店类型" selectFlag="F">
+	    <field lgName="数据项名称" pyName="DATA_DTL_NAME" />
+		<field lgName="数据项值" pyName="DATA_DTL_CODE" />
+	</table>
+	
+	
+	<table id="92" pyName="( select a.SJXMC, a.SJXZ
+			  from T_SYS_SJZD u
+			  left join T_SYS_SJZDMX a
+			    on u.SJZDID = a.SJZDID
+			 where u.DELFLAG = 0
+			   and a.DELFLAG = 0
+			   and u.STATE = '启用'
+			   and u.SJZDBH = 'COST_TYPE' )"
+		lgName="营业状态" isDbTable="T" orderName="SJXZ" desc="费用类别" orderType="ASC"
+		checkCondition="">
+		<field lgName="数据项名称" pyName="SJXMC" />
+		<field lgName="数据项值" pyName="SJXZ" />
+	</table>
+	
+	<table id="93" lgName="订货订单类型" desc="订货订单类型" selectFlag="F">
+	    <field text="备货订货" value="备货订货" />
+	    <field text="订单转订货" value="订单转订货" />
+	    <field text="预订单转订货" value="预订单转订货" />
+	    <field text="返利订货" value="返利订货" />
+	    <field text="赠品订货" value="赠品订货" />
+	</table>
+	
+	<table id="94" lgName="验收项目名称" desc="验收项目名称" selectFlag="F">
+	    <field text="标志材质、安装、色彩是否符合公司要求" value="标志材质、安装、色彩是否符合公司要求" />
+	    <field text="门面移位或更改" value="门面移位或更改" />
+	    <field text="墙纸胶水迹明显" value="墙纸胶水迹明显" />
+	</table>
+	
+	<table id="95" lgName="项目分值" desc="项目分值" selectFlag="F">
+	    <field text="10" value="10" />
+	    <field text="15" value="15" />
+	    <field text="20" value="20" />
+	</table>
+	
+	<table id="96" lgName="验收项目类型" desc="验收项目类型" selectFlag="F">
+	    <field text="整体设计布局" value="整体设计布局" />
+	    <field text="装修施工细节" value="装修施工细节" />
+	    <field text="装修卫生" value="装修卫生" />
+	</table>
+	
+	<table id="97" lgName="整改单状态" desc="整改单状态" selectFlag="F">
+	    <field text="已整改" value="已整改" />
+	    <field text="整改通过" value="整改通过" />
+	    <field text="重新整改" value="重新整改" />
+	</table>
+	
+	<table id="98" lgName="区域服务中心销售出库状态" desc="销售出库状态" selectFlag="F">
+		<field text="已处理" value="已处理" />
+		<field text="未处理" value="未处理" />
+		<field text="已取消" value="已取消" />
+	</table>
+
+	<table id="99" lgName="分销-参数设置" desc="参数设置" selectFlag="F">
+		<field text="付款方式" value="付款方式" />
+	</table>
+	<!-- add by zzb 2014-6-17  -->
+<!--	<table id="100" lgName="渠道销售级别" desc="渠道销售级别" selectFlag="F">-->
+<!--		<field text="A" value="A" />-->
+<!--		<field text="B" value="B" />-->
+<!--		<field text="C" value="C" />-->
+<!--	</table>-->
+<!-- add by lyg 2015-08-18  -->
+	<table id="100"
+		pyName="(select a.SJXMC, a.SJXZ
+		  from T_SYS_SJZD u
+		  left join T_SYS_SJZDMX a
+		    on u.SJZDID = a.SJZDID
+		 where u.DELFLAG = 0
+		   and a.DELFLAG = 0
+		   and u.STATE = '启用'
+		   and u.SJZDBH = 'CHAA_LVL' )"
+		lgName="渠道销售级别" isDbTable="T" orderName="SJXZ" desc="渠道销售级别" orderType="ASC"
+		checkCondition="">
+		<field lgName="数据项名称" pyName="SJXMC" />
+		<field lgName="数据项值" pyName="SJXZ" />
+	</table>
+	
+	<!-- add by zzb 2014-6-17  -->
+    <table id="101" lgName="城市类型" desc="渠道" selectFlag="F">
+		<field text="镇" value="镇" />
+		<field text="县级" value="县级" />
+		<field text="地级" value="地级" />
+		<field text="省会" value="省会" />
+		<field text="直辖市" value="直辖市" />
+		<field text="计划单列市" value="计划单列市" />
+	</table>
+	
+   	<table id="102" pyName="(select DATA_NAME,DATA_TYPE,DATA_VAL,DEL_FLAG,LEDGER_ID,IS_DEAL_FLAG from DRP_DATA_CONF where DATA_TYPE = '付款方式')"
+		lgName="付款方式" isDbTable="T" orderName="" desc="付款方式" orderType=""
+		checkCondition="">
+		<field lgName="数据项名称" pyName="DATA_NAME" />
+		<field lgName="数据项值" pyName="DATA_VAL" />
+	</table>
+	
+	<table id="103" lgName="培训类型" desc="培训课程维护" selectFlag="F">
+		<field text="加盟商" value="加盟商" />
+		<field text="终端导购" value="终端导购" />
+		<field text="终端店长" value="终端店长" />		
+	</table>
+	<table id="104" lgName="培训类型" desc="渠道培训申请单" selectFlag="F">
+		<field text="导购员" value="导购员" />
+		<field text="渠道" value="渠道" />
+		<field text="内部" value="内部" />		
+	</table>
+	<!-- add by zzb 2014-7-10 -->
+	<table id="105" lgName="退货申请单单据类型" desc="退货申请单" selectFlag="F">
+		<field text="售后退货" value="售后退货" />
+		<field text="关店退货" value="关店退货" />
+	</table>
+	<table id="106" lgName="退货申请单单据类型" desc="退货申请单" selectFlag="F">
+		<field text="售后退货" value="售后退货" />
+	</table>
+	
+	<table id="107" lgName="培训签到情况" desc="渠道培训结果反馈" selectFlag="F">
+		<field text="正常" value="正常" />
+		<field text="缺勤" value="缺勤" />
+		<field text="迟到" value="迟到" />
+	</table>
+	<table id="108" lgName="考核情况" desc="渠道培训结果反馈" selectFlag="F">		
+		<field text="优秀" value="优秀" />
+		<field text="良好" value="良好" />
+		<field text="合格" value="合格" />		
+		<field text="不合格" value="不合格" />		
+	</table>
+	
+	<!-- 车型  add by zzb 2014-7-14-->
+	<table id="109"   pyName="( select b.SJXMC,b.SJXZ from  T_SYS_SJZDMX b  left join  T_SYS_SJZD a on a.SJZDID=b.SJZDID
+		  where a.STATE='启用'   and a.SJZDMC='车型' and a.DELFLAG = 0 and b.DELFLAG=0)" isDbTable="T"  lgName="车型" desc="车型" >		
+		<field lgName="数据项名称" pyName="SJXMC" />
+		<field lgName="数据项值" pyName="SJXZ" />
+	</table>
+	
+	<!-- 购物车货品类型  add by zzb 2014-7-14-->
+	<table id="110"   pyName="( select b.SJXMC,b.SJXZ from  T_SYS_SJZDMX b  left join  T_SYS_SJZD a on a.SJZDID=b.SJZDID
+		  where a.STATE='启用'   and a.SJZDMC='购物车-单据类型' and a.DELFLAG = 0 and b.DELFLAG=0)" isDbTable="T"  lgName="购物车货品来源类型" desc="购物车货品来源类型" >		
+		<field lgName="数据项名称" pyName="SJXMC" />
+		<field lgName="数据项值" pyName="SJXZ" />
+	</table>
+	
+	<table id="111" lgName="广告投放类型" desc="广告投放申请单维护" selectFlag="F">		
+		<field text="联合投放" value="联合投放" />
+	</table>
+	
+	<table id="112" pyName="(select b.DATA_DTL_CODE,b.DATA_DTL_NAME RANK_NAME,b.DATA_DTL_DES_1 RANK_VALUE from project_data_dictionary a 
+       left join project_data_dictionary_dtl b on a.data_id=b.data_id       
+       where a.data_name='渠道排名' and b.delflag=0 and a.delflag=0 and a.state='启用'
+       order by b.data_dtl_id desc  )" isDbTable="T" desc="渠道排名" selectFlag="F">        
+        <field lgName="数据项名称" pyName="RANK_NAME" />	    
+	    <field lgName="排名对应比例" pyName="RANK_VALUE" />
+	</table>
+
+	<table id="113" pyName="(select b.DATA_DTL_NAME NVALUE,b.DATA_DTL_NAME NTEXT from project_data_dictionary a 
+       left join project_data_dictionary_dtl b on a.data_id=b.data_id       
+       where a.data_name='付款批次' and b.delflag=0 and a.delflag=0 and a.state='启用'
+       order by b.data_dtl_id desc )" isDbTable="T" desc="付款批次" selectFlag="F">        
+        <field lgName="数据项名称" pyName="NTEXT" />	    
+	    <field lgName="数据项值" pyName="NVALUE" />
+	</table>
+	
+	<table id="114" lgName="付款方式" desc="广告投放申请单维护" selectFlag="F">
+		<field text="电汇" value="电汇" />
+		<field text="转账" value="转账" />
+		<field text="支票" value="支票" />
+	</table>
+	
+	<table id="115" pyName="(select b.SJXMC,b.SJXZ from  T_SYS_SJZDMX b  left join  T_SYS_SJZD a on a.SJZDID=b.SJZDID
+		  where a.STATE='启用'   and a.sjzdbh='ERP_PRD_SEND_DELAY_TYPE' and a.DELFLAG = 0 and b.DELFLAG=0)" isDbTable="T" desc="总部货品发运-延迟原因" selectFlag="F">        
+        <field lgName="数据项名称" pyName="SJXMC" />
+		<field lgName="数据项值" pyName="SJXZ" />
+	</table>
+	
+	 
+	<table id="116" pyName="(select t.DATA_DTL_ID,t.DATA_DTL_NAME  
+			  from  PROJECT_DATA_DICTIONARY_DTL t left join PROJECT_DATA_DICTIONARY p 
+			  on t.data_id = p.data_id  where p.data_name = '渠道拜访填报项目' 
+			  and t.delflag=0 and p.delflag=0 and t.par_data_dtl_id is null)" isDbTable="T" desc="项目名称" selectFlag="F">
+		<field lgName="数据项值"   pyName="DATA_DTL_NAME" />
+		<field lgName="数据项名称" pyName="DATA_DTL_ID" />
+     </table>
+     
+     <table id="117" pyName="(select t.DATA_DTL_ID,t.DATA_DTL_NAME  
+			  from  PROJECT_DATA_DICTIONARY_DTL t left join PROJECT_DATA_DICTIONARY p 
+			  on t.data_id = p.data_id" isDbTable="T" desc="项目名称" selectFlag="F">
+		<field lgName="数据项值"   pyName="DATA_DTL_NAME" />
+		<field lgName="数据项名称" pyName="DATA_DTL_ID" />
+     </table>
+	
+	 <table id="118" pyName="(select t.DATA_DTL_ID,t.DATA_DTL_NAME  
+			  from  PROJECT_DATA_DICTIONARY_DTL t left join PROJECT_DATA_DICTIONARY p 
+			  on t.data_id = p.data_id  where p.data_name = '门店拜访填报项目' 
+			  and t.delflag=0 and p.delflag=0 and t.par_data_dtl_id is null)" isDbTable="T" desc="项目名称" selectFlag="F">
+		<field lgName="数据项值"   pyName="DATA_DTL_NAME" />
+		<field lgName="数据项名称" pyName="DATA_DTL_ID" />
+     </table>
+     
+     <table id="119" pyName="(select t.DATA_DTL_ID,t.DATA_DTL_NAME  
+        from  PROJECT_DATA_DICTIONARY_DTL t left join PROJECT_DATA_DICTIONARY p 
+        on t.data_id = p.data_id  where p.data_name = '拜访客户意向' 
+        and t.delflag=0 and p.delflag=0)" isDbTable="T" desc="拜访客户意向" selectFlag="F">
+		<field lgName="数据项值"   pyName="DATA_DTL_NAME" />
+		<field lgName="数据项名称" pyName="DATA_DTL_ID" />
+     </table>
+	
+	<table id="120" lgName="软体层次" desc="软体层次" selectFlag="F">
+		<field text="1" value="1" />
+		<field text="2" value="2" />
+		<field text="3" value="3" />
+		<field text="4" value="4" />
+		<field text="5" value="5" />
+	</table>
+	
+	<table id="121" lgName="定位" desc="定位" selectFlag="F">
+		<field text="A" value="A" />
+		<field text="B" value="B" />
+		<field text="C" value="C" />
+		<field text="D" value="D" />
+	</table>
+	
+	<table id="122" lgName="知名度" desc="知名度" selectFlag="F">
+		<field text="高" value="高" />
+		<field text="中" value="中" />
+		<field text="低" value="低" />
+	</table>
+	
+	<table id="123" lgName="待确认预订单状态" desc="待确认预订单" selectFlag="F">
+		<field text="提交" value="提交" />
+		<field text="待确认" value="待确认" />
+	</table>
+	
+	<table id="124" lgName="销售订单查询" desc="销售订单查询" selectFlag="F">
+		<field text="标准" value="标准" />
+		<field text="非标" value="非标" />
+		<field text="赠品订货" value="赠品订货" />
+		<field text="返利订货" value="返利订货" />
+		<field text="返修订单" value="返修订单" />
+	</table>
+	
+	<table id="125" lgName="非标订单查询" desc="非标订单查询" selectFlag="F">
+		<field text="未提交" value="未提交" />
+		<field text="待核价" value="待核价" />
+		<field text="已核价" value="已核价" />
+		<field text="已取消" value="已取消" />
+		<field text="审核通过" value="审核通过" />
+		<field text="已完成" value="已完成" />
+	</table>
+	
+	<table id="126" lgName="销售订单查看状态" desc="销售订单查看状态" selectFlag="F">
+		<field text="未提交" value="未提交" />
+		<field text="已取消" value="已取消" />
+		<field text="待核价" value="待核价" />
+		<field text="已核价" value="已核价" />
+		<field text="审核通过" value="审核通过" />
+		<field text="已完成" value="已完成" />
+		<!--<field text="退回" value="退回" />
+	--></table>
+	
+	<table id="127" lgName="订货订单状态" desc="订货订单状态-报表" selectFlag="F">
+	    <field text="制作" value="制作" />
+	    <field text="未处理" value="未处理" />
+		<field text="已处理" value="已处理" />
+	</table>
+	<table id="128" lgName="订单发货状态查询" desc="订单发货状态查询-报表" selectFlag="F">
+	    <field text="未审核" value="未审核" />
+	    <field text="已审核" value="已审核" />
+	</table>
+	<table id="129" lgName="标准订单维护" desc="标准订单维护" selectFlag="F">
+		<field text="标准" value="标准" />
+		<field text="赠品订货" value="赠品订货" />
+	</table>
+	<table id="130" lgName="业务操作" desc="业务操作" selectFlag="F">
+		<field text="加" value="0" />
+		<field text="减" value="1" />
+	</table>
+	<table id="131" pyName="(select a.sjxmc,a.sjxz
+						  from T_SYS_SJZD u
+						  left join T_SYS_SJZDMX a
+						  on u.sjzdid = a.sjzdid
+						where u.delflag=0
+						and a.delflag = 0
+						and u.state='启用'
+						and u.sjzdmc='成本计算方式'  )
+            "
+		lgName="成本计算方式" isDbTable="T" orderName="" desc="成本计算方式" orderType=""
+		checkCondition="">
+		<field lgName="数据项名称" pyName="SJXMC" />
+		<field lgName="数据项值" pyName="SJXZ" />
+	</table>
+	
+	<table id="132" lgName="销售订单处理" desc="销售订单处理状态" selectFlag="F">
+	    <field text="未提交" value="未提交" />
+	    <field text="提交" value="提交" />
+	    <field text="关闭" value="关闭" />
+	    <field text="待核价" value="待核价" />
+	    <field text="已核价" value="已核价" />
+	    <field text="审核通过" value="审核通过" />
+		<field text="待发货" value="待发货" />
+		<field text="已发货" value="已发货" />
+	</table>
+	<table id="133" lgName="出货计划维护" desc="状态" selectFlag="F">
+		<field text="未提交" value="未提交" />
+		<field text="已提交库房" value="已提交库房" />
+		<field text="关闭" value="关闭" />
+	</table>
+	<table id="134"
+		pyName="(select a.sjxmc,a.sjxz
+						  from T_SYS_SJZD u
+						  left join T_SYS_SJZDMX a
+						  on u.sjzdid = a.sjzdid
+						where u.delflag=0
+						and a.delflag = 0
+						and u.state='启用'
+						and u.sjzdmc='终端版本')"
+		lgName="终端版本" isDbTable="T" orderName="SJXZ" desc="全局通用" orderType="ASC"
+		checkCondition="">
+		<field lgName="数据项值" pyName="SJXZ" />
+		<field lgName="数据项名称" pyName="SJXMC" />
+	</table>
+	<table id="135" lgName="营业状态" desc="状态" selectFlag="F">
+		<field text="正常营业" value="正常营业" />
+		<field text="转分销" value="转分销" />
+		<field text="撤店" value="撤店" />
+		<field text="装修中" value="装修中" />
+	</table>
+	<table id="136" lgName="开店类型" desc="状态" selectFlag="F">
+		<field text="新户新城市" value="新户新城市" />
+		<field text="老户新城市" value="老户新城市" />
+		<field text="老户老城市" value="老户老城市" />
+	</table>
+	<!--门店发货统计  -->
+	<table id="137" lgName="分组类型" desc="分组类型" selectFlag="F">
+		<field text="按产品明细" value="按产品明细" />
+		<field text="按产品类别" value="按产品类别" />
+	</table>
+	<table id="138" lgName="公告信息" desc="公告信息" selectFlag="F">
+		<field text="未提交" value="未提交" />
+		<field text="提交" value="提交" />
+		<field text="撤销" value="撤销" />
+		<field text="否决" value="否决" />
+		<field text="审核通过" value="审核通过" />
+		<field text="关闭" value="关闭" />
+	</table>
+	
+    <table id="139" pyName="(select b.DATA_DTL_NAME,b.DATA_DTL_NAME DATA_DTL_CODE from project_data_dictionary a 
+       left join project_data_dictionary_dtl b on a.data_id=b.data_id
+       and b.delflag=0 and a.delflag=0 
+       where a.data_name='经营品牌' order by b.data_dtl_id asc )" isDbTable="T" desc="经营品牌" selectFlag="F">
+        <field lgName="数据项值"   pyName="DATA_DTL_NAME" />
+	    <field lgName="数据项名称" pyName="DATA_DTL_CODE" />
+	</table>
+	<table id="140" lgName="销售订单行状态" desc="销售订单行状态" selectFlag="F">
+		<field text="正常" value="正常" />
+		<field text="关闭" value="关闭" />
+		<field text="已发货" value="已发货" />
+	</table>
+	<table id="141" lgName="预订单开票状态" desc="预订单开票状态" selectFlag="F">
+		<field text="已开票" value="1" />
+		<field text="未开票" value="0" />
+	</table>
+	<table id="142" lgName="拜访计划类型" desc="拜访计划类型" selectFlag="F">
+		<field text="加盟商" value="加盟商"/>
+<!--		<field text="城市"   value="城市"  />-->
+		<field text="门店"   value="门店"  />
+	</table>
+	<table id="143" lgName="总部促销价格设定状态" desc="总部促销价格设定状态" selectFlag="F">
+		<field text="启用" value="启用"/>
+		<field text="停用"   value="停用"  />
+	</table>
+	<table id="144" pyName="( 
+		select a.SJXMC, a.SJXZ
+	  from T_SYS_SJZD u
+	  left join T_SYS_SJZDMX a
+	    on u.SJZDID = a.SJZDID
+	 where u.DELFLAG = 0
+	   and a.DELFLAG = 0
+	   and u.STATE = '启用'
+	   and u.SJZDBH = 'MARKETING_CARD_TYPE'
+            )"
+		lgName="营销活动卡券类型" isDbTable="T" orderName="SJXZ" desc="营销活动卡券类型" orderType="ASC"
+		checkCondition="">
+		<field lgName="数据项值" pyName="SJXZ" />
+		<field lgName="数据项名称" pyName="SJXMC" />
+	</table>
+	
+	<table id="145" pyName="( 
+		select a.SJXMC, a.SJXZ
+	  from T_SYS_SJZD u
+	  left join T_SYS_SJZDMX a
+	    on u.SJZDID = a.SJZDID
+	 where u.DELFLAG = 0
+	   and a.DELFLAG = 0
+	   and u.STATE = '启用'
+	   and u.SJZDBH = 'ERP_BUDGET_ITEM_TYPE'
+            )"
+		lgName="预算科目类型" isDbTable="T" orderName="SJXZ" desc="预算科目类型" orderType="ASC"
+		checkCondition="">
+		<field lgName="数据项值" pyName="SJXZ" />
+		<field lgName="数据项名称" pyName="SJXMC" />
+	</table>
+	
+	<table id="146" lgName="拜访方式" desc="拜访方式" selectFlag="F">
+		<field text="电话拜访" value="电话拜访" />
+		<field text="实地拜访" value="实地拜访" />
+	</table>
+	
+	<table id="147" pyName="(select t.BRAND NAME,t.BRAND VALUE from BASE_BRAND t where t.STATE='启用' and t.DEL_FLAG=0)"
+		lgName="品牌" isDbTable="T" orderName="" desc="品牌" orderType=""
+		checkCondition="">
+		<field lgName="数据项值" pyName="NAME" />
+		<field lgName="数据项名称" pyName="VALUE" />
+	</table>
+	
+	<table id="148" lgName="季度" desc="季度" selectFlag="F">
+		<field text="一季度" value="一季度"/>
+		<field text="二季度"   value="二季度"  />
+		<field text="三季度"   value="三季度"  />
+		<field text="四季度"   value="四季度"  />
+	</table>
+	<table id="149" lgName="销售退款单状态" desc="销售退款单状态" selectFlag="F">
+		<field text="未提交" value="未提交" />
+		<field text="待结算" value="待结算" />
+		<field text="已结算" value="已结算" />
+		<field text="已核销" value="已核销" />
+	</table>
+	
+	<table id="150"
+		pyName="(select a.SJXMC, a.SJXZ
+		  from T_SYS_SJZD u
+		  left join T_SYS_SJZDMX a
+		    on u.SJZDID = a.SJZDID
+		 where u.DELFLAG = 0
+		   and a.DELFLAG = 0
+		   and u.STATE = '启用'
+		   and u.SJZDBH = 'ERP_EXPENSE_TYPE' )"
+		lgName="费用报销类型" isDbTable="T" orderName="SJXZ" desc="费用报销类型" orderType="ASC"
+		checkCondition="">
+		<field lgName="数据项值" pyName="SJXZ" />
+		<field lgName="数据项名称" pyName="SJXMC" />
+	</table>
+	<table id="151"
+		pyName="(select a.SJXMC, a.SJXZ
+		  from T_SYS_SJZD u
+		  left join T_SYS_SJZDMX a
+		    on u.SJZDID = a.SJZDID
+		 where u.DELFLAG = 0
+		   and a.DELFLAG = 0
+		   and u.STATE = '启用'
+		   and u.SJZDBH = 'ERP_EXPENSE_DTL_TYPE' )"
+		lgName="费用报销明细类型" isDbTable="T" orderName="SJXZ" desc="费用报销明细类型" orderType="ASC"
+		checkCondition="">
+		<field lgName="数据项值" pyName="SJXZ" />
+		<field lgName="数据项名称" pyName="SJXMC" />
+	</table>
+	<table id="152"
+		pyName="(select a.SJXMC, a.SJXZ
+		  from T_SYS_SJZD u
+		  left join T_SYS_SJZDMX a
+		    on u.SJZDID = a.SJZDID
+		 where u.DELFLAG = 0
+		   and a.DELFLAG = 0
+		   and u.STATE = '启用'
+		   and u.SJZDBH = 'ERP_REBATE_CHANGE_REQ_TYPE' )"
+		lgName="返利额度变更状态" isDbTable="T" orderName="SJXZ" desc="返利额度变更状态" orderType="ASC"
+		checkCondition="">
+		<field lgName="数据项值" pyName="SJXZ" />
+		<field lgName="数据项名称" pyName="SJXMC" />
+	</table>
+	
+	<!-- 总部预订单单据类型 -->
+	<table id="153"
+		pyName="(select a.SJXMC, a.SJXZ
+		  from T_SYS_SJZD u
+		  left join T_SYS_SJZDMX a
+		    on u.SJZDID = a.SJZDID
+		 where u.DELFLAG = 0
+		   and a.DELFLAG = 0
+		   and u.STATE = '启用'
+		   and u.SJZDBH = 'ERP_ADVC_ORDER_BILL_TYPE' )"
+		lgName="返利额度变更状态" isDbTable="T" orderName="SJXZ" desc="总部预订单单据类型" orderType="ASC"
+		checkCondition="">
+		<field lgName="数据项值" pyName="SJXZ" />
+		<field lgName="数据项名称" pyName="SJXMC" />
+	</table>	 
+	 <!-- 拓展拜访 拜访类型 -->
+	<table id="154"
+		pyName="(select a.SJXMC, a.SJXZ
+		  from T_SYS_SJZD u
+		  left join T_SYS_SJZDMX a
+		    on u.SJZDID = a.SJZDID
+		 where u.DELFLAG = 0
+		   and a.DELFLAG = 0
+		   and u.STATE = '启用'
+		   and u.SJZDBH = 'CONTINUATION_TYPE' )"
+		lgName="拓展 拜访类型" isDbTable="T" orderName="SJXZ" desc="拓展拜访类型" orderType="ASC"
+		checkCondition="">
+		<field lgName="数据项值" pyName="SJXZ" />
+		<field lgName="数据项名称" pyName="SJXMC" />
+	</table>	 
+	  <!-- 门店拜访 拜访类型 -->
+	<table id="155"
+		pyName="(select a.SJXMC, a.SJXZ
+		  from T_SYS_SJZD u
+		  left join T_SYS_SJZDMX a
+		    on u.SJZDID = a.SJZDID
+		 where u.DELFLAG = 0
+		   and a.DELFLAG = 0
+		   and u.STATE = '启用'
+		   and u.SJZDBH = 'STORE_TYPE' )"
+		lgName="门店拜访类型" isDbTable="T" orderName="SJXZ" desc="门店拜访类型" orderType="ASC"
+		checkCondition="">
+		<field lgName="数据项值" pyName="SJXZ" />
+		<field lgName="数据项名称" pyName="SJXMC" />
+	</table>
+	 <!-- 加盟商 拜访类型 -->
+	<table id="156"
+		pyName="(select a.SJXMC, a.SJXZ
+		  from T_SYS_SJZD u
+		  left join T_SYS_SJZDMX a
+		    on u.SJZDID = a.SJZDID
+		 where u.DELFLAG = 0
+		   and a.DELFLAG = 0
+		   and u.STATE = '启用'
+		   and u.SJZDBH = 'CHANN_TYPE' )"
+		lgName="加盟商 拜访类型" isDbTable="T" orderName="SJXZ" desc="加盟商拜访类型" orderType="ASC"
+		checkCondition="">
+		<field lgName="数据项值" pyName="SJXZ" />
+		<field lgName="数据项名称" pyName="SJXMC" />
+	</table>
+	
+	
+	<table id="157" lgName="业务数据状态" desc="全局通用" selectFlag="F">
+		<field text="未提交" value="未提交" />
+		<field text="提交" value="提交" />
+		<field text="撤销" value="撤销" />
+		<field text="否决" value="否决" />
+		<field text="审核通过" value="审核通过" />
+		<field text="已结算" value="已结算" />
+	</table>
+	<table id="158" lgName="预订单货品状态" desc="全局通用" selectFlag="F">
+		<field text="关闭" value="关闭" />
+	</table>
+	<table id="159" lgName="拜访类型" desc="全局通用" selectFlag="F">
+		<field text="加盟商拜访" value="加盟商拜访" />
+		<field text="门店拜访" value="门店拜访" />
+	</table>
+	 <!-- 终端 门店分类 -->
+	<table id="160"
+		pyName="(select a.SJXMC, a.SJXZ
+		  from T_SYS_SJZD u
+		  left join T_SYS_SJZDMX a
+		    on u.SJZDID = a.SJZDID
+		 where u.DELFLAG = 0
+		   and a.DELFLAG = 0
+		   and u.STATE = '启用'
+		   and u.SJZDBH = 'TERM_TYPE' )"
+		lgName="门店分类" isDbTable="T" orderName="SJXZ" desc="门店分类" orderType="ASC"
+		checkCondition="">
+		<field lgName="数据项值" pyName="SJXZ" />
+		<field lgName="数据项名称" pyName="SJXMC" />
+	</table>
+	<!-- 门店销售统计 查询发货状态 -->
+	<table id="161" lgName="发货状态" desc="全局通用" selectFlag="F">
+		<field text="全部" value="全部" />
+		<field text="已发货" value="已发货" />
+		<field text="未发货" value="未发货" />
+	</table>
+	
+	<!-- 顾客现场签到状态 -->
+	<table id="162" lgName="顾客现场签到状态 " desc="全局通用" selectFlag="F">
+		<field text="未签到" value="未签到" />
+		<field text="已签到" value="已签到" />
+		<field text="已签出" value="已签出" />
+	</table>
+
+
+	<!--门店发货统计  -->
+	<table id="163" lgName="分组类型" desc="分组类型" selectFlag="F">
+		<field text="按产品明细" value="按产品明细" />
+		<field text="按产品类别" value="按产品类别" />
+		<field text="导购员" value="导购员" />
+	</table>
+	<!-- 用户设置首页URL -->
+	<table id="164"
+		pyName="(select a.SJXMC, a.SJXZ
+		  from T_SYS_SJZD u
+		  left join T_SYS_SJZDMX a
+		    on u.SJZDID = a.SJZDID
+		 where u.DELFLAG = 0
+		   and a.DELFLAG = 0
+		   and u.STATE = '启用'
+		   and u.SJZDBH = 'PORTAL_URL' )"
+		lgName="首页URL" isDbTable="T" orderName="SJXZ" desc="首页URL" orderType="ASC"
+		checkCondition="">
+		<field lgName="数据项名称" pyName="SJXMC" />
+		<field lgName="数据项值" pyName="SJXZ" />
+	</table>
+	<!-- 销售订单单据类型 -->
+	<table id="165" lgName="单据类型 " desc="全局通用" selectFlag="F">
+		<field text="正常销售" value="正常销售" />
+	</table>
+	<!-- 销售订单状态 -->
+	<table id="166" lgName=" 销售订单状态 " desc="全局通用" selectFlag="F">
+		<field text="未提交" value="未提交" />
+		<field text="提交" value="提交" />
+		<field text="撤销" value="撤销" />
+		<field text="审核通过" value="审核通过" />
+		<field text="关闭" value="关闭" />
+	</table>
+	<!-- 返利类别 -->
+	<table id="167"
+		pyName="(select a.SJXMC, a.SJXZ
+		  from T_SYS_SJZD u
+		  left join T_SYS_SJZDMX a
+		    on u.SJZDID = a.SJZDID
+		 where u.DELFLAG = 0
+		   and a.DELFLAG = 0
+		   and u.STATE = '启用'
+		   and u.SJZDBH = 'REBATE_TYPE' )"
+		lgName="返利类别" isDbTable="T" orderName="SJXZ" desc="返利类别" orderType="ASC"
+		checkCondition="">
+		<field lgName="数据项名称" pyName="SJXMC" />
+		<field lgName="数据项值" pyName="SJXZ" />
+	</table>
+	
+	<!-- 退货原因归类-->
+	<table id="168"
+		pyName="(select a.SJXMC, a.SJXZ
+		  from T_SYS_SJZD u
+		  left join T_SYS_SJZDMX a
+		    on u.SJZDID = a.SJZDID
+		 where u.DELFLAG = 0
+		   and a.DELFLAG = 0
+		   and u.STATE = '启用'
+		   and u.SJZDBH = 'DRP_RETURN_RSON_TYPE' )"
+		lgName="退货原因归类" isDbTable="T" orderName="SJXZ" desc="退货原因归类" orderType="ASC"
+		checkCondition="">
+		<field lgName="数据项名称" pyName="SJXMC" />
+		<field lgName="数据项值" pyName="SJXZ" />
+	</table>
+	<!-- 投诉来源-->
+	<table id="169"
+		pyName="(select a.SJXMC, a.SJXZ
+		  from T_SYS_SJZD u
+		  left join T_SYS_SJZDMX a
+		    on u.SJZDID = a.SJZDID
+		 where u.DELFLAG = 0
+		   and a.DELFLAG = 0
+		   and u.STATE = '启用'
+		   and u.SJZDBH = 'ADVS_SOURCE' )"
+		lgName="投诉来源" isDbTable="T" orderName="SJXZ" desc="投诉来源" orderType="ASC"
+		checkCondition="">
+		<field lgName="数据项名称" pyName="SJXMC" />
+		<field lgName="数据项值" pyName="SJXZ" />
+	</table>
+	
+	<table id="170" lgName="季度" desc="季度" selectFlag="F">
+		<field text="一季度" value="1"/>
+		<field text="二季度"   value="2"  />
+		<field text="三季度"   value="3"  />
+		<field text="四季度"   value="4"  />
+	</table>
+	<table id="171" lgName="销售数据上报货品类型 " desc="全局通用" selectFlag="F">
+		<field text="床垫" value="床垫" />
+		<field text="软床" value="软床" />
+		<field text="其他" value="其他" />
+	</table>
+	<!-- 投诉与建议货品类型-->
+	<table id="172"
+		pyName="(select a.SJXMC, a.SJXZ
+		  from T_SYS_SJZD u
+		  left join T_SYS_SJZDMX a
+		    on u.SJZDID = a.SJZDID
+		 where u.DELFLAG = 0
+		   and a.DELFLAG = 0
+		   and u.STATE = '启用'
+		   and u.SJZDBH = 'CMPL_PRD_TYPE' )"
+		lgName="投诉与建议货品类型" isDbTable="T" orderName="SJXZ" desc="投诉与建议货品类型" orderType="ASC"
+		checkCondition="">
+		<field lgName="数据项名称" pyName="SJXMC" />
+		<field lgName="数据项值" pyName="SJXZ" />
+	</table>
+	
+	<table id="173" lgName="预计量上报 " desc="全局通用" selectFlag="F">
+		<field text="制定" value="制定" />
+		<field text="发布" value="发布" />
+		<field text="取消" value="取消" />
+		<field text="结束上报" value="结束上报" />
+	</table>
+	
+	<table id="174" lgName="分销商类型" desc="分销商类型" selectFlag="F">
+		<field text="商场分销" value="商场分销" />
+		<field text="乡镇分销" value="乡镇分销" />
+	</table>
+	<table id="175" lgName="意向程度" desc="意向程度" selectFlag="F">
+		<field text="强" value="强" />
+		<field text="中" value="中" />
+		<field text="无" value="无" />
+	</table>
+	<table id="176" lgName="培训主题" desc="培训主题" selectFlag="F">
+		<field text="产品知识" value="产品知识" />
+		<field text="销售技巧/话术" value="销售技巧/话术" />
+		<field text="销售心态" value="销售心态" />
+	</table>
+	<table id="177" lgName="培训形式" desc="培训形式" selectFlag="F">
+		<field text="集中专场培训" value="集中专场培训" />
+		<field text="门店模拟演练培训" value="门店模拟演练培训" />
+	</table>
+	<table id="178" lgName="合作商场类型" desc="合作商场类型" selectFlag="F">
+		<field text="同商场"   value="同商场" />
+		<field text="不同商场" value="不同商场" />
+	</table>
+	
+	<table id="179" lgName="活动形式" desc="活动形式" selectFlag="F">
+		<field text="模拟厂购" value="模拟厂购" />
+		<field text="联盟活动" value="联盟活动" />
+		<field text="博览会"   value="博览会" />
+		<field text="其他" value="其他" />
+	</table>
+	
+	<table id="180" lgName="查看方式" desc="查看方式" selectFlag="F">
+		<field text="报表形式" value="报表形式" />
+		<field text="日历形式" value="日历形式" />
+	</table>
+	
+	<table id="181"
+		pyName="( select a.SJXMC, a.SJXZ
+			  from T_SYS_SJZD u
+			  left join T_SYS_SJZDMX a
+			    on u.SJZDID = a.SJZDID
+			 where u.DELFLAG = 0
+			   and a.DELFLAG = 0
+			   and u.STATE = '启用'
+			   and u.SJZDBH = 'BUSS_STATE' )"
+		lgName="营业状态" isDbTable="T" orderName="SJXZ" desc="营业状态" orderType="ASC"
+		checkCondition="">
+		<field lgName="数据项名称" pyName="SJXMC" />
+		<field lgName="数据项值" pyName="SJXZ" />
+	</table>
+	<table id="182"
+		pyName="(select a.sjxmc,a.sjxz
+						  from T_SYS_SJZD u
+						  left join T_SYS_SJZDMX a
+						  on u.sjzdid = a.sjzdid
+						where u.delflag=0
+						and a.delflag = 0
+						and u.state='启用'
+						and u.SJZDBH='YHLB'  
+            )"
+		lgName="用户类别" isDbTable="T" orderName="SJXZ" desc="用户类别" orderType="ASC"
+		checkCondition="">
+		<field lgName="数据项值" pyName="SJXZ" />
+		<field lgName="数据项名称" pyName="SJXMC" />
+	</table>
+	
+</tables> 
+ 
+	<!--
+		注意：请将旧文件中的配置文件拷贝过来，每个人在添加table的时候必须注明添加的时间、
+		使用的模块、添加人，修改时需注明修改时间和修改人，否则追究责任。在添加之前请仔细 检查，是否有可以借用的配置，尽量不要重复添加。
+	-->

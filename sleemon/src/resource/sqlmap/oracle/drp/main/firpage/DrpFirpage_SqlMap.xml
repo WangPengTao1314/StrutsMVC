@@ -1,0 +1,1334 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author  
+@function  分销首页
+@version 2013-08-11 17:38:52
+-->
+<sqlMap  namespace="DrpFirpage">
+  
+<!-- 促销SQL -->
+<select id="queryPrmt" parameterClass="map" resultClass="java.util.HashMap">
+  <![CDATA[ 
+  select row_.*, rownum rownum_
+  from
+	(select 
+		u.PRMT_PLAN_ID,
+		u.PRMT_PLAN_NO,
+		u.PRMT_PLAN_NAME,
+		u.PRMT_TYPE,
+		to_char(u.EFFCT_DATE_BEG,'yyyy-MM-DD') EFFCT_DATE_BEG,
+		to_char(u.EFFCT_DATE_END,'yyyy-MM-DD') EFFCT_DATE_END,
+		u.REMARK,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG
+      from ${SYSSCHEMA}.ERP_PRMT_PLAN u 
+       where u.PRMT_PLAN_ID in(select distinct b.PRMT_PLAN_ID from ERP_PRMT_EFFCT_AREA b 
+        where b.AREA_ID in(select AREA_ID  from BASE_AREA  
+               start with  AREA_ID=(select AREA_ID  from BASE_CHANN where  CHANN_ID=#CHANN_ID#)
+               connect by PRIOR  AREA_ID_P = AREA_ID)
+      ) 
+      and u.STATE=#STATE#
+      and u.EFFCT_DATE_BEG <= sysdate
+      and u.EFFCT_DATE_END >= sysdate
+      order by u.CRE_TIME desc) row_
+      where rownum <=#size#
+		 
+   ]]>
+   
+</select> 
+
+<!-- 查询 公告 先查询用户所属的渠道ID  然后再渠道表查出 渠道所属的区域ID  然后去公告生效区域查询 公告ID -->
+ 
+<select id="queryNotice" parameterClass="map" resultClass="java.util.HashMap">
+  	<![CDATA[ 
+  select row_.*, rownum rownum_
+    from
+  	(select u.NOTICE_ID,(case when length(u.NOTICE)>300 then substr(u.NOTICE, 0, 300)||'...' else u.NOTICE end ) NOTICE,
+			(case when length(u.NOTICE_TITLE)>8 then substr(u.NOTICE_TITLE, 0, 8)||'...' else u.NOTICE_TITLE end ) NOTICE_TITLE,
+			NOTICE_TYPE,
+			to_char(u.STATIME,'yyyy-MM-DD') STATIME,
+			to_char(u.ENDTIME,'yyyy-MM-DD HH24:MI:SS') ENDTIME,
+			u.ISSUER_ID,u.ISSUER_NAME,
+			u.ZTXXID,u.STATE,u.CREATER,u.CRENAME,u.UPDNAME,
+			to_char(u.CRETIME,'yyyy-MM-DD HH24:MI:SS')CRETIME,
+		    to_char(u.UPDTIME,'yyyy-MM-DD HH24:MI:SS')UPDTIME,
+		    u.UPDATER,u.DELFLAG,
+		    att.ATT_PATH
+		 from ${SYSSCHEMA}.T_SYS_NOTICE u
+		 left join BASE_ATT att on att.FROM_BILL_ID = u.NOTICE_ID
+		 where u.NOTICE_ID in(
+		 select distinct a.NOTICE_ID from T_SYS_NOTC_AREA a 
+		 where a.AREA_ID in  (select AREA_ID  from BASE_AREA  
+               start with  AREA_ID=(select AREA_ID  from BASE_CHANN where CHANN_ID=#CHANN_ID#)
+               connect by PRIOR  AREA_ID_P = AREA_ID)
+		  )
+          and u.STATE=#STATE#
+          and u.NOTICE_OBJ like '%'||#NOTICE_OBJ#||'%'
+          and u.STATIME <= sysdate
+          and u.ENDTIME >= sysdate
+         order by u.NOTICE_TYPE desc, u.CRETIME desc)row_
+      where rownum <#size#]]>
+</select>
+
+<select id="queryAllNotices" parameterClass="map" resultClass="java.util.HashMap">
+  	<![CDATA[ 
+       select row_.*, rownum rownum_
+    from
+  	(select u.NOTICE_ID,(case when length(u.NOTICE)>300 then substr(u.NOTICE, 0, 300)||'...' else u.NOTICE end ) NOTICE,
+			(case when length(u.NOTICE_TITLE)>8 then substr(u.NOTICE_TITLE, 0, 8)||'...' else u.NOTICE_TITLE end ) NOTICE_TITLE,
+			NOTICE_TYPE,
+			to_char(u.STATIME,'yyyy-MM-DD') STATIME,
+			to_char(u.ENDTIME,'yyyy-MM-DD HH24:MI:SS') ENDTIME,
+			u.ISSUER_ID,u.ISSUER_NAME,
+			u.ZTXXID,u.STATE,u.CREATER,u.CRENAME,u.UPDNAME,
+			to_char(u.CRETIME,'yyyy-MM-DD HH24:MI:SS')CRETIME,
+		    to_char(u.UPDTIME,'yyyy-MM-DD HH24:MI:SS')UPDTIME,
+		    u.UPDATER,u.DELFLAG,
+		    att.ATT_PATH
+		 from ${SYSSCHEMA}.T_SYS_NOTICE u
+		 left join BASE_ATT att on att.FROM_BILL_ID = u.NOTICE_ID
+		 where 
+		  u.STATE=#STATE#
+		  and u.DELFLAG = 0              
+          order by u.NOTICE_TYPE desc, u.CRETIME desc)row_
+          where rownum <#size#
+   
+    ]]>
+</select>
+
+
+<select id="queryNoticers" parameterClass="string" resultClass="java.util.HashMap">
+  	<![CDATA[ 
+        select c.XTYHJSID, c.XTJSID, d.YHBH, d. YHM, c.xm
+               from (select b.xtyhjsid, b.xtjsid, b.xtyhid, a.xm
+               from T_SYS_XTYHjs b
+               left join t_SYS_XTYH d
+               on d.XTYHID = b.XTYHID
+               and d.delflag = 0
+               left join T_SYS_RYXX a
+               on a.RYXXID = d.RYXXID
+               and a.DELFLAG = 0
+               left join T_SYS_XTJS e
+               on e.XTJSid = b.XTJSID
+               where e.Jsmc like '%所有公告%'
+               and b.delflag = 0) c,
+               T_SYS_XTYH d
+               where c.xtyhid = d.xtyhid
+               and d.RYXXID = #RYXXID#
+    ]]>
+</select>
+
+<!-- 总部的首页查询 -->
+<select id="queryNoticeForErp" parameterClass="map" resultClass="java.util.HashMap">
+  	<![CDATA[ 
+  select row_.*, rownum rownum_
+    from
+  	(select u.NOTICE_ID,(case when length(u.NOTICE)>300 then substr(u.NOTICE, 0, 300)||'...' else u.NOTICE end ) NOTICE,
+			(case when length(u.NOTICE_TITLE)>16 then substr(u.NOTICE_TITLE, 0, 16)||'...' else u.NOTICE_TITLE end ) NOTICE_TITLE,
+			NOTICE_TYPE,
+			to_char(u.STATIME,'yyyy-MM-DD') STATIME,
+			to_char(u.ENDTIME,'yyyy-MM-DD HH24:MI:SS') ENDTIME,
+			u.ISSUER_ID,u.ISSUER_NAME,
+			u.ZTXXID,u.STATE,u.CREATER,u.CRENAME,u.UPDNAME,
+			to_char(u.CRETIME,'yyyy-MM-DD HH24:MI:SS')CRETIME,
+		    to_char(u.UPDTIME,'yyyy-MM-DD HH24:MI:SS')UPDTIME,
+		    u.UPDATER,u.DELFLAG,
+		    att.ATT_PATH
+		 from ${SYSSCHEMA}.T_SYS_NOTICE u
+		 left join BASE_ATT att on att.FROM_BILL_ID = u.NOTICE_ID
+		 where 
+		  u.STATE=#STATE#
+          and u.STATIME <= sysdate
+          and u.ENDTIME >= sysdate
+          and u.NOTICE_ID in
+               (select b.NOTICE_ID
+                          from T_SYS_NOTC_DEPT b
+                         where b.DEL_FLAG = 0
+                           and b.DEPT_ID in ($BMXXIDS$))
+                           
+         and u.NOTICE_OBJ like '%'||#NOTICE_OBJ#||'%'                  
+                           
+         order by u.NOTICE_TYPE desc, u.CRETIME desc)row_
+      where rownum <#size#]]>
+</select>
+ <!-- ==============================================促销  查询更多================================================================== -->
+
+<!-- 动态查询 and 列表分页 -->
+     <sql id="queryDynSql_prmt"> 
+     <isNotEmpty prepend="and" property="STATE">
+            <![CDATA[u.STATE in ($STATE$)]]>
+     </isNotEmpty>
+        
+      <isNotEmpty prepend="and" property="XTYHID">
+          u.PRMT_PLAN_ID 
+         in( select distinct b.PRMT_PLAN_ID from ERP_PRMT_EFFCT_AREA b 
+              where b.AREA_ID in (select AREA_ID  from BASE_AREA  
+               start with  AREA_ID=(select AREA_ID  from BASE_CHANN where  CHANN_ID=#CHANN_ID# )
+               connect by PRIOR  AREA_ID_P = AREA_ID)
+          )
+      </isNotEmpty>
+     <isNotEmpty prepend="and" property="PRMT_PLAN_NO">
+          u.PRMT_PLAN_NO like '%'||#PRMT_PLAN_NO#||'%'
+    </isNotEmpty>
+    <isNotEmpty prepend="and" property="PRMT_PLAN_NAME">
+          u.PRMT_PLAN_NAME like '%'||#PRMT_PLAN_NAME#||'%'
+    </isNotEmpty>
+    <isNotEmpty prepend="and" property="PRMT_TYPE">
+          u.PRMT_TYPE = #PRMT_TYPE#
+    </isNotEmpty>
+    <isNotEmpty prepend="and" property="EFFCT_DATE_BEG">
+         <![CDATA[ u.EFFCT_DATE_BEG >= to_date(#EFFCT_DATE_BEG#,'yyyy-MM-DD')]]>
+    </isNotEmpty>
+     <isNotEmpty prepend="and" property="EFFCT_DATE_END">
+          <![CDATA[u.EFFCT_DATE_END <= to_date(#EFFCT_DATE_END#,'yyyy-MM-DD')]]>
+    </isNotEmpty>
+     </sql>
+	<sql id="orderSql_prmt">
+		 u.CRE_TIME DESC
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql_prmt">
+		<![CDATA[   
+		    select 
+		u.PRMT_PLAN_ID,
+		u.PRMT_PLAN_NO,
+		u.PRMT_PLAN_NAME,
+		u.PRMT_TYPE,
+		to_char(u.EFFCT_DATE_BEG,'yyyy-MM-DD') EFFCT_DATE_BEG,
+		to_char(u.EFFCT_DATE_END,'yyyy-MM-DD') EFFCT_DATE_END,
+		u.REMARK,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG
+      from ${SYSSCHEMA}.ERP_PRMT_PLAN u 
+		 ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql_prmt" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql_prmt"/>
+		</dynamic>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery_prmt" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql_prmt" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount_prmt" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(0) cnt FROM ${SYSSCHEMA}.ERP_PRMT_PLAN u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql_prmt"/>
+		</dynamic>
+	</select>
+
+  <!-- ==============================================公告信息 查询更多================================================================== -->
+
+	<!-- 动态查询 and 列表分页 -->
+     <sql id="queryDynSql_notice"> 
+      <isNotEmpty prepend="and" property="STATE">
+            <![CDATA[u.STATE in $STATE$]]>
+      </isNotEmpty>
+      
+      <!-- 分销按照公告区域查询公告 -->
+      <isNotEmpty prepend="and" property="XTYHID">
+        u.NOTICE_ID in(select distinct a.NOTICE_ID from T_SYS_NOTC_AREA_FLAT a 
+		  where a.AREA_ID in  (select AREA_ID  from BASE_AREA  
+               start with  AREA_ID=(select AREA_ID  from BASE_CHANN where CHANN_ID=#CHANN_ID#)
+               connect by PRIOR  AREA_ID_P = AREA_ID))
+      </isNotEmpty>
+      <isNotEmpty prepend="and" property="NOTICE_OBJ">
+             u.NOTICE_OBJ like '%'||#NOTICE_OBJ#||'%'
+      </isNotEmpty>
+      
+      <!-- 总部按照部门查询公告 -->
+      <isNotEmpty prepend="and" property="BMXXIDS">
+          and u.NOTICE_ID in
+               (select b.NOTICE_ID
+                          from T_SYS_NOTC_DEPT b
+                         where b.DEL_FLAG = 0
+                           and b.DEPT_ID in ($BMXXIDS$))
+      </isNotEmpty>
+      
+      
+      <isNotEmpty prepend="and" property="NOTICE_TITLE">
+            u.NOTICE_TITLE like '%'||#NOTICE_TITLE#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="NOTICE_TYPE">
+            u.NOTICE_TYPE = #NOTICE_TYPE#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="NOTICE">
+            u.NOTICE like '%'||#NOTICE#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="STATIME">
+            <![CDATA[u.STATIME >=  to_date(#STATIME#,'yyyy-MM-DD HH24:MI:SS')]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="ENDTIME">
+            <![CDATA[u.ENDTIME <= to_date(#ENDTIME#,'yyyy-MM-DD HH24:MI:SS')]]>
+        </isNotEmpty>
+     </sql>
+     
+     
+     <sql id="queryDynSql_Allnotice"> 
+      <isNotEmpty prepend="and" property="STATE">
+            <![CDATA[u.STATE in $STATE$]]>
+      </isNotEmpty>
+      <isNotEmpty prepend="and" property="NOTICE_TITLE">
+            u.NOTICE_TITLE like '%'||#NOTICE_TITLE#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="NOTICE_TYPE">
+            u.NOTICE_TYPE = #NOTICE_TYPE#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="NOTICE">
+            u.NOTICE like '%'||#NOTICE#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="STATIME">
+            <![CDATA[u.STATIME >=  to_date(#STATIME#,'yyyy-MM-DD HH24:MI:SS')]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="ENDTIME">
+            <![CDATA[u.ENDTIME <= to_date(#ENDTIME#,'yyyy-MM-DD HH24:MI:SS')]]>
+        </isNotEmpty>
+     </sql>
+     
+     
+	<sql id="orderSql_notice">
+	   <isNotEmpty prepend=" " property="orderField"> $orderField$ </isNotEmpty>
+	</sql>
+	
+	<!-- 查询SQL -->
+	<sql id="coreSql_notice">
+		<![CDATA[  select u.NOTICE_ID,(case when length(u.NOTICE)>40 then substr(u.NOTICE, 0, 40)||'...' else u.NOTICE end ) NOTICE,
+			NOTICE_TITLE,NOTICE_TYPE,
+			to_char(u.STATIME,'yyyy-MM-DD HH24:MI:SS') STATIME,
+			to_char(u.ENDTIME,'yyyy-MM-DD HH24:MI:SS') ENDTIME,
+			u.ISSUER_ID,u.ISSUER_NAME,
+			u.ZTXXID,u.STATE,u.CREATER,u.CRENAME,u.UPDNAME,
+			to_char(u.CRETIME,'yyyy-MM-DD HH24:MI:SS')CRETIME,
+		    to_char(u.UPDTIME,'yyyy-MM-DD HH24:MI:SS')UPDTIME,
+		    u.UPDATER,u.DELFLAG
+		 from ${SYSSCHEMA}.T_SYS_NOTICE u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql_notice" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql_notice"/>
+		</dynamic>
+	</sql>
+	
+	<sql id="coreSql_Allnotice">
+		<![CDATA[  select u.NOTICE_ID,(case when length(u.NOTICE)>40 then substr(u.NOTICE, 0, 40)||'...' else u.NOTICE end ) NOTICE,
+			NOTICE_TITLE,NOTICE_TYPE,
+			to_char(u.STATIME,'yyyy-MM-DD HH24:MI:SS') STATIME,
+			to_char(u.ENDTIME,'yyyy-MM-DD HH24:MI:SS') ENDTIME,
+			u.ISSUER_ID,u.ISSUER_NAME,
+			u.ZTXXID,u.STATE,u.CREATER,u.CRENAME,u.UPDNAME,
+			to_char(u.CRETIME,'yyyy-MM-DD HH24:MI:SS')CRETIME,
+		    to_char(u.UPDTIME,'yyyy-MM-DD HH24:MI:SS')UPDTIME,
+		    u.UPDATER,u.DELFLAG
+		 from ${SYSSCHEMA}.T_SYS_NOTICE u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql_Allnotice" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql_notice"/>
+		</dynamic>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery_notice" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql_notice" />
+		<include refid="public.pageEnd" />
+	</select>
+	
+	<select id="pageQuery_Allnotice" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql_Allnotice" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount_notice" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(0) cnt FROM ${SYSSCHEMA}.T_SYS_NOTICE u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql_notice"/>
+		</dynamic>
+	</select>
+	
+	<select id="pageCount_Allnotice" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(0) cnt FROM ${SYSSCHEMA}.T_SYS_NOTICE u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql_Allnotice"/>
+		</dynamic>
+	</select>
+	
+<!-- ========================================================================== -->
+   <!-- 库存预警 
+	<select id="queryStore" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[
+		select PRD_ID,PRD_NO,PRD_NAME,STORE_NUM from (select acct.PRD_ID,stock.PRD_NO,stock.PRD_NAME,acct.STORE_NUM from DRP_STORE_ACCT acct ,DRP_RESV_STOCK stock where acct.PRD_ID = stock.PRD_ID and acct.STORE_NUM < stock.SAFE_STORE_NUM  order by acct.STORE_NUM desc ) temp where ROWNUM <=4 group by PRD_ID,PRD_NO,PRD_NAME,STORE_NUM
+		]]>
+	</select>--><!--
+	
+	<select id="queryStore" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[
+	select PRD_ID,PRD_NO,PRD_NAME,STORE_NUM from (
+    select sum(STORE_NUM) STORE_NUM, SAFE_STORE_NUM, STORE_ID, PRD_ID, PRD_NO,PRD_NAME
+      from (select acct.STORE_ID,
+                   acct.STORG_ID,
+                   acct.PRD_ID,
+                   stock.PRD_NO,
+                   stock.PRD_NAME,
+                   acct.STORE_NUM,
+                   stock.SAFE_STORE_NUM
+              from DRP_STORE_ACCT acct, DRP_RESV_STOCK stock
+             where acct.PRD_ID = stock.PRD_ID
+             order by acct.STORE_NUM desc)
+     group by SAFE_STORE_NUM, STORE_ID, PRD_ID,PRD_NO, PRD_NAME
+    having(sum(STORE_NUM) < SAFE_STORE_NUM))temp where ROWNUM <=4
+		
+		 
+		]]>
+		 
+	</select>
+	
+		-->
+<select id="queryStore" parameterClass="map" resultClass="java.util.HashMap">
+<![CDATA[
+
+   select  t.PRD_NO,t.PRD_NAME,t.STORE_NUM from           
+   (select temp.PRD_ID,stock.PRD_NO,stock.PRD_NAME,temp.STORE_NUM,stock.SAFE_STORE_NUM ,temp.LEDGER_ID from 
+   (select acct.PRD_ID,acct.LEDGER_ID, sum(NVL(acct.STORE_NUM,0))STORE_NUM
+              from DRP_STORE_ACCT acct
+              group by acct.PRD_ID, acct.LEDGER_ID) temp 
+               ,DRP_RESV_STOCK stock where temp.PRD_ID = stock.PRD_ID
+               and stock.STATE='启用'
+               and stock.DEL_FLAG=0
+               and temp.STORE_NUM < stock.SAFE_STORE_NUM) t where t.LEDGER_ID=#LEDGER_ID# and ROWNUM <=4
+
+ ]]>
+		 
+</select>
+	
+	
+	<!-- 查询 代发货预订单   待入库  待退货  -->
+	<select id="queryCount" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[
+		   select 
+		     (select count(0)  FROM DRP_ADVC_ORDER where STATE='待发货') as DRP_ADVC_ORDER,
+            (select count(0)  FROM DRP_STOREIN_NOTICE where STATE='提交')  as DRP_STOREIN_NOTICE,
+            ( select count(0)  FROM DRP_PRD_RETURN_REQ where STATE='提交')  as DRP_PRD_RETURN_REQ
+            from dual
+		]]>
+	</select>
+	
+	<!-- 查询  待发货预订单    -->
+	<select id="queryOrderCount" parameterClass="map" resultClass="int">
+		<![CDATA[
+		   select count(0)  FROM DRP_ADVC_ORDER u where STATE=#STATE#
+		    and LEDGER_ID=#LEDGER_ID#
+		    and BILL_TYPE=#BILL_TYPE#
+		    and DEL_FLAG=#DEL_FLAG#
+		]]>
+	 <isNotEmpty prepend=" and " property="QXJBCON">$QXJBCON$</isNotEmpty>
+	</select>
+	<!-- 查询  待退货  -->
+   <select id="queryPrdRetuenReqCount" parameterClass="map" resultClass="int">
+		<![CDATA[
+             select count(0) FROM DRP_PRD_RETURN_REQ  where 1=1
+		]]>
+		<isNotEmpty prepend="and" property="LEDGER_ID">
+            LEDGER_ID = #LEDGER_ID#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="QXJBCON">
+             $QXJBCON$
+        </isNotEmpty>
+	</select>
+	
+   <!-- 查询  待入库  -->
+   <select id="queryStoreIn" parameterClass="map" resultClass="int">
+		<![CDATA[
+             select count(0)  FROM DRP_STOREIN_NOTICE  where 1=1
+		]]>
+		<isNotEmpty prepend="and" property="LEDGER_ID">
+            LEDGER_ID = #LEDGER_ID#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="QXJBCON">
+             $QXJBCON$
+        </isNotEmpty>
+	</select>
+	
+	
+    <!-- 首页柱状图  当月 按品牌分组
+	<select id="queryBar" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[
+		   select  b.BRAND,sum(b.ORDER_NUM) ORDER_NUM from DRP_ADVC_ORDER_DTL b 
+           where b.ADVC_ORDER_ID in( 
+                 select t.ADVC_ORDER_ID from DRP_ADVC_ORDER t 
+                 where t.STATE=#STATE#
+                 and to_char(t.SALE_DATE,'yyyymm') =(select to_char(sysdate,'yyyymm') as nowTime from dual)
+                 ) 
+           group by b.BRAND
+		]]>
+	</select> -->
+	
+	    <!-- 首页柱状图  当月 按货品前5分组   modify by zzb 2014-6-19 zxw -->
+	<select id="queryBar" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[
+		   select row_.*, rownum rownum_
+			  from (
+			        
+			        select b.PRD_NO, b.PRD_NAME, sum(b.ORDER_NUM) ORDER_NUM
+			          from DRP_ADVC_ORDER_DTL b
+			         where b.ADVC_ORDER_ID in
+			               (select t.ADVC_ORDER_ID from DRP_ADVC_ORDER t where 1=1
+			                 and t.STATE !='未提交' and LEDGER_ID=#LEDGER_ID#
+			               )
+			         group by b.PRD_NO, b.PRD_NAME
+			         order by sum(b.ORDER_NUM) desc
+			        
+			        ) row_
+			 where rownum <= 5
+		]]>
+	</select>
+	<select id="queryGoodsCount" resultClass="int" parameterClass="map">
+		select count(1) from DRP_GOODS_ORDER where STATE=#STATE# and ORDER_CHANN_ID in $CHANNS_CHARG$ and DEL_FLAG=0 and NVL(IS_AREA_SER_ORDER,0) = 0
+	</select>
+	<select id="queryTurnoverplanCount" resultClass="int" parameterClass="map">
+		select count(1) from ERP_SALE_ORDER u where u.STATE in ($STATE$) 
+		and  u.ORDER_CHANN_ID in $CHANNS_CHARG$ and u.DEL_FLAG=#DEL_FLAG# 
+		and u.SALE_ORDER_ID in(
+		Select t.SALE_ORDER_ID 
+		from ERP_SALE_ORDER_DTL t  
+		where t.DEL_FLAG = 0 
+		and NVL(t.CANCEL_FLAG, 0) = 0 
+		and NVL(t.order_num,0)>NVL(t.planed_num,0)
+		)
+	</select>
+	<select id="queryTurnoverhdCount" resultClass="int" parameterClass="map">
+	select count(1)
+	  from ERP_DELIVER_ORDER u
+	 where u.STATE in ($STATE$)
+	   and u.ORDER_CHANN_ID in $CHANNS_CHARG$
+	   and u.DEL_FLAG = #DEL_FLAG#
+	</select>
+	
+	<!-- 查询待审核工艺单 -->
+	<select id="queryTechorderAuditCount" resultClass="int" parameterClass="map">
+	select count(1)
+	  from ERP_TECH_ORDER t,ERP_TECH_ORDER_DTL u
+	 where t.TECH_ORDER_ID = u.TECH_ORDER_ID
+       and u.STATE in ($STATE$)
+	   and t.ORDER_CHANN_ID in $CHANNS_CHARG$
+	   and t.DEL_FLAG = #DEL_FLAG#
+	   and u.DEL_FLAG = #DEL_FLAG#
+	</select>
+	
+	<!-- 查询待核价工艺单 -->
+	<select id="queryTechorderCount" resultClass="int" parameterClass="map">
+	select count(1)
+	  from ERP_TECH_ORDER u
+	 where u.STATE in ($STATE$)
+	   and u.ORDER_CHANN_ID in $CHANNS_CHARG$
+	   and u.DEL_FLAG = #DEL_FLAG#
+	</select>
+	
+	<!-- 查询发运单 -->
+	<select id="queryDeliver" resultClass="java.util.HashMap" parameterClass="map">
+		<![CDATA[
+	  select row_.*, rownum rownum_  from 
+	(    select 
+		u.DELIVER_ORDER_ID,
+		u.DELIVER_ORDER_NO,
+		u.DELIVER_TYPE,
+		u.TRUCK_TYPE,
+		u.CHANN_TYPE,
+		u.AREA_SER_ID,
+		u.AREA_SER_NO,
+		u.AREA_SER_NAME,
+		u.SEND_CHANN_ID,
+		u.SEND_CHANN_NO,
+		u.SEND_CHANN_NAME,
+		u.RECV_CHANN_ID,
+		u.RECV_CHANN_NO,
+		u.RECV_CHANN_NAME,
+		to_char(u.ADVC_SEND_DATE,'yyyy-MM-DD') ADVC_SEND_DATE,
+		u.TOTAL_VOLUME,
+		u.STATE,
+		u.REMARK,
+		u.SHIP_POINT_ID,
+		u.SHIP_POINT_NAME,
+		u.APPCH_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.DEL_FLAG,
+		u.BILL_TYPE,
+		u.ORDER_CHANN_ID,
+		u.ORDER_CHANN_NO,
+		u.ORDER_CHANN_NAME,
+		u.FROM_BILL_NO,
+		u.FROM_BILL_ID,
+		NVL(u.IS_ALL_FREEZE_FLAG,0)IS_ALL_FREEZE_FLAG,
+		u.RECV_ADDR_NO,
+		u.JOIN_DELIVER_ORDER_NO
+		from ERP_DELIVER_ORDER u
+		where u.ORDER_CHANN_ID=#ZTXXID# and u.DEL_FLAG=#DEL_FLAG#
+		 
+	)row_
+			 where rownum <= 5
+			
+			]]>
+	</select>
+	
+	
+	<!-- 查询 渠道部门或门店部门  -->
+	<select id="queryDeptCount" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[
+		   select count(0) from BASE_CHANN c where c.CHANN_ID=#DEPT_ID# and DEL_FLAG=0
+		     
+		]]>
+	</select>
+	<!-- 总部出库金额按月份  -->
+	<select id="qrySaleAmountByMonth" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[
+		   select  u.YEAR,u.MONTH,round(NVL(s.SALE_AMOUNT,0)/10000,2) SALE_AMOUNT ,round(NVL(k.PLAN_SALE_AMOUNT,0)/10000,2) PLAN_SALE_AMOUNT
+			  from 
+			   ERP_YEAR_MONTH u left join 
+			   (select
+			    sum(decode(c.IS_FREE_FLAG, 1, 0, b.DECT_AMOUNT)) SALE_AMOUNT,to_char(a.Storeout_Time,'yyyy') THE_YEAR,to_char(a.Storeout_Time,'mm') THE_MONTH
+			  from ERP_STOREOUT         a,
+                    ERP_STOREOUT_PRD_DTL b,
+                    ERP_SALE_ORDER_DTL   c,
+                    base_chann           e
+              where e.chann_id = a.ORDER_CHANN_ID
+                and a.STOREOUT_ID = b.STOREOUT_ID
+                and b.SALE_ORDER_DTL_ID = c.SALE_ORDER_DTL_ID
+                and a.DEL_FLAG = 0
+                and b.Del_Flag = 0
+                and c.DEL_FLAG = 0
+                and e.del_flag = 0
+                and e.chann_type <> '直营办'
+			group by to_char(a.Storeout_Time,'yyyy'),to_char(a.Storeout_Time,'mm') ) s  on u.YEAR=s.THE_YEAR and u.MONTH=s.THE_MONTH
+			left join 
+			 (
+			  select 
+			       m.PLAN_YEAR,m.PLAN_MONTH,sum(PLAN_SALE_AMOUNT*10000) PLAN_SALE_AMOUNT 
+			  from ERP_AREA_SALE_PLAN u,ERP_AREA_SALE_PLAN_DTL m  
+			  where u.AREA_SALE_PLAN_ID=m.AREA_SALE_PLAN_ID 
+			        and u.STATE='审核通过' 
+			        and u.DEL_FLAG=0
+			        and m.DEL_FLAG=0
+			  group by   m.PLAN_YEAR,m.PLAN_MONTH
+			 ) k on u.YEAR=k.PLAN_YEAR and u.MONTH=k.PLAN_MONTH
+			 where 
+			    u.YEAR=#YEAR#
+			   and u.MONTH in ($MONTH$)
+			  order by   u.YEAR asc,u.MONTH asc
+		     
+		]]>
+	</select>
+	
+	<select id="columnChartDefAccordingToCategoryHeadquatersShippingAmount" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+		  select 
+		       u.YEAR,u.MONTH,round(NVL(s.SALE_AMOUNT_CD,0)/10000,2) SALE_AMOUNT_CD ,
+		       round(NVL(s.SALE_AMOUNT_RC,0)/10000,2) SALE_AMOUNT_RC ,
+		       round(NVL(s.SALE_AMOUNT_QT,0)/10000,2) SALE_AMOUNT_QT 
+		       from ERP_YEAR_MONTH u left join 
+		       ( select sum( case when d.PAR_PRD_ID like '01%' then decode(c.IS_FREE_FLAG, 1, 0, b.DECT_AMOUNT) else 0 end ) SALE_AMOUNT_CD,
+		        sum( case when d.PAR_PRD_ID like '02%' then decode(c.IS_FREE_FLAG, 1, 0, b.DECT_AMOUNT) else 0 end ) SALE_AMOUNT_RC,
+		        sum( case when d.PAR_PRD_ID like '01%' or d.PAR_PRD_ID like '02%' then 0 else decode(c.IS_FREE_FLAG, 1, 0, b.DECT_AMOUNT) end ) SALE_AMOUNT_QT, 
+		        to_char(a.Storeout_Time,'yyyy') THE_YEAR, to_char(a.Storeout_Time,'mm') THE_MONTH 
+		             from ERP_STOREOUT         a,
+	                    base_chann           e,
+	                    ERP_STOREOUT_PRD_DTL b,
+	                    ERP_SALE_ORDER_DTL   c,
+	                    BASE_PRODUCT         d
+	              where a.STOREOUT_ID = b.STOREOUT_ID
+	                and b.SALE_ORDER_DTL_ID = c.SALE_ORDER_DTL_ID
+	                and e.chann_id = a.ORDER_CHANN_ID
+	                and b.PRD_ID = d.PRD_ID
+	                and a.DEL_FLAG = 0
+	                and b.Del_Flag = 0
+	                and c.DEL_FLAG = 0
+	                and d.DEL_FLAG = 0
+	                and e.del_flag = 0
+	                and e.chann_type <> '直营办'
+		          group by to_char(a.Storeout_Time,'yyyy'),to_char(a.Storeout_Time,'mm') )s 
+		          on u.YEAR=s.THE_YEAR and u.MONTH=s.THE_MONTH where u.YEAR=#YEAR# 
+		          and u.MONTH in ($MONTH$) order by u.YEAR asc,u.MONTH asc
+ 		]]>
+	</select>
+	
+	<!-- 需要修改  -->
+		<select id="directsaleStoreDevelopmentTheSalesAmountOfSummary" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+	select u.YEAR,
+		       u.MONTH,
+		       round(NVL(SALE_AMOUNT_CD, 0) / 10000, 2) SALE_AMOUNT_CD,
+		       round(NVL(SALE_AMOUNT_RC, 0) / 10000, 2) SALE_AMOUNT_RC,
+		       round(NVL(SALE_AMOUNT_QT, 0) / 10000, 2) SALE_AMOUNT_QT
+		       
+		  from ERP_YEAR_MONTH u
+		  left join (select to_char(a.DEAL_TIME, 'yyyy') YEAR,
+		                    to_char(a.DEAL_TIME, 'MM') MONTH,
+		                     sum(case
+		                          when d.PAR_PRD_ID like '01%' then
+		                           decode(b.PRD_TYPE, '赠品', 0, b.DECT_AMOUNT)
+		                          else
+		                           0
+		                        end) SALE_AMOUNT_CD,
+		                    sum(case
+		                          when d.PAR_PRD_ID like '02%' then
+		                           decode(b.PRD_TYPE, '赠品', 0, b.DECT_AMOUNT)
+		                          else
+		                           0
+		                        end) SALE_AMOUNT_RC,
+		                    sum(case
+		                          when d.PAR_PRD_ID like '01%' or d.PAR_PRD_ID like '02%' then
+		                           0
+		                          else
+		                           decode(b.PRD_TYPE, '赠品', 0, b.DECT_AMOUNT)
+		                        end) SALE_AMOUNT_QT
+		                   
+		               from DRP_STOREOUT a
+		               left join DRP_STOREOUT_DTL b
+		                 on a.STOREOUT_ID = b.STOREOUT_ID
+		                and b.DEL_FLAG = 0
+		                left join BASE_PRODUCT d
+		                 on b.PRD_ID = d.PRD_ID  and d.DEL_FLAG = 0
+		              where a.STATE = '已处理'
+		                and a.DEL_FLAG = 0
+		                and a.BILL_TYPE='销售出库'
+		                and a.LEDGER_ID in('4108','4109','4110','4111')
+		              group by to_char(a.DEAL_TIME, 'yyyy'),
+		                       to_char(a.DEAL_TIME, 'MM')) temp
+		    on u.YEAR = temp.YEAR
+		   and u.MONTH = temp.MONTH
+		 where  u.YEAR=#YEAR#
+		 order by u.YEAR, u.MONTH asc
+		
+		     
+		]]>
+	</select>
+	
+	
+	<!-- 销售出库 按战区  维度季度 -->
+		<select id="qrySaleAmountByWarZoneQuarter" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[
+		
+		select  u.AREA_NAME,round(NVL(s.SALE_AMOUNT,0)/10000,2) SALE_AMOUNT ,NVL(k.PLAN_SALE_AMOUNT,0) PLAN_SALE_AMOUNT,
+           (case when NVL(k.PLAN_SALE_AMOUNT,0)=0 and NVL(s.SALE_AMOUNT,0)>0 then 1  else
+            case when NVL(k.PLAN_SALE_AMOUNT,0)>0 then round(NVL(s.SALE_AMOUNT,0)/NVL(k.PLAN_SALE_AMOUNT,0),2) else 0 end end )*100 FINISH_RATE
+          from BASE_AREA u 
+          left join 
+         (
+          select
+              sum(decode(c.IS_FREE_FLAG, 1, 0, b.DECT_AMOUNT)) SALE_AMOUNT,f.WAREA_ID
+         from 
+           ERP_STOREOUT a 
+            left join ERP_STOREOUT_PRD_DTL b  on a.STOREOUT_ID=b.STOREOUT_ID and b.Del_Flag=0
+            left join ERP_SALE_ORDER_DTL c  on b.SALE_ORDER_DTL_ID=c.SALE_ORDER_DTL_ID and c.DEL_FLAG=0
+            left join ERP_SALE_ORDER f on c.SALE_ORDER_ID=f.SALE_ORDER_ID and f.DEL_FLAG=0
+         where 
+          a.DEL_FLAG=0
+        
+          and  to_char(a.Storeout_Time,'yyyy')=#YEAR#
+          and  to_char(a.Storeout_Time,'q') in($RPT_QUARTER$)
+       group by  f.WAREA_ID   ) s  on u.AREA_ID=s.WAREA_ID 
+      left join 
+       (
+        select u.WAREA_ID, 
+			 $sumColumns$  PLAN_SALE_AMOUNT
+			  from ERP_AREA_SALE_PLAN u 
+			  where u.STATE = '审核通过' 
+			  and u.DEL_FLAG = 0 
+			  and u.plan_year = #YEAR#
+			 group by u.WAREA_ID
+        
+       ) k on u.AREA_ID=k.WAREA_ID
+       where 
+           u.AREA_ID_P is null and u.IS_BRANCH_COMPANY_FLAG=0
+            and u.STATE='启用'
+        order by   u.AREA_NO asc 
+		
+		]]>
+	</select>
+	
+	
+	
+	<!-- 销售出库 按战区 维度月份 -->
+		<select id="qrySaleAmountByWarZoneMonth" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[
+		
+		select   u.AREA_NAME,
+		    round(NVL(s.SALE_AMOUNT,0)/10000,2) SALE_AMOUNT ,round(NVL(k.PLAN_SALE_AMOUNT,0)/10000,2) PLAN_SALE_AMOUNT,
+           (case when NVL(k.PLAN_SALE_AMOUNT,0)=0 and NVL(s.SALE_AMOUNT,0)>0 then 1  else
+            case when NVL(k.PLAN_SALE_AMOUNT,0)>0 then round(NVL(s.SALE_AMOUNT,0)/NVL(k.PLAN_SALE_AMOUNT,0),2) else 0 end end )*100 FINISH_RATE
+          from BASE_AREA u 
+          left join 
+         (
+             select  
+               f.AREA_ID_P,
+               f.AREA_NAME_P,
+               SUM(decode(c.IS_FREE_FLAG, 1, 0, b.DECT_AMOUNT)) SALE_AMOUNT  
+               from ERP_STOREOUT         a,
+                    ERP_STOREOUT_PRD_DTL b,
+                    ERP_SALE_ORDER_DTL   c,
+                    base_chann           e,
+                    BASE_AREA            f
+               where e.chann_id = a.ORDER_CHANN_ID
+                and a.STOREOUT_ID = b.STOREOUT_ID
+                and b.SALE_ORDER_DTL_ID = c.SALE_ORDER_DTL_ID
+                and e.AREA_ID = f.AREA_ID
+                and a.DEL_FLAG = 0
+                and b.Del_Flag = 0
+                and c.DEL_FLAG = 0
+                and e.del_flag = 0
+                and e.chann_type <> '直营办'
+                and to_char(a.Storeout_Time, 'yyyy') =#YEAR#
+                and to_char(a.Storeout_Time, 'mm')  in ($MONTH$)
+                and f.STATE = '启用'
+                group by f.AREA_ID_P, f.AREA_NAME_P
+        ) s  on u.AREA_ID=s.AREA_ID_P
+      left join 
+       (
+        select 
+              u.WAREA_ID,
+              u.WAREA_NAME,
+              sum(NVL(PLAN_SALE_AMOUNT,0)*10000) PLAN_SALE_AMOUNT 
+        from ERP_AREA_SALE_PLAN u,ERP_AREA_SALE_PLAN_DTL m 
+        where u.AREA_SALE_PLAN_ID=m.AREA_SALE_PLAN_ID 
+              and u.STATE='审核通过' 
+              and u.DEL_FLAG=0
+              and m.DEL_FLAG=0
+              and m.PLAN_YEAR=#YEAR#
+              and m.PLAN_MONTH in ($MONTH$)
+        group by  u.WAREA_ID,u.WAREA_NAME
+       ) k on u.AREA_ID=k.WAREA_ID
+       where 
+           u.AREA_ID_P is null and u.IS_BRANCH_COMPANY_FLAG=0
+           and u.STATE='启用'
+           and  u.AREA_NAME IS NOT NULL
+           and  u.AREA_NAME NOT LIKE '%直营%'
+           and  s.SALE_AMOUNT !=0
+           order by   u.AREA_NO asc 
+		]]>
+	</select>
+	
+   <!-- 渠道部（当前有效门店数） 有效门店发展汇总 按总部 -->
+		<select id="effectiveStoreChannelDeptsSummarization" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[
+	select
+    u.YEAR, u.MONTH, 
+    (case when to_char(sysdate ,'yyyyMM')>=u.YEAR || u.MONTH then  (select  sum(1) OPEN_NUM
+               from BASE_TERMINAL t
+              where t.DEL_FLAG = 0
+                and t.STATE = '启用'
+                and  to_char(t.BEG_SBUSS_DATE, 'yyyyMM')<=u.YEAR||u.MONTH
+                ) else 0 end )   OPEN_NUM, NVL(b.QUOTA_NUM,0)QUOTA_NUM
+  from ERP_YEAR_MONTH u
+  left join (select q.YEAR, q.MONTH, sum(q.QUOTA_NUM) QUOTA_NUM
+               from ERP_CHANN_TERMINAL_QUOTA q
+              where q.DEL_FLAG = 0
+              group by q.YEAR, q.MONTH) b
+    on u.YEAR = b.YEAR
+   and u.MONTH = b.MONTH
+ where u.YEAR =#YEAR#
+ order by u.MONTH asc
+
+		]]>
+	</select>
+	
+	
+<!-- 渠道部（当前有效门店数） 各战区门店发展汇总 按战区 -->
+<select id="effectiveStoreChannelDeptsSummarizationByWarZone" parameterClass="map" resultClass="java.util.HashMap">
+<![CDATA[
+ SELECT * FROM (
+        select p.AREA_NAME, p.AREA_NO,
+       sum(NVL(temp.OPEN_NUM, 0)) OPEN_NUM,
+       sum(NVL(zb.QUOTA_NUM, 0)) QUOTA_NUM
+  from BASE_AREA a
+  left join BASE_CHANN c
+    on a.AREA_ID = c.AREA_ID
+    and c.STATE = '启用'
+  left join BASE_AREA p
+    on a.AREA_ID_P = p.AREA_ID
+    and p.STATE = '启用'
+  left join (select t.CHANN_ID_P, sum(1) OPEN_NUM
+               from BASE_TERMINAL t
+              where t.DEL_FLAG = 0
+                and t.STATE = '启用'
+                and to_char(t.BEG_SBUSS_DATE, 'yyyyMM') <= #RPT_YEAR_MONTH#
+              group by t.CHANN_ID_P) temp
+    on c.CHANN_ID = temp.CHANN_ID_P
+  left join (select q.AREA_ID, sum(q.QUOTA_NUM) QUOTA_NUM
+               from ERP_CHANN_TERMINAL_QUOTA q
+              where q.DEL_FLAG = 0
+                and q.YEAR = #YEAR#
+                and q.MONTH =#RPT_MONTH#
+              group by q.AREA_ID) zb
+    on a.AREA_ID = zb.AREA_ID
+ where a.AREA_NAME_P is not null
+ and p.AREA_NAME IS NOT NULL
+ and p.AREA_NAME NOT LIKE '%直营%'
+ group by p.AREA_NAME,p.AREA_NO
+ order by p.AREA_NO
+         )
+ UNION  ALL
+SELECT * FROM (
+ select p.AREA_NAME,
+       p.AREA_NO,
+       sum(NVL(temp.OPEN_NUM, 0)) OPEN_NUM,
+       sum(NVL(zb.QUOTA_NUM, 0)) QUOTA_NUM
+  from BASE_AREA a
+  left join BASE_CHANN c
+    on a.AREA_ID = c.AREA_ID
+    and c.STATE = '启用'
+  left join BASE_AREA p
+    on a.AREA_ID_P = p.AREA_ID
+    and p.STATE = '启用'
+  left join (select t.CHANN_ID_P, sum(1) OPEN_NUM
+               from BASE_TERMINAL t
+              where t.DEL_FLAG = 0
+                and t.STATE = '启用'
+                and to_char(t.BEG_SBUSS_DATE, 'yyyyMM') <= '201602'
+              group by t.CHANN_ID_P) temp
+    on c.CHANN_ID = temp.CHANN_ID_P
+  left join (select q.AREA_ID, sum(q.QUOTA_NUM) QUOTA_NUM
+               from ERP_CHANN_TERMINAL_QUOTA q
+              where q.DEL_FLAG = 0
+                and q.YEAR = '2016'
+                and q.MONTH = '02'
+              group by q.AREA_ID) zb
+    on a.AREA_ID = zb.AREA_ID
+ where a.AREA_NAME_P is not null
+       and p.AREA_NAME IS NOT NULL
+       and p.AREA_NAME LIKE '%直营%'
+ group by p.AREA_NAME,p.AREA_NO 
+ order by p.AREA_NO
+         ) 
+   
+		]]>
+	</select>
+	
+
+	<!-- 总部订货金额（货品分类） -->
+		<select id="headquartersOrderAmountClassificationOfGoods" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[
+
+		
+		select u.YEAR, u.MONTH,round(NVL(temp.SALE_AMOUNT_CD,0)/10000,2) SALE_AMOUNT_CD,round(NVL(temp.SALE_AMOUNT_RC,0)/10000,2) SALE_AMOUNT_RC,round(NVL(temp.SALE_AMOUNT_QT,0)/10000,2) SALE_AMOUNT_QT
+  from ERP_YEAR_MONTH u
+  left join 
+  (select  
+    sum(case when p.PAR_PRD_ID like '01%' then  b.ORDER_AMOUNT else  0   end) SALE_AMOUNT_CD,
+    sum(case when p.PAR_PRD_ID like '02%' then  b.ORDER_AMOUNT else  0   end) SALE_AMOUNT_RC,
+    sum(case  when p.PAR_PRD_ID like '01%' or p.PAR_PRD_ID like '02%' then 0  else  b.ORDER_AMOUNT  end) SALE_AMOUNT_QT,
+    to_char(a.AUDIT_TIME, 'yyyy') YEAR,
+    to_char(a.AUDIT_TIME, 'MM') MONTH 
+     from DRP_GOODS_ORDER a
+      left join DRP_GOODS_ORDER_DTL b
+      on a.GOODS_ORDER_ID = b.GOODS_ORDER_ID
+      left join BASE_PRODUCT p
+      on p.prd_id = b.prd_id
+      where a.STATE = '已处理'
+      and a.DEL_FLAG = 0
+      and b.DEL_FLAG = 0
+      and a.RECV_CHANN_ID in
+                    (select c.CHANN_ID
+                       from BASE_CHANN c
+                      where c.CHANN_TYPE in ('区域服务中心', '加盟商'))
+     group by  to_char(a.AUDIT_TIME, 'yyyy'),  to_char(a.AUDIT_TIME, 'MM')) temp
+    on temp.YEAR = u.YEAR
+   and temp.MONTH = u.MONTH
+ where u.year = #YEAR#
+ order by u.MONTH asc 
+		     
+		]]>
+	</select>
+	
+	
+	
+	<!-- 总部订货金额（总部维度） -->
+		<select id="headquartersOrderAmountByHeaderQuaterDimension" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[
+            select u.YEAR,
+			       u.MONTH,
+			       round(NVL(temp.ORDER_AMOUNT, 0) / 10000, 2) ORDER_AMOUNT
+				   from ERP_YEAR_MONTH u
+				  left join (      
+			             SELECT 
+			             t.YEAR,
+			             t.MONTH,
+			             sum(t.ORDER_AMOUNT) ORDER_AMOUNT   
+			             FROM (      
+			               SELECT 
+			                area.AREA_NAME_P, 
+	                        to_char(a.AUDIT_TIME, 'yyyy') YEAR,
+	                        to_char(a.AUDIT_TIME, 'MM') MONTH,
+	                        sum(b.ORDER_AMOUNT) ORDER_AMOUNT
+	                        FROM BASE_CHANN c LEFT JOIN BASE_AREA area on c.AREA_ID = area.AREA_ID
+	                        LEFT JOIN DRP_GOODS_ORDER a
+	                        on a.ORDER_CHANN_ID = c.CHANN_ID
+	                        left join DRP_GOODS_ORDER_DTL b
+	                        on a.GOODS_ORDER_ID = b.GOODS_ORDER_ID
+                            where a.STATE = '已处理'
+                            and c.STATE = '启用'
+                            and a.DEL_FLAG = 0
+                            and b.DEL_FLAG = 0
+                            and c.CHANN_TYPE in ('区域服务中心', '加盟商')
+                            and to_char(a.AUDIT_TIME, 'yyyy') = #YEAR#
+                            group by to_char(a.AUDIT_TIME, 'yyyy'),
+                            to_char(a.AUDIT_TIME, 'MM'),
+                            area.AREA_NAME_P       
+			                       
+			                )t      
+			                group by t.YEAR,t.MONTH
+			               ) temp
+					    on temp.YEAR = u.YEAR
+					    and temp.MONTH = u.MONTH
+					   where u.year =  #YEAR#
+					   order by u.MONTH asc
+		     
+		]]>
+	</select>
+	
+	
+	
+		<!-- 总部订货金额（战区维度） 按月 -->
+		<select id="headquartersOrderAmountByWarDimension" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[
+select t.AREA_NAME,t.AREA_NO,sum(round(NVL(temp.ORDER_AMOUNT,0)/10000,2)) ORDER_AMOUNT
+  from ERP_YEAR_MONTH u
+  left join BASE_AREA t
+  on 1 = 1
+  left join ( 
+            SELECT area.AREA_NAME_P, 
+                        to_char(a.AUDIT_TIME, 'yyyy') YEAR,
+                        to_char(a.AUDIT_TIME, 'MM') MONTH,
+                        sum(b.ORDER_AMOUNT) ORDER_AMOUNT
+                        FROM BASE_CHANN c LEFT JOIN BASE_AREA area on c.AREA_ID = area.AREA_ID
+                        LEFT JOIN DRP_GOODS_ORDER a
+                        on a.ORDER_CHANN_ID = c.CHANN_ID
+                         left join DRP_GOODS_ORDER_DTL b
+                         on a.GOODS_ORDER_ID = b.GOODS_ORDER_ID
+                          where a.STATE = '已处理'
+                          and c.STATE = '启用'
+                          and a.DEL_FLAG = 0
+                          and b.DEL_FLAG = 0
+                          and c.CHANN_TYPE in ('区域服务中心', '加盟商')
+                          and to_char(a.AUDIT_TIME, 'yyyy') =  #YEAR#
+                          group by to_char(a.AUDIT_TIME, 'yyyy'),
+                                 to_char(a.AUDIT_TIME, 'MM'),
+                                 area.AREA_NAME_P
+                     ) temp
+    on temp.YEAR = u.YEAR
+    and temp.MONTH = u.MONTH
+    and temp.AREA_NAME_P = t.AREA_NAME
+    where  u.YEAR = #YEAR#
+    and u.month in($RPT_MONTH$)
+    and t.AREA_ID_P is null
+    and temp.ORDER_AMOUNT !=0
+    and t.IS_BRANCH_COMPANY_FLAG=0
+    and t.STATE='启用'
+    group by  t.AREA_NAME  ,t.AREA_NO
+    ORDER BY t.AREA_NO
+		]]>
+	</select>
+	
+	
+	
+	
+   <!-- 总部订货金额（按战区 按季度） -->
+   <select id="headquartersOrderAmountByWarDimensionByQuarter" parameterClass="map" resultClass="java.util.HashMap">
+   <![CDATA[
+    select t.AREA_NAME, temp.YEAR,temp.QUARTER,round(NVL(temp.ORDER_AMOUNT,0)/10000,2) ORDER_AMOUNT
+     from   BASE_AREA t
+     left join (select area.AREA_NAME_P,
+                    to_char(a.AUDIT_TIME, 'yyyy') YEAR,
+                    to_char(a.AUDIT_TIME, 'Q') QUARTER,
+                    sum(b.ORDER_AMOUNT) ORDER_AMOUNT
+               from DRP_GOODS_ORDER a
+               left join DRP_GOODS_ORDER_DTL b
+                 on a.GOODS_ORDER_ID = b.GOODS_ORDER_ID and b.DEL_FLAG=0
+               left join BASE_AREA area
+                 on area.AREA_ID = a.AREA_ID and area.DEL_FLAG=0
+              where a.STATE = '已处理'
+                and a.DEL_FLAG = 0
+                and b.DEL_FLAG = 0
+              group by area.AREA_NAME_P,
+                       to_char(a.AUDIT_TIME, 'yyyy'),
+                       to_char(a.AUDIT_TIME, 'Q')) temp
+  on temp.AREA_NAME_P = t.AREA_NAME
+ where temp.YEAR = #YEAR#
+   and t.AREA_ID_P is null
+   and t.IS_BRANCH_COMPANY_FLAG=0
+   and t.STATE='启用'
+   and temp.QUARTER in($RPT_QUARTER$)
+ ]]>
+	</select>
+<!-- 直营销售出库金额汇总 -->
+<select id="directsalestoreTheSalesAmountOfSummary" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[
+	          	select
+				       u.YEAR,
+				       u.MONTH,
+				       round(NVL(SH_AMOUNT,0)/10000,2) SH_AMOUNT,
+                       round(NVL(SX_AMOUNT,0)/10000,2) SX_AMOUNT,
+                       round(NVL(HZ_AMOUNT,0)/10000,2) HZ_AMOUNT,
+                       round(NVL(BJ_AMOUNT,0)/10000,2) BJ_AMOUNT,
+                       round(NVL(CD_AMOUNT, 0) / 10000, 2) CD_AMOUNT,
+                       round(NVL(SZ_AMOUNT, 0) / 10000, 2) SZ_AMOUNT
+				  from ERP_YEAR_MONTH u 
+				 left join
+				  ( select 
+				             to_char(a.DEAL_TIME, 'yyyy')YEAR,
+				             to_char(a.DEAL_TIME, 'MM')MONTH,
+				       sum((case when a.LEDGER_ID='4108' then decode(b.PRD_TYPE,'赠品',0 ,  NVL(b.DECT_AMOUNT,0)) else 0 end )) SH_AMOUNT,
+                       sum((case when a.LEDGER_ID='4110' then decode(b.PRD_TYPE,'赠品',0 ,  NVL(b.DECT_AMOUNT,0)) else 0 end )) SX_AMOUNT,
+                      sum((case when a.LEDGER_ID='4109' then decode(b.PRD_TYPE,'赠品',0 ,  NVL(b.DECT_AMOUNT,0)) else 0 end )) HZ_AMOUNT,
+                      sum((case when a.LEDGER_ID='4111' then decode(b.PRD_TYPE,'赠品',0 ,  NVL(b.DECT_AMOUNT,0)) else 0 end)) BJ_AMOUNT,
+				      sum((case
+                          when a.LEDGER_ID = 'b4c6231eea2c49ce855e474650c115cb' then
+                           decode(b.PRD_TYPE, '赠品', 0, NVL(b.DECT_AMOUNT, 0))
+                          else
+                           0
+                        end)) CD_AMOUNT,
+                      sum((case
+                          when a.LEDGER_ID = 'a74665dda22d4bf7aa38f106663df32c' then
+                           decode(b.PRD_TYPE, '赠品', 0, NVL(b.DECT_AMOUNT, 0))
+                          else
+                           0
+                        end)) SZ_AMOUNT
+				      from DRP_STOREOUT a left join DRP_STOREOUT_DTL b  on a.STOREOUT_ID = b.STOREOUT_ID and b.DEL_FLAG=0
+         where a.STATE = '已处理'
+           and a.DEL_FLAG = 0
+           and a.BILL_TYPE='销售出库'
+           group by 
+                  to_char(a.DEAL_TIME, 'yyyy'),
+                  to_char(a.DEAL_TIME, 'MM')
+                  )temp
+                  on u.YEAR=temp.YEAR
+                 and u.MONTH=temp.MONTH
+                 where u.YEAR=#YEAR#
+         order by u.YEAR, u.MONTH asc
+        ]]>
+	</select>
+
+ <!-- 渠道（含直营办）  杭州直营办销售出库金额 -->
+ <select id="channelAndDirectSaleStoreSalesAmountOfOutbound" parameterClass="map" resultClass="java.util.HashMap">
+  <![CDATA[
+    select u.YEAR,
+       u.MONTH,
+       round(NVL(DECT_AMOUNT, 0) / 10000, 2) DECT_AMOUNT
+    from ERP_YEAR_MONTH u
+        left join (select to_char(a.DEAL_TIME, 'yyyy') YEAR,
+                    to_char(a.DEAL_TIME, 'MM') MONTH,
+                     sum(decode(b.PRD_TYPE,'赠品',0 ,  NVL(b.DECT_AMOUNT,0))) DECT_AMOUNT
+               from DRP_STOREOUT a
+               left join DRP_STOREOUT_DTL b
+                 on a.STOREOUT_ID = b.STOREOUT_ID
+              where a.STATE = '已处理'
+                and a.DEL_FLAG = 0
+                and b.DEL_FLAG = 0
+                and a.LEDGER_ID=#LEDGER_ID#
+              group by to_char(a.DEAL_TIME, 'yyyy'), to_char(a.DEAL_TIME, 'MM')) temp
+                on u.YEAR = temp.YEAR
+          and u.MONTH = temp.MONTH
+       where u.YEAR =#YEAR#
+         order by u.YEAR, u.MONTH asc
+  ]]>
+ </select>
+ 
+  <!-- 渠道（含直营办）  杭州直营办销售出库TOP5 根据门店 -->
+ <select id="channelAndDirectSaleStoreSalesOutboundTop5ByStore" parameterClass="map" resultClass="java.util.HashMap">
+  <![CDATA[
+  select TERM_NO,TERM_NAME,round(NVL(DECT_AMOUNT, 0) / 10000, 2) DECT_AMOUNT  from (     
+        select TERM_NO,TERM_NAME,DECT_AMOUNT
+            from (  
+             select  a.TERM_NO,a.TERM_NAME,sum( decode(b.PRD_TYPE,'赠品',0 ,  NVL(b.DECT_AMOUNT,0))) DECT_AMOUNT
+               from DRP_STOREOUT a
+               left join DRP_STOREOUT_DTL b
+                 on a.STOREOUT_ID = b.STOREOUT_ID  and b.DEL_FLAG = 0
+              where a.STATE = '已处理'
+                and a.DEL_FLAG = 0
+                 and to_char(a.DEAL_TIME,'yyyy')=#YEAR#
+                and to_char(a.DEAL_TIME,'MM') in ($RPT_MONTH$)
+                and a.LEDGER_ID=#LEDGER_ID#
+              group by a.TERM_NO,a.TERM_NAME ) temp 
+            order by  DECT_AMOUNT desc )  where  rownum<=#PARAMROWNUM#
+
+  ]]>
+ </select>
+ 
+ 
+ 
+ 
+ 
+   <!-- 渠道（含直营办）  杭州直营办销售出库TOP5 根据货品-->
+ <select id="channelAndDirectSaleStoreSalesOutboundTop5ByGoods" parameterClass="map" resultClass="java.util.HashMap">
+  <![CDATA[
+select  PRD_NO,(case when instr(PRD_NAME,'-')>0 then  substr(PRD_NAME,0,instr(PRD_NAME,'-')-1) else PRD_NAME end ) PRD_NAME,round(NVL(DECT_AMOUNT, 0) / 10000, 2) DECT_AMOUNT  from (     
+        select PRD_NO,PRD_NAME,DECT_AMOUNT
+            from (  
+             select  b.PRD_NO,b.PRD_NAME,sum( decode(b.PRD_TYPE,'赠品',0 ,  NVL(b.DECT_AMOUNT,0))) DECT_AMOUNT
+               from DRP_STOREOUT a
+               left join DRP_STOREOUT_DTL b
+                 on a.STOREOUT_ID = b.STOREOUT_ID and b.DEL_FLAG = 0
+              where a.STATE = '已处理'
+                and a.DEL_FLAG = 0
+                 and to_char(a.DEAL_TIME,'yyyy')=#YEAR#
+                and to_char(a.DEAL_TIME,'MM') in ($RPT_MONTH$)
+                and a.LEDGER_ID=#LEDGER_ID#
+              group by  b.PRD_NO,b.PRD_NAME ) temp 
+            order by  DECT_AMOUNT desc )  where  rownum<=#PARAMROWNUM#
+  ]]>
+ </select>
+ 
+ 
+ 
+ 
+    <!-- 渠道（含直营办）  杭州直营办销售出库TOP5 根据导购-->
+ <select id="channelAndDirectSaleStoreSalesOutboundTop5BySalesman" parameterClass="map" resultClass="java.util.HashMap">
+  <![CDATA[
+		
+		select SALE_PSON_ID,SALE_PSON_NAME,round(NVL(DECT_AMOUNT, 0) / 10000, 2) DECT_AMOUNT  from (     
+        select SALE_PSON_ID,SALE_PSON_NAME,DECT_AMOUNT
+            from (  
+             select  a.SALE_PSON_ID,a.SALE_PSON_NAME,sum( decode(b.PRD_TYPE,'赠品',0 ,  NVL(b.DECT_AMOUNT,0))) DECT_AMOUNT
+               from DRP_STOREOUT a
+               left join DRP_STOREOUT_DTL b
+                 on a.STOREOUT_ID = b.STOREOUT_ID  and b.DEL_FLAG = 0
+              where a.STATE = '已处理'
+                and a.DEL_FLAG = 0
+                and to_char(a.DEAL_TIME,'yyyy')=#YEAR#
+                and to_char(a.DEAL_TIME,'MM') in ($RPT_MONTH$)
+                and a.LEDGER_ID=#LEDGER_ID#
+              group by a.SALE_PSON_ID,a.SALE_PSON_NAME ) temp 
+            order by  DECT_AMOUNT desc )  where  rownum<=#PARAMROWNUM#
+		
+  ]]>
+ </select>
+
+
+<!-- 总部订货金额前30   区域维度 按季度 -->	
+<select id="queryAreaTopByQuarter" parameterClass="map" resultClass="java.util.HashMap">
+ <![CDATA[
+ select b.ORDER_CHANN_NAME,decode(b.RC,0,0.0001,b.RC)RC, decode(b.CD,0,0.0001,b.CD)CD, decode(b.QT,0,0.0001,b.QT)QT
+ from
+ ( select *
+  from (select temp.ORDER_CHANN_NAME,
+              round(SUM(NVL(temp.ORDER_AMOUNT, 0))/10000,2) ORDER_AMOUNT
+          from (select t.ORDER_CHANN_NO,
+                       t.ORDER_CHANN_NAME,
+                       to_char(t.CRE_TIME, 'yyyy') S_YEAR,
+                       to_char(t.CRE_TIME, 'mm') S_MM,
+                       TO_CHAR(t.CRE_TIME, 'Q') S_QUARTER,
+                      sum(NVL(d.DECT_PRICE, 0) * NVL(d.ORDER_NUM, 0)) ORDER_AMOUNT
+                    from DRP_GOODS_ORDER t 
+                    left join  DRP_GOODS_ORDER_DTL d on t.GOODS_ORDER_ID = d.GOODS_ORDER_ID
+                    left join BASE_CHANN c on t.ORDER_CHANN_ID=c.CHANN_ID and c.DEL_FLAG=0
+                    where 1=1
+                   and t.DEL_FLAG = 0
+                   and d.DEL_FLAG = 0
+                   and t.STATE in ('未处理', '已处理')
+                   and NVL(d.CANCEL_FLAG, 0) = 0
+                   and c.CHANN_TYPE='加盟商'
+                 group by t.ORDER_CHANN_NO,
+                          t.ORDER_CHANN_NAME,
+                          to_char(t.CRE_TIME, 'yyyy'),
+                          to_char(t.CRE_TIME, 'mm'),
+                          TO_CHAR(t.CRE_TIME, 'Q')
+                          ) temp
+         WHERE temp.S_YEAR = #YEAR#
+           AND $COLUMN$ in ($RPT_QUARTER$)
+         GROUP BY temp.ORDER_CHANN_NAME
+         order by SUM(NVL(temp.ORDER_AMOUNT, 0)) desc) tt
+ where rownum <= #RAKING#)a
+ left join
+ ( select temp.ORDER_CHANN_NAME,
+               round(sum(NVL(temp.RC,0))/10000,2)RC,
+               round(sum(NVL(temp.CD,0))/10000,2)CD,
+               round(sum(NVL(temp.QT,0))/10000,2)QT
+          from (select t.ORDER_CHANN_NO,
+                       t.ORDER_CHANN_NAME,
+                       to_char(t.CRE_TIME, 'yyyy') S_YEAR,
+                       to_char(t.CRE_TIME, 'mm') S_MM,
+                       TO_CHAR(t.CRE_TIME, 'Q') S_QUARTER,
+                     case when p.PAR_PRD_NAME='软床' then
+                       sum(NVL(d.DECT_PRICE, 0) * NVL(d.ORDER_NUM, 0)) 
+                      end RC,
+                     case when p.PAR_PRD_NAME='床垫' then
+                       sum(NVL(d.DECT_PRICE, 0) * NVL(d.ORDER_NUM, 0)) 
+                      end CD,
+                      case when p.PAR_PRD_NAME!='软床' and p.PAR_PRD_NAME !='床垫' then
+                       sum(NVL(d.DECT_PRICE, 0) * NVL(d.ORDER_NUM, 0)) 
+                      end QT
+                  from DRP_GOODS_ORDER t, DRP_GOODS_ORDER_DTL d
+                  left join BASE_PRODUCT p 
+                  on p.PRD_ID=d.PRD_ID and p.DEL_FLAG=0
+                 where t.GOODS_ORDER_ID = d.GOODS_ORDER_ID
+                   and t.DEL_FLAG = 0
+                   and d.DEL_FLAG = 0
+                   and t.STATE in ('未处理', '已处理')
+                   and NVL(d.CANCEL_FLAG, 0) = 0
+                 group by t.ORDER_CHANN_NO,
+                          t.ORDER_CHANN_NAME,
+                          p.p.PAR_PRD_NAME,
+                          to_char(t.CRE_TIME, 'yyyy'),
+                          to_char(t.CRE_TIME, 'mm'),
+                          TO_CHAR(t.CRE_TIME, 'Q')
+                          ) temp
+         WHERE temp.S_YEAR = #YEAR#
+           AND $COLUMN$ in ($RPT_QUARTER$)
+         GROUP BY temp.ORDER_CHANN_NAME)b
+ on a.ORDER_CHANN_NAME =b.ORDER_CHANN_NAME
+ order by a.ORDER_AMOUNT ASC
+ 
+ ]]>
+</select>
+ 
+ 	
+	
+</sqlMap>

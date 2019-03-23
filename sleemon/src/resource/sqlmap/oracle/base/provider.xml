@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  
+/**
+ * @module 系统管理
+ * @func 供应商信息
+ * @version 1.1
+ * @author 张涛
+ */
+-->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="PROVIDER">
+
+	<typeAlias type="com.hoperun.base.provider.model.ProviderModel" alias="providerModel" />
+
+	<!-- 使用JGXX装载结果集 -->
+	<resultMap id="providerModel" class="providerModel">
+		<result column="PRVD_ID" property="PRVD_ID" />
+	</resultMap>
+
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="PRVD_NO">
+			u.PRVD_NO like '%'||#PRVD_NO#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="PRVD_NAME">
+			u.PRVD_NAME like '%'||#PRVD_NAME#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="PRVD_TYPE">
+			u.PRVD_TYPE =#PRVD_TYPE#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="PROV">
+			u.PROV =#PROV#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CITY">
+			u.CITY =#CITY#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="PERSON_BUSS">
+			u.PERSON_BUSS =#PERSON_BUSS#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CRE_TIME_FROM">
+			<![CDATA[u.CRE_TIME >= to_date(#CRE_TIME_FROM#,'yyyy-MM-DD HH24:MI:SS') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CRE_TIME_TO">
+			<![CDATA[u.CRE_TIME <=to_date(#CRE_TIME_TO#,'yyyy-MM-DD HH24:MI:SS')  ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="STATE">
+			u.STATE =#STATE#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="DELFLAG">
+			u.DEL_FLAG = #DELFLAG#
+		</isNotEmpty>	    
+	</sql>
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField">
+			$orderField$,
+		</isNotEmpty>
+		u.CRE_TIME DESC
+	</sql>
+
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[SELECT u.PRVD_ID,u.PRVD_NO,u.PRVD_NAME, u.PRVD_TYPE, 
+		u.PROV, u.CITY, u.PERSON_BUSS, u.CRE_NAME,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME, u.DEPT_NAME, u.STATE 
+		FROM BASE_PROVIDER u]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql" />
+		</dynamic>
+	</sql>
+
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT COUNT(u.PRVD_ID) cnt FROM ${SYSSCHEMA}.BASE_PROVIDER u]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+
+	<!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	
+	<select id="queryBhForInt" parameterClass="String" resultClass="int">
+			select count(PRVD_NO) from ${SYSSCHEMA}.BASE_PROVIDER where PRVD_NO=#PRVD_NO# 
+	</select>
+	
+    <!--新增-->
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+			INSERT INTO ${SYSSCHEMA}.BASE_PROVIDER (PRVD_ID,PRVD_NO,PRVD_NAME,PRVD_TYPE,PRVD_LVL,PRVD_NATRUE,ZONE_ID,NATION,PROV,CITY,COUNTY,
+			PRVD_CY,PRVD_CAP,PERSON_BUSS,PERSON_CON,TEL,TAX,POST,ADDRESS,EMAIL,WEB,LEGAL_REPRE,BUSS_LIC,INVOICE_TI,INVOICE_ADDR,
+			BANK_ACCT,FI_CMP_NO,STATE,REMARK,CREATOR,CRE_NAME,CRE_TIME,UPDATOR,UPD_NAME,UPD_TIME,DEPT_ID,DEPT_NAME,ORG_ID,ORG_NAME,
+			LEDGER_ID,LEDGER_NAME,DEL_FLAG,DEFAULT_FLAG)
+			VALUES (#PRVD_ID:VARCHAR:NULL#,#PRVD_NO:VARCHAR:NULL#,#PRVD_NAME:VARCHAR:NULL#,#PRVD_TYPE:VARCHAR:NULL#,#PRVD_LVL:VARCHAR:NULL#,
+			#PRVD_NATRUE:VARCHAR:NULL#,#ZONE_ID:VARCHAR:NULL#,#NATION:VARCHAR:NULL#,#PROV:VARCHAR:NULL#,#CITY:VARCHAR:NULL#,#COUNTY:VARCHAR:NULL#,
+			#PRVD_CY:VARCHAR:NULL#,#PRVD_CAP:VARCHAR:NULL#,#PERSON_BUSS:VARCHAR:NULL#,#PERSON_CON:VARCHAR:NULL#,#TEL:VARCHAR:NULL#,
+			#TAX:VARCHAR:NULL#,#POST:VARCHAR:NULL#,#ADDRESS:VARCHAR:NULL#,#EMAIL:VARCHAR:NULL#,#WEB:VARCHAR:NULL#,#LEGAL_REPRE:VARCHAR:NULL#,#BUSS_LIC:VARCHAR:NULL#,
+			#INVOICE_TI:VARCHAR:NULL#,#INVOICE_ADDR:VARCHAR:NULL#,#BANK_ACCT:VARCHAR:NULL#,#FI_CMP_NO:VARCHAR:NULL#,#STATE:VARCHAR:NULL#,
+			#REMARK:VARCHAR:NULL#,#CREATOR:VARCHAR:NULL#,#CRE_NAME:VARCHAR:NULL#,sysdate,#UPDATOR:VARCHAR:NULL#,#UPD_NAME:VARCHAR:NULL#,
+			sysdate,#DEPT_ID:VARCHAR:NULL#,#DEPT_NAME:VARCHAR:NULL#,#ORG_ID:VARCHAR:NULL#,#ORG_NAME:VARCHAR:NULL#,#LEDGER_ID:VARCHAR:NULL#,
+			#LEDGER_NAME:VARCHAR:NULL#,0,#DEFAULT_FLAG#)
+		]]>
+	</insert>
+    <!--修改-->
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.BASE_PROVIDER ]]>
+		<dynamic prepend="set">
+			<isNotNull property="PRVD_NAME" prepend=","><![CDATA[PRVD_NAME = #PRVD_NAME#]]></isNotNull>
+			<isNotNull property="PRVD_TYPE" prepend=","><![CDATA[PRVD_TYPE = #PRVD_TYPE#]]></isNotNull>
+			<isNotNull property="PRVD_LVL" prepend=","><![CDATA[PRVD_LVL = #PRVD_LVL#]]></isNotNull>
+			<isNotNull property="PRVD_NATRUE" prepend=","><![CDATA[PRVD_NATRUE = #PRVD_NATRUE#]]></isNotNull>
+			<isNotNull property="PRVD_CY" prepend=","><![CDATA[PRVD_CY = #PRVD_CY#]]></isNotNull>
+			<isNotNull property="PRVD_CAP" prepend=","><![CDATA[PRVD_CAP = #PRVD_CAP#]]></isNotNull>
+			<isNotNull property="PERSON_BUSS" prepend=","><![CDATA[PERSON_BUSS = #PERSON_BUSS#]]></isNotNull>
+			<isNotNull property="PERSON_CON" prepend=","><![CDATA[PERSON_CON = #PERSON_CON#]]></isNotNull>
+			<isNotNull property="TEL" prepend=","><![CDATA[TEL = #TEL#]]></isNotNull>
+			<isNotNull property="TAX" prepend=","><![CDATA[TAX = #TAX#]]></isNotNull>
+			<isNotNull property="POST" prepend=","><![CDATA[POST = #POST#]]></isNotNull>
+			<isNotNull property="EMAIL" prepend=","><![CDATA[EMAIL = #EMAIL#]]></isNotNull>
+			<isNotNull property="WEB" prepend=","><![CDATA[WEB = #WEB#]]></isNotNull>
+			<isNotNull property="LEGAL_REPRE" prepend=","><![CDATA[LEGAL_REPRE = #LEGAL_REPRE#]]></isNotNull>
+			<isNotNull property="BUSS_LIC" prepend=","><![CDATA[BUSS_LIC = #BUSS_LIC#]]></isNotNull>
+			<isNotNull property="INVOICE_TI" prepend=","><![CDATA[INVOICE_TI = #INVOICE_TI#]]></isNotNull>
+            <isNotNull property="INVOICE_ADDR" prepend=","><![CDATA[INVOICE_ADDR = #INVOICE_ADDR#]]></isNotNull>
+            <isNotNull property="DEFAULT_FLAG" prepend=","><![CDATA[DEFAULT_FLAG = #DEFAULT_FLAG#]]></isNotNull>
+			
+			<isNotNull property="BANK_ACCT" prepend=","><![CDATA[BANK_ACCT = #BANK_ACCT#]]></isNotNull>
+			<isNotNull property="FI_CMP_NO" prepend=","><![CDATA[FI_CMP_NO = #FI_CMP_NO#]]></isNotNull>
+			<isNotNull property="ADDRESS" prepend=","><![CDATA[ADDRESS = #ADDRESS#]]></isNotNull>
+			<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DELFLAG#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ WHERE PRVD_ID = #PRVD_ID# ]]>
+	</update>
+	<!-- 软删除 只是更新状态-->
+	<delete id="delete" parameterClass="map">
+		 <![CDATA[ UPDATE ${SYSSCHEMA}.BASE_PROVIDER ]]>
+		<dynamic prepend="set">
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = 1]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+		</dynamic>
+		<![CDATA[ WHERE PRVD_ID = #PRVD_ID# ]]>		
+	</delete>
+	<!--把删除数据移到回车站-->
+	<insert id="insertDelDate" parameterClass="map">
+	   
+	</insert>
+	<!--详细查询-->
+	<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[  SELECT u.PRVD_ID,u.PRVD_NO,u.PRVD_NAME,u.PRVD_TYPE ,u.PRVD_LVL ,
+		u.PRVD_NATRUE ,u.NATION ,u.PROV ,u.CITY ,u.COUNTY ,u.PRVD_CY ,u.PRVD_CAP,
+		u.PERSON_BUSS,u.PERSON_CON,u.POST ,u.TEL,u.TAX,u.EMAIL,
+		u.WEB,u.LEGAL_REPRE,u.BUSS_LIC,u.INVOICE_TI,u.INVOICE_ADDR,
+		u.BANK_ACCT,u.FI_CMP_NO,u.CRE_NAME,to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME ,u.UPD_NAME,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,u.DEPT_NAME,
+		u.ORG_NAME ,u.LEDGER_NAME,u.STATE,u.ADDRESS,u.REMARK,u.DEFAULT_FLAG 
+		FROM ${SYSSCHEMA}.BASE_PROVIDER u
+					WHERE u.PRVD_ID = #PRVD_ID#]]>
+	</select>
+	<!--启用/停用-->
+	<update id="updStusById" parameterClass="map">	
+		<![CDATA[ update ${SYSSCHEMA}.BASE_PROVIDER ]]>
+		<dynamic prepend="set">
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where PRVD_ID = #PRVD_ID# ]]>	
+	</update>
+	<select id="getPrvdInfo" resultClass="java.util.HashMap">
+		select PRVD_ID,PRVD_NO,PRVD_NAME from BASE_PROVIDER where DEFAULT_FLAG=1
+	</select>
+	<select id="checkDEFAULT_FLAG" resultClass="int">
+		select count(1) from BASE_PROVIDER where DEFAULT_FLAG=1
+	</select>
+</sqlMap>
+

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://struts.apache.org/dtds/struts-config_1_2.dtd">
+<struts-config>
+
+	<form-beans>
+		<form-bean name="BaseForm" type="com.hoperun.commons.sample.form.BaseForm"/>
+	</form-beans>
+	
+	<!-- 通用组件 仅做示例用，版本正式发布时删除 -->
+	<action-mappings>
+	    <action parameter="action" path="/sample/sample" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="toFrame" path="/pages/common/sample/samplePlus.jsp" />
+			<forward name="toHtml5" path="/pages/common/sample/sample_html5.jsp" />
+		</action>
+		<action parameter="action" path="/sample/singletree" scope="request" 
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="toedit" path="/pages/sample/singletree/singletree_Edit.jsp" />
+			<forward name="view" path="/pages/sample/singletree/singletree_Detail.jsp" />
+			<forward name="list" path="/pages/sample/singletree/singletree_List.jsp" />
+			<forward name="frames" path="/pages/sample/singletree/singletree_Frame.jsp" />
+			<forward name="tree" path="/pages/sample/singletree/singletree_Tree.jsp" />
+		</action>
+		<!-- 1.1新单表 add by zhuxw  -->
+		<action parameter="action" path="/sample/newsingletable" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="toedit" path="/pages/sample/newsingletable/newsingletable_Edit.jsp" />
+			<forward name="view" path="/pages/sample/newsingletable/newsingletable_Detail.jsp" />
+			<forward name="list" path="/pages/sample/newsingletable/newsingletable_List.jsp" />
+			<forward name="frames" path="/pages/sample/newsingletable/newsingletable_Frame.jsp" />
+			<forward name="tree" path="/pages/sample/newsingletable/newsingletable_Tree.jsp" />
+		</action>
+		
+		<!-- 1.1版本新主从表 add by zhuxw -->
+		<action parameter="action" path="/sample/newmasterslave" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/sample/newmasterslave/NewCpbltzd_Frame.jsp" />
+			<forward name="list" path="/pages/sample/newmasterslave/NewCpbltzd_List.jsp" />
+			<forward name="toedit" path="/pages/sample/newmasterslave/NewCpbltzd_Edit.jsp" />
+			<forward name="todetail" path="/pages/sample/newmasterslave/NewCpbltzd_Detail.jsp" />
+			<forward name="editFrame" path="/pages/sample/newmasterslave/NewCpbltzd_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/sample/newmasterslave/NewCpbltzd_Cpbltzdmx_Mx_List.jsp"/>
+			<forward name="childedit" path="/pages/sample/newmasterslave/NewCpbltzd_Cpbltzdmx_Mx_Edit.jsp"/>
+		</action>
+		<action parameter="action" path="/grant" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/sample/grant/Grant_Frame.jsp" />
+			<forward name="list" path="/pages/sample/grant/Grant_List.jsp" />
+			<forward name="toedit" path="/pages/sample/grant/Grant_Edit.jsp" />
+			<forward name="todetail" path="/pages/sample/grant/Grant_Detail.jsp" />
+			<forward name="editFrame" path="/pages/sample/grant/Grant_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/sample/grant/Grant_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/sample/grant/Grant_Edit_Chld.jsp"/>
+			<forward name="gchildlist" path="/pages/sample/grant/Grant_List_Gchld.jsp"/>
+			<forward name="gchildedit" path="/pages/sample/grant/Grant_Edit_Gchld.jsp"/>
+		</action>
+		
+	</action-mappings>
+</struts-config>
+

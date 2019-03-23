@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zcx
+@function 
+@version 2014-11-06 10:49:05
+-->
+<sqlMap  namespace="distributorvisit">
+<typeAlias type="com.hoperun.drp.oamg.mkmdayreport.model.DistributorVisitModel" alias="DistributorVisitModel"/>
+<!-- 使用Promoreim装载结果集 -->
+<resultMap id="DistributorVisitModel" class="DistributorVisitModel">
+    <result column="DISTRIBUTOR_VISIT_ID" property="DISTRIBUTOR_VISIT_ID" />
+</resultMap>
+<!-- 动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  u.DEL_FLAG = 0 
+  <isNotEmpty prepend="" property="MKM_DAY_RPT_NO">
+       <![CDATA[ and u.MKM_DAY_RPT_NO = #MKM_DAY_RPT_NO#]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CRE_TIME_FROM">
+       <![CDATA[ and u.CRE_TIME >=to_date(#CRE_TIME_FROM#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CRE_TIME_TO">
+       <![CDATA[ and u.CRE_TIME <=to_date(#CRE_TIME_TO#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="" property="LAST_DECOR_TIME_BEG">
+       <![CDATA[ and u.LAST_DECOR_TIME >=to_date(#LAST_DECOR_TIME_BEG#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="LAST_DECOR_TIME_END">
+       <![CDATA[ and u.LAST_DECOR_TIME <=to_date(#LAST_DECOR_TIME_END#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="QXJBCON">
+	  and   $QXJBCON$  
+  </isNotEmpty>
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+	   u.DISTRIBUTOR_VISIT_ID,
+       u.MKM_DAY_RPT_ID,
+       u.DISTRIBUTOR_ID,
+       u.DISTRIBUTOR_NO,
+       u.DISTRIBUTOR_NAME,
+       u.MAIN_PROBLEM,
+       u.SOLUTION,
+       u.WILL_DISTRIBUTOR_TYPE,
+       u.WILL_SALE_STORE_NAME,
+       u.WILL_DISTRIBUTOR_NAME,
+       u.WILL_DISTRIBUTOR_ADDRESS,
+       u.WILL_DISTRIBUTOR_TEL,
+       u.WILL_DISTRIBUTOR_BUSS_BRAND,
+       u.WILL_DISTRIBUTOR_BUSS_CLASS,
+       u.WILL_DEGREE,
+       u.NO_WILL_RESON
+       from DRP_DISTRIBUTOR_VISIT u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+<!-- 分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+</select>
+ 
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt 
+              from DRP_DISTRIBUTOR_VISIT u
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+ 
+<!-- 查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_DISTRIBUTOR_VISIT(
+					 DISTRIBUTOR_VISIT_ID,
+					 MKM_DAY_RPT_ID,
+					 DISTRIBUTOR_ID,
+					 DISTRIBUTOR_NO,
+					 DISTRIBUTOR_NAME,
+					 MAIN_PROBLEM,
+					 SOLUTION,
+					 WILL_DISTRIBUTOR_TYPE,
+					 WILL_SALE_STORE_NAME,
+					 WILL_DISTRIBUTOR_NAME,
+					 WILL_DISTRIBUTOR_ADDRESS,
+					 WILL_DISTRIBUTOR_TEL,
+					 WILL_DISTRIBUTOR_BUSS_BRAND,
+					 WILL_DISTRIBUTOR_BUSS_CLASS,
+					 WILL_DEGREE,
+					 NO_WILL_RESON,
+					 DEL_FLAG
+				   )values(
+				     #DISTRIBUTOR_VISIT_ID#,
+					 #MKM_DAY_RPT_ID#,
+					 #DISTRIBUTOR_ID#,
+					 #DISTRIBUTOR_NO#,
+					 #DISTRIBUTOR_NAME#,
+					 #MAIN_PROBLEM#,
+					 #SOLUTION#,
+					 #WILL_DISTRIBUTOR_TYPE#,
+					 #WILL_SALE_STORE_NAME#,
+					 #WILL_DISTRIBUTOR_NAME#,
+					 #WILL_DISTRIBUTOR_ADDRESS#,
+					 #WILL_DISTRIBUTOR_TEL#,
+					 #WILL_DISTRIBUTOR_BUSS_BRAND#,
+					 #WILL_DISTRIBUTOR_BUSS_CLASS#,
+					 #WILL_DEGREE#,
+					 #NO_WILL_RESON#,
+					 #DEL_FLAG#
+					)
+   ]]>
+</insert> 
+
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update DRP_DISTRIBUTOR_VISIT ]]>
+	<dynamic prepend="set">
+    <isNotNull property="MKM_DAY_RPT_ID"       prepend=","><![CDATA[MKM_DAY_RPT_ID   = #MKM_DAY_RPT_ID# ]]></isNotNull>
+    <isNotNull property="DISTRIBUTOR_ID"       prepend=","><![CDATA[DISTRIBUTOR_ID   = #DISTRIBUTOR_ID# ]]></isNotNull>
+    <isNotNull property="DISTRIBUTOR_NO"       prepend=","><![CDATA[DISTRIBUTOR_NO   = #DISTRIBUTOR_NO# ]]></isNotNull>
+    <isNotNull property="DISTRIBUTOR_NAME"     prepend=","><![CDATA[DISTRIBUTOR_NAME = #DISTRIBUTOR_NAME# ]]></isNotNull>
+    <isNotNull property="MAIN_PROBLEM"         prepend=","><![CDATA[MAIN_PROBLEM = #MAIN_PROBLEM# ]]></isNotNull>
+    <isNotNull property="SOLUTION"   prepend=","><![CDATA[SOLUTION = #SOLUTION# ]]></isNotNull>
+    <isNotNull property="WILL_DISTRIBUTOR_TYPE"    prepend=","><![CDATA[WILL_DISTRIBUTOR_TYPE = #WILL_DISTRIBUTOR_TYPE# ]]></isNotNull>
+    <isNotNull property="WILL_SALE_STORE_NAME"     prepend=","><![CDATA[WILL_SALE_STORE_NAME = #WILL_SALE_STORE_NAME# ]]></isNotNull>
+    <isNotNull property="WILL_DISTRIBUTOR_NAME" prepend=","><![CDATA[WILL_DISTRIBUTOR_NAME = #WILL_DISTRIBUTOR_NAME# ]]></isNotNull>
+    <isNotNull property="WILL_DISTRIBUTOR_ADDRESS"    prepend=","><![CDATA[WILL_DISTRIBUTOR_ADDRESS = #WILL_DISTRIBUTOR_ADDRESS# ]]></isNotNull>
+    <isNotNull property="WILL_DISTRIBUTOR_TEL"     prepend=","><![CDATA[WILL_DISTRIBUTOR_TEL = #WILL_DISTRIBUTOR_TEL# ]]></isNotNull>
+    <isNotNull property="WILL_DISTRIBUTOR_BUSS_BRAND"     prepend=","><![CDATA[WILL_DISTRIBUTOR_BUSS_BRAND = #WILL_DISTRIBUTOR_BUSS_BRAND# ]]></isNotNull>
+    <isNotNull property="WILL_DISTRIBUTOR_BUSS_CLASS"     prepend=","><![CDATA[WILL_DISTRIBUTOR_BUSS_CLASS = #WILL_DISTRIBUTOR_BUSS_CLASS# ]]></isNotNull>
+    <isNotNull property="WILL_DEGREE"     prepend=","><![CDATA[WILL_DEGREE = #WILL_DEGREE# ]]></isNotNull>
+    <isNotNull property="NO_WILL_RESON"     prepend=","><![CDATA[NO_WILL_RESON = #NO_WILL_RESON# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where DISTRIBUTOR_VISIT_ID = #DISTRIBUTOR_VISIT_ID#]]>
+</update>
+
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	    select 
+		       u.DISTRIBUTOR_VISIT_ID,
+		       u.MKM_DAY_RPT_ID,
+		       u.DISTRIBUTOR_ID,
+		       u.DISTRIBUTOR_NO,
+		       u.DISTRIBUTOR_NAME,
+		       u.MAIN_PROBLEM,
+		       u.SOLUTION,
+		       u.WILL_DISTRIBUTOR_TYPE,
+		       u.WILL_SALE_STORE_NAME,
+		       u.WILL_DISTRIBUTOR_NAME,
+		       u.WILL_DISTRIBUTOR_ADDRESS,
+		       u.WILL_DISTRIBUTOR_TEL,
+		       u.WILL_DISTRIBUTOR_BUSS_BRAND,
+		       u.WILL_DISTRIBUTOR_BUSS_CLASS,
+		       u.WILL_DEGREE,
+		       u.NO_WILL_RESON
+	           from DRP_DISTRIBUTOR_VISIT u
+		       where 
+			   u.MKM_DAY_RPT_ID = #MKM_DAY_RPT_ID#
+			   and u.DEL_FLAG = 0
+	]]>
+</select>
+
+<select id="queryDisId" parameterClass="map" resultClass="String">
+	<![CDATA[ 
+	    select u.DISTRIBUTOR_VISIT_ID
+	    from DRP_DISTRIBUTOR_VISIT u
+	    where u.MKM_DAY_RPT_ID = #MKM_DAY_RPT_ID#
+	]]>
+</select>
+
+<!-- 删除 -->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update DRP_DISTRIBUTOR_VISIT ]]>
+	<dynamic prepend="set">
+		<isNotNull property="DEL_FLAG"><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+	</dynamic>
+	<![CDATA[ where DISTRIBUTOR_VISIT_ID = #DISTRIBUTOR_VISIT_ID# ]]>
+</delete>
+
+</sqlMap>

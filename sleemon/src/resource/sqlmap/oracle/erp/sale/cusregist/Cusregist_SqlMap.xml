@@ -1,0 +1,677 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zzb
+@function 顾客现场签到
+@version 2013-09-15 10:35:10
+-->
+<sqlMap  namespace="Cusregist">
+<!-- 定义  -->
+<typeAlias type="com.hoperun.erp.sale.marketcardsale.model.MarketcardSaleModel" alias="MarketcardSaleModel"/>
+<typeAlias type="com.hoperun.erp.sale.marketcardsale.model.MarketcardSaleChldModel" alias="MarketcardSaleChldModel" />
+ 
+
+<!-- 使用MarketcardSaleModel装载结果集 -->
+<resultMap id="MarketcardSaleModel" class="MarketcardSaleModel">
+    <result column="CARD_SALE_ORDER_ID" property="CARD_SALE_ORDER_ID" />
+</resultMap>  
+
+
+<!-- 使用MarketcardSaleChldModel装载结果集 -->
+<resultMap id="MarketcardSaleChldModel" class="MarketcardSaleChldModel">
+    <result column="CARD_SALE_ORDER_DTL_ID" property="CARD_SALE_ORDER_DTL_ID" />
+</resultMap>
+ 
+
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="MARKETING_CARD_NO">
+    u.MARKETING_CARD_NO like '%'||#MARKETING_CARD_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CARD_TYPE">
+    u.CARD_TYPE = #CARD_TYPE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="MOBILE_PHONE">
+    u.MOBILE_PHONE like '%'||#MOBILE_PHONE#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="SALE_PSON_NAME">
+    u.SALE_PSON_NAME like '%'||#SALE_PSON_NAME#||'%'
+  </isNotEmpty>  
+  
+  <isNotEmpty prepend="and" property="TERM_NO">
+    t.TERM_NO like '%'||#TERM_NO#||'%'
+  </isNotEmpty>  
+  <isNotEmpty prepend="and" property="TERM_NAME">
+    t.TERM_NAME like '%'||#TERM_NAME#||'%'
+  </isNotEmpty>  
+  <isNotEmpty prepend="and" property="CHANN_NO">
+    t.CHANN_NO like '%'||#CHANN_NO#||'%'
+  </isNotEmpty>  
+  <isNotEmpty prepend="and" property="CHANN_NAME">
+    t.CHANN_NAME like '%'||#CHANN_NAME#||'%'
+  </isNotEmpty>  
+  
+  <isNotEmpty prepend="and" property="SALE_DATE_BEG">
+	  <![CDATA[  u.SALE_DATE >= to_date(#SALE_DATE_BEG#,'yyyy-MM-DD')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="SALE_DATE_END">
+	  <![CDATA[  u.SALE_DATE <= to_date(#SALE_DATE_END#,'yyyy-MM-DD')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="CRE_TIME_BEGIN">
+	  <![CDATA[  u.CRE_TIME >= to_date(#CRE_TIME_BEGIN#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+	  <![CDATA[  u.CRE_TIME <= to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>  
+  <isNotEmpty prepend="and" property="REGIST_STATE">
+    u.REGIST_STATE = #REGIST_STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="DEL_FLAG">
+    u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+   <isNotEmpty prepend="and " property="REGIST_FLAG">
+     u.REGIST_FLAG = #REGIST_FLAG#
+  </isNotEmpty>
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		 u.CARD_SALE_ORDER_DTL_ID,
+		 u.CARD_SALE_ORDER_ID,
+		 u.MARKETING_CARD_ID,
+		 u.MARKETING_CARD_NO,
+		 u.CARD_TYPE,
+		 u.CARD_VALUE,
+		 to_char(u.CRE_TIME,'yyyy-MM-DD')CRE_TIME,
+		 u.STATE,
+		 u.CUST_NAME,
+		 u.MOBILE_PHONE,
+		 u.SEX,
+		 to_char(u.BIRTHDAY,'yyyy-MM-DD')BIRTHDAY,
+		 u.HOBBY,
+		 u.ADDRESS,
+		 u.REMARK,
+		 u.PAYABLE_AMOUNT,
+		 u.DEL_FLAG,
+		 u.REGIST_FLAG,
+		 u.REGIST_STATE,
+		 t.TERM_ID,
+	     t.TERM_NO,
+	     t.TERM_NAME,
+	     t.CHANN_ID,
+	     t.CHANN_NO,
+	     t.CHANN_NAME,
+		 to_char(u.REGIST_TIME,'yyyy-MM-DD HH24:MI:SS') REGIST_TIME,
+		 to_char(t.SALE_DATE,'yyyy-MM-DD')SALE_DATE
+       from ERP_CARD_SALE_ORDER_DTL u
+       left join ERP_CARD_SALE_ORDER t on 
+        u.CARD_SALE_ORDER_ID = t.CARD_SALE_ORDER_ID
+       where 
+       u.DEL_FLAG = 0
+       and t.DEL_FLAG = 0
+       and t.STATE='审核通过'
+       and 1=1
+      
+   ]]>
+    <dynamic prepend=" and ">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[
+       select count(0) cnt FROM ERP_CARD_SALE_ORDER_DTL u
+        left join ERP_CARD_SALE_ORDER t on 
+        u.CARD_SALE_ORDER_ID = t.CARD_SALE_ORDER_ID
+       where 
+       u.DEL_FLAG = 0
+       and t.DEL_FLAG = 0
+       and t.STATE='审核通过'
+       and 1=1
+       ]]>
+	<dynamic prepend=" and ">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+
+ 
+	
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_CARD_SALE_ORDER(
+	     CARD_SALE_ORDER_ID,
+	     CARD_SALE_ORDER_NO,
+	     TERM_ID,
+	     TERM_NO,
+	     TERM_NAME,
+	     CHANN_ID,
+	     CHANN_NO,
+	     CHANN_NAME,
+	     MARKETING_ACT_ID,
+	     MARKETING_ACT_NO,
+	     MARKETING_ACT_NAME,
+	     SALE_PSON_ID,
+	     SALE_PSON_NAME,
+	     SALE_DATE,
+	     SALE_CARD_AMOUNT,
+		 REMARK,
+		 STATE,
+         CRE_NAME,
+         CREATOR,
+         CRE_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         DEL_FLAG
+	   )values(
+		 #CARD_SALE_ORDER_ID#,
+	     #CARD_SALE_ORDER_NO#,
+	     #TERM_ID#,
+	     #TERM_NO#,
+	     #TERM_NAME#,
+	     #CHANN_ID#,
+	     #CHANN_NO#,
+	     #CHANN_NAME#,
+	     #MARKETING_ACT_ID#,
+	     #MARKETING_ACT_NO#,
+	     #MARKETING_ACT_NAME#,
+	     #SALE_PSON_ID#,
+	     #SALE_PSON_NAME#,
+	     to_date(#SALE_DATE#,'yyyy-MM-DD'),
+	     #SALE_CARD_AMOUNT#,
+		 #REMARK#,
+		 #STATE#,
+         #CRE_NAME#,
+         #CREATOR#,
+	     sysdate, 
+         #DEPT_ID#,
+         #DEPT_NAME#,
+         #ORG_ID#,
+         #ORG_NAME#,
+         #LEDGER_ID#,
+         #LEDGER_NAME#,
+		 #DEL_FLAG#
+		)
+   ]]>
+</insert>
+
+
+ 
+
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update ERP_CARD_SALE_ORDER 
+	               set DEL_FLAG = #DEL_FLAG#
+                      ,UPD_NAME=#UPD_NAME#
+                     ,UPDATOR=#UPDATOR#
+                      ,UPD_TIME=sysdate
+ 	  where 
+	     CARD_SALE_ORDER_ID = #CARD_SALE_ORDER_ID# 
+    ]]>
+</delete>
+
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+<![CDATA[ 
+     	select 
+		 u.CARD_SALE_ORDER_DTL_ID,
+		 u.CARD_SALE_ORDER_ID,
+		 u.MARKETING_CARD_ID,
+		 u.MARKETING_CARD_NO,
+		 u.CARD_TYPE,
+		 u.CARD_VALUE,
+		 to_char(u.CRE_TIME,'yyyy-MM-DD')CRE_TIME,
+		 u.STATE,
+		 u.CUST_NAME,
+		 u.MOBILE_PHONE,
+		 u.SEX,
+		 to_char(u.BIRTHDAY,'yyyy-MM-DD')BIRTHDAY,
+		 u.HOBBY,
+		 u.ADDRESS,
+		 u.REMARK,
+		 u.PAYABLE_AMOUNT,
+		 u.DEL_FLAG,
+		 t.CARD_SALE_ORDER_ID,
+	     to_char(t.SALE_DATE,'yyyy-MM-DD')SALE_DATE,
+        t.CHANN_ID,
+        t.TERM_ID,
+        t.TERM_NO,
+        t.TERM_NAME
+       from ERP_CARD_SALE_ORDER_DTL u
+         left join ERP_CARD_SALE_ORDER t
+         on t.CARD_SALE_ORDER_ID=u.CARD_SALE_ORDER_ID
+       where u.CARD_SALE_ORDER_DTL_ID = #CARD_SALE_ORDER_DTL_ID#
+       and u.DEL_FLAG=0
+]]>
+</select>
+
+<select id="loadByCardNo" parameterClass="map" resultClass="java.util.HashMap">
+<![CDATA[ 
+     	select 
+		 u.CARD_SALE_ORDER_DTL_ID,
+		 u.CARD_SALE_ORDER_ID,
+		 u.MARKETING_CARD_ID,
+		 u.MARKETING_CARD_NO,
+		 u.CARD_TYPE,
+		 u.CARD_VALUE,
+		 to_char(u.CRE_TIME,'yyyy-MM-DD')CRE_TIME,
+		 u.STATE,
+		 u.CUST_NAME,
+		 u.MOBILE_PHONE,
+		 u.SEX,
+		 to_char(u.BIRTHDAY,'yyyy-MM-DD')BIRTHDAY,
+		 u.HOBBY,
+		 u.ADDRESS,
+		 u.REMARK,
+		 u.PAYABLE_AMOUNT,
+		 u.DEL_FLAG,
+	     to_char(t.SALE_DATE,'yyyy-MM-DD')SALE_DATE,
+        t.CHANN_ID,
+        t.CHANN_NO,
+		t.CHANN_NAME,
+        t.TERM_ID,
+        t.TERM_NO,
+        t.TERM_NAME
+       from ERP_CARD_SALE_ORDER_DTL u
+         left join ERP_CARD_SALE_ORDER t
+         on t.CARD_SALE_ORDER_ID=u.CARD_SALE_ORDER_ID
+       where u.MARKETING_CARD_NO = #MARKETING_CARD_NO#
+       and u.DEL_FLAG=0
+        and u.STATE='正常'
+]]>
+</select>
+
+
+<!-- ==========================================================明细操作开始================-->
+ 
+<!--明细表插入 -->
+<insert id="insertChld" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_CARD_SALE_ORDER_DTL(
+		 CARD_SALE_ORDER_DTL_ID,
+		 CARD_SALE_ORDER_ID,
+		 MARKETING_CARD_ID,
+		 MARKETING_CARD_NO,
+		 CARD_TYPE,
+		 CARD_VALUE,
+		 CRE_TIME,
+		 STATE,
+		 CUST_NAME,
+		 MOBILE_PHONE,
+		 SEX,
+		 BIRTHDAY,
+		 HOBBY,
+		 ADDRESS,
+		 REMARK,
+		 PAYABLE_AMOUNT,
+		 DEL_FLAG,
+		 REGIST_FLAG,
+		 REGIST_TIME,
+		 REGIST_STATE
+		 
+	   )values(
+		 #CARD_SALE_ORDER_DTL_ID#,
+		 #CARD_SALE_ORDER_ID#,
+		 #MARKETING_CARD_ID#,
+		 #MARKETING_CARD_NO#,
+		 #CARD_TYPE#,
+		 #CARD_VALUE#,
+		 to_date(#CRE_TIME#,'yyyy-MM-DD'),
+		 #STATE#,
+		 #CUST_NAME#,
+		 #MOBILE_PHONE#,
+		 #SEX#,
+		 to_date(#BIRTHDAY#,'yyyy-MM-DD'),
+		 #HOBBY#,
+		 #ADDRESS#,
+		 #REMARK#,
+		 #PAYABLE_AMOUNT#,
+		 #DEL_FLAG#,
+		 #REGIST_FLAG#,
+		 sysdate,
+		 #REGIST_STATE#
+		)
+   ]]>
+</insert>
+
+<!--明细表更新 -->
+<update id="updateChldById" parameterClass="map">
+	<![CDATA[ update ERP_CARD_SALE_ORDER_DTL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="MARKETING_CARD_ID" prepend=","><![CDATA[MARKETING_CARD_ID = #MARKETING_CARD_ID# ]]></isNotNull>
+    <isNotNull property="MARKETING_CARD_NO" prepend=","><![CDATA[MARKETING_CARD_NO = #MARKETING_CARD_NO# ]]></isNotNull>
+    <isNotNull property="CARD_TYPE" prepend=","><![CDATA[CARD_TYPE = #CARD_TYPE# ]]></isNotNull>
+    <isNotNull property="CARD_VALUE" prepend=","><![CDATA[CARD_VALUE = #CARD_VALUE# ]]></isNotNull>
+    <isNotNull property="CRE_TIME" prepend=","><![CDATA[CRE_TIME = to_date(#CRE_TIME#,'yyyy-MM-DD') ]]></isNotNull>
+    <isNotNull property="CUST_NAME" prepend=","><![CDATA[CUST_NAME = #CUST_NAME# ]]></isNotNull>
+    <isNotNull property="MOBILE_PHONE" prepend=","><![CDATA[MOBILE_PHONE = #MOBILE_PHONE# ]]></isNotNull>
+    <isNotNull property="SEX" prepend=","><![CDATA[SEX = #SEX# ]]></isNotNull>
+    <isNotNull property="BIRTHDAY" prepend=","><![CDATA[BIRTHDAY = to_date(#BIRTHDAY#,'yyyy-MM-DD') ]]></isNotNull>
+    <isNotNull property="PAYABLE_AMOUNT" prepend=","><![CDATA[PAYABLE_AMOUNT = #PAYABLE_AMOUNT# ]]></isNotNull>
+    <isNotNull property="HOBBY" prepend=","><![CDATA[HOBBY = #HOBBY# ]]></isNotNull>
+    <isNotNull property="ADDRESS" prepend=","><![CDATA[ADDRESS = #ADDRESS# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    <isNotNull property="REGIST_FLAG" prepend=","><![CDATA[REGIST_FLAG = #REGIST_FLAG# ]]></isNotNull>
+    <isNotNull property="REGIST_TIME" prepend=","><![CDATA[REGIST_TIME = sysdate ]]></isNotNull>
+    <isNotNull property="REGIST_STATE" prepend=","><![CDATA[REGIST_STATE = #REGIST_STATE# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where CARD_SALE_ORDER_DTL_ID = #CARD_SALE_ORDER_DTL_ID#]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteChldByIds" parameterClass="map">
+	<![CDATA[ update ERP_CARD_SALE_ORDER_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      CARD_SALE_ORDER_DTL_ID in ($CARD_SALE_ORDER_DTL_IDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细 -->
+<delete id="delChldByFkId" parameterClass="map">
+	<![CDATA[ update ERP_CARD_SALE_ORDER_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      CARD_SALE_ORDER_ID = #CARD_SALE_ORDER_ID#
+    ]]>
+</delete>
+ 
+ <!-- 子表更新的时候 同步更新主表的 销售卡券总额 -->
+<update id="updateMainTableAmount" parameterClass="String">
+	update ERP_CARD_SALE_ORDER t
+	   set t.SALE_CARD_AMOUNT =
+	       (select sum(d.PAYABLE_AMOUNT)
+	          from ERP_CARD_SALE_ORDER_DTL d
+	         where d.CARD_SALE_ORDER_ID = t.CARD_SALE_ORDER_ID
+	           and d.DEL_FLAG = 0)
+	 where t.CARD_SALE_ORDER_ID=#CARD_SALE_ORDER_ID#
+    
+</update> 
+
+<!-- 查询未销售的卡券 -->
+<select id="loadNoSaleCard" parameterClass="map" resultClass="java.util.HashMap">
+<![CDATA[ 
+     select 
+		u.MARKETING_CARD_ID,
+		u.MARKETING_CARD_NO,
+		u.CARD_TYPE,
+		u.CARD_VALUE,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME_,
+		u.CARD_SEQ_NO,
+		u.STATE,
+		u.DEL_FLAG,
+		u.MARKETING_ACT_ID,
+		u.CHANN_ID,
+		u.CHANN_NO,
+		u.CHANN_NAME,
+		to_char(u.ASSIGNE_TIME,'yyyy-MM-DD') CRE_TIME
+       from ERP_MARKETING_CARD u
+       where u.MARKETING_CARD_NO = #MARKETING_CARD_NO#
+       and u.DEL_FLAG=0
+       	 
+]]>
+
+</select>
+
+
+<!-- 插入卡券销售表 -->
+<insert id="insertCardSale" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_CARD_SALE_ORDER(
+	     CARD_SALE_ORDER_ID,
+	     CARD_SALE_ORDER_NO,
+	     TERM_ID,
+	     TERM_NO,
+	     TERM_NAME,
+	     CHANN_ID,
+	     CHANN_NO,
+	     CHANN_NAME,
+	     SALE_PSON_ID,
+	     SALE_PSON_NAME,
+	     SALE_DATE,
+	     SALE_CARD_AMOUNT,
+		 REMARK,
+		 STATE,
+         CRE_NAME,
+         CREATOR,
+         CRE_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         DEL_FLAG,
+         MARKETING_ACT_ID,
+	     MARKETING_ACT_NO,
+	     MARKETING_ACT_NAME
+	     ) 
+	   select 
+		 #CARD_SALE_ORDER_ID#,
+	     #CARD_SALE_ORDER_NO#,
+	     #TERM_ID#,
+	     #TERM_NO#,
+	     #TERM_NAME#,
+	     #CHANN_ID#,
+	     #CHANN_NO#,
+	     #CHANN_NAME#,
+	     #SALE_PSON_ID#,
+	     #SALE_PSON_NAME#,
+	     to_date(#SALE_DATE#,'yyyy-MM-DD'),
+	     #SALE_CARD_AMOUNT#,
+		 #REMARK#,
+		 #STATE#,
+         #CRE_NAME#,
+         #CREATOR#,
+	     sysdate, 
+         #DEPT_ID#,
+         #DEPT_NAME#,
+         #ORG_ID#,
+         #ORG_NAME#,
+         #LEDGER_ID#,
+         #LEDGER_NAME#,
+		 #DEL_FLAG#,
+		 a.MARKETING_ACT_ID,
+	     a.MARKETING_ACT_NO,
+	     a.MARKETING_ACT_NAME
+	      from ERP_MARKETING_CARD c
+     left join ERP_MARKETING_ACT a
+       on a.MARKETING_ACT_ID = c.MARKETING_ACT_ID
+    where c.MARKETING_CARD_NO = #MARKETING_CARD_NO#
+    and c.DEL_FLAG=0 and a.DEL_FLAG=0
+   ]]>
+</insert>
+
+
+    
+
+
+ <!-- 根据手机号查询会员 -->
+ <select id="queryMemberByPhone" parameterClass="map" resultClass="int">
+   select count(1) from ERP_MEMBER_INFO where MOBILE_PHONE = #MOBILE_PHONE# and DEL_FLAG=0
+ </select>
+ 
+ <update id="updateMemberByPhone" parameterClass="map">
+	<![CDATA[ update ERP_MEMBER_INFO ]]>
+	<dynamic prepend="set">
+	<isNotNull property="MOBILE_PHONE" prepend=","><![CDATA[MOBILE_PHONE = #MOBILE_PHONE# ]]></isNotNull>
+	<isNotNull property="MEMBER_NAME" prepend=","><![CDATA[MEMBER_NAME = #MEMBER_NAME# ]]></isNotNull>
+    <isNotNull property="SEX" prepend=","><![CDATA[SEX = #SEX# ]]></isNotNull>
+    <isNotNull property="POINT_VALUE" prepend=","><![CDATA[POINT_VALUE = #POINT_VALUE# ]]></isNotNull>
+    <isNotNull property="CHANN_ID" prepend=","><![CDATA[CHANN_ID = #CHANN_ID# ]]></isNotNull>
+    <isNotNull property="CHANN_NO" prepend=","><![CDATA[CHANN_NO = #CHANN_NO# ]]></isNotNull>
+    <isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME# ]]></isNotNull>
+    <isNotNull property="BIRTHDAY" prepend=","><![CDATA[BIRTHDAY = to_date(#BIRTHDAY#,'yyyy-MM-DD') ]]></isNotNull>
+    <isNotNull property="HOBBY" prepend=","><![CDATA[HOBBY = #HOBBY# ]]></isNotNull>
+    <isNotNull property="ADDRESS" prepend=","><![CDATA[ADDRESS = #ADDRESS# ]]></isNotNull>
+    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+    <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where MOBILE_PHONE = #MOBILE_PHONE#]]>
+</update>
+
+ 
+<!-- 插入会员活动卡券表 --> 
+<insert id="insertMemberCard" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_MEMBER_CARD_DTL(
+	   MEMBER_CARD_DTL_ID,
+	   MEMBER_ID,
+	   MEMBER_ACT_DTL_ID,
+	   MARKETING_CARD_ID,
+	   MARKETING_CARD_NO,
+	   CARD_TYPE,
+	   CARD_VALUE,
+	   CRE_TIME,
+	   STATE,
+	   DEL_FLAG)
+	  select 
+         sys_guid() ,
+         u.MEMBER_ID,
+         #MARKETING_ACT_ID#,
+         t.MARKETING_CARD_ID,
+         t.MARKETING_CARD_NO,
+         t.CARD_TYPE,
+         t.CARD_VALUE,
+         t.CRE_TIME,
+         t.STATE,
+         0
+    from ERP_CARD_SALE_ORDER_DTL t
+    left join ERP_MEMBER_INFO u
+      on u.MOBILE_PHONE = t.MOBILE_PHONE
+   where t.CARD_SALE_ORDER_ID = #CARD_SALE_ORDER_ID#
+     and u.DEL_FLAG = 0
+     and t.DEL_FLAG=0
+     and not exists (select 1 from ERP_MEMBER_CARD_DTL a where a.MARKETING_CARD_ID=t.MARKETING_CARD_ID and a.DEL_FLAG=0 )
+   ]]>
+</insert>
+ 
+ 
+ 
+ 
+ <!-- 插入会员参加活动表 --> 
+<insert id="insertMemberAct" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_MEMBER_ACT_DTL(
+	    MEMBER_ACT_DTL_ID,
+	    MEMBER_ID,
+	    MARKETING_ACT_ID,
+	    MARKETING_ACT_NO,
+	    MARKETING_ACT_NAME,
+	    START_DATE,
+	    END_DATE,
+	    SPONSOR_NAME,
+	    DEL_FLAG
+	    )
+	   select 
+	      sys_guid(),
+          u.MEMBER_ID,
+          t.MARKETING_ACT_ID,
+          t.MARKETING_ACT_NO,
+          t.MARKETING_ACT_NAME,
+          a.START_DATE,
+          a.END_DATE,
+          a.SPONSOR_NAME,
+          0
+     from ERP_CARD_SALE_ORDER_DTL d
+     left join ERP_CARD_SALE_ORDER t
+       on d.CARD_SALE_ORDER_ID = t.CARD_SALE_ORDER_ID
+   left join ERP_MARKETING_ACT a on a.MARKETING_ACT_ID=t.MARKETING_ACT_ID
+     left join ERP_MEMBER_INFO u
+       on u.MOBILE_PHONE = d.MOBILE_PHONE
+    where t.CARD_SALE_ORDER_ID = #CARD_SALE_ORDER_ID#
+      and u.DEL_FLAG = 0
+      and t.DEL_FLAG = 0
+      and d.DEL_FLAG=0
+    and not exists (select 1 from ERP_MEMBER_ACT_DTL a where a.MARKETING_ACT_ID=t.MARKETING_ACT_ID and a.DEL_FLAG=0 )
+	  
+   ]]>
+</insert>
+ 
+<!-- 查询客户参与的活动以及发放的卡券  同一个活动只能有一张卡券  -->
+<select id="queryCusNum" parameterClass="map" resultClass="java.util.HashMap">
+select t.MARKETING_ACT_NAME, d.MOBILE_PHONE, d.CUST_NAME,d.MARKETING_CARD_ID,d.MARKETING_CARD_NO
+  from ERP_CARD_SALE_ORDER t, ERP_CARD_SALE_ORDER_DTL d
+ where t.CARD_SALE_ORDER_ID = d.CARD_SALE_ORDER_ID
+   and t.DEL_FLAG = 0
+   and d.DEL_FLAG = 0
+   and d.MOBILE_PHONE = #MOBILE_PHONE#
+   
+   and t.MARKETING_ACT_ID = (select MARKETING_ACT_ID from ERP_CARD_SALE_ORDER where CARD_SALE_ORDER_ID=#CARD_SALE_ORDER_ID# )
+   and d.CARD_SALE_ORDER_DTL_ID !=#CARD_SALE_ORDER_DTL_ID#   
+</select>
+
+
+<!-- 根据手机号查询会员信息 -->
+<select id="getMemberInfo" parameterClass="map" resultClass="java.util.HashMap">
+  select 
+  t.MEMBER_NAME,
+  t.MOBILE_PHONE,
+  t.SEX,
+  t.HOBBY,
+  to_char(t.BIRTHDAY,'yyyy-MM-DD')BIRTHDAY,
+  t.ADDRESS,
+  t.REMARK 
+  from ERP_MEMBER_INFO t 
+  where t.MOBILE_PHONE=#MOBILE_PHONE#
+  and t.DEL_FLAG=0
+</select>
+
+
+<!--根据卡券ID删除会员卡券表的相关卡券信息 -->
+<delete id="delMemberCardByCardId" parameterClass="map">
+	<![CDATA[ update ERP_MEMBER_CARD_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+		  where 1=1
+	      
+	]]>
+	
+	<isNotEmpty prepend="and" property="CARD_SALE_ORDER_DTL_IDS">
+	    MARKETING_CARD_ID  in 
+	    (select t.MARKETING_CARD_ID from ERP_CARD_SALE_ORDER_DTL t where t.CARD_SALE_ORDER_DTL_ID in($CARD_SALE_ORDER_DTL_IDS$) and t.DEL_FLAG=0)
+	</isNotEmpty>
+	
+	<isNotEmpty prepend="and" property="CARD_SALE_ORDER_ID">
+	    MARKETING_CARD_ID in 
+	    (select t.MARKETING_CARD_ID from ERP_CARD_SALE_ORDER_DTL t where t.CARD_SALE_ORDER_ID=#CARD_SALE_ORDER_ID# and t.DEL_FLAG=0)
+	</isNotEmpty>
+</delete>  
+
+
+<!-- 手机端卡券录入的时候  根据当前登录人 查询最近的未提交的 卡券销售单 -->
+<select id="queryLastOrder" parameterClass="map" resultClass="java.util.HashMap"  remapResults="true" >
+  select row_.*
+     from (  
+          select u.CARD_SALE_ORDER_ID, u.CARD_SALE_ORDER_NO
+		  from ERP_CARD_SALE_ORDER u
+		 where u.SALE_PSON_ID = #SALE_PSON_ID#
+		   and u.STATE = '未提交'
+		   and u.DEL_FLAG = 0
+		 order by u.SALE_DATE desc
+     ) row_
+    where rownum = 1
+</select>
+
+
+
+ 
+</sqlMap>

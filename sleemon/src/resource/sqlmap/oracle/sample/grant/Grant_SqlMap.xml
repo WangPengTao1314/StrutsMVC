@@ -1,0 +1,498 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zhuxw
+@function 
+@version 2013-05-15 10:35:31
+-->
+<sqlMap  namespace="Grant">
+<!-- 定义GrantModel,GrantModelChld -->
+<typeAlias type="com.hoperun.sample.grant.model.GrantModel" alias="GrantModel"/>
+<typeAlias type="com.hoperun.sample.grant.model.GrantModelChld" alias="GrantModelChld" />
+<!-- 使用GrantModel装载结果集 -->
+<resultMap id="GrantModel" class="GrantModel">
+    <result column="CPBLTZDID" property="CPBLTZDID" />
+</resultMap>
+<!-- 使用GrantModelChld装载结果集 -->
+<resultMap id="GrantModelChld" class="GrantModelChld">
+    <result column="CPBLTZDMXID" property="CPBLTZDMXID" />
+</resultMap>
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="CPBLTZDBH">
+    u.CPBLTZDBH like '%'||#CPBLTZDBH#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="LCH">
+    u.LCH like '%'||#LCH#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRENAME">
+    u.CRENAME like '%'||#CRENAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRETIME_BEG">
+     <![CDATA[u.CRETIME >=to_date(#CRETIME_BEG#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRETIME_END">
+     <![CDATA[u.CRETIME <=  to_date(#CRETIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="BMMC">
+    u.BMMC like '%'||#BMMC#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="JGMC">
+    u.JGMC like '%'||#JGMC#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE like '%'||#STATE#||'%'
+  </isNotEmpty>
+	<isNotEmpty prepend="and " property="DELFLAG">
+	        u.DELFLAG=#DELFLAG#
+	</isNotEmpty>
+    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	</isNotEmpty>
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.CPBLTZDID,
+		u.CPBLTZDBH,
+		u.LCH,
+		u.WLXXID,
+		u.WLDWXXID,
+		u.WLDWBH,
+		u.WLDWMC,
+		u.WLXXYSID,
+		u.CPZJTZDID,
+		u.CPZJDBH,
+		u.CPCGDDBH,
+		u.PP,
+		u.NF,
+		u.JJ,
+		u.YSBH,
+		u.YSMC,
+		u.WLBH,
+		u.WLMC,
+		u.TZSL,
+		u.TZHGSL,
+		u.TZBHGSL,
+		u.THSL,
+		u.RBJSSL,
+		u.BFSL,
+		u.XSSL,
+		u.JYRID,
+		u.JYRXM,
+		to_char(u.JYSJ,'yyyy-MM-DD HH24:MI:SS') JYSJ,
+		u.CLYJ,
+		u.WBYYBJ,
+		u.REMARK,
+		u.AUDITER,
+		u.AUDITNAME,
+		to_char(u.AUDITTIME,'yyyy-MM-DD HH24:MI:SS') AUDITTIME,
+		u.YTZBHGSL,
+		u.KTZBHGSL,
+		u.KZCRKSL,
+		u.RKXH,
+		u.CRENAME,
+		u.CREATER,
+		to_char(u.CRETIME,'yyyy-MM-DD HH24:MI:SS') CRETIME,
+		u.UPDNAME,
+		u.UPDATER,
+		to_char(u.UPDTIME,'yyyy-MM-DD HH24:MI:SS') UPDTIME,
+		u.BMXXID,
+		u.BMMC,
+		u.JGXXID,
+		u.JGMC,
+		u.ZTXXID,
+		u.STATE,
+		u.DELFLAG
+      from T_ERP_ZJ_CPBLTZD u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM T_ERP_ZJ_CPBLTZD u ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into T_ERP_ZJ_CPBLTZD(
+		 CPBLTZDID,
+         WLDWXXID,
+         CPBLTZDBH,
+         LCH,
+         WLDWBH,
+         WLDWMC,
+         THSL,
+         CRENAME,
+         CREATER,
+         CRETIME,
+         UPDNAME,
+         UPDATER,
+         UPDTIME,
+         BMXXID,
+         BMMC,
+         JGXXID,
+         JGMC,
+         ZTXXID,
+         STATE,
+         DELFLAG
+	   )values(
+		#CPBLTZDID#,
+        #WLDWXXID#,
+        #CPBLTZDBH#,
+        #LCH#,
+        #WLDWBH#,
+        #WLDWMC#,
+        #THSL#,
+        #CRENAME#,
+        #CREATER#,
+	    sysdate, 
+        #UPDNAME#,
+        #UPDATER#,
+		sysdate, 
+        #BMXXID#,
+        #BMMC#,
+        #JGXXID#,
+        #JGMC#,
+        #ZTXXID#,
+        #STATE#,
+		#DELFLAG#
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update T_ERP_ZJ_CPBLTZD ]]>
+	<dynamic prepend="set">
+    <isNotNull property="WLDWXXID" prepend=","><![CDATA[WLDWXXID = #WLDWXXID# ]]></isNotNull>
+    <isNotNull property="CPBLTZDBH" prepend=","><![CDATA[CPBLTZDBH = #CPBLTZDBH# ]]></isNotNull>
+    <isNotNull property="LCH" prepend=","><![CDATA[LCH = #LCH# ]]></isNotNull>
+    <isNotNull property="WLDWBH" prepend=","><![CDATA[WLDWBH = #WLDWBH# ]]></isNotNull>
+    <isNotNull property="WLDWMC" prepend=","><![CDATA[WLDWMC = #WLDWMC# ]]></isNotNull>
+    <isNotNull property="THSL" prepend=","><![CDATA[THSL = #THSL# ]]></isNotNull>
+    <isNotNull property="UPDNAME" prepend=","><![CDATA[UPDNAME = #UPDNAME# ]]></isNotNull>
+    <isNotNull property="UPDATER" prepend=","><![CDATA[UPDATER = #UPDATER# ]]></isNotNull>
+     <isNotNull property="UPDTIME" prepend=","><![CDATA[UPDTIME = sysdate ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where CPBLTZDID = #CPBLTZDID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update T_ERP_ZJ_CPBLTZD 
+	               set DELFLAG = #DELFLAG#
+                      ,UPDNAME=#UPDNAME#
+                     ,UPDATER=#UPDATER#
+                      ,UPDTIME=sysdate
+ 	  where 
+	     CPBLTZDID = #CPBLTZDID:VARCHAR# 
+    ]]>
+</delete>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.CPBLTZDID,
+		u.CPBLTZDBH,
+		u.LCH,
+		u.WLXXID,
+		u.WLDWXXID,
+		u.WLDWBH,
+		u.WLDWMC,
+		u.WLXXYSID,
+		u.CPZJTZDID,
+		u.CPZJDBH,
+		u.CPCGDDBH,
+		u.PP,
+		u.NF,
+		u.JJ,
+		u.YSBH,
+		u.YSMC,
+		u.WLBH,
+		u.WLMC,
+		u.TZSL,
+		u.TZHGSL,
+		u.TZBHGSL,
+		u.THSL,
+		u.RBJSSL,
+		u.BFSL,
+		u.XSSL,
+		u.JYRID,
+		u.JYRXM,
+		to_char(u.JYSJ,'yyyy-MM-DD HH24:MI:SS') JYSJ,
+		u.CLYJ,
+		u.WBYYBJ,
+		u.REMARK,
+		u.AUDITER,
+		u.AUDITNAME,
+		to_char(u.AUDITTIME,'yyyy-MM-DD HH24:MI:SS') AUDITTIME,
+		u.YTZBHGSL,
+		u.KTZBHGSL,
+		u.KZCRKSL,
+		u.RKXH,
+		u.CRENAME,
+		u.CREATER,
+		to_char(u.CRETIME,'yyyy-MM-DD HH24:MI:SS') CRETIME,
+		u.UPDNAME,
+		u.UPDATER,
+		to_char(u.UPDTIME,'yyyy-MM-DD HH24:MI:SS') UPDTIME,
+		u.BMXXID,
+		u.BMMC,
+		u.JGXXID,
+		u.JGMC,
+		u.ZTXXID,
+		u.STATE,
+		u.DELFLAG
+	  from
+       T_ERP_ZJ_CPBLTZD u 
+	  where 
+		u.CPBLTZDID = #CPBLTZDID#
+	]]>
+</select>
+<!-- 明细操作开始-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DELFLAG">
+     u.DELFLAG=#DELFLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+     select 
+		u.CPBLTZDMXID,
+		u.CPBLTZDID,
+		u.CPZJXMID,
+		u.CPZJXMBH,
+		u.CPZJXMMC,
+		u.ZJXMLB,
+		u.YYBZ,
+		u.JYCS,
+		u.HGBZ,
+		u.JYZ,
+		u.RBJSSL,
+		u.BFSL,
+		u.THSL,
+		u.XSSL,
+		u.REMARK,
+		u.KZCRKSL,
+		u.DELFLAG
+       from T_ERP_ZJ_CPBLTZDMX u 
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.CPBLTZDID=#CPBLTZDID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+	        u.CPBLTZDMXID in ($CPBLTZDMXIDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+<!--明细表插入 -->
+<insert id="insertChld" parameterClass="map">
+  <![CDATA[
+	  insert into T_ERP_ZJ_CPBLTZDMX(
+		 CPBLTZDMXID,
+		 CPBLTZDID,
+         CPZJXMMC,
+         ZJXMLB,
+         YYBZ,
+         JYCS,
+         HGBZ,
+         DELFLAG
+	   )values(
+		#CPBLTZDMXID#,
+		#CPBLTZDID#,
+        #CPZJXMMC#,
+        #ZJXMLB#,
+        #YYBZ#,
+        #JYCS#,
+        #HGBZ#,
+		#DELFLAG#
+		)
+   ]]>
+</insert>
+<!--明细表更新 -->
+<update id="updateChldById" parameterClass="map">
+	<![CDATA[ update T_ERP_ZJ_CPBLTZDMX ]]>
+	<dynamic prepend="set">
+    <isNotNull property="CPZJXMMC" prepend=","><![CDATA[CPZJXMMC = #CPZJXMMC# ]]></isNotNull>
+    <isNotNull property="ZJXMLB" prepend=","><![CDATA[ZJXMLB = #ZJXMLB# ]]></isNotNull>
+    <isNotNull property="YYBZ" prepend=","><![CDATA[YYBZ = #YYBZ# ]]></isNotNull>
+    <isNotNull property="JYCS" prepend=","><![CDATA[JYCS = #JYCS# ]]></isNotNull>
+    <isNotNull property="HGBZ" prepend=","><![CDATA[HGBZ = #HGBZ# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where CPBLTZDMXID = #CPBLTZDMXID#]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteChldByIds" parameterClass="map">
+	<![CDATA[ update T_ERP_ZJ_CPBLTZDMX 
+	               set DELFLAG = #DELFLAG#	 
+ 	  where 
+	      CPBLTZDMXID in ($CPBLTZDMXIDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细 -->
+<delete id="delChldByFkId" parameterClass="map">
+	<![CDATA[ update T_ERP_ZJ_CPBLTZDMX 
+	               set DELFLAG = #DELFLAG#	 
+ 	  where 
+	      CPBLTZDID = #CPBLTZDID:VARCHAR#
+    ]]>
+</delete>
+
+<!--明细的明细操作开始-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlGchld">
+  <isNotEmpty prepend="and" property="DELFLAG">
+     u.DELFLAG=#DELFLAG#
+  </isNotEmpty>
+</sql>
+<sql id="orderSqlGchld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>  
+<sql id="coreSqlGchld">
+	<![CDATA[ 
+     select 
+		u.CPBLTZDMXMXID,
+		u.CPBLTZDMXID,
+		u.CPBLTZDID,
+		u.WLBH,
+		u.WLMC,
+		u.GGXH,
+		u.WLSL,
+		u.REMARK
+       from T_ERP_ZJ_CPBLTZDMXMX u 
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+ <select id="queryGchldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlGchld"/>
+	  <dynamic prepend="where">
+			u.CPBLTZDMXID=#CPBLTZDMXID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlGchld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlGchld"/>
+	  </isNotNull>
+ </select>
+ 
+ <!--根据明细表子表IDS查询 -->
+ <select id="loadGchldByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlGchld"/>
+	  <dynamic prepend="where">
+	        u.CPBLTZDMXMXID in ($CPBLTZDMXMXIDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlGchld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlGchld"/>
+	  </isNotNull>
+</select>
+
+ <!--明细的子表的插入 -->
+<insert id="insertGchld" parameterClass="map">
+  <![CDATA[
+	  insert into T_ERP_ZJ_CPBLTZDMXMX(
+	     CPBLTZDMXMXID,
+		 CPBLTZDMXID,
+		 CPBLTZDID,
+         WLBH,
+         WLMC,
+         GGXH,
+         WLSL,
+         REMARK,
+         DELFLAG
+	   )values(
+		#CPBLTZDMXMXID#,
+		#CPBLTZDMXID#,
+        #CPBLTZDID#,
+        #WLBH#,
+        #WLMC#,
+        #GGXH#,
+        #WLSL#,
+        #REMARK#,
+		#DELFLAG#
+		)
+   ]]>
+</insert>
+<!--明细的子表更新 -->
+<update id="updateGchldById" parameterClass="map">
+	<![CDATA[ update T_ERP_ZJ_CPBLTZDMXMX ]]>
+	<dynamic prepend="set">
+    <isNotNull property="WLBH" prepend=","><![CDATA[WLBH = #WLBH# ]]></isNotNull>
+    <isNotNull property="WLMC" prepend=","><![CDATA[WLMC = #WLMC# ]]></isNotNull>
+    <isNotNull property="GGXH" prepend=","><![CDATA[GGXH = #GGXH# ]]></isNotNull>
+    <isNotNull property="WLSL" prepend=","><![CDATA[WLSL = #WLSL# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where CPBLTZDMXMXID = #CPBLTZDMXMXID#]]>
+</update>
+<!--根据子表的明细IDs删除明细 -->
+<delete id="deleteGchldByIds" parameterClass="map">
+	<![CDATA[ update T_ERP_ZJ_CPBLTZDMXMX 
+	                   set DELFLAG = #DELFLAG#	 
+ 	  where 
+	      CPBLTZDMXMXID in ($CPBLTZDMXMXIDS$)
+    ]]>
+</delete>
+<!--根据明细主键ID删除明细 -->
+<delete id="delGchldByFkId" parameterClass="map">
+	<![CDATA[ update T_ERP_ZJ_CPBLTZDMXMX 
+	                 set DELFLAG = #DELFLAG#	 
+ 	  where 
+	       CPBLTZDMXID in ($CPBLTZDMXIDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细的子表 -->
+<delete id="delGchldByGrantId" parameterClass="map">
+	<![CDATA[ update T_ERP_ZJ_CPBLTZDMXMX 
+	                 set DELFLAG = #DELFLAG#	 
+ 	  where 
+	       CPBLTZDID = #CPBLTZDID:VARCHAR#
+    ]]>
+</delete>
+</sqlMap>

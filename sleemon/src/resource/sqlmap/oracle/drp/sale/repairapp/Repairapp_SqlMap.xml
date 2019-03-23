@@ -1,0 +1,493 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author chenj
+@function 
+@version 2013-11-03 16:25:12
+-->
+<sqlMap  namespace="Repairapp">
+<!-- 定义RepairappModel,RepairappModelChld -->
+<typeAlias type="com.hoperun.drp.sale.repairapp.model.RepairappModel" alias="RepairappModel"/>
+<typeAlias type="com.hoperun.drp.sale.repairapp.model.RepairappModelChld" alias="RepairappModelChld" />
+<!-- 使用RepairappModel装载结果集 -->
+<resultMap id="RepairappModel" class="RepairappModel">
+    <result column="ERP_REPAIR_ORDER_ID" property="ERP_REPAIR_ORDER_ID" />
+</resultMap>
+<!-- 使用RepairappModelChld装载结果集 -->
+<resultMap id="RepairappModelChld" class="RepairappModelChld">
+    <result column="REPAIR_ORDER_DTL_ID" property="REPAIR_ORDER_DTL_ID" />
+</resultMap>
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="ERP_REPAIR_ORDER_NO">
+    u.ERP_REPAIR_ORDER_NO like '%'||#ERP_REPAIR_ORDER_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="REPAIR_CHANN_NO">
+    u.REPAIR_CHANN_NO like '%'||#REPAIR_CHANN_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="REPAIR_CHANN_NAME">
+    u.REPAIR_CHANN_NAME like '%'||#REPAIR_CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_BEG">
+     <![CDATA[u.CRE_TIME >=to_date(#CRE_TIME_BEG#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+     <![CDATA[u.CRE_TIME <=  to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="FINISH_DATE_BEG">
+     <![CDATA[u.REQ_FINISH_DATE >=to_date(#FINISH_DATE_BEG#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="FINISH_DATE_END">
+     <![CDATA[u.REQ_FINISH_DATE <=  to_date(#FINISH_DATE_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and" property="PRD_NO">
+    u.ERP_REPAIR_ORDER_ID in (select a.ERP_REPAIR_ORDER_ID from ERP_REPAIR_ORDER_DTL a where upper(a.PRD_NO) like upper('%'||#PRD_NO#||'%') and a.DEL_FLAG=0)
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="PRD_NAME">
+    u.ERP_REPAIR_ORDER_ID in (select a.ERP_REPAIR_ORDER_ID from ERP_REPAIR_ORDER_DTL a where upper(a.PRD_NAME) like upper('%'||#PRD_NAME#||'%') and a.DEL_FLAG=0)
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="PRD_SPEC">
+    u.ERP_REPAIR_ORDER_ID in (select a.ERP_REPAIR_ORDER_ID from ERP_REPAIR_ORDER_DTL a where upper(a.PRD_SPEC) like upper('%'||#PRD_SPEC#||'%') and a.DEL_FLAG=0)
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE = #STATE#
+  </isNotEmpty>
+	<isNotEmpty prepend="and " property="DEL_FLAG">
+	        u.DEL_FLAG=#DEL_FLAG#
+	</isNotEmpty>
+    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	</isNotEmpty>
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.ERP_REPAIR_ORDER_ID,
+		u.ERP_REPAIR_ORDER_NO,
+		u.REPAIR_CHANN_ID,
+		u.REPAIR_CHANN_NO,
+		u.REPAIR_CHANN_NAME,
+		u.AREA_ID,
+		u.AREA_NO,
+		u.AREA_NAME,
+		to_char(u.REQ_FINISH_DATE,'yyyy-MM-DD') REQ_FINISH_DATE,
+		u.STOREOUT_STORE_ID,
+		u.STOREOUT_STORE_NO,
+		u.STOREOUT_STORE_NAME,
+		u.STORAGE_FLAG,
+		u.REMARK,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG,
+		u.SHIP_POINT_ID,
+		u.SHIP_POINT_NAME,
+		u.DELIVER_ADDR_ID,
+		u.DELIVER_ADDR_NO,
+		u.DELIVER_DTL_ADDR,
+		(select sum(NVL(d.TOTAL_VOLUME,0)) TOTAL_VOLUME from ERP_REPAIR_ORDER_DTL d 
+		where d.ERP_REPAIR_ORDER_ID=u.ERP_REPAIR_ORDER_ID and d.DEL_FLAG=0)TOTAL_VOLUME
+		
+      from ERP_REPAIR_ORDER u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM ERP_REPAIR_ORDER u ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_REPAIR_ORDER(
+		 ERP_REPAIR_ORDER_ID,
+		 ERP_REPAIR_ORDER_NO,
+		 REPAIR_CHANN_ID,
+		 REPAIR_CHANN_NO,
+         REPAIR_CHANN_NAME,
+         AREA_ID,
+         AREA_NO,
+         AREA_NAME,
+         REQ_FINISH_DATE,
+         STOREOUT_STORE_ID,
+         STOREOUT_STORE_NO,
+         STOREOUT_STORE_NAME,
+         STORAGE_FLAG,
+         STATE,
+         REMARK,
+         CREATOR,
+         CRE_NAME,
+         CRE_TIME,
+         UPD_NAME,
+         UPDATOR,
+         UPD_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         DEL_FLAG,
+         DELIVER_ADDR_ID,
+		 DELIVER_ADDR_NO,
+		 DELIVER_DTL_ADDR
+	   )values(
+		#ERP_REPAIR_ORDER_ID#,
+		#ERP_REPAIR_ORDER_NO#,
+		#REPAIR_CHANN_ID#,
+		#REPAIR_CHANN_NO#,
+        #REPAIR_CHANN_NAME#,
+        #AREA_ID#,
+        #AREA_NO#,
+        #AREA_NAME#,
+        to_date(#REQ_FINISH_DATE#,'yyyy-MM-DD HH24:MI:SS'),
+        #STOREOUT_STORE_ID#,
+        #STOREOUT_STORE_NO#,
+        #STOREOUT_STORE_NAME#,
+        #STORAGE_FLAG#,
+    	#STATE#,
+        #REMARK#,
+        #CREATOR#,
+        #CRE_NAME#,
+	    sysdate, 
+        #UPD_NAME#,
+        #UPDATOR#,
+		sysdate, 
+        #DEPT_ID#,
+        #DEPT_NAME#,
+        #ORG_ID#,
+        #ORG_NAME#,
+        #LEDGER_ID#,
+        #LEDGER_NAME#,
+		#DEL_FLAG#,
+		#DELIVER_ADDR_ID#,
+		#DELIVER_ADDR_NO#,
+		#DELIVER_DTL_ADDR#
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update ERP_REPAIR_ORDER ]]>
+	<dynamic prepend="set">
+	<isNotNull property="REPAIR_CHANN_ID" prepend=","><![CDATA[REPAIR_CHANN_ID = #REPAIR_CHANN_ID# ]]></isNotNull>
+	<isNotNull property="REPAIR_CHANN_NO" prepend=","><![CDATA[REPAIR_CHANN_NO = #REPAIR_CHANN_NO# ]]></isNotNull>
+    <isNotNull property="REPAIR_CHANN_NAME" prepend=","><![CDATA[REPAIR_CHANN_NAME = #REPAIR_CHANN_NAME# ]]></isNotNull>
+    <isNotNull property="AREA_ID" prepend=","><![CDATA[AREA_ID = #AREA_ID# ]]></isNotNull>
+	<isNotNull property="AREA_NO" prepend=","><![CDATA[AREA_NO = #AREA_NO# ]]></isNotNull>
+    <isNotNull property="AREA_NAME" prepend=","><![CDATA[AREA_NAME = #AREA_NAME# ]]></isNotNull>
+    <isNotNull property="STOREOUT_STORE_ID" prepend=","><![CDATA[STOREOUT_STORE_ID = #STOREOUT_STORE_ID# ]]></isNotNull>
+	<isNotNull property="STOREOUT_STORE_NO" prepend=","><![CDATA[STOREOUT_STORE_NO = #STOREOUT_STORE_NO# ]]></isNotNull>
+    <isNotNull property="STOREOUT_STORE_NAME" prepend=","><![CDATA[STOREOUT_STORE_NAME = #STOREOUT_STORE_NAME# ]]></isNotNull>
+    <isNotNull property="REQ_FINISH_DATE" prepend=","><![CDATA[REQ_FINISH_DATE = to_date(#REQ_FINISH_DATE#,'yyyy-MM-DD HH24:MI:SS') ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    <isNotNull property="ERP_REPAIR_ORDER_NO" prepend=","><![CDATA[ERP_REPAIR_ORDER_NO = #ERP_REPAIR_ORDER_NO# ]]></isNotNull>
+    <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+    <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    
+    <isNotNull property="DELIVER_ADDR_ID" prepend=","><![CDATA[DELIVER_ADDR_ID = #DELIVER_ADDR_ID# ]]></isNotNull>
+    <isNotNull property="DELIVER_ADDR_NO" prepend=","><![CDATA[DELIVER_ADDR_NO = #DELIVER_ADDR_NO# ]]></isNotNull>
+    <isNotNull property="DELIVER_DTL_ADDR" prepend=","><![CDATA[DELIVER_DTL_ADDR = #DELIVER_DTL_ADDR# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where ERP_REPAIR_ORDER_ID = #ERP_REPAIR_ORDER_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update ERP_REPAIR_ORDER 
+	               set DEL_FLAG = #DEL_FLAG#
+                      ,UPD_NAME=#UPD_NAME#
+                     ,UPDATOR=#UPDATOR#
+                      ,UPD_TIME=sysdate
+ 	  where 
+	     ERP_REPAIR_ORDER_ID = #ERP_REPAIR_ORDER_ID:VARCHAR# 
+    ]]>
+</delete>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.ERP_REPAIR_ORDER_ID,
+		u.ERP_REPAIR_ORDER_NO,
+		u.REPAIR_CHANN_ID,
+		u.REPAIR_CHANN_NO,
+		u.REPAIR_CHANN_NAME,
+		u.AREA_ID,
+		u.AREA_NO,
+		u.AREA_NAME,
+		to_char(u.REQ_FINISH_DATE,'yyyy-MM-DD') REQ_FINISH_DATE,
+		u.STOREOUT_STORE_ID,
+		u.STOREOUT_STORE_NO,
+		u.STOREOUT_STORE_NAME,
+		u.STORAGE_FLAG,
+		u.REMARK,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG,
+		u.SHIP_POINT_ID,
+		u.SHIP_POINT_NAME,
+		u.DELIVER_ADDR_ID,
+		u.DELIVER_ADDR_NO,
+		u.DELIVER_DTL_ADDR,
+		c.AREA_SER_ID,
+		c.AREA_SER_NO,
+		c.AREA_SER_NAME
+	  from
+       ERP_REPAIR_ORDER u 
+       left join BASE_CHANN c on u.REPAIR_CHANN_ID = c.CHANN_ID
+	  where 
+		u.ERP_REPAIR_ORDER_ID = #ERP_REPAIR_ORDER_ID#
+	]]>
+</select>
+<!-- 明细操作开始-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+     select 
+		u.REPAIR_ORDER_DTL_ID,
+		u.ERP_REPAIR_ORDER_ID,
+		u.PRD_ID,
+		u.PRD_NO,
+		u.PRD_NAME,
+		u.PRD_SPEC,
+		u.PRD_COLOR,
+		u.BRAND,
+		u.STD_UNIT,
+		u.REPAIR_NUM,
+		u.REPAIR_PRICE,
+		u.REPAIR_AMOUNT,
+		u.REPAIR_RESON,
+		s.SPCL_TECH_FLAG,
+		s.SPCL_TECH_ID,
+		u.REPAIR_ATT,
+		u.VOLUME,
+		u.TOTAL_VOLUME,
+		temp.SAFE_NUM,
+		p.PAR_PRD_NAME,
+		s.DM_SPCL_TECH_NO
+       from ERP_REPAIR_ORDER_DTL u 
+       left join BASE_PRODUCT p on u.PRD_ID = p.PRD_ID
+       left join DRP_SPCL_TECH s on u.SPCL_TECH_ID = s.SPCL_TECH_ID
+	   left join ERP_REPAIR_ORDER a on u.ERP_REPAIR_ORDER_ID = a.ERP_REPAIR_ORDER_ID
+	   left join ( select acct.store_id, acct.prd_id, 
+	                 (sum(NVL(acct.STORE_NUM, 0)) -sum( NVL(acct.FREEZE_NUM, 0))) SAFE_NUM 
+                  from DRP_STORE_ACCT acct group by acct.PRD_ID,acct.STORE_ID) temp 
+      on u.PRD_ID = temp.PRD_ID  and a.STOREOUT_STORE_ID = temp.STORE_ID
+ 
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="RepairappModelChld">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.ERP_REPAIR_ORDER_ID=#ERP_REPAIR_ORDER_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+  
+
+<select id="queryTotal" parameterClass="map" resultClass="java.util.HashMap">
+	 select 
+	 sum(NVL(d.TOTAL_VOLUME,0)) TOTAL_VOLUME ,
+	 sum(NVL(d.REPAIR_NUM,0))TOTAL_REPAIR_NUM,
+     sum(NVL(d.REPAIR_AMOUNT,0))TOTAL_REPAIR_AMOUNT
+	 from ERP_REPAIR_ORDER_DTL d 
+		where d.ERP_REPAIR_ORDER_ID=#ERP_REPAIR_ORDER_ID# and d.DEL_FLAG=0 
+		
+</select>
+  
+  
+  
+   <!-- add by zzb 2014-8-5 根据主表ID查询明细 -->
+  <select id="queryChldByParentId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.ERP_REPAIR_ORDER_ID=#ERP_REPAIR_ORDER_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+  
+  
+  
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+	        u.REPAIR_ORDER_DTL_ID in ($REPAIR_ORDER_DTL_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+<!--明细表插入 -->
+<insert id="insertChld" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_REPAIR_ORDER_DTL(
+		 REPAIR_ORDER_DTL_ID,
+		 ERP_REPAIR_ORDER_ID,
+         REPAIR_ATT,
+         REPAIR_RESON,
+         PRD_COLOR,
+         PRD_ID,
+         PRD_NO,
+         STD_UNIT,
+         SPCL_TECH_ID,
+         PRD_NAME,
+         BRAND,
+         PRD_SPEC,
+         REPAIR_NUM,
+         REPAIR_AMOUNT,
+         REPAIR_PRICE,
+         DEL_FLAG,
+         VOLUME,
+         TOTAL_VOLUME
+	   )values(
+		#REPAIR_ORDER_DTL_ID#,
+		#ERP_REPAIR_ORDER_ID#,
+        #REPAIR_ATT#,
+        #REPAIR_RESON#,
+        #PRD_COLOR#,
+        #PRD_ID#,
+        #PRD_NO#,
+        #STD_UNIT#,
+        #SPCL_TECH_ID#,
+        #PRD_NAME#,
+        #BRAND#,
+        #PRD_SPEC#,
+        #REPAIR_NUM#,
+        #REPAIR_AMOUNT#,
+        #REPAIR_PRICE#,
+        #DEL_FLAG#,
+        #VOLUME#,
+        #TOTAL_VOLUME#
+		)
+   ]]>
+</insert>
+<!--明细表更新 -->
+<update id="updateChldById" parameterClass="map">
+	<![CDATA[ update ERP_REPAIR_ORDER_DTL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="REPAIR_ATT" prepend=","><![CDATA[REPAIR_ATT = #REPAIR_ATT# ]]></isNotNull>
+    <isNotNull property="REPAIR_RESON" prepend=","><![CDATA[REPAIR_RESON = #REPAIR_RESON# ]]></isNotNull>
+    <isNotNull property="PRD_COLOR" prepend=","><![CDATA[PRD_COLOR = #PRD_COLOR# ]]></isNotNull>
+    <isNotNull property="PRD_ID" prepend=","><![CDATA[PRD_ID = #PRD_ID# ]]></isNotNull>
+    <isNotNull property="PRD_NO" prepend=","><![CDATA[PRD_NO = #PRD_NO# ]]></isNotNull>
+    <isNotNull property="STD_UNIT" prepend=","><![CDATA[STD_UNIT = #STD_UNIT# ]]></isNotNull>
+    <isNotNull property="SPCL_TECH_ID" prepend=","><![CDATA[SPCL_TECH_ID = #SPCL_TECH_ID# ]]></isNotNull>
+    <isNotNull property="PRD_NAME" prepend=","><![CDATA[PRD_NAME = #PRD_NAME# ]]></isNotNull>
+    <isNotNull property="BRAND" prepend=","><![CDATA[BRAND = #BRAND# ]]></isNotNull>
+    <isNotNull property="PRD_SPEC" prepend=","><![CDATA[PRD_SPEC = #PRD_SPEC# ]]></isNotNull>
+    <isNotNull property="REPAIR_AMOUNT" prepend=","><![CDATA[REPAIR_AMOUNT = #REPAIR_AMOUNT# ]]></isNotNull>
+    <isNotNull property="REPAIR_PRICE" prepend=","><![CDATA[REPAIR_PRICE = #REPAIR_PRICE# ]]></isNotNull>
+    <isNotNull property="REPAIR_NUM" prepend=","><![CDATA[REPAIR_NUM = #REPAIR_NUM# ]]></isNotNull>
+    <isNotNull property="VOLUME" prepend=","><![CDATA[VOLUME = #VOLUME# ]]></isNotNull>
+    <isNotNull property="TOTAL_VOLUME" prepend=","><![CDATA[TOTAL_VOLUME = #TOTAL_VOLUME# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where REPAIR_ORDER_DTL_ID = #REPAIR_ORDER_DTL_ID#]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteChldByIds" parameterClass="map">
+	<![CDATA[ update ERP_REPAIR_ORDER_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      REPAIR_ORDER_DTL_ID in ($REPAIR_ORDER_DTL_IDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细 -->
+<delete id="delChldByFkId" parameterClass="map">
+	<![CDATA[ update ERP_REPAIR_ORDER_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      ERP_REPAIR_ORDER_ID = #ERP_REPAIR_ORDER_ID:VARCHAR#
+    ]]>
+</delete>
+
+
+<select id="queryAreaByuserChann" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[
+	  Select AREA_ID, AREA_NO, AREA_NAME,CHANN_ID,CHANN_NO,CHANN_NAME from BASE_CHANN where CHANN_ID = #CHANN_ID#
+	 ]]>
+</select>
+<select id="queryAreaByChannType" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+	  Select AREA_ID, AREA_NO, AREA_NAME,CHANN_ID,CHANN_NO,CHANN_NAME from BASE_CHANN where CHANN_TYPE = #CHANN_TYPE# AND  STATE= #STATE#
+	 ]]>
+</select>	  
+	<update id="updateStateById" parameterClass="map">	
+		<![CDATA[ update ${SYSSCHEMA}.ERP_REPAIR_ORDER ]]>
+		<dynamic prepend="set">
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="SHIP_POINT_ID" prepend=","><![CDATA[SHIP_POINT_ID = #SHIP_POINT_ID#]]></isNotNull>
+	 		<isNotNull property="SHIP_POINT_NAME" prepend=","><![CDATA[SHIP_POINT_NAME = #SHIP_POINT_NAME#]]></isNotNull>
+		</dynamic>
+		<![CDATA[, UPD_TIME = sysdate]]>
+		<![CDATA[ where ERP_REPAIR_ORDER_ID = #ERP_REPAIR_ORDER_ID#  ]]>	
+	</update>
+</sqlMap>

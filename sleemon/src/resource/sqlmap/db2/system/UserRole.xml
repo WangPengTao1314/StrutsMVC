@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="UserRole"> 
+	
+	<!-- 动态查询 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="userId">
+			ur.USER_ID = #userId#
+		</isNotEmpty>
+	</sql>
+	
+	<!-- 查询角色与用户关联关系 -->	
+	<select id="query" parameterClass="map" resultClass="java.util.HashMap"> 
+		<![CDATA[ select ROLE_ID from ${PUB}.USER_ROLE ur ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>	
+	
+	<!-- 删除角色与用户关联关系 -->	
+	<delete id="delete" parameterClass="map">
+		<![CDATA[ delete from ${PUB}.USER_ROLE ur ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</delete>	
+	
+	<!-- 增加角色与用户关联关系 -->	
+	<insert id="insert" parameterClass="map">
+		<![CDATA[ insert into ${PUB}.USER_ROLE (USER_ID,ROLE_ID) values(#userId#, #roleId#) ]]>
+	</insert> 
+	
+	
+</sqlMap>
+

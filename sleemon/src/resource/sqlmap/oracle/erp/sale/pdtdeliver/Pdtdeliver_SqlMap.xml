@@ -1,0 +1,1474 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zzb
+@function 货品发运
+@version 2013-10-12 13:52:19
+-->
+<sqlMap  namespace="Pdtdeliver">
+<!-- 定义SaleorderModel,SaleorderModelChld -->
+<typeAlias type="com.hoperun.erp.sale.turnoverplan.model.TurnoverplanModel" alias="TurnoverplanModel"/>
+<typeAlias type="com.hoperun.erp.sale.turnoverplan.model.TurnoverplanChildModel" alias="TurnoverplanChildModel" />
+<!-- 使用TurnoverplanChildModel装载结果集 -->
+<resultMap id="TurnoverplanModel" class="TurnoverplanModel">
+    <result column="DELIVER_ORDER_ID" property="DELIVER_ORDER_ID" />
+</resultMap>
+<!-- 使用TurnoverplanChildModel装载结果集 -->
+<resultMap id="TurnoverplanChildModel" class="TurnoverplanChildModel">
+    <result column="DELIVER_ORDER_DTL_ID" property="DELIVER_ORDER_DTL_ID" />
+</resultMap>
+
+
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+ <isNotEmpty prepend="and" property="CHANNS_CHARG">
+    u.ORDER_CHANN_ID  in $CHANNS_CHARG$
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="DELIVER_ORDER_NO">
+    u.DELIVER_ORDER_NO like '%'||#DELIVER_ORDER_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="SEND_CHANN_NO">
+    u.SEND_CHANN_NO like '%'||#SEND_CHANN_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="SEND_CHANN_NAME">
+    u.SEND_CHANN_NAME like '%'||#SEND_CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="DELIVER_TYPE">
+    u.DELIVER_TYPE = #DELIVER_TYPE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CHANN_TYPE">
+    u.CHANN_TYPE = #CHANN_TYPE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="BILL_TYPE">
+    u.BILL_TYPE = #BILL_TYPE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="ADVC_SEND_DATE_START">
+	  <![CDATA[  u.ADVC_SEND_DATE >= to_date(#ADVC_SEND_DATE_START#,'yyyy-MM-DD')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="ADVC_SEND_DATE_END">
+	  <![CDATA[  u.ADVC_SEND_DATE <= to_date(#ADVC_SEND_DATE_END#,'yyyy-MM-DD')]]>
+  </isNotEmpty> 
+   <isNotEmpty prepend="and" property="AREA_SER_NO">
+	 <![CDATA[   upper(u.AREA_SER_NO)  like upper('%'||#AREA_SER_NO#||'%')  ]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="CRE_TIME_BEGIN">
+	  <![CDATA[  u.CRE_TIME >= to_date(#CRE_TIME_BEGIN#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+	  <![CDATA[  u.CRE_TIME <= to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="CRE_NAME">
+    u.CRE_NAME  like '%'||#CRE_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="SHIP_POINT_ID">
+    u.SHIP_POINT_ID  like '%'||#SHIP_POINT_ID#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="SHIP_POINT_NAME">
+    u.SHIP_POINT_NAME  like '%'||#SHIP_POINT_NAME#||'%'
+  </isNotEmpty>
+   <isNotEmpty prepend="and" property="PRD_NO">
+    u.DELIVER_ORDER_ID in (select a.DELIVER_ORDER_ID from ERP_DELIVER_ORDER_DTL a where upper(a.PRD_NO) like upper('%'||#PRD_NO#||'%') and a.DEL_FLAG=0)
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="PRD_NAME">
+    u.DELIVER_ORDER_ID in (select a.DELIVER_ORDER_ID from ERP_DELIVER_ORDER_DTL a where upper(a.PRD_NAME) like upper('%'||#PRD_NAME#||'%') and a.DEL_FLAG=0)
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="PRD_SPEC">
+    u.DELIVER_ORDER_ID in (select a.DELIVER_ORDER_ID from ERP_DELIVER_ORDER_DTL a where upper(a.PRD_SPEC) like upper('%'||#PRD_SPEC#||'%') and a.DEL_FLAG=0)
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and" property="AREA_SER_NAME">
+	 <![CDATA[ 
+	   u.AREA_SER_NAME  like '%'||#AREA_SER_NAME#||'%'
+	 ]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="PROV_SQL">
+    u.ORDER_CHANN_ID in (select CHANN_ID from  BASE_CHANN t where 1=1 $PROV_SQL$)
+  </isNotEmpty>
+   
+  <isNotEmpty prepend="and " property="DEL_FLAG">
+	u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and " property="RECV_CHANN_NO">
+	u.RECV_CHANN_NO like '%'||#RECV_CHANN_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="RECV_CHANN_NAME">
+	u.RECV_CHANN_NAME like '%'||#RECV_CHANN_NAME#||'%'
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and " property="JOIN_DELIVER_ORDER_NO">
+	(u.JOIN_DELIVER_ORDER_NO  like '%'||#JOIN_DELIVER_ORDER_NO#||'%'
+	 or u.DELIVER_ORDER_NO like '%'||#JOIN_DELIVER_ORDER_NO#||'%')
+  </isNotEmpty>
+  
+  <!-- 催款的时候 直营办不催 -->
+  <isNotEmpty prepend="and " property="NO_IN_CHANN">
+	u.RECV_CHANN_ID not in(select c.CHANN_ID from BASE_CHANN c where c.CHANN_TYPE='直营办')
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and " property="QXJBCON">
+	$QXJBCON$
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and" property="AREA_NO">
+    u.DELIVER_ORDER_ID in 
+    ( select d.DELIVER_ORDER_ID  from ERP_DELIVER_ORDER_DTL d where d.SALE_ORDER_ID in 
+     (select s.SALE_ORDER_ID from ERP_SALE_ORDER s where upper(s.AREA_NO) like upper('%'||#AREA_NO#||'%'))
+    )
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and" property="AREA_NAME">
+    u.DELIVER_ORDER_ID in 
+    ( select d.DELIVER_ORDER_ID  from ERP_DELIVER_ORDER_DTL d where d.SALE_ORDER_ID in 
+     (select s.SALE_ORDER_ID from ERP_SALE_ORDER s where s.AREA_NAME like '%'||#AREA_NAME#||'%' )
+    )
+  </isNotEmpty>
+  
+  
+  <isNotEmpty prepend="and" property="ORDER_CHANN_NO">
+    u.DELIVER_ORDER_ID in 
+    ( select d.DELIVER_ORDER_ID  from ERP_DELIVER_ORDER_DTL d where d.SALE_ORDER_ID in 
+     (select s.SALE_ORDER_ID from ERP_SALE_ORDER s where s.ORDER_CHANN_NO like '%'||#ORDER_CHANN_NO#||'%' )
+    )
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and" property="ORDER_CHANN_NAME">
+    u.DELIVER_ORDER_ID in 
+    ( select d.DELIVER_ORDER_ID  from ERP_DELIVER_ORDER_DTL d where d.SALE_ORDER_ID in 
+     (select s.SALE_ORDER_ID from ERP_SALE_ORDER s where s.ORDER_CHANN_NAME like '%'||#ORDER_CHANN_NAME#||'%' )
+    )
+  </isNotEmpty>
+  
+  
+   <isNotEmpty prepend="and" property="SALE_ORDER_NO">
+    u.DELIVER_ORDER_ID in 
+    ( select d.DELIVER_ORDER_ID  from ERP_DELIVER_ORDER_DTL d where d.SALE_ORDER_ID in 
+     (select s.SALE_ORDER_ID from ERP_SALE_ORDER s where s.SALE_ORDER_NO like '%'||#SALE_ORDER_NO#||'%' )
+    )
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and" property="FROM_BILL_NO">
+      u.DELIVER_ORDER_ID in(
+     ( select DELIVER_ORDER_ID from ERP_DELIVER_ORDER
+                              start with DELIVER_ORDER_ID in
+                              (select DELIVER_ORDER_ID from ERP_DELIVER_ORDER 
+                              where DELIVER_ORDER_NO like '%'||#FROM_BILL_NO#||'%')
+                              connect by prior DELIVER_ORDER_ID = FROM_BILL_ID)
+      union all 
+      (select DELIVER_ORDER_ID
+                  from ERP_DELIVER_ORDER
+                 start with DELIVER_ORDER_ID in
+                            (select DELIVER_ORDER_ID
+                               from ERP_DELIVER_ORDER
+                              where DELIVER_ORDER_NO like
+                                    '%'||#FROM_BILL_NO#||'%')
+                connect by prior FROM_BILL_ID = DELIVER_ORDER_ID)
+           )
+  </isNotEmpty>
+  
+ 
+  
+ 
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty> ,u.DELIVER_ORDER_NO DESC
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.DELIVER_ORDER_ID,
+		u.DELIVER_ORDER_NO,
+		u.DELIVER_TYPE,
+		u.TRUCK_TYPE,
+		u.CHANN_TYPE,
+		u.PRVD_ID,
+		u.PRVD_NO,
+		u.PRVD_NAME,
+		u.AREA_SER_ID,
+		u.AREA_SER_NO,
+		u.AREA_SER_NAME,
+		u.SEND_CHANN_ID,
+		u.SEND_CHANN_NO,
+		u.SEND_CHANN_NAME,
+		u.RECV_CHANN_ID,
+		u.RECV_CHANN_NO,
+		u.RECV_CHANN_NAME,
+		to_char(u.ADVC_SEND_DATE,'yyyy-MM-DD') ADVC_SEND_DATE,
+		u.TOTAL_VOLUME,
+		u.STATE,
+		u.REMARK,
+		(case when length(u.REMARK)>20 then substr(u.REMARK, 0, 20)||'...' else u.REMARK end )SHORT_REMARK,
+		u.SHIP_POINT_ID,
+		u.SHIP_POINT_NAME,
+		to_char(u.APPCH_TIME,'yyyy-MM-DD HH24:MI:SS') APPCH_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.DEL_FLAG,
+		u.BILL_TYPE,
+		u.DELAY_TYPE,
+		u.JOIN_DELIVER_ORDER_NO,
+		u.ORDER_CHANN_ID,
+		u.ORDER_CHANN_NO,
+		u.ORDER_CHANN_NAME,
+		u.FROM_BILL_ID,
+	    u.FROM_BILL_NO,
+	    NVL(u.IS_ALL_FREEZE_FLAG,0)IS_ALL_FREEZE_FLAG,
+		to_char(u.STOREOUT_TIME,'yyyy-MM-DD') STOREOUT_TIME,
+		floor(to_date(u.STOREOUT_TIME)-u.ADVC_SEND_DATE)STOREOUT_TIME_DIFF,
+		floor(to_date(u.ADVC_SEND_DATE)-sysdate+1)SEND_DATE_DIFF,
+		u.RECV_ADDR_NO,
+		addr.DELIVER_DTL_ADDR
+		from ERP_DELIVER_ORDER u
+		left join BASE_DELIVER_ADDR addr on u.RECV_ADDR_NO=addr.DELIVER_ADDR_NO and addr.DEL_FLAG=0  and addr.STATE='启用' 
+	     
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[
+        select count(0) cnt FROM ERP_DELIVER_ORDER u 
+      ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+ 
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update ERP_DELIVER_ORDER ]]>
+	<dynamic prepend="set">
+	   <isNotNull property="SEND_CHANN_NO" prepend=","><![CDATA[SEND_CHANN_NO = #SEND_CHANN_NO# ]]></isNotNull>
+	   <isNotNull property="SEND_CHANN_NAME" prepend=","><![CDATA[SEND_CHANN_NAME = #SEND_CHANN_NAME# ]]></isNotNull>
+	   <isNotNull property="PRVD_ID" prepend=","><![CDATA[PRVD_ID = #PRVD_ID# ]]></isNotNull>
+	   <isNotNull property="PRVD_NO" prepend=","><![CDATA[PRVD_NO = #PRVD_NO# ]]></isNotNull>
+	   <isNotNull property="PRVD_NAME" prepend=","><![CDATA[PRVD_NAME = #PRVD_NAME# ]]></isNotNull>
+	   <isNotNull property="CHANN_TYPE" prepend=","><![CDATA[CHANN_TYPE = #CHANN_TYPE# ]]></isNotNull>
+	   <isNotNull property="AREA_SER_ID" prepend=","><![CDATA[AREA_SER_ID = #AREA_SER_ID# ]]></isNotNull>
+	   <isNotNull property="AREA_SER_NO" prepend=","><![CDATA[AREA_SER_NO = #AREA_SER_NO# ]]></isNotNull>
+	   <isNotNull property="AREA_SER_NAME" prepend=","><![CDATA[AREA_SER_NAME = #AREA_SER_NAME# ]]></isNotNull>
+	   <isNotNull property="SEND_CHANN_ID" prepend=","><![CDATA[SEND_CHANN_ID = #SEND_CHANN_ID# ]]></isNotNull>
+	   <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+       <isNotNull property="ADVC_SEND_DATE" prepend=","><![CDATA[ADVC_SEND_DATE = to_date(#ADVC_SEND_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+       <isNotNull property="APPCH_TIME" prepend=","><![CDATA[APPCH_TIME = to_date(#APPCH_TIME#,'yyyy-MM-DD HH24:MI:SS') ]]></isNotNull>
+       <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+       <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+       <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+       <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+       
+       <isNotNull property="CONSAR_NO" prepend=","><![CDATA[CONSAR_NO = #CONSAR_NO# ]]></isNotNull>
+       <isNotNull property="DRV_MOB_NO" prepend=","><![CDATA[DRV_MOB_NO = #DRV_MOB_NO# ]]></isNotNull>
+       <isNotNull property="DELAY_TYPE" prepend=","><![CDATA[DELAY_TYPE = #DELAY_TYPE# ]]></isNotNull>
+       <isNotNull property="JOIN_DELIVER_ORDER_NO" prepend=","><![CDATA[JOIN_DELIVER_ORDER_NO = #JOIN_DELIVER_ORDER_NO# ]]></isNotNull>
+       <!-- 更新总体积 -->
+       <isNotNull property="TOTAL_VOLUME_FLAG" prepend=",">
+        <![CDATA[TOTAL_VOLUME = (select sum((d.PLAN_NUM * d.VOLUME))TOTAL 
+        from ERP_DELIVER_ORDER_DTL d  
+        where d.DELIVER_ORDER_ID = #DELIVER_ORDER_ID#) ]]>
+       </isNotNull>
+        
+    </dynamic>
+	<![CDATA[ where DELIVER_ORDER_ID = #DELIVER_ORDER_ID#]]>
+</update>
+
+<!-- 提交交付计划之后 更新原始单据的总容积 按发运数量计算 -->
+<update id="updateOldDeliveTotalVolum" parameterClass="map">
+    update  ERP_DELIVER_ORDER t 
+    set t.TOTAL_VOLUME = ( select sum((d.PLAN_NUM * d.VOLUME))TOTAL from ERP_DELIVER_ORDER_DTL d  
+    where d.DELIVER_ORDER_ID = #DELIVER_ORDER_ID#)
+    where t.DELIVER_ORDER_ID = #DELIVER_ORDER_ID#
+</update>
+ 
+
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	   select 
+		u.DELIVER_ORDER_ID,
+		u.DELIVER_ORDER_NO,
+		u.DELIVER_TYPE,
+		u.TRUCK_TYPE,
+		u.CHANN_TYPE,
+		u.PRVD_ID,
+		u.PRVD_NO,
+		u.PRVD_NAME,
+		u.AREA_SER_ID,
+		u.AREA_SER_NO,
+		u.AREA_SER_NAME,
+		u.SEND_CHANN_ID,
+		u.SEND_CHANN_NO,
+		u.SEND_CHANN_NAME,
+		u.RECV_CHANN_ID,
+		u.RECV_CHANN_NO,
+		u.RECV_CHANN_NAME,
+		u.ADVC_SEND_DATE,
+		u.TOTAL_VOLUME,
+		u.STATE,
+		u.REMARK,
+		u.SHIP_POINT_ID,
+		u.SHIP_POINT_NAME,
+		to_char(u.APPCH_TIME,'yyyy-MM-DD HH24:MI:SS') APPCH_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.DEL_FLAG,
+		u.BILL_TYPE,
+		u.DRV_MOB_NO,
+		u.CONSAR_NO,
+		u.DELAY_TYPE,
+		u.JOIN_DELIVER_ORDER_NO,
+		u.ORDER_CHANN_ID,
+		u.ORDER_CHANN_NO,
+		u.ORDER_CHANN_NAME,
+		u.FROM_BILL_ID,
+		u.FROM_BILL_NO,
+		NVL(u.IS_ALL_FREEZE_FLAG,0)IS_ALL_FREEZE_FLAG
+		from ERP_DELIVER_ORDER u 
+	    where u.DELIVER_ORDER_ID = #DELIVER_ORDER_ID#
+	]]>
+</select>
+
+<select id="loadByNo" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	   select 
+		u.DELIVER_ORDER_ID,
+		u.DELIVER_ORDER_NO,
+		u.DELIVER_TYPE,
+		u.TRUCK_TYPE,
+		u.CHANN_TYPE,
+		u.PRVD_ID,
+		u.PRVD_NO,
+		u.PRVD_NAME,
+		u.AREA_SER_ID,
+		u.AREA_SER_NO,
+		u.AREA_SER_NAME,
+		u.SEND_CHANN_ID,
+		u.SEND_CHANN_NO,
+		u.SEND_CHANN_NAME,
+		u.ADVC_SEND_DATE,
+		u.TOTAL_VOLUME,
+		u.STATE,
+		u.REMARK,
+		u.SHIP_POINT_ID,
+		u.SHIP_POINT_NAME,
+		to_char(u.APPCH_TIME,'yyyy-MM-DD HH24:MI:SS') APPCH_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.DEL_FLAG,
+		u.BILL_TYPE
+		from ERP_DELIVER_ORDER u 
+	    where u.DELIVER_ORDER_NO = #DELIVER_ORDER_NO#
+	]]>
+</select>
+
+<!--  =================== 明细操作开始 =============================-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlDeliverChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlDeliverChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlDeliverChld">
+	<![CDATA[ 
+     select 
+		u.DELIVER_ORDER_DTL_ID,
+		u.DELIVER_ORDER_ID,
+		u.SALE_ORDER_ID,
+		u.SALE_ORDER_NO,
+		u.SALE_ORDER_DTL_ID,
+		u.ORDER_CHANN_ID,
+		u.ORDER_CHANN_NO,
+		u.ORDER_CHANN_NAME,
+		u.RECV_CHANN_ID,
+		u.RECV_CHANN_NO,
+		u.RECV_CHANN_NAME,
+		u.PRD_ID,
+		u.PRD_NO,
+		u.PRD_NAME,
+		u.PRD_SPEC,
+		u.PRD_COLOR,
+		u.BRAND,
+		u.STD_UNIT,
+		u.VOLUME,
+		u.IS_NO_STAND_FLAG,
+		u.SPCL_TECH_ID,
+		u.RECV_ADDR,
+		u.REMARK,
+		u.IS_SEND_FIN,
+		u.SESSION_ID,
+		u.IS_BACKUP_FLAG,
+		NVL(u.ADVC_PLAN_NUM, 0)ADVC_PLAN_NUM,
+		NVL(u.PLAN_NUM, 0)PLAN_NUM,
+		NVL(u.REAL_SEND_NUM, 0)REAL_SEND_NUM,
+		NVL(u.NO_SEND_NUM, 0)NO_SEND_NUM,
+		u.NO_SEND_DEAL_TYPE,
+		u.DEL_FLAG,
+		s.SPCL_TECH_FLAG,
+		u.DECT_PRICE,
+		u.IS_FREE_FLAG,
+		u.U9_SALE_ORDER_NO,
+		u.U9_SALE_ORDER_DTL_NO,
+		p.PAR_PRD_NAME,
+		(case when length(u.RECV_ADDR)>40 then substr(u.RECV_ADDR, 0, 20)||'...' else u.RECV_ADDR end )RECV_ADDR_SHORT,
+		a.PRICE
+	    from ERP_DELIVER_ORDER_DTL u 
+	    left join DRP_SPCL_TECH s on u.SPCL_TECH_ID = s.SPCL_TECH_ID and s.USE_FLAG = 1
+	    left join BASE_PRODUCT p on u.PRD_ID = p.PRD_ID
+	    left join ERP_SALE_ORDER_DTL a on a.SALE_ORDER_DTL_ID=u.SALE_ORDER_DTL_ID and a.DEL_FLAG=0
+	   
+   ]]>
+</sql>
+
+ 
+ 
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlDeliverChld"/>
+	  <dynamic prepend="where">
+			u.DELIVER_ORDER_ID = #DELIVER_ORDER_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlDeliverChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlDeliverChld"/>
+	  </isNotNull>
+  </select>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlDeliverChld"/>
+	  <dynamic prepend="where">
+	        u.DELIVER_ORDER_DTL_ID in ($DELIVER_ORDER_DTL_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlDeliverChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlDeliverChld"/>
+	  </isNotNull>
+  </select>
+   <!-- 根据销售订单编号和货品编号查询明细  测试用-->
+  <select id="queryChldByOrderNo" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlDeliverChld"/>
+	  <dynamic prepend="where">
+	  		u.DELIVER_ORDER_ID = (SELECT DELIVER_ORDER_ID FROM ERP_DELIVER_ORDER WHERE DELIVER_ORDER_NO = #DELIVER_ORDER_NO#)
+		and	u.SALE_ORDER_NO = #SALE_ORDER_NO#
+		and u.PRD_NO = #PRD_NO#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlDeliverChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlDeliverChld"/>
+	  </isNotNull>
+  </select>
+  
+ <!-- ==================================提交库房======================================= -->
+ 
+ <!-- 生产新的发运单 -->
+ <insert id="newTurnoverplan" parameterClass="map">
+     <![CDATA[
+	  insert into ERP_DELIVER_ORDER(
+	   DELIVER_ORDER_ID,
+	   DELIVER_ORDER_NO,
+	   DELIVER_TYPE,
+	   CHANN_TYPE,
+	   TRUCK_TYPE,
+	   AREA_SER_ID,
+	   AREA_SER_NO,
+	   AREA_SER_NAME,
+	   SEND_CHANN_ID,
+	   SEND_CHANN_NO,
+	   SEND_CHANN_NAME,
+	   RECV_CHANN_ID,
+	   RECV_CHANN_NO,
+	   RECV_CHANN_NAME,
+	   RECV_ADDR_NO,
+	   ADVC_SEND_DATE,
+	   TOTAL_VOLUME,
+	   STATE,
+	   DEL_FLAG,
+	   SHIP_POINT_ID,
+	   SHIP_POINT_NAME,
+	   CREATOR,
+	   CRE_NAME,
+	   CRE_TIME ,
+	   DEPT_ID,
+	   DEPT_NAME,
+	   ORG_ID,
+	   ORG_NAME,
+	   LEDGER_ID,
+	   LEDGER_NAME,
+	   BILL_TYPE,
+	   ORDER_CHANN_ID,
+	   ORDER_CHANN_NO,
+	   ORDER_CHANN_NAME,
+	   FROM_BILL_ID,
+	   FROM_BILL_NO,
+	   IS_ALL_FREEZE_FLAG
+	   )select 
+	   #DELIVER_ORDER_ID#,
+	   #DELIVER_ORDER_NO#,
+	   #DELIVER_TYPE#,
+	   t.CHANN_TYPE,
+	   t.TRUCK_TYPE,
+	   t.AREA_SER_ID,
+	   t.AREA_SER_NO,
+	   t.AREA_SER_NAME,
+	   t.SEND_CHANN_ID,
+	   t.SEND_CHANN_NO,
+	   t.SEND_CHANN_NAME,
+	   t.RECV_CHANN_ID,
+	   t.RECV_CHANN_NO,
+	   t.RECV_CHANN_NAME,
+	   t.RECV_ADDR_NO,
+	   t.ADVC_SEND_DATE,
+	   #TOTAL_VOLUME#,
+	   #STATE#,
+	   #DEL_FLAG#,
+	   t.SHIP_POINT_ID,
+	   t.SHIP_POINT_NAME,
+	   #CREATOR#,
+	   #CRE_NAME#,
+	   sysdate,
+	   #DEPT_ID#,
+	   #DEPT_NAME#,
+	   #ORG_ID#,
+	   #ORG_NAME#,
+	   #LEDGER_ID#,
+	   #LEDGER_NAME#,
+	   t.BILL_TYPE,
+	   t.ORDER_CHANN_ID,
+	   t.ORDER_CHANN_NO,
+	   t.ORDER_CHANN_NAME,
+	   t.DELIVER_ORDER_ID,
+	   t.DELIVER_ORDER_NO,
+	   t.IS_ALL_FREEZE_FLAG
+	   from  ERP_DELIVER_ORDER t
+	   where t.DELIVER_ORDER_ID=#DELIVER_ORDER_ID_OLD#
+	  
+		 
+   ]]>
+ </insert>
+  
+  
+<!-- 生成发运单明细-->
+<insert id="insertDeliverOrderDtl" parameterClass="map">
+<![CDATA[ 
+     insert into ERP_DELIVER_ORDER_DTL(
+        DELIVER_ORDER_DTL_ID,
+        DELIVER_ORDER_ID,
+		SALE_ORDER_ID,
+		SALE_ORDER_NO,
+		SALE_ORDER_DTL_ID,
+		ORDER_CHANN_ID,
+		ORDER_CHANN_NO,
+		ORDER_CHANN_NAME,
+		RECV_CHANN_ID,
+		RECV_CHANN_NO,
+		RECV_CHANN_NAME,
+		RECV_ADDR_NO,
+		RECV_ADDR,
+		PRD_ID,
+		PRD_NO,
+		PRD_NAME,
+		PRD_SPEC,
+		PRD_COLOR,
+		BRAND,
+		STD_UNIT,
+		VOLUME,
+		IS_NO_STAND_FLAG,
+		SPCL_TECH_ID,
+		ADVC_PLAN_NUM,
+		PLAN_NUM,
+		REAL_SEND_NUM,
+		NO_SEND_NUM,
+		NO_SEND_DEAL_TYPE,
+		DEL_FLAG,
+		U_CODE,
+		GOODS_ORDER_NO,
+		DECT_PRICE,
+		CREDIT_FREEZE_PRICE,
+		IS_FREE_FLAG,
+		U9_SALE_ORDER_NO,
+		U9_SALE_ORDER_DTL_NO,
+		IS_BACKUP_FLAG,
+		REMARK
+		)select
+		#DELIVER_ORDER_DTL_ID#,
+        #DELIVER_ORDER_ID#,
+		d.SALE_ORDER_ID,
+		d.SALE_ORDER_NO,
+		d.SALE_ORDER_DTL_ID,
+		d.ORDER_CHANN_ID,
+		d.ORDER_CHANN_NO,
+		d.ORDER_CHANN_NAME,
+		d.RECV_CHANN_ID,
+		d.RECV_CHANN_NO,
+		d.RECV_CHANN_NAME,
+		d.RECV_ADDR_NO,
+		d.RECV_ADDR,
+		d.PRD_ID,
+		d.PRD_NO,
+		d.PRD_NAME,
+		d.PRD_SPEC,
+		d.PRD_COLOR,
+		d.BRAND,
+		d.STD_UNIT,
+		d.VOLUME,
+		d.IS_NO_STAND_FLAG,
+		d.SPCL_TECH_ID,
+		#ADVC_PLAN_NUM#,
+		#ADVC_PLAN_NUM#,
+		0,
+		0,
+		#NO_SEND_DEAL_TYPE#,
+		#DEL_FLAG#,
+		d.U_CODE,
+		d.GOODS_ORDER_NO,
+		d.DECT_PRICE,
+		d.CREDIT_FREEZE_PRICE,
+		d.IS_FREE_FLAG,
+		d.U9_SALE_ORDER_NO,
+		d.U9_SALE_ORDER_DTL_NO,
+		d.IS_BACKUP_FLAG,
+		d.REMARK
+		from ERP_DELIVER_ORDER_DTL d where d.DELIVER_ORDER_DTL_ID=#DELIVER_ORDER_DTL_ID_OLD#
+	    
+   ]]>
+</insert>
+
+<!-- 剩余货品处理之后  更新发运单的总容积 按 预排车计算 -->
+<update id="updateDeliveTotalVolum" parameterClass="map">
+    update  ERP_DELIVER_ORDER t 
+    set t.TOTAL_VOLUME = ( select sum((d.ADVC_PLAN_NUM * d.VOLUME))TOTAL from ERP_DELIVER_ORDER_DTL d  
+    where d.DELIVER_ORDER_ID = #DELIVER_ORDER_ID#)
+    where t.DELIVER_ORDER_ID = #DELIVER_ORDER_ID#
+</update>
+
+
+
+
+<!-- 货品发运的时候 更新销售订单明细 
+<update id="updateSaleOrderDtl" parameterClass="map">
+  update  ERP_SALE_ORDER_DTL a set a.PLANED_NUM = 
+  (select sum(NVL(b.PLAN_NUM,0)) from ERP_DELIVER_ORDER_DTL b where b.DEL_FLAG=0 and b.SALE_ORDER_DTL_ID=#SALE_ORDER_DTL_ID#)
+  where a.SALE_ORDER_DTL_ID = #SALE_ORDER_DTL_ID#
+</update>
+ -->
+<!-- 货品发运的时候  更新销售订单明细   排车数量-->
+<update id="updateSaleOrderPlanNumDtl" parameterClass="map">
+  update  ERP_SALE_ORDER_DTL a set a.PLANED_NUM = (a.PLANED_NUM - #NO_SEND_NUM#)
+  where a.SALE_ORDER_DTL_ID = #SALE_ORDER_DTL_ID#
+</update>
+
+
+
+<!-- 发运确认的时候   纳入下次交付计划   更新销售订单明细  已发数量和排车数量 -->
+<update id="updateSaleOrderDtlDelive" parameterClass="map">
+  update  ERP_SALE_ORDER_DTL a set 
+   a.PLANED_NUM = (a.PLANED_NUM-#NO_SEND_NUM#),
+   a.SENDED_NUM = (select sum(NVL(b.REAL_SEND_NUM,0)) from ERP_DELIVER_ORDER_DTL b where b.DEL_FLAG=0 and b.SALE_ORDER_DTL_ID=#SALE_ORDER_DTL_ID#)
+  where a.SALE_ORDER_DTL_ID = #SALE_ORDER_DTL_ID#
+</update>
+
+<!-- 发运确认的时候     更新销售订单明细 的  已发数量  -->
+<update id="updateSaleOrderDtlSendNum" parameterClass="map">
+  update  ERP_SALE_ORDER_DTL a set  
+   a.SENDED_NUM = (select sum(NVL(b.REAL_SEND_NUM,0)) from ERP_DELIVER_ORDER_DTL b where b.DEL_FLAG=0 and b.SALE_ORDER_DTL_ID=#SALE_ORDER_DTL_ID#)
+  where a.SALE_ORDER_DTL_ID = #SALE_ORDER_DTL_ID#
+</update>
+
+  
+ <!-- 更新销售订单 -->
+<update id="updateSaleOrder" parameterClass="map">
+  update  ERP_SALE_ORDER set 
+       STATE = #STATE#,
+       UPDATOR = #UPDATOR#,
+       UPD_NAME = #UPD_NAME#,
+       UPD_TIME = sysdate
+  where SALE_ORDER_ID in ($SALE_ORDER_IDS$)
+</update>
+
+<!--  更新订货订单明细的已发货数量  -->
+<update id="updateGoodserOrderDtl" parameterClass="map">
+    update DRP_GOODS_ORDER_DTL d set d.SENDED_NUM= 
+    (select sum(e.PLAN_NUM) from ERP_DELIVER_ORDER_DTL e where e.SALE_ORDER_DTL_ID=#SALE_ORDER_DTL_ID#)
+    where d.goods_order_dtl_id = (
+      select s.FROM_BILL_DTL_ID from ERP_SALE_ORDER_DTL s  where s.SALE_ORDER_DTL_ID = #SALE_ORDER_DTL_ID#
+    )
+     
+</update>
+
+ 
+ <!-- 查询某销售订单 下的明细是否全部排车 -->
+<select id="querySaleDtl" parameterClass="map" resultClass="int">
+      <![CDATA[
+         select (sum(NVL(d.ORDER_NUM,0))-sum(NVL(d.PLANED_NUM,0))) rr
+         from ERP_SALE_ORDER_DTL d where d.SALE_ORDER_ID=#SALE_ORDER_ID#
+      ]]>
+</select>
+   
+  <!-- 更新发运单明细的 未排货品处理方式 -->  
+<update id="updateDeliverOrderDtl" parameterClass="map">
+  <![CDATA[ update ERP_DELIVER_ORDER_DTL ]]>
+   <dynamic prepend="set">
+	   <isNotNull property="NO_SEND_DEAL_TYPE" prepend=","><![CDATA[NO_SEND_DEAL_TYPE = #NO_SEND_DEAL_TYPE# ]]></isNotNull>
+	   <isNotNull property="PLAN_NUM" prepend=","><![CDATA[PLAN_NUM = #PLAN_NUM# ]]></isNotNull>
+	   <isNotNull property="NO_SEND_NUM" prepend=","><![CDATA[NO_SEND_NUM = #NO_SEND_NUM# ]]></isNotNull>
+	   <isNotNull property="REAL_SEND_NUM" prepend=","><![CDATA[REAL_SEND_NUM = #REAL_SEND_NUM# ]]></isNotNull>
+	   <isNotNull property="IS_SEND_FIN" prepend=","><![CDATA[IS_SEND_FIN = #IS_SEND_FIN# ]]></isNotNull>
+	   <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+	   <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+	   <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+	    
+    </dynamic>
+    <![CDATA[ where DELIVER_ORDER_DTL_ID = #DELIVER_ORDER_DTL_ID# ]]>
+</update>
+
+
+  
+ <select id="queryDeliverDtlByIDs" parameterClass="string" resultClass="TurnoverplanChildModel">
+      <![CDATA[
+         select 
+          DELIVER_ORDER_DTL_ID,
+        DELIVER_ORDER_ID,
+		SALE_ORDER_ID,
+		SALE_ORDER_NO,
+		SALE_ORDER_DTL_ID,
+		ORDER_CHANN_ID,
+		ORDER_CHANN_NO,
+		ORDER_CHANN_NAME,
+		RECV_CHANN_ID,
+		RECV_CHANN_NO,
+		RECV_CHANN_NAME,
+		RECV_ADDR,
+		PRD_ID,
+		PRD_NO,
+		PRD_NAME,
+		PRD_SPEC,
+		PRD_COLOR,
+		BRAND,
+		STD_UNIT,
+		VOLUME,
+		IS_NO_STAND_FLAG,
+		SPCL_TECH_ID,
+		ADVC_PLAN_NUM,
+		PLAN_NUM,
+		REAL_SEND_NUM,
+		NO_SEND_NUM,
+		NO_SEND_DEAL_TYPE,
+		DEL_FLAG,
+		U_CODE,
+		GOODS_ORDER_NO
+        from ERP_DELIVER_ORDER_DTL where DELIVER_ORDER_DTL_ID in($dtlIds$)
+      ]]>
+</select>
+
+<select id="queryU9CODE" parameterClass="map" resultClass="java.util.HashMap">
+      <![CDATA[
+         select 
+          U_CODE
+        from ERP_DELIVER_ORDER_DTL where DELIVER_ORDER_DTL_ID = #DELIVER_ORDER_DTL_ID#
+      ]]>
+</select>
+
+<!-- 生成入库通知单-->
+<insert id="insertStorein" parameterClass="map">
+ <![CDATA[
+    insert into DRP_STOREIN_NOTICE(
+         STOREIN_NOTICE_ID,
+         STOREIN_NOTICE_NO,
+         BILL_TYPE,
+         FROM_BILL_ID,
+         FROM_BILL_NO,
+         ORDER_CHANN_ID,
+         ORDER_CHANN_NO,
+         ORDER_CHANN_NAME,
+         RECV_CHANN_ID,
+         RECV_CHANN_NO,
+         RECV_CHANN_NAME,
+         SEND_CHANN_ID,
+         SEND_CHANN_NO,
+         SEND_CHANN_NAME,
+         DEF_STORE_ID,
+         DEF_STORE_NO,
+         DEF_STORE_NAME,
+         CRE_NAME,
+         CREATOR,
+         CRE_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         STATE,
+         DEL_FLAG
+    ) select 
+         #STOREIN_NOTICE_ID#,
+         #STOREIN_NOTICE_NO#,
+         #BILL_TYPE#,
+         t.DELIVER_ORDER_ID,
+         t.DELIVER_ORDER_NO,
+         d.ORDER_CHANN_ID,
+         d.ORDER_CHANN_NO,
+         d.ORDER_CHANN_NAME,
+         d.RECV_CHANN_ID,
+         d.RECV_CHANN_NO,
+         d.RECV_CHANN_NAME,
+         t.SEND_CHANN_ID,
+         t.SEND_CHANN_NO,
+         t.SEND_CHANN_NAME,
+         g.STORE_ID,
+         g.STORE_NO,
+         g.STORE_NAME,
+         #CRE_NAME#,
+         #CREATOR#,
+         sysdate,
+         d.RECV_CHANN_ID,
+         d.RECV_CHANN_NAME,
+         d.RECV_CHANN_ID,
+         d.RECV_CHANN_NAME,
+         d.RECV_CHANN_ID,
+         d.RECV_CHANN_NAME,
+         #STATE#,
+         #DEL_FLAG#
+         from ERP_DELIVER_ORDER t left join ERP_DELIVER_ORDER_DTL  d 
+         on t.DELIVER_ORDER_ID = d.DELIVER_ORDER_ID
+         left join DRP_GOODS_ORDER g on g.GOODS_ORDER_NO = d.GOODS_ORDER_NO
+         where  d.DELIVER_ORDER_DTL_ID = #DELIVER_ORDER_DTL_ID#
+         and t.DELIVER_ORDER_ID = #DELIVER_ORDER_ID#
+    
+ ]]>
+</insert>
+
+<select id="queryZTXX"  parameterClass="String" resultClass="java.util.HashMap">
+  <![CDATA[ 
+    select * from (select a.*, b.XM,c.jgmc,d.bmmc,e.ztmc from T_SYS_XTYH a 
+			left join T_SYS_RYXX b on a.RYXXID = b.RYXXID and ryzt='启用'
+			left join T_SYS_JGXX c on a.jgxxid = c.jgxxid and c.delflag=0
+			LEFT JOIN T_SYS_BMXX d on a.bmxxid = d.bmxxid and d.bmzt='启用' and d.delflag=0
+            left join T_SYS_ZTXX e on a.ztxxid = e.ztxxid and e.state='启用' and e.delflag=0
+			where a.yhzt='启用' and a.delflag=0) temp
+   where temp.XTYHID=#XTYHID#
+			
+   ]]>
+</select>
+
+<!-- 生成入库通知单明细 -->
+<insert id="insertStoreinDtl" parameterClass="map">
+<![CDATA[ 
+   insert into DRP_STOREIN_NOTICE_DTL(
+         STOREIN_NOTICE_DTL_ID,
+		 STOREIN_NOTICE_ID,
+		 STOREIN_STORE_ID,
+		 STOREIN_STORE_NO,
+		 STOREIN_STORE_NAME,
+		 PRD_ID,
+		 PRD_NO,
+		 PRD_NAME,
+		 PRD_SPEC,
+		 PRD_COLOR,
+		 BRAND,
+		 STD_UNIT,
+		 PRICE,
+		 DECT_RATE,
+		 DECT_PRICE,
+		 NOTICE_NUM,
+		 DECT_AMOUNT,
+		 SALE_ORDER_ID,
+		 SALE_ORDER_NO,
+		 SALE_ORDER_DTL_ID,
+		 GOODS_ORDER_NO,
+		 SPCL_TECH_ID,
+		 DEL_FLAG
+   )select
+        #STOREIN_NOTICE_DTL_ID#,
+		#STOREIN_NOTICE_ID#,
+		g.STORE_ID,
+        g.STORE_NO,
+        g.STORE_NAME,
+		d.PRD_ID,
+		d.PRD_NO,
+		d.PRD_NAME,
+		d.PRD_SPEC,
+		d.PRD_COLOR,
+		d.BRAND,
+		d.STD_UNIT,
+		s.PRICE,
+		s.DECT_RATE,
+		d.DECT_PRICE,
+		d.REAL_SEND_NUM,
+	   (d.REAL_SEND_NUM*d.DECT_PRICE),
+	   d.SALE_ORDER_ID,
+       d.SALE_ORDER_NO,
+       d.SALE_ORDER_DTL_ID,
+       d.GOODS_ORDER_NO,
+       d.SPCL_TECH_ID,
+       #DEL_FLAG#
+		 
+   from ERP_DELIVER_ORDER_DTL d 
+   left join DRP_GOODS_ORDER g on g.GOODS_ORDER_NO = d.GOODS_ORDER_NO
+   left join ERP_SALE_ORDER_DTL s on s.SALE_ORDER_DTL_ID = d.SALE_ORDER_DTL_ID
+   where d.DELIVER_ORDER_DTL_ID = #DELIVER_ORDER_DTL_ID#
+   
+]]>
+</insert>
+
+
+<!-- 生成分发指令单-->
+<insert id="insertDstr" parameterClass="map">
+<![CDATA[ 
+    insert into ERP_DSTR_ORDER(
+        DSTR_ORDER_ID,
+		DSTR_ORDER_NO,
+		FROM_BILL_ID,
+		FROM_BILL_NO,
+		SEND_CHANN_ID,
+		SEND_CHANN_NO,
+		SEND_CHANN_NAME,
+		ORDER_CHANN_ID,
+		ORDER_CHANN_NO,
+		ORDER_CHANN_NAME,
+		RECV_CHANN_ID,
+		RECV_CHANN_NO,
+		RECV_CHANN_NAME,
+		PERSON_CON,
+		TEL,
+		RECV_ADDR,
+		RECV_STORE_ID,
+		RECV_STORE_NO,
+		RECV_STORE_NAME,
+		DSTR_CHANN_ID,
+		DSTR_CHANN_NO,
+		DSTR_CHANN_NAME,
+		CRE_NAME,
+		CREATOR,
+		CRE_TIME,
+		LEDGER_ID,
+		LEDGER_NAME,
+		STATE,
+		DEL_FLAG)
+		select 
+		 #DSTR_ORDER_ID#,
+		 #DSTR_ORDER_NO#,
+		t.DELIVER_ORDER_ID,
+		t.DELIVER_ORDER_NO,
+		t.SEND_CHANN_ID,
+		t.SEND_CHANN_NO,
+		t.SEND_CHANN_NAME,
+		d.ORDER_CHANN_ID,
+		d.ORDER_CHANN_NO,
+		d.ORDER_CHANN_NAME,
+		#RECV_CHANN_ID#,
+		#RECV_CHANN_NO#,
+		#RECV_CHANN_NAME#,
+		g.PERSON_CON,
+		g.TEL,
+		g.RECV_ADDR,
+		g.STORE_ID,
+		g.STORE_NO,
+		g.STORE_NAME,
+		t.AREA_SER_ID,
+		t.AREA_SER_NO,
+		t.AREA_SER_NAME,
+		#CRE_NAME#,
+		#CREATOR#,
+		sysdate,
+		#RECV_CHANN_NO#,
+		#RECV_CHANN_NAME#,
+		#STATE#,
+		#DEL_FLAG#
+		FROM ERP_DELIVER_ORDER t
+		left join ERP_DELIVER_ORDER_DTL d on t.DELIVER_ORDER_ID = d.DELIVER_ORDER_ID
+		left join DRP_GOODS_ORDER g on g.GOODS_ORDER_NO = d.GOODS_ORDER_NO
+		where d.DELIVER_ORDER_DTL_ID = #DELIVER_ORDER_DTL_ID#
+		
+]]>
+</insert>
+
+<!-- 生成分发指令接收单明细 -->
+<insert id="insertDstrDtl" parameterClass="map">
+ <![CDATA[ 
+   insert into ERP_DSTR_ORDER_DTL(
+         DSTR_ORDER_DTL_ID,
+		 DSTR_ORDER_ID,
+		 PRD_ID,
+		 PRD_NO,
+		 PRD_NAME,
+		 PRD_SPEC,
+		 PRD_COLOR,
+		 BRAND,
+		 STD_UNIT,
+		 PRICE,
+		 DECT_RATE,
+		 DECT_PRICE,
+		 ORDER_NUM,
+		 DSTR_NUM,
+		 DECT_AMOUNT,
+		 DEL_FLAG,
+		 REAL_DSTR_NUM,
+		 SALE_ORDER_ID,
+		 SALE_ORDER_NO,
+		 SALE_ORDER_DTL_ID,
+		 GOODS_ORDER_NO,
+		 SPCL_TECH_ID
+   )select
+        #DSTR_ORDER_DTL_ID#,
+		#DSTR_ORDER_ID#,
+		d.PRD_ID,
+		p.PRD_NO,
+		p.PRD_NAME,
+		p.PRD_SPEC,
+		p.PRD_COLOR,
+		p.BRAND,
+		p.STD_UNIT,
+		s.PRICE,
+		s.DECT_RATE,
+		d.DECT_PRICE,
+		s.ORDER_NUM,
+		d.REAL_SEND_NUM,
+	   (d.REAL_SEND_NUM*d.DECT_PRICE),
+	   #DEL_FLAG#,
+	   d.REAL_SEND_NUM,
+	   d.SALE_ORDER_ID,
+       d.SALE_ORDER_NO,
+       d.SALE_ORDER_DTL_ID,
+       d.GOODS_ORDER_NO,
+       d.SPCL_TECH_ID
+		 
+   from ERP_DELIVER_ORDER_DTL d 
+   left join DRP_GOODS_ORDER g on g.GOODS_ORDER_NO = d.GOODS_ORDER_NO
+   left join ERP_SALE_ORDER_DTL s on s.SALE_ORDER_DTL_ID = d.SALE_ORDER_DTL_ID
+   left join BASE_PRODUCT p on p.PRD_ID = d.PRD_ID
+   where d.DELIVER_ORDER_DTL_ID = #DELIVER_ORDER_DTL_ID#
+   
+]]>
+</insert>
+<!-- left join BASE_AREA_DSCT_FLAT  f on d.PRD_ID = f.PRD_ID and f.AREA_ID = g.AREA_ID -->
+<!-- 发送消息  -->
+<insert id="insertMessage" parameterClass="map">
+ <![CDATA[ 
+    insert into T_SYS_MESSAGE(MESSAGEID,SENDID,SENDER,MSGINFO,SENDTIME,RECEIVEID,RECEIVER)
+    values(#MESSAGEID#,#SENDID#,#SENDER#,#MSGINFO#,sysdate,#RECEIVEID#,#RECEIVER#)
+ ]]>
+</insert>
+
+<!-- 更新发运单明细的 计划排车数量 -->
+<update id="updateChildById" parameterClass="map">
+	<![CDATA[ update ERP_DELIVER_ORDER_DTL ]]>
+	<dynamic prepend="set">
+	   <isNotNull property="PLAN_NUM" prepend=","><![CDATA[PLAN_NUM = #PLAN_NUM# ]]></isNotNull>
+	   <isNotNull property="NO_SEND_NUM" prepend=","><![CDATA[NO_SEND_NUM = #NO_SEND_NUM# ]]></isNotNull>
+	   <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+	   <isNotNull property="NO_SEND_DEAL_TYPE" prepend=","><![CDATA[NO_SEND_DEAL_TYPE = #NO_SEND_DEAL_TYPE# ]]></isNotNull>
+	   <isNotNull property="IS_SEND_FIN" prepend=","><![CDATA[IS_SEND_FIN = #IS_SEND_FIN# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where DELIVER_ORDER_DTL_ID = #DELIVER_ORDER_DTL_ID#]]>
+</update>
+
+
+<select id="queryGooderOrderAmount"  parameterClass="map" resultClass="java.util.HashMap">
+  <![CDATA[ 
+     select t.DELIVER_ORDER_ID,t.DELIVER_ORDER_NO, t.BILL_TYPE, NVL((select sum(d.PLAN_NUM*d.DECT_PRICE) -sum(d.PLAN_NUM*d.CREDIT_FREEZE_PRICE)  
+     from ERP_DELIVER_ORDER_DTL  d where d.DELIVER_ORDER_ID = t.DELIVER_ORDER_ID),0)SEND_AMOUNT
+    from ERP_DELIVER_ORDER t where t.DELIVER_ORDER_ID in($DELIVER_ORDER_IDS$)
+   ]]>
+</select>
+
+
+
+<select id="queryGooderOrderCreate"  parameterClass="map" resultClass="java.util.HashMap">
+  <![CDATA[ 
+       select distinct t.CREATOR from DRP_GOODS_ORDER t where T.GOODS_ORDER_NO in(
+          select distinct d.GOODS_ORDER_NO from ERP_DELIVER_ORDER_DTL d where d.DELIVER_ORDER_ID in($DELIVER_ORDER_IDS$))
+   ]]>
+</select>
+
+
+	<!-- 修改渠道信息信用获取方式 -->
+	<select id="getChannCredit" parameterClass="string" resultClass="java.util.HashMap">
+		<![CDATA[
+			select 
+				a.CHANN_ID,
+				a.CHANN_NO,
+				a.CHANN_NAME,
+				a.AREA_ID,
+				a.AREA_NO,
+				a.AREA_NAME,
+				NVL(a.FREEZE_CREDIT,0)FREEZE_CREDIT,
+				(NVL(a.REBATE_CURRT,0)-NVL(a.REBATE_FREEZE,0)) REBATE_CURRT,
+				a.PERSON_CON,
+				a.TEL,
+				a.ADDRESS,
+				NVL(a.CREDIT_CURRT,0) CREDIT_CURRT,
+        		(sum(NVL(b.TEMP_CREDIT_REQ,0))+NVL(a.CREDIT_CURRT,0)-NVL(a.FREEZE_CREDIT,0))  TEMP_CREDIT,
+        		NVL(a.REBATE_TOTAL,0) REBATE_TOTAL
+			from BASE_CHANN a 
+			left join ERP_TEMP_CREDIT_REQ b on a.CHANN_ID=b.CHANN_ID and b.STATE='审核通过' and b.DEL_FLAG=0 and b.TEMP_CREDIT_VALDT>=sysdate
+			where a.CHANN_ID=#CHANN_ID#
+		      group by
+		        a.CHANN_ID,
+				a.CHANN_NO,
+				a.CHANN_NAME,
+				a.AREA_ID,
+				a.AREA_NO,
+				a.AREA_NAME,
+				a.CREDIT_CURRT,
+				a.TEMP_CREDIT,
+				a.REBATE_CURRT,
+				a.PERSON_CON,
+				a.TEL,
+				a.ADDRESS,
+				a.PAYMENT_CREDIT,
+				a.REBATE_TOTAL,
+				a.REBATE_FREEZE,
+				a.FREEZE_CREDIT
+		]]>
+	</select>
+	
+	<!-- 报表[销售订单生产状态查询]跟据销售单号找到对应的所有发运单号 -->
+	<select id="queryDeliverBySaleNo"  parameterClass="String" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+                      SELECT (SELECT T.DELIVER_ORDER_NO
+                                FROM ERP_DELIVER_ORDER T
+                               WHERE T.DELIVER_ORDER_ID = D.DELIVER_ORDER_ID) DELIVER_ORDER_NO,
+                             D.DELIVER_ORDER_DTL_ID,
+                             (SELECT S.ORDER_NUM
+                                FROM ERP_SALE_ORDER_DTL S
+                               WHERE S.SALE_ORDER_DTL_ID =
+                                     D.SALE_ORDER_DTL_ID) ORDER_NUM
+                        FROM ERP_DELIVER_ORDER_DTL D
+                       WHERE D.SALE_ORDER_NO = #SALE_ORDER_NO#
+	   ]]>
+	</select>
+	
+	<select id="queryDeliverDtlFormID"  parameterClass="map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+	    SELECT distinct d.SALE_ORDER_ID
+         FROM ERP_DELIVER_ORDER_DTL d where d.DELIVER_ORDER_ID=#DELIVER_ORDER_ID#
+				
+	   ]]>
+	</select>
+
+
+<!-- 催款 -->	
+<select id="queryDuingSql"  parameterClass="map" resultClass="java.util.HashMap">
+ <![CDATA[ 
+	      select temp.*,
+		       NVL(temp.SEND_AMOUNT, 0) -
+		       (NVL(c.CREDIT_CURRT, 0) - NVL(c.FREEZE_CREDIT, 0)) -
+		       NVL(d.TEMP_CREDIT_REQ, 0) LAST_CREDIT,
+		       e.XTYHID,
+		       e.yhm,
+		       e.ztxxid 
+		  from (select b.ORDER_CHANN_ID,
+		               b.ORDER_CHANN_NO,
+		               b.ORDER_CHANN_NAME,
+		               wmsys.wm_concat(a.DELIVER_ORDER_NO) DELIVER_ORDER_NO,
+		               sum(NVL(b.PLAN_NUM, 0) *
+		                   (NVL(b.DECT_PRICE, 0) - NVL(b.CREDIT_FREEZE_PRICE, 0))) SEND_AMOUNT
+		          from ERP_DELIVER_ORDER a, ERP_DELIVER_ORDER_DTL b
+		         where a.DELIveR_ORDER_ID = b.DELIveR_ORDER_ID
+		           and a.DELIVER_ORDER_ID in ($DELIVER_ORDER_IDS$)
+		         group by b.ORDER_CHANN_ID, b.ORDER_CHANN_NO, b.ORDER_CHANN_NAME) temp
+		  left join BASE_CHANN c
+		    on temp.ORDER_CHANN_ID = c.CHANN_ID
+		  left join (select sum(NVL(b.TEMP_CREDIT_REQ, 0)) TEMP_CREDIT_REQ, CHANN_ID
+		               from ERP_TEMP_CREDIT_REQ b
+		              where b.STATE = '审核通过'
+		                and b.DEL_FLAG = 0
+		                and b.TEMP_CREDIT_VALDT >= sysdate
+		              group by CHANN_ID) d
+		    on temp.ORDER_CHANN_ID = d.CHANN_ID
+		  left join (select  distinct c.XTYHID, c.ZTXXID,c.yhm
+		               from T_SYS_JSQX a, T_SYS_XTYHJS b, T_SYS_XTYH c
+		              where a.XTJSID = b.XTJSID
+		                and b.XTYHID = c.XTYHID
+		                and a. XTMKID = 'FX0020401'
+		                and c.YHZT = '启用') e
+		    on temp.ORDER_CHANN_ID = e.ZTXXID
+		    
+		    where NVL(temp.SEND_AMOUNT,0)-(NVL(c.CREDIT_CURRT,0)-NVL(c.FREEZE_CREDIT,0))-NVL(d.TEMP_CREDIT_REQ,0)>0
+				
+	   ]]>
+</select>
+
+	<select id="queryNewDeliverOrder"  parameterClass="String" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+		select d.DELIVER_ORDER_DTL_ID
+  from ERP_DELIVER_ORDER_DTL d
+ where d.DELIVER_ORDER_ID = #DELIVER_ORDER_ID#
+   and d.DEL_FLAG = 0
+
+	   ]]>
+	</select>
+	<select id="downGetById" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+		select u.DELIVER_ORDER_NO,
+	       to_char(u.ADVC_SEND_DATE, 'yyyy-mm-dd') ADVC_SEND_DATE,
+	       u.BILL_TYPE,
+	       u.DELIVER_TYPE,
+	       u.TRUCK_TYPE,
+	       u.CHANN_TYPE,
+	       u.SHIP_POINT_NAME,
+	       u.AREA_SER_NO,
+	       u.AREA_SER_NAME,
+	       u.SEND_CHANN_NO,
+	       u.SEND_CHANN_NAME,
+	       u.ORDER_CHANN_NO,
+	       u.ORDER_CHANN_NAME,
+	       u.RECV_CHANN_NO,
+	       u.RECV_CHANN_NAME,
+	       u.JOIN_DELIVER_ORDER_NO,
+	       to_char(u.APPCH_TIME,'yyyy-MM-DD HH24:MI:SS') APPCH_TIME,
+	       (select sum(NVL(c.VOLUME,0) * NVL(c.ADVC_PLAN_NUM,0))
+	          from ERP_DELIVER_ORDER_DTL c
+	         where c.DELIVER_ORDER_ID = u.DELIVER_ORDER_ID
+	           and DEL_FLAG = 0) ALLVOL,
+	       u.STATE,
+	       u.REMARK PRIMARYREMARK,
+	       u.CRE_NAME,
+	       u.PRVD_NO,
+	       u.PRVD_NAME,
+	       to_char(u.CRE_TIME, 'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+	       b.SALE_ORDER_NO,
+	       b.ORDER_CHANN_NAME,
+	       b.PRD_NO,
+	       b.PRD_NAME,
+	       b.PRD_SPEC,
+	       b.PRD_COLOR,
+	       b.BRAND,
+	       b.STD_UNIT,
+	       NVL(b.PLAN_NUM,0) PLAN_NUM,
+	       NVL(b.NO_SEND_NUM,0) NO_SEND_NUM,
+	       NVL(b.DECT_PRICE,0) DECT_PRICE,
+	       NVL(b.REAL_SEND_NUM,0) REAL_SEND_NUM,
+	       (NVL(b.PLAN_NUM,0)-NVL(b.REAL_SEND_NUM,0)) DIFFNUM,
+	       (NVL(b.DECT_PRICE,0)*NVL(b.REAL_SEND_NUM,0)) ALLPRICE,
+	       (NVL(b.DECT_PRICE,0)*NVL(b.PLAN_NUM,0)) PLANPRICE,
+	       (NVL(b.VOLUME,0)*NVL(b.PLAN_NUM,0)) PLANVOLDTL,
+	       (NVL(b.VOLUME,0)*NVL(b.NO_SEND_NUM,0)) NOSENDVOLDTL,
+	       NVL(b.VOLUME,0) VOLUME,
+	       (NVL(b.VOLUME,0)*NVL(b.REAL_SEND_NUM,0)) ALLVOLDTL,
+	       b.NO_SEND_DEAL_TYPE,
+	       d.SPCL_DTL_REMARK SPCL_SPEC_REMARK,
+	       (case when b.IS_NO_STAND_FLAG=1 then '是' else '否' end) IS_NO_STAND_FLAG,
+	       (case when b.IS_BACKUP_FLAG=1 then '是' else '否' end) IS_BACKUP_FLAG,
+	       (case when b.IS_FREE_FLAG=1 then '是' else '否' end) IS_FREE_FLAG,
+	       NVL(b.ADVC_PLAN_NUM,0) ADVC_PLAN_NUM,
+	       e.DELIVER_DTL_ADDR,
+	       b.REMARK,
+	       b.U9_SALE_ORDER_DTL_NO,
+	       b.U9_SALE_ORDER_NO,
+	       b.RECV_ADDR_NO,
+	       b.RECV_ADDR,
+	       (case  when NVL(b.IS_SEND_FIN,0)=0 then '未处理' when b.IS_SEND_FIN=1 then '已处理' when b.IS_SEND_FIN=3 then '关闭' end)
+           IS_SEND_FIN,
+          (case when b.PLAN_NUM=b.REAL_SEND_NUM and b.PLAN_NUM>0 then '已发' when NVL(b.REAL_SEND_NUM,0)=0 and b.PLAN_NUM>0 
+          then '未发' when  b.PLAN_NUM=0 then '不发'   else '部分发' end  ) ROWSTATE,
+	       f.PAR_PRD_NAME
+	  from ERP_DELIVER_ORDER u
+	  left join ERP_DELIVER_ORDER_DTL b on u.DELIVER_ORDER_ID = b.DELIVER_ORDER_ID and b.del_flag=0
+	  left join DRP_SPCL_TECH d on b.SPCL_TECH_ID=d.SPCL_TECH_ID and d.USE_FLAG=1
+	  left join BASE_DELIVER_ADDR e on e.DELIVER_ADDR_NO=b.RECV_ADDR_NO and e.DEL_FLAG=0  and e.STATE='启用' 
+	  left join BASE_PRODUCT f on f.PRD_ID=b.PRD_ID 
+	]]>
+	<dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+</select>
+
+
+
+ <!-- 行关闭 -->  
+<update id="closeDeliverOrderDtl" parameterClass="map">
+  <![CDATA[ update ERP_DELIVER_ORDER_DTL ]]>
+   <dynamic prepend="set">
+	   <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+	   <isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG# ]]></isNotNull>
+	   <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+	   <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+    </dynamic>
+    <![CDATA[ where DELIVER_ORDER_DTL_ID in ($DELIVER_ORDER_DTL_IDS$) ]]>
+</update>
+
+<!-- 主表 状态为已提交生产  行关闭的时候 更新销售订单明细的排车数量-->
+<update id="updateSaleOrderDtlById" parameterClass="map">
+	<![CDATA[ 
+	  update ERP_SALE_ORDER_DTL t set t.PLANED_NUM=(
+         select  (NVL(t.PLANED_NUM,0) - NVL(e.ADVC_PLAN_NUM,0))
+         from ERP_DELIVER_ORDER_DTL e 
+         where e.SALE_ORDER_DTL_ID=t.SALE_ORDER_DTL_ID
+         and e.DELIVER_ORDER_ID=#DELIVER_ORDER_ID#)
+     where t.SALE_ORDER_DTL_ID in 
+     (select d.SALE_ORDER_DTL_ID 
+     from ERP_DELIVER_ORDER_DTL d 
+     where d.DELIVER_ORDER_DTL_ID  in ($DELIVER_ORDER_DTL_IDS$) )
+      
+    ]]>
+</update>
+
+
+
+<update id="delete" parameterClass="map">
+ <![CDATA[ update ERP_DELIVER_ORDER ]]>
+    <dynamic prepend="set">
+     <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+     <isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG# ]]></isNotNull>
+     <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+     <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+     <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where DELIVER_ORDER_ID = #DELIVER_ORDER_ID#]]>
+</update>
+
+
+<select id="selectCountDeliver" parameterClass="map" resultClass="int">
+   select count(0) from ERP_DELIVER_ORDER_DTL d where 
+   d.DELIVER_ORDER_ID = #DELIVER_ORDER_ID#
+   and  d.DEL_FLAG=0
+</select>
+
+ <!-- 货品发运时进行关闭 -->  
+<update id="closePdtDeliverOrderDtl" parameterClass="map">
+  <![CDATA[ update ERP_DELIVER_ORDER_DTL ]]>
+   <dynamic prepend="set">
+	   <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+	   <isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG# ]]></isNotNull>
+	   <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+	   <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+	   <isNotNull property="IS_SEND_FIN" prepend=","><![CDATA[IS_SEND_FIN = #IS_SEND_FIN# ]]></isNotNull>
+	   <isNotNull property="REAL_SEND_NUM" prepend=","><![CDATA[REAL_SEND_NUM = #REAL_SEND_NUM# ]]></isNotNull>
+    </dynamic>
+    <![CDATA[ where DELIVER_ORDER_DTL_ID in ($DELIVER_ORDER_DTL_IDS$) ]]>
+</update>
+
+<!-- 行关闭的时候 更新销售订单明细的排车数量-->
+<update id="updateDeliverIdStat" parameterClass="map">
+	<![CDATA[ 
+UPDATE ERP_DELIVER_ORDER t
+ set t.STATE = #STATE#
+ where t.DELIVER_ORDER_ID = #DELIVER_ORDER_ID#
+    ]]>
+</update>
+<select id="queryDeliverDtlId" parameterClass="String" resultClass="java.util.HashMap">
+SELECT T.DELIVER_ORDER_DTL_ID
+  FROM ERP_DELIVER_ORDER_DTL T
+ WHERE T.DELIVER_ORDER_ID = #DELIVER_ORDER_ID# and T.DEL_FLAG = 0 and T.IS_SEND_FIN !=3
+</select>
+<select id="queryDeliverByFromId" parameterClass="String" resultClass="java.util.HashMap">
+SELECT  T.DELIVER_ORDER_ID,T.DELIVER_ORDER_NO,T.STATE
+  FROM ERP_DELIVER_ORDER T
+ WHERE T.FROM_BILL_ID = #FROM_BILL_ID# and T.DEL_FLAG = 0
+</select>
+<!-- 检查是否存在已经关闭的行记录-->
+<select id="checkIsExsitClose" parameterClass="String" resultClass="java.util.HashMap">
+SELECT D.PRD_NO
+  FROM ERP_DELIVER_ORDER_DTL D
+ WHERE D.IS_SEND_FIN = 3
+   AND D.DELIVER_ORDER_DTL_ID IN ($DELIVER_ORDER_DTL_IDS$)
+</select>
+<!-- 检查是整单冻结状态-->
+<select id="checkIsFreezeFlg" parameterClass="map" resultClass="java.util.HashMap">
+SELECT T.DELIVER_ORDER_ID
+  FROM ERP_DELIVER_ORDER T
+ WHERE NVL(T.IS_ALL_FREEZE_FLAG,0) = #IS_ALL_FREEZE_FLAG#
+ AND T.DELIVER_ORDER_ID = #DELIVER_ORDER_ID#
+</select>
+
+
+<!-- 查询明细是否都已处理-->
+<select id="queryIsSendFin" parameterClass="map" resultClass="int">
+  select count(1) from ERP_DELIVER_ORDER_DTL d  where d.DELIVER_ORDER_ID=#DELIVER_ORDER_ID#
+  and d.DEL_FLAG=0 and NVL(d.IS_SEND_FIN,0)=0
+</select>
+
+
+<!-- 生成出货计划号 -->
+<update id="updateJoinDeliverById" parameterClass="map">
+	<![CDATA[ update ERP_DELIVER_ORDER ]]>
+	<dynamic prepend="set">
+       <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+       <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+       <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+       <isNotNull property="JOIN_DELIVER_ORDER_NO" prepend=","><![CDATA[JOIN_DELIVER_ORDER_NO = #JOIN_DELIVER_ORDER_NO# ]]></isNotNull>
+        
+    </dynamic>
+	<![CDATA[ where DELIVER_ORDER_ID in($DELIVER_ORDER_IDS$)]]>
+</update>
+
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlDeliverChld"/>
+	  <dynamic prepend="where">
+			u.DELIVER_ORDER_ID in($DELIVER_ORDER_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlDeliverChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlDeliverChld"/>
+	  </isNotNull>
+  </select>
+  
+  
+ <select id="justOnlyAreaSer" parameterClass="map" resultClass="java.util.HashMap">
+	 select t.DELIVER_ORDER_ID, t.RECV_CHANN_ID,t.AREA_SER_ID from ERP_DELIVER_ORDER t 
+       where t.DELIVER_ORDER_ID in($DELIVER_ORDER_IDS$)
+</select>
+
+  
+
+</sqlMap>

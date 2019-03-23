@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="FACTORY">
+
+	<!-- 
+		*@module 系统管理
+		*@func 生产基地维护
+		*@version 1.0
+		*@author 王志格
+		*  -->
+	<typeAlias type="com.hoperun.base.factory.model.FactoryModel" alias="FactoryModel" />
+		
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="FACTORY_ID">
+			FACTORY_ID = #FACTORY_ID#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="FACTORY_NO">
+			FACTORY_NO like '%'||#FACTORY_NO#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="FACTORY_NAME">
+			FACTORY_NAME like '%'||#FACTORY_NAME#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="PERSON_CON">
+			PERSON_CON like '%'||#PERSON_CON#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="MOBILE_NO">
+			MOBILE_NO like '%'||#MOBILE_NO#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CRE_TIME_FROM">
+				<![CDATA[ CRE_TIME >=  to_date(#CRE_TIME_FROM#,'yyyy-MM-DD HH24:MI:SS') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CRE_TIME_TO">
+				<![CDATA[ CRE_TIME <=  to_date(#CRE_TIME_TO#,'yyyy-MM-DD HH24:MI:SS') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="STATE">
+			STATE = #STATE#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="DEL_FLAG">
+			DEL_FLAG = #DEL_FLAG#
+		</isNotEmpty>
+		 <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+		</isNotEmpty>
+	</sql>
+	
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField">
+			$orderField$,
+		</isNotEmpty>
+		CRE_TIME DESC
+	</sql>
+	
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[  SELECT  FACTORY_ID,FACTORY_NO,FACTORY_NAME,PERSON_CON,MOBILE_NO,STATE,
+							CRE_NAME,to_char(CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,DEPT_NAME
+  					FROM ${SYSSCHEMA}.BASE_FACTORY
+		                ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql" />
+		</dynamic>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+	
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(1) cnt FROM ${SYSSCHEMA}.BASE_FACTORY ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+	<!-- 详细信息加载 -->
+	<select id="loadById" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<![CDATA[  SELECT  FACTORY_ID,FACTORY_NO,FACTORY_NAME,PERSON_CON,MOBILE_NO,TEL,
+  							TAX,POST,ADDRESS,STATE,CREATOR,CRE_NAME,to_char(CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+  							UPDATOR,UPD_NAME,to_char(UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,DEPT_ID,DEPT_NAME,ORG_ID,
+  							ORG_NAME,LEDGER_ID,LEDGER_NAME 
+  					FROM ${SYSSCHEMA}.BASE_FACTORY 
+  				    WHERE FACTORY_ID = #FACTORY_ID#
+  		]]>
+	</select>
+	
+	<!-- 新增 -->
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into  ${SYSSCHEMA}.BASE_FACTORY( FACTORY_ID,FACTORY_NO,FACTORY_NAME,
+		 					PERSON_CON,MOBILE_NO,TEL,TAX,POST,ADDRESS,STATE,DEL_FLAG,CREATOR,CRE_NAME,CRE_TIME,
+  							UPDATOR,UPD_NAME,UPD_TIME,DEPT_ID,DEPT_NAME,ORG_ID,
+  							ORG_NAME,LEDGER_ID,LEDGER_NAME )
+		 values(#FACTORY_ID#,#FACTORY_NO#,#FACTORY_NAME#,#PERSON_CON#,#MOBILE_NO#,#TEL#,
+  							#TAX#,#POST#,#ADDRESS#,#STATE#,0,#CREATOR#,#CRE_NAME#,sysdate ,
+  							#UPDATOR#,#UPD_NAME#,sysdate,#DEPT_ID#,#DEPT_NAME#,#ORG_ID#,
+  							#ORG_NAME#,#LEDGER_ID#,#LEDGER_NAME#)
+		]]>
+	</insert>
+	
+	<!-- 根据ID修改 -->
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.BASE_FACTORY ]]>
+		<!-- CHANAME, CHADES,CHADATE,CHASTU     -->
+		<dynamic prepend="set">
+			<isNotNull property="FACTORY_NAME" prepend=","><![CDATA[FACTORY_NAME = #FACTORY_NAME#]]></isNotNull>
+			<isNotNull property="PERSON_CON" prepend=","><![CDATA[PERSON_CON = #PERSON_CON#]]></isNotNull>
+			<isNotNull property="MOBILE_NO" prepend=","><![CDATA[MOBILE_NO = #MOBILE_NO#]]></isNotNull>
+			<isNotNull property="TEL" prepend=","><![CDATA[TEL = #TEL#]]></isNotNull>
+			<isNotNull property="TAX" prepend=","><![CDATA[TAX = #TAX#]]></isNotNull>
+			<isNotNull property="POST" prepend=","><![CDATA[POST = #POST#]]></isNotNull>
+			<isNotNull property="ADDRESS" prepend=","><![CDATA[ADDRESS = #ADDRESS#]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where FACTORY_ID = #FACTORY_ID# ]]>
+	</update>
+		
+	<select id="getExits" parameterClass="map" resultClass="int">
+		<![CDATA[ SELECT COUNT(1) FROM ${SYSSCHEMA}.BASE_FACTORY  where FACTORY_NO = #FACTORY_NO# and DEL_FLAG = #DEL_FLAG#]]>
+	</select>
+	
+</sqlMap>

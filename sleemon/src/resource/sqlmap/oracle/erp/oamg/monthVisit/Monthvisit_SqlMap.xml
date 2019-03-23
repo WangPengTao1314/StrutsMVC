@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+	@author zcx
+	@function  月度拜访计划维护
+	@version 2014-05-20 11:13:12
+-->
+<sqlMap namespace="monthvisit">
+	<typeAlias
+		type="com.hoperun.erp.oamg.monthVisit.model.MonthvisitModel"
+		alias="MonthvisitModel" />
+	<!-- 使用Resvstore装载结果集 -->
+	<resultMap id="MonthvisitModel" class="MonthvisitModel">
+		<result column="MONTH_VISIT_PLAN_ID" property="MONTH_VISIT_PLAN_ID" />
+	</resultMap>
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		u.DEL_FLAG = 0
+		<isNotEmpty property="MONTH_VISIT_PLAN_NO">
+			and u.MONTH_VISIT_PLAN_NO like '%'||#MONTH_VISIT_PLAN_NO#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="RYBH">
+			and u.RYBH like '%'||#RYBH#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="RYMC">
+			and u.RYMC like '%'||#RYMC#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="PLAN_YEAR">
+			and u.PLAN_YEAR like '%'||#PLAN_YEAR#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="PLAN_MONTH">
+			and u.PLAN_MONTH like '%'||#PLAN_MONTH#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="STATE">
+			and u.STATE = #STATE#
+		</isNotEmpty>
+		<isNotEmpty property="LEDGER_ID">
+			and u.LEDGER_ID = #LEDGER_ID#
+		</isNotEmpty>
+		<isNotEmpty prepend="" property="QXJBCON">
+		 and  $QXJBCON$
+	    </isNotEmpty>
+	</sql>
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField">
+			$orderField$
+		</isNotEmpty>
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[ 
+			select
+			   u.MONTH_VISIT_PLAN_ID,
+		       u.MONTH_VISIT_PLAN_NO,
+		       u.RYXXID,
+		       u.RYBH,
+		       u.RYMC,
+		       u.PLAN_YEAR,
+		       u.PLAN_MONTH,
+		       u.PLAN_VISIT_NUM_TOTAL,
+		       u.STATE,
+		       u.REMARK
+		       from ERP_MONTH_VISIT_PLAN u
+   ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql" />
+		</dynamic>
+	</sql>
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[
+	   select count(0) cnt 
+            from ERP_MONTH_VISIT_PLAN u 
+		   ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+	<!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+	  insert into ERP_MONTH_VISIT_PLAN(
+		 MONTH_VISIT_PLAN_ID,
+		 MONTH_VISIT_PLAN_NO,
+		 RYXXID,
+		 RYBH,
+		 RYMC,
+		 PLAN_YEAR,
+		 PLAN_MONTH,
+		 PLAN_VISIT_NUM_TOTAL,
+		 STATE,
+		 REMARK,
+		 DEL_FLAG,
+		 CREATOR,
+		 CRE_NAME,
+		 CRE_TIME,
+		 DEPT_ID,
+		 DEPT_NAME,
+		 ORG_ID,
+		 ORG_NAME,
+		 LEDGER_ID,
+		 LEDGER_NAME
+	   )values(
+		 #MONTH_VISIT_PLAN_ID#,
+		 #MONTH_VISIT_PLAN_NO#,
+		 #RYXXID#,
+		 #RYBH#,
+		 #RYMC#,
+		 #PLAN_YEAR#,
+		 #PLAN_MONTH#,
+		 #PLAN_VISIT_NUM_TOTAL#,
+		 #STATE#,
+		 #REMARK#,
+		 #DEL_FLAG#,
+		 #CREATOR#,
+		 #CRE_NAME#,
+		 sysdate,
+		 #DEPT_ID#,
+		 #DEPT_NAME#,
+		 #ORG_ID#,
+		 #ORG_NAME#,
+		 #LEDGER_ID#,
+		 #LEDGER_NAME#
+		)
+   ]]>
+	</insert>
+	
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ERP_MONTH_VISIT_PLAN ]]>
+		<dynamic prepend="set">
+		    <isNotNull property="MONTH_VISIT_PLAN_NO" prepend=","><![CDATA[MONTH_VISIT_PLAN_NO = #MONTH_VISIT_PLAN_NO# ]]></isNotNull>
+		    <isNotNull property="RYXXID" prepend=","><![CDATA[RYXXID = #RYXXID# ]]></isNotNull>
+			<isNotNull property="RYBH"   prepend=","><![CDATA[RYBH = #RYBH# ]]></isNotNull>
+			<isNotNull property="RYMC"   prepend=","><![CDATA[RYMC = #RYMC# ]]></isNotNull>
+			<isNotNull property="PLAN_YEAR" prepend=","><![CDATA[PLAN_YEAR =  #PLAN_YEAR# ]]></isNotNull>
+			<isNotNull property="PLAN_MONTH" prepend=","><![CDATA[PLAN_MONTH = #PLAN_MONTH# ]]></isNotNull>
+			<isNotNull property="PLAN_VISIT_NUM_TOTAL" prepend=","><![CDATA[PLAN_VISIT_NUM_TOTAL = #PLAN_VISIT_NUM_TOTAL# ]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+	        <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+	        <isNotNull property="REMARK" prepend=","><![CDATA[REMARK =  #REMARK# ]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where MONTH_VISIT_PLAN_ID = #MONTH_VISIT_PLAN_ID#]]>
+	</update>
+
+	<select id="loadById" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[ 
+		  select 
+			 u.MONTH_VISIT_PLAN_ID,
+			 u.MONTH_VISIT_PLAN_NO,
+			 u.RYXXID,
+			 u.RYBH,
+			 u.RYMC,
+			 u.PLAN_YEAR,
+			 u.PLAN_MONTH,
+			 u.PLAN_VISIT_NUM_TOTAL,
+			 u.STATE,
+			 u.REMARK,
+			 u.CREATOR,
+			 u.CRE_NAME,
+			 to_char(u.CRE_TIME,'yyyy-MM-DD') CRE_TIME,
+			 u.DEPT_ID,
+			 u.DEPT_NAME,
+			 u.ORG_ID,
+			 u.ORG_NAME,
+			 u.LEDGER_ID,
+			 u.LEDGER_NAME,
+			 u.REMARK
+	         from ERP_MONTH_VISIT_PLAN u  
+		     where 
+			 u.MONTH_VISIT_PLAN_ID = #MONTH_VISIT_PLAN_ID#
+	]]>
+	</select>
+	
+	<select id="loadByIds" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[  
+	   select 
+	     u.MONTH_VISIT_PLAN_DTL_ID,
+	     u.MONTH_VISIT_PLAN_ID,
+         u.VISIT_OBJ_TYPE,
+         u.VISIT_OBJ_ID,
+         u.VISIT_OBJ_NO,
+         u.VISIT_OBJ_NAME,
+         u.PLAN_VISIT_NUM,
+         u.VISIT_TYPE
+         from ERP_MONTH_VISIT_PLAN_DTL u  left join  ERP_MONTH_VISIT_PLAN d on u.MONTH_VISIT_PLAN_ID = d.MONTH_VISIT_PLAN_ID
+	     where u.DEL_FLAG=0 AND  u.MONTH_VISIT_PLAN_DTL_ID in ($MONTH_VISIT_PLAN_DTL_IDS$)
+	]]>
+    </select>
+    
+    <select id="querybyNum" parameterClass="String" resultClass="String">
+	<![CDATA[  
+	   select 
+			 u.PLAN_VISIT_NUM_TOTAL
+             from ERP_MONTH_VISIT_PLAN u 
+             where u.MONTH_VISIT_PLAN_ID = #MONTH_VISIT_PLAN_ID#  and u.DEL_FLAG=0
+	]]>
+    </select>
+    
+    <select id="queryChildbyNum" parameterClass="String" resultClass="String">
+	<![CDATA[  
+	   select 
+			 u.PLAN_VISIT_NUM
+             from ERP_MONTH_VISIT_PLAN_DTL u 
+             where u.MONTH_VISIT_PLAN_DTL_ID = #MONTH_VISIT_PLAN_DTL_ID#  and u.DEL_FLAG=0
+	]]>
+    </select>
+    
+	 <!-- 根据主表ID查询明细  left join ERP_SALE_ORDER t on u.SALE_ORDER_ID = t.SALE_ORDER_ID  -->
+	 <select id="childQuery" parameterClass="map" resultClass="java.util.HashMap">
+		  <![CDATA[ 
+	      select 
+           t.MONTH_VISIT_PLAN_DTL_ID,
+	       t.MONTH_VISIT_PLAN_ID,
+	       t.VISIT_OBJ_TYPE,
+	       t.VISIT_OBJ_ID,
+	       t.VISIT_OBJ_NO,
+	       t.VISIT_OBJ_NAME,
+	       t.PLAN_VISIT_NUM,
+	       t.DEL_FLAG,
+	       t.VISIT_TYPE
+	       from ERP_MONTH_VISIT_PLAN_DTL t where t.MONTH_VISIT_PLAN_ID=#MONTH_VISIT_PLAN_ID# and t.DEL_FLAG=0
+	      ]]>
+	  </select>
+	  
+	<update id="deleteByIds" parameterClass="map">
+		<![CDATA[ 
+	     update ERP_MONTH_VISIT_PLAN_DTL u
+	         set u.DEL_FLAG = 1
+ 	         where 
+	         u.MONTH_VISIT_PLAN_DTL_ID = #MONTH_VISIT_PLAN_DTL_ID#
+    ]]>
+	</update>
+	
+	<delete id="deleteByIdsT" parameterClass="map">
+		<![CDATA[ update  ERP_MONTH_VISIT_PLAN_DTL u
+		          set u.DEL_FLAG = 1
+		          where u.MONTH_VISIT_PLAN_DTL_ID in ($MONTH_VISIT_PLAN_DTL_IDs$) ]]>
+    </delete>
+	
+	<update id="deleteByIds1" parameterClass="map">
+		<![CDATA[ 
+	        update  ERP_MONTH_VISIT_PLAN_DTL u
+			        set u.DEL_FLAG = 1
+			        where u.MONTH_VISIT_PLAN_DTL_ID in ('$MONTH_VISIT_PLAN_DTL_IDs$')
+    ]]>
+	</update>
+	
+    <delete id="delete" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.ERP_MONTH_VISIT_PLAN ]]>
+		<dynamic prepend="set">
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where MONTH_VISIT_PLAN_ID in ('$MONTH_VISIT_PLAN_ID$')]]>
+	</delete> 
+	
+	<!--根据明细IDs删除明细 -->
+	<delete id="deleteChldByIds" parameterClass="map">
+		<![CDATA[ update ERP_WORK_PLAN_DTL 
+		          set DEL_FLAG = #DEL_FLAG#	 
+	 	          where 
+		          WORK_PLAN_DTL_ID  in ('$WORK_PLAN_DTL_ID$') 
+	    ]]>
+    </delete>
+     
+</sqlMap>

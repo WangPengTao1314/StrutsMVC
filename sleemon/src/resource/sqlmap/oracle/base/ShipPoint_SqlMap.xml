@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="SHIPPOINT">
+
+	<!-- 
+		*@module 系统管理
+		*@func 发货点维护
+		*@version 1.0
+		*@author 王志格
+		*  -->
+	<typeAlias type="com.hoperun.base.shipPoint.model.ShipPointModel" alias="ShipPointModel" />
+	
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">  
+		<isNotEmpty prepend="and" property="SHIP_POINT_ID">
+			SHIP_POINT_ID = #SHIP_POINT_ID#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="SHIP_POINT_NO">
+			SHIP_POINT_NO  like '%'||#SHIP_POINT_NO#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="SHIP_POINT_NAME">
+			SHIP_POINT_NAME like '%'||#SHIP_POINT_NAME#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CRE_TIME_FROM">
+				<![CDATA[ CRE_TIME >= to_date(#CRE_TIME_FROM#,'yyyy-MM-DD HH24:MI:SS') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CRE_TIME_TO">
+				<![CDATA[ CRE_TIME <= to_date(#CRE_TIME_TO#,'yyyy-MM-DD HH24:MI:SS')]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="STATE">
+			<![CDATA[ STATE = #STATE# ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="DEL_FLAG">
+			<![CDATA[ DEL_FLAG = #DEL_FLAG# ]]>
+		</isNotEmpty>
+		
+		<isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+		</isNotEmpty>
+	</sql>
+	
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField">
+			$orderField$,
+		</isNotEmpty>
+		CRE_TIME DESC
+	</sql>
+	
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[  SELECT  SHIP_POINT_ID,SHIP_POINT_NO,SHIP_POINT_NAME,STATE,
+							CRE_NAME,to_char(CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,DEPT_NAME
+  					FROM ${SYSSCHEMA}.BASE_SHIP_POINT 
+		                ]]>
+		<dynamic prepend="where ">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql" />
+		</dynamic>
+		
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+	
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(1) cnt FROM ${SYSSCHEMA}.BASE_SHIP_POINT ]]>
+		<dynamic prepend="where ">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+	<!-- 详细信息加载 -->
+	<select id="loadById" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<![CDATA[  SELECT  SHIP_POINT_ID,SHIP_POINT_NO,SHIP_POINT_NAME,
+  							ADDRESS,STATE,CREATOR,CRE_NAME,to_char(CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+  							UPDATOR,UPD_NAME,to_char(UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,DEPT_ID,DEPT_NAME,ORG_ID,
+  							ORG_NAME,LEDGER_ID,LEDGER_NAME 
+  					FROM ${SYSSCHEMA}.BASE_SHIP_POINT 
+  				    WHERE SHIP_POINT_ID = #SHIP_POINT_ID#
+  		]]>
+	</select>
+	
+	<!-- 新增 -->
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into  ${SYSSCHEMA}.BASE_SHIP_POINT( SHIP_POINT_ID,SHIP_POINT_NO,SHIP_POINT_NAME,ADDRESS,STATE,DEL_FLAG,
+		 					CREATOR,CRE_NAME,CRE_TIME,UPDATOR,UPD_NAME,UPD_TIME,DEPT_ID,DEPT_NAME,ORG_ID,
+  							ORG_NAME,LEDGER_ID,LEDGER_NAME )
+		 values(#SHIP_POINT_ID#,#SHIP_POINT_NO#,#SHIP_POINT_NAME#,#ADDRESS#,#STATE#,0,
+		 					#CREATOR#,#CRE_NAME#,sysdate,#UPDATOR#,#UPD_NAME#,
+		 					sysdate,#DEPT_ID#,#DEPT_NAME#,#ORG_ID#,
+  							#ORG_NAME#,#LEDGER_ID#,#LEDGER_NAME#)
+		]]>
+	</insert>
+	
+	<!-- 根据ID修改 -->
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.BASE_SHIP_POINT ]]>
+		<!-- CHANAME, CHADES,CHADATE,CHASTU     -->
+		<dynamic prepend="set">
+			<isNotNull property="SHIP_POINT_NAME" prepend=","><![CDATA[SHIP_POINT_NAME = #SHIP_POINT_NAME#]]></isNotNull>
+			<isNotNull property="ADDRESS" prepend=","><![CDATA[ADDRESS = #ADDRESS#]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where SHIP_POINT_ID = #SHIP_POINT_ID# ]]>
+	</update>
+	
+	<select id="getExits" parameterClass="map" resultClass="int">
+		<![CDATA[ SELECT COUNT(1) FROM ${SYSSCHEMA}.BASE_SHIP_POINT  where SHIP_POINT_NO = #SHIP_POINT_NO# and  DEL_FLAG = #DEL_FLAG#]]>
+	</select>
+	
+</sqlMap>

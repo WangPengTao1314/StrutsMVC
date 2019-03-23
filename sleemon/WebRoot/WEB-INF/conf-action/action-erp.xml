@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd"
+	default-autowire="byName">
+	
+ 	<!-- 个人工作计划 -->
+	<bean name="/grgzjh" class="com.hoperun.base.grgzjh.action.GrgzjhAction" scope="singleton">
+	    <property name="grgzjhService" ref="grgzjhService"></property>
+    </bean>
+ 
+	<!-- 信用额度变更申请信息 -->
+	<bean name="/credit_req" class="com.hoperun.erp.sale.creditreq.action.CreditReqAction" scope="singleton">
+	    <property name="creditReqService" ref="creditReqService"></property>
+    </bean>
+	
+ 
+	<!-- 区域折扣信息 add by wzg-->
+	<bean name="/dsct" class="com.hoperun.erp.sale.dsct.action.AreaDsctAction" scope="singleton">
+		<property name="areaDsctService" ref="AreaDsctService"></property>
+	</bean>
+ 
+	<!-- 临时额度调整申请 add by lyg-->
+	<bean name="/temp_credit_req" class="com.hoperun.erp.sale.tempcreditreq.action.TempCreditReqAction" scope="singleton">
+		<property name="tempCreditReqService" ref="tempCreditReqService"></property>
+	</bean>
+
+	<!-- 信用额度设定-->
+	<bean name="/credit" class="com.hoperun.erp.sale.credit.action.CreditAction" scope="singleton">
+		<property name="creditService" ref="CreditService"></property>
+	</bean>
+ 
+ 
+ 
+ 	<!-- 返利登记-->
+	<bean name="/rebate" class="com.hoperun.erp.sale.rebate.action.RebateAction" scope="singleton">
+		<property name="rebateService" ref="rebateService"></property>
+	</bean>
+ 	
+ 	<!-- 客户付款单 -->
+ 	<bean name="/payment" class="com.hoperun.erp.sale.payment.action.PaymentAction" scope="singleton">
+	    <property name="paymentService" ref="paymentService"></property>
+	</bean>
+	
+	<!-- 退货单维护 -->
+	<bean name="/prdreturn" class="com.hoperun.erp.sale.prdreturn.action.PrdreturnAction" scope="singleton">
+	    <property name="prdreturnService" ref="prdreturnService"></property>
+	</bean>
+	
+	<!-- 投诉与建议处理  -->
+	<bean name="/advisehd" class="com.hoperun.erp.sale.advisehd.action.AdvisehdAction" scope="singleton">
+	    <property name="advisehdService" ref="advisehdService"></property>
+	</bean>
+	<!-- 付款凭证确认 -->
+	<bean name="/paymentcmt" class="com.hoperun.erp.sale.paymentcmt.action.PaymentcmtAction" scope="singleton">
+	    <property name="paymentcmtService" ref="paymentcmtService"></property>
+	</bean>
+	<!--service 推广促销方案-->
+	<bean name="/prmtplan" class="com.hoperun.erp.sale.prmtplan.action.PrmtplanAction" scope="singleton">
+	    <property name="prmtplanService" ref="prmtplanService"></property>
+    </bean>
+    <!--促销发放-->
+	<bean name="/prmtexit" class="com.hoperun.erp.sale.prmtexit.action.PrmtexitAction" scope="singleton">
+		    <property name="prmtexitService" ref="prmtexitService"></property>
+	</bean>
+    <!-- 订货订单处理 -->
+	<bean name="/goodsorder" class="com.hoperun.erp.sale.goodsorder.action.GoodsorderAction" scope="singleton">
+		    <property name="goodsorderService" ref="goodsorderService"></property>
+	</bean>
+  
+    <!--标准订单-->
+	<bean name="/saleorder" class="com.hoperun.erp.sale.saleorder.action.SaleorderAction" scope="singleton">
+		    <property name="saleorderService" ref="saleorderService"></property>
+	</bean>
+
+	<!--工艺单审核-->
+	<bean name="/techorder" class="com.hoperun.erp.sale.techorder.action.TechorderAction" scope="singleton">
+		    <property name="techorderService" ref="techorderService"></property>
+	</bean>
+	
+	<!--非标订单-->
+	<bean name="/saleordersp" class="com.hoperun.erp.sale.saleordersp.action.SaleorderspAction" scope="singleton">
+		    <property name="saleorderspService" ref="saleorderspService"></property>
+	</bean>
+ 
+ 	<!--工艺单核价-->
+	<bean name="/techorderprice" class="com.hoperun.erp.sale.techorderprice.action.TechorderPriceAction" scope="singleton">
+		    <property name="techorderPriceService" ref="techorderPriceService"></property>
+	</bean>
+	
+	 <!--销售订单  审核-->
+	<bean name="/saleorderrls" class="com.hoperun.erp.sale.saleorderrls.action.SaleorderrlsAction" scope="singleton">
+		    <property name="saleorderrlsService" ref="saleorderrlsService"></property>
+	</bean>
+	 <!--销售补单查询-->
+	<bean name="/saleorderque" class="com.hoperun.erp.sale.saleorderque.action.SaleorderqueAction" scope="singleton">
+		    <property name="saleorderqueService" ref="saleorderqueService"></property>
+	</bean>
+	
+	<!--工艺单维护-->
+	<bean name="/techordershow" class="com.hoperun.erp.sale.techordershow.action.TechorderShowAction" scope="singleton">
+		    <property name="techorderShowService" ref="techorderShowService"></property>
+	</bean>
+	
+	<!-- 渠道惩罚设定 add by lyg-->
+	<bean name="/channpunish" class="com.hoperun.erp.sale.channpunish.action.ChannpunishAction" scope="singleton">
+		<property name="channpunishService" ref="channpunishService"></property>
+	</bean>
+
+	<!--制定交付计划-->
+	<bean name="/turnoverplan" class="com.hoperun.erp.sale.turnoverplan.action.TurnoverplanAction" scope="singleton">
+	   <property name="turnoverplanService" ref="turnoverplanService"></property>
+	</bean>
+	
+	<!--退货单财务核价-->
+	<bean name="/prdreturnfin" class="com.hoperun.erp.sale.prdreturnfin.action.PrdreturnfinAction" scope="singleton">
+	  <property name="prdreturnfinService" ref="prdreturnfinService"></property>
+	</bean>
+	
+	<!--交付计划维护-->
+	<bean name="/turnoverhd" class="com.hoperun.erp.sale.turnoverhd.action.TurnoverhdAction" scope="singleton">
+	   <property name="turnoverhdService" ref="turnoverhdService"></property>
+	</bean>
+	
+	<bean name="/storediffaff" class="com.hoperun.erp.sale.storediffaff.action.StorediffaffAction" scope="singleton">
+		    <property name="storediffaffService" ref="storediffaffService"></property>
+	</bean>
+
+    <!--货品发运-->
+	<bean name="/pdtdeliver" class="com.hoperun.erp.sale.pdtdeliver.action.PdtdeliverAction" scope="singleton">
+	   <property name="pdtdeliverService" ref="pdtdeliverService"></property>
+	</bean>
+	
+	<!--发运query-->
+	<bean name="/deliverconfm" class="com.hoperun.erp.sale.deliverconfm.action.DeliverconfmAction" scope="singleton">
+	   <property name="deliverconfmService" ref="deliverconfmService"></property>
+	</bean>
+	
+	<!-- 付款凭证关闭 -->
+	<bean name="/paymentclose" class="com.hoperun.erp.sale.paymentclose.action.PaymentcloseAction" scope="singleton">
+	    <property name="paymentcloseService" ref="paymentcloseService"></property>
+	</bean>
+	
+	<!-- 专卖店撤店及终止申请单 -->
+	<bean name="/storeclose" class="com.hoperun.erp.oamg.storeclose.action.StorecloseAction" scope="singleton">
+	    <property name="storecloseService" ref="storecloseService"></property>
+	</bean>
+
+
+	<!-- 渠道折扣 -->
+	<bean name="/channdiscount" class="com.hoperun.erp.sale.channdiscount.action.ChannDiscountAction" scope="singleton">
+	    <property name="channDiscountService" ref="channDiscountService"></property>
+	</bean>
+	
+	<!-- 报表抄送 -->
+	<bean name="/reptshareview" class="com.hoperun.erp.report.reptshareview.action.ReptShareViewAction" scope="singleton">
+	    <property name="reptShareViewService" ref="reptShareViewService"></property>
+	</bean>
+	
+	<!--销售报表 -->
+	<bean name="/salereport" class="com.hoperun.erp.report.salereport.action.SaleReportAction" scope="singleton">
+	    <property name="saleReportService" ref="saleReportService"></property>
+	</bean>
+	
+	<!-- 培训课程维护 -->
+	<bean name="/traincourse" class="com.hoperun.erp.oamg.traincourse.action.TraincourseAction" scope="singleton">
+	    <property name="traincourseService" ref="traincourseService"></property>
+	</bean>
+	
+	<!-- 渠道培训结果反馈 -->
+	<bean name="/trainresult" class="com.hoperun.erp.oamg.trainresult.action.TrainresultAction" scope="singleton">
+	    <property name="trainresultService" ref="trainresultService"></property>
+	</bean>
+	
+    <!--总部首页-->
+	<bean name="/erpFirpage" class="com.hoperun.erp.main.firpage.action.ErpFirpageAction" scope="singleton">
+		    <property name="erpFirpageService" ref="erpFirpageService"></property>
+	</bean>
+	<!--总部出库单-->
+	<bean name="/erpStoreout" class="com.hoperun.erp.sale.storeout.action.ErpStoreoutAction" scope="singleton">
+		    <property name="erpStoreoutService" ref="erpStoreoutService"></property>
+	</bean>
+	<!--销售订单处理-->
+	<bean name="/saleordermge" class="com.hoperun.erp.sale.saleordermge.action.SaleordermgeAction" scope="singleton">
+		    <property name="saleordermgeService" ref="saleordermgeService"></property>
+	</bean>
+	<!--出货计划维护-->
+	<bean name="/deliveryhd" class="com.hoperun.erp.sale.deliveryhd.action.DeliveryhdAction" scope="singleton">
+		    <property name="deliveryhdService" ref="deliveryhdService"></property>
+	</bean>
+	
+	<!--销售计划维护-->
+	<bean name="/saleplan" class="com.hoperun.erp.sale.saleplan.action.SaleplanAction" scope="singleton">
+		    <property name="saleplanService" ref="saleplanService"></property>
+	</bean>
+	
+	<!--区域销售指标设定-->
+	<bean name="/areasaleplan" class="com.hoperun.erp.sale.areasaleplan.action.AreasaleplanAction" scope="singleton">
+		    <property name="areasaleplanService" ref="areasaleplanService"></property>
+	</bean>
+	
+	<!--月度拜访计划维护-->
+	<bean name="/monthVisit" class="com.hoperun.erp.oamg.monthVisit.action.MonthVisitAction" scope="singleton">
+		    <property name="monthvisitService" ref="monthvisitService"></property>
+	</bean>
+	<!--总部促销价格设置-->
+	<bean name="/erpprmtprice" class="com.hoperun.erp.sale.erpprmtprice.action.ErpprmtpriceAction" scope="singleton">
+		    <property name="erpprmtpriceService" ref="erpprmtpriceService"></property>
+	</bean>
+	
+    <!--月度拜访工作计划达成率-->
+	<bean name="/monthvisitreport" class="com.hoperun.erp.oamg.monthvisitreport.action.MonthvisitReportAction" scope="singleton">
+		    <property name="monthvisitreqService" ref="monthvisitreqService"></property>
+	</bean>
+	<!-- 营销活动 -->
+	<bean name="/marketact" class="com.hoperun.erp.sale.marketing.action.MarketActivitiyAction" scope="singleton">
+	    <property name="marketActivitiyService" ref="marketActivitiyService"></property>
+	</bean>
+	<!-- 会员信息 -->
+	<bean name="/member" class="com.hoperun.erp.sale.member.action.MemberAction" scope="singleton">
+	    <property name="memberService" ref="memberService"></property>
+	</bean>
+	<!-- 给加盟商分配卡券-->
+	<bean name="/allotchanncard" class="com.hoperun.erp.sale.allotchanncard.action.AllotChannCardAction" scope="singleton">
+	    <property name="allotChannCardService" ref="allotChannCardService"></property>
+	</bean>
+	<!-- 预算科目-->
+	<bean name="/budgetitem" class="com.hoperun.erp.sale.budgetitem.action.BudgetitemAction" scope="singleton">
+	    <property name="budgetitemService" ref="budgetitemService"></property>
+	</bean>
+	<!-- 预算额度设置-->
+	<bean name="/budgetquota" class="com.hoperun.erp.sale.budgetquota.action.BudgetquotaAction" scope="singleton">
+	    <property name="budgetquotaService" ref="budgetquotaService"></property>
+	</bean>
+	<!-- 费用报销单-->
+	<bean name="/expenseorder" class="com.hoperun.erp.sale.expenseorder.action.ExpenseorderAction" scope="singleton">
+	    <property name="expenseorderService" ref="expenseorderService"></property>
+	</bean>
+	<!-- 返利额度变更申请单-->
+	<bean name="/erprebatechangereq" class="com.hoperun.erp.sale.erprebatechangereq.action.ErprebatechangereqAction" scope="singleton">
+	    <property name="erprebatechangereqService" ref="erprebatechangereqService"></property>
+	</bean>
+	<!-- 总部 预订单-->
+	<bean name="/erpadvcorder" class="com.hoperun.erp.sale.erpadvcorder.action.ErpAdvcorderAction" scope="singleton">
+	    <property name="erpAdvcorderService" ref="erpAdvcorderService"></property>
+	</bean>
+	<!-- 总部 结算单-->
+	<bean name="/erpadvcorderstatement" class="com.hoperun.erp.sale.erpadvcorderstatements.action.ErpAdvcorderStatementsAction" scope="singleton">
+	    <property name="erpAdvcorderStatementsService" ref="erpAdvcorderStatementsService"></property>
+	</bean>
+	
+	<!-- 卡券销售-->
+	<bean name="/marketcardsale" class="com.hoperun.erp.sale.marketcardsale.action.MarketcardSaleAction" scope="singleton">
+	    <property name="marketcardSaleService" ref="marketcardSaleService"></property>
+	</bean>
+	
+	<!-- 渠道合同上传-->
+	<bean name="/channcontractup" class="com.hoperun.drp.oamg.channcontractup.action.ChanncontractupAction" scope="singleton">
+	    <property name="channcontractupService" ref="channcontractupService"></property>
+	</bean>
+	<!-- 顾客现场签到 -->
+	<bean name="/cusregist" class="com.hoperun.erp.sale.cusregist.action.CusRegistAction" scope="singleton">
+	    <property name="cusRegistService" ref="cusRegistService"></property>
+	</bean>
+	<!-- 返利年结 -->
+	<bean name="/annualClosing" class="com.hoperun.erp.sale.annualClosing.action.AnnualClosingAction" scope="singleton">
+	    <property name="annualClosingService" ref="annualClosingService"></property>
+	</bean>
+	<!-- 意向客户拜访 -->
+	<bean name="/intentionvisit" class="com.hoperun.erp.visit.intentionvisit.action.IntentionVisitAction" scope="singleton">
+	    <property name="intentionVisitService" ref="intentionVisitService"></property>
+	</bean>
+	<!-- 预计量上报 货品设置 -->
+	<bean name="/forecastprd" class="com.hoperun.erp.sale.forecastprd.action.ForecastPrdAction" scope="singleton">
+	    <property name="forecastPrdService" ref="forecastPrdService"></property>
+	</bean>
+	<!-- 预计量上报 渠道设置 -->
+	<bean name="/forecastchann" class="com.hoperun.erp.sale.forecastchann.action.ForecastchannAction" scope="singleton">
+	    <property name="forecastchannService" ref="forecastchannService"></property>
+	</bean>
+	<!-- 预计量上报 上报任务发布 -->
+	<bean name="/forecasttask" class="com.hoperun.erp.sale.forecasttask.action.ForecastTaskAction" scope="singleton">
+	    <property name="forecastTaskService" ref="forecastTaskService"></property>
+	</bean>
+	<!-- 预计量上报 上报任务发布 -->
+	<bean name="/forecasttaskupaudit" class="com.hoperun.erp.sale.forecasttaskup.action.ForecastTaskupAuditAction" scope="singleton">
+	    <property name="forecastTaskupAuditService" ref="forecastTaskupAuditService"></property>
+	</bean>
+	
+	
+	<!-- 待完善预订单（与龙安接口） -->
+	<bean name="/propressadvcorder" class="com.hoperun.drp.sale.progressadvc.action.ProgressAdvcOrderAction" scope="singleton">
+	    <property name="progressAdvcOrderService" ref="progressAdvcOrderService"></property>
+	</bean>
+	
+</beans>

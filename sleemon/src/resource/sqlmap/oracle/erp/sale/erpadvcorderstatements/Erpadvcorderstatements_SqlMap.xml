@@ -1,0 +1,481 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zzb
+@function 总部-结算单
+@version 2013-09-15 10:35:10
+-->
+<sqlMap  namespace="Erpadvcorderstatements">
+<!-- 定义  -->
+<typeAlias type="com.hoperun.erp.sale.erpadvcorderstatements.model.ErpAdvcorderStatementsModel" alias="ErpAdvcorderStatementsModel"/>
+<typeAlias type="com.hoperun.erp.sale.erpadvcorderstatements.model.ErpAdvcorderStatementsChldModel" alias="ErpAdvcorderStatementsChldModel" />
+ 
+
+<!-- 使用ErpAdvcorderModel装载结果集 -->
+<resultMap id="ErpAdvcorderStatementsModel" class="ErpAdvcorderStatementsModel">
+    <result column="ADVC_STATEMENTS_ORDER_ID" property="ADVC_STATEMENTS_ORDER_ID" />
+</resultMap>
+
+
+<!-- 使用ErpAdvcorderStatementsChldModel装载结果集 -->
+<resultMap id="ErpAdvcorderStatementsChldModel" class="ErpAdvcorderStatementsChldModel">
+    <result column="ADVC_STATEMENTS_ORDER_DTL_ID" property="ADVC_STATEMENTS_ORDER_DTL_ID" />
+</resultMap>
+ 
+
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="ADVC_STATEMENTS_ORDER_NO">
+    u.ADVC_STATEMENTS_ORDER_NO like '%'||#ADVC_STATEMENTS_ORDER_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CHANN_NO">
+    u.CHANN_NO like '%'||#CHANN_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CHANN_NAME">
+    u.CHANN_NAME like '%'||#CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="MARKETING_ACT_NO">
+    u.MARKETING_ACT_NO like '%'||#MARKETING_ACT_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="MARKETING_ACT_NAME">
+    u.MARKETING_ACT_NAME like '%'||#MARKETING_ACT_NAME#||'%'
+  </isNotEmpty>
+ 
+  <isNotEmpty prepend="and" property="STATEMENTS_DATE_BEG">
+	  <![CDATA[  u.STATEMENTS_DATE >= to_date(#STATEMENTS_DATE_BEG#,'yyyy-MM-DD')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="STATEMENTS_DATE_END">
+	  <![CDATA[  u.STATEMENTS_DATE <= to_date(#STATEMENTS_DATE_END#,'yyyy-MM-DD')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="CRE_TIME_BEGIN">
+	  <![CDATA[  u.CRE_TIME >= to_date(#CRE_TIME_BEGIN#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+	  <![CDATA[  u.CRE_TIME <= to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>  
+  
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="DEL_FLAG">
+    u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="QXJBCON">
+        $QXJBCON$
+  </isNotEmpty>
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+	    u.ADVC_STATEMENTS_ORDER_ID,
+	    u.ADVC_STATEMENTS_ORDER_NO,
+	    u.CHANN_ID,
+	    u.CHANN_NO,
+	    u.CHANN_NAME,
+	    u.MARKETING_ACT_ID,
+	    u.MARKETING_ACT_NO,
+	    u.MARKETING_ACT_NAME,
+	    to_char(u.STATEMENTS_DATE,'yyyy-MM-DD')STATEMENTS_DATE,
+	    u.STATEMENTS_AMOUNT,
+	    u.ADVCS_AMOUNT,
+	    u.BANK_RATE,
+	    u.BANK_AMOUNT,
+	    u.COMMISSION_PERCENTAGE,
+	    u.COMMISSION_AMOUNT,
+	    NVL(u.GIFT_AMOUNT,0)GIFT_AMOUNT,
+	    NVL(u.OTHER_AMOUNT,0)OTHER_AMOUNT,
+	    u.LAST_STATEMENTS_AMOUNT,
+		u.REMARK,
+		u.STATE,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.DEL_FLAG
+      from ERP_ADVC_STATEMENTS_ORDER u
+      
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM ERP_ADVC_STATEMENTS_ORDER u ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+
+ 
+	
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_ADVC_STATEMENTS_ORDER(
+		 ADVC_STATEMENTS_ORDER_ID,
+	     ADVC_STATEMENTS_ORDER_NO,
+	     CHANN_ID,
+	     CHANN_NO,
+	     CHANN_NAME,
+	     MARKETING_ACT_ID,
+	     MARKETING_ACT_NO,
+	     MARKETING_ACT_NAME,
+	     STATEMENTS_DATE,
+	     STATEMENTS_AMOUNT,
+	     ADVCS_AMOUNT,
+	     BANK_RATE,
+	     BANK_AMOUNT,
+	     COMMISSION_PERCENTAGE,
+	     COMMISSION_AMOUNT,
+	     GIFT_AMOUNT,
+	     OTHER_AMOUNT,
+	     LAST_STATEMENTS_AMOUNT,
+		 REMARK,
+		 STATE,
+         CRE_NAME,
+         CREATOR,
+         CRE_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         DEL_FLAG
+	   )values(
+		 #ADVC_STATEMENTS_ORDER_ID#,
+	     #ADVC_STATEMENTS_ORDER_NO#,
+	     #CHANN_ID#,
+	     #CHANN_NO#,
+	     #CHANN_NAME#,
+	     #MARKETING_ACT_ID#,
+	     #MARKETING_ACT_NO#,
+	     #MARKETING_ACT_NAME#,
+	     to_date(#STATEMENTS_DATE#,'yyyy-MM-DD'),
+	     #STATEMENTS_AMOUNT#,
+	     #ADVCS_AMOUNT#,
+	     #BANK_RATE#,
+	     #BANK_AMOUNT#,
+	     #COMMISSION_PERCENTAGE#,
+	     #COMMISSION_AMOUNT#,
+	     #GIFT_AMOUNT#,
+	     #OTHER_AMOUNT#,
+	     #LAST_STATEMENTS_AMOUNT#,
+		 #REMARK#,
+		 #STATE#,
+         #CRE_NAME#,
+         #CREATOR#,
+	     sysdate, 
+         #DEPT_ID#,
+         #DEPT_NAME#,
+         #ORG_ID#,
+         #ORG_NAME#,
+         #LEDGER_ID#,
+         #LEDGER_NAME#,
+		 #DEL_FLAG#
+		)
+   ]]>
+</insert>
+
+
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update ERP_ADVC_STATEMENTS_ORDER ]]>
+	<dynamic prepend="set">
+	<isNotNull property="CHANN_ID" prepend=","><![CDATA[CHANN_ID = #CHANN_ID#]]></isNotNull>
+    <isNotNull property="CHANN_NO" prepend=","><![CDATA[CHANN_NO = #CHANN_NO# ]]></isNotNull>
+    <isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME# ]]></isNotNull>
+    <isNotNull property="STATEMENTS_DATE" prepend=","><![CDATA[STATEMENTS_DATE = to_date(#STATEMENTS_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+    <isNotNull property="STATEMENTS_AMOUNT" prepend=","><![CDATA[STATEMENTS_AMOUNT = #STATEMENTS_AMOUNT# ]]></isNotNull>
+    <isNotNull property="ADVCS_AMOUNT" prepend=","><![CDATA[ADVCS_AMOUNT = #ADVCS_AMOUNT# ]]></isNotNull>
+    <isNotNull property="MARKETING_ACT_ID" prepend=","><![CDATA[MARKETING_ACT_ID = #MARKETING_ACT_ID# ]]></isNotNull>
+    <isNotNull property="MARKETING_ACT_NO" prepend=","><![CDATA[MARKETING_ACT_NO = #MARKETING_ACT_NO# ]]></isNotNull>
+    <isNotNull property="MARKETING_ACT_NAME" prepend=","><![CDATA[MARKETING_ACT_NAME = #MARKETING_ACT_NAME# ]]></isNotNull>
+    <isNotNull property="BANK_RATE" prepend=","><![CDATA[BANK_RATE = #BANK_RATE# ]]></isNotNull>
+    <isNotNull property="BANK_AMOUNT" prepend=","><![CDATA[BANK_AMOUNT = #BANK_AMOUNT# ]]></isNotNull>
+    <isNotNull property="COMMISSION_PERCENTAGE" prepend=","><![CDATA[COMMISSION_PERCENTAGE = #COMMISSION_PERCENTAGE# ]]></isNotNull>
+    <isNotNull property="COMMISSION_AMOUNT" prepend=","><![CDATA[COMMISSION_AMOUNT = #COMMISSION_AMOUNT# ]]></isNotNull>
+    <isNotNull property="GIFT_AMOUNT" prepend=","><![CDATA[GIFT_AMOUNT = #GIFT_AMOUNT# ]]></isNotNull>
+    <isNotNull property="OTHER_AMOUNT" prepend=","><![CDATA[OTHER_AMOUNT = #OTHER_AMOUNT# ]]></isNotNull>
+    <isNotNull property="LAST_STATEMENTS_AMOUNT" prepend=","><![CDATA[LAST_STATEMENTS_AMOUNT = #LAST_STATEMENTS_AMOUNT# ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+    <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where ADVC_STATEMENTS_ORDER_ID = #ADVC_STATEMENTS_ORDER_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update ERP_ADVC_STATEMENTS_ORDER 
+	               set DEL_FLAG = #DEL_FLAG#
+                      ,UPD_NAME=#UPD_NAME#
+                     ,UPDATOR=#UPDATOR#
+                      ,UPD_TIME=sysdate
+ 	  where 
+	     ADVC_STATEMENTS_ORDER_ID = #ADVC_STATEMENTS_ORDER_ID# 
+    ]]>
+</delete>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	 select 
+	    u.ADVC_STATEMENTS_ORDER_ID,
+	    u.ADVC_STATEMENTS_ORDER_NO,
+	    u.CHANN_ID,
+	    u.CHANN_NO,
+	    u.CHANN_NAME,
+	    u.MARKETING_ACT_ID,
+	    u.MARKETING_ACT_NO,
+	    u.MARKETING_ACT_NAME,
+	    to_char(u.STATEMENTS_DATE,'yyyy-MM-DD')STATEMENTS_DATE,
+	    u.STATEMENTS_AMOUNT,
+	    u.ADVCS_AMOUNT,
+	    u.BANK_RATE,
+	    u.BANK_AMOUNT,
+	    u.COMMISSION_PERCENTAGE,
+	    u.COMMISSION_AMOUNT,
+	    u.GIFT_AMOUNT,
+	    u.OTHER_AMOUNT,
+	    u.LAST_STATEMENTS_AMOUNT,
+		u.REMARK,
+		u.STATE,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.DEL_FLAG
+      from ERP_ADVC_STATEMENTS_ORDER u
+		where u.ADVC_STATEMENTS_ORDER_ID = #ADVC_STATEMENTS_ORDER_ID#
+	]]>
+</select>
+
+
+<!-- ==========================================================明细操作开始================-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+     select 
+		 u.ADVC_STATEMENTS_ORDER_DTL_ID,
+		 u.ADVC_STATEMENTS_ORDER_ID,
+		 u.ADVC_ORDER_ID,
+		 u.ADVC_ORDER_NO,
+		 u.BILL_TYPE,
+		 to_char(u.SALE_DATE,'yyyy-MM-DD')SALE_DATE,
+		 u.CUST_NAME,
+		 u.TEL,
+		 u.ADVC_AMOUNT,
+		 u.CUR_STATEMENTS_AMOUNT,
+		 u.PAYABLE_AMOUNT,
+		 u.MARKETING_CARD_ID,
+		 u.MARKETING_CARD_NO,
+		 u.DEL_FLAG,
+		 ( select sum(NVL(g.PAYABLE_AMOUNT,0)) PAYABLE_AMOUNT from ERP_ADVC_GIFT_DTL g 
+		  where g.ADVC_ORDER_ID=u.ADVC_ORDER_ID and g.DEL_FLAG=0) GIFT_AMOUNT
+       from ERP_ADVC_STATEMENTS_ORDER_DTL u
+        
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.ADVC_STATEMENTS_ORDER_ID=#ADVC_STATEMENTS_ORDER_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+  </select>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+	        u.ADVC_STATEMENTS_ORDER_DTL_ID in ($ADVC_STATEMENTS_ORDER_DTL_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+  </select>
+<!--明细表插入 -->
+<insert id="insertChld" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_ADVC_STATEMENTS_ORDER_DTL(
+		 ADVC_STATEMENTS_ORDER_DTL_ID,
+		 ADVC_STATEMENTS_ORDER_ID,
+		 ADVC_ORDER_ID,
+		 ADVC_ORDER_NO,
+		 BILL_TYPE,
+		 SALE_DATE,
+		 CUST_NAME,
+		 TEL,
+		 ADVC_AMOUNT,
+		 CUR_STATEMENTS_AMOUNT,
+		 PAYABLE_AMOUNT,
+		 MARKETING_CARD_ID,
+		 MARKETING_CARD_NO,
+		 DEL_FLAG
+	   )values(
+		 #ADVC_STATEMENTS_ORDER_DTL_ID#,
+		 #ADVC_STATEMENTS_ORDER_ID#,
+		 #ADVC_ORDER_ID#,
+		 #ADVC_ORDER_NO#,
+		 #BILL_TYPE#,
+		 to_date(#SALE_DATE#,'yyyy-MM-DD'),
+		 #CUST_NAME#,
+		 #TEL#,
+		 #ADVC_AMOUNT#,
+		 #CUR_STATEMENTS_AMOUNT#,
+		 #PAYABLE_AMOUNT#,
+		 #MARKETING_CARD_ID#,
+		 #MARKETING_CARD_NO#,
+		 #DEL_FLAG#
+		)
+   ]]>
+</insert>
+<!--明细表更新 -->
+<update id="updateChldById" parameterClass="map">
+	<![CDATA[ update ERP_ADVC_STATEMENTS_ORDER_DTL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="ADVC_ORDER_ID" prepend=","><![CDATA[ADVC_ORDER_ID = #ADVC_ORDER_ID# ]]></isNotNull>
+    <isNotNull property="ADVC_ORDER_NO" prepend=","><![CDATA[ADVC_ORDER_NO = #ADVC_ORDER_NO# ]]></isNotNull>
+    <isNotNull property="BILL_TYPE" prepend=","><![CDATA[BILL_TYPE = #BILL_TYPE# ]]></isNotNull>
+    <isNotNull property="SALE_DATE" prepend=","><![CDATA[SALE_DATE = to_date(#SALE_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+    <isNotNull property="CUST_NAME" prepend=","><![CDATA[CUST_NAME = #CUST_NAME# ]]></isNotNull>
+    <isNotNull property="TEL" prepend=","><![CDATA[TEL = #TEL# ]]></isNotNull>
+    <isNotNull property="ADVC_AMOUNT" prepend=","><![CDATA[ADVC_AMOUNT = #ADVC_AMOUNT# ]]></isNotNull>
+    <isNotNull property="CUR_STATEMENTS_AMOUNT" prepend=","><![CDATA[CUR_STATEMENTS_AMOUNT = #CUR_STATEMENTS_AMOUNT# ]]></isNotNull>
+    <isNotNull property="PAYABLE_AMOUNT" prepend=","><![CDATA[PAYABLE_AMOUNT = #PAYABLE_AMOUNT# ]]></isNotNull>
+    <isNotNull property="MARKETING_CARD_ID" prepend=","><![CDATA[MARKETING_CARD_ID = #MARKETING_CARD_ID# ]]></isNotNull>
+    <isNotNull property="MARKETING_CARD_NO" prepend=","><![CDATA[MARKETING_CARD_NO = #MARKETING_CARD_NO# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where ADVC_STATEMENTS_ORDER_DTL_ID = #ADVC_STATEMENTS_ORDER_DTL_ID#]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteChldByIds" parameterClass="map">
+	<![CDATA[ update ERP_ADVC_STATEMENTS_ORDER_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      ADVC_STATEMENTS_ORDER_DTL_ID in ($ADVC_STATEMENTS_ORDER_DTL_IDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细 -->
+<delete id="delChldByFkId" parameterClass="map">
+	<![CDATA[ update ERP_ADVC_STATEMENTS_ORDER_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      ADVC_STATEMENTS_ORDER_ID = #ADVC_STATEMENTS_ORDER_ID#
+    ]]>
+</delete>
+
+<!-- 查询付款方式 -->
+<select id="querySumPaymentDel" parameterClass="map" resultClass="java.util.HashMap" >
+	<![CDATA[
+	  select p.PAY_TYPE,Sum(p.PAY_AMONT)PAY_AMONT,p.PAY_INFO ,p.PAY_BILL_NO from ERP_PAYMENT_DTL p 
+	  where  p.ADVC_ORDER_ID 
+	  in(select ADVC_ORDER_ID from ERP_ADVC_STATEMENTS_ORDER_DTL d where d.ADVC_STATEMENTS_ORDER_ID=#ADVC_STATEMENTS_ORDER_ID# and DEL_FLAG=0)  
+	  and p.DEL_FLAG=0 group by  p.PAY_TYPE,p.PAY_INFO ,p.PAY_BILL_NO
+	]]>
+</select>
+
+
+<select id="queryAdvcIds" parameterClass="map" resultClass="java.util.HashMap" >
+<![CDATA[
+     select to_char(wmsys.wm_concat( '''' || d.ADVC_ORDER_ID  || '''' )) ADVC_ORDER_IDS
+     from ERP_ADVC_STATEMENTS_ORDER_DTL d where d.ADVC_STATEMENTS_ORDER_ID=#ADVC_STATEMENTS_ORDER_ID#
+     and d.DEL_FLAG=0
+    
+]]>
+</select>
+
+
+
+<update id="updateAmountById" parameterClass="map">
+ update ERP_ADVC_STATEMENTS_ORDER u
+     set (u.ADVCS_AMOUNT, u.STATEMENTS_AMOUNT, u.GIFT_AMOUNT) =
+         (select sum(d.ADVC_AMOUNT) ADVC_AMOUNT,
+                 sum(d.PAYABLE_AMOUNT) PAYABLE_AMOUNT,
+                 sum(p.GIFT_AMOUNT) GIFT_AMOUNT
+            from ERP_ADVC_STATEMENTS_ORDER_DTL d
+            left join  
+            (select sum(g.PAYABLE_AMOUNT)GIFT_AMOUNT,g.ADVC_ORDER_ID from ERP_ADVC_GIFT_DTL g  
+            where g.DEL_FLAG=0 group by g.ADVC_ORDER_ID)p
+              on p.ADVC_ORDER_ID = d.ADVC_ORDER_ID
+           where d.ADVC_STATEMENTS_ORDER_ID = u.ADVC_STATEMENTS_ORDER_ID
+             AND d.DEL_FLAG = 0)
+   where u.ADVC_STATEMENTS_ORDER_ID = #ADVC_STATEMENTS_ORDER_ID#
+</update>
+
+<!-- 实际结算金额=结算金额-银行扣点金额-导购员提成金额-礼品费用-其它费用 -->
+<update id="updateBankCommLastAmountById" parameterClass="map">
+  update ERP_ADVC_STATEMENTS_ORDER u set 
+  u.BANK_AMOUNT=u.BANK_RATE*u.ADVCS_AMOUNT,
+  u.COMMISSION_AMOUNT=u.COMMISSION_PERCENTAGE*u.STATEMENTS_AMOUNT,
+  u.LAST_STATEMENTS_AMOUNT=u.STATEMENTS_AMOUNT-
+  round((u.BANK_RATE*u.ADVCS_AMOUNT),2)-
+  round((u.COMMISSION_PERCENTAGE*u.STATEMENTS_AMOUNT),2)-NVL(u.GIFT_AMOUNT,0)-NVL(u.OTHER_AMOUNT,0)
+  where u.ADVC_STATEMENTS_ORDER_ID = #ADVC_STATEMENTS_ORDER_ID#
+</update>
+ 
+ <!-- 审核通过后 将预订单的状态‘已结算’ -->
+ <update id="updateAdvcStateById" parameterClass="map">
+     update ERP_ADVC_ORDER a  
+     set a.STATE= #STATE#
+     where a.ADVC_ORDER_ID 
+      in(select  ADVC_ORDER_ID from ERP_ADVC_STATEMENTS_ORDER_DTL d 
+      where d.ADVC_STATEMENTS_ORDER_ID=#ADVC_STATEMENTS_ORDER_ID# and d.DEL_FLAG=0 )
+</update>
+ 
+ 
+
+ 
+ 
+ 
+</sqlMap>

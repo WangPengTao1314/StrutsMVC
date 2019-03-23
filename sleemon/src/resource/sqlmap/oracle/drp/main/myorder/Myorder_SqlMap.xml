@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ *@module 基础资料
+ *@func 货品信息
+ *@version 1.1
+ *@author 刘曰刚
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Myorder">
+
+	<typeAlias type="com.hoperun.drp.main.myorder.model.MyorderModel"
+		alias="MyorderModel" />
+
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="MyorderModel" class="MyorderModel">
+		<result column="PRD_ID" property="PRD_ID" />
+	</resultMap>
+	<!-- 动态查询 and 列表排序 -->
+	<sql id="queryDynSql"> 
+		<isNotEmpty prepend="and " property="prd_Info"> (a.PRD_NAME like '%'||#prd_Info#||'%' or a.PRD_NO like '%'||#prd_Info#||'%')</isNotEmpty>
+		<isNotEmpty prepend="and " property="type">a.PAR_PRD_NAME like '%'||#type#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="brand">a.BRAND in ($brand$)</isNotEmpty>
+		<isNotEmpty prepend="and " property="spec">a.PRD_SPEC like '%'||#spec#||'%'</isNotEmpty> 
+		<isNotEmpty prepend="and " property="DEL_FLAG">a.DEL_FLAG =#DEL_FLAG#</isNotEmpty>
+		<isNotEmpty prepend="and " property="STATE">a.STATE =#STATE#</isNotEmpty>
+		<isNotEmpty prepend="and " property="FINAL_NODE_FLAG">a.FINAL_NODE_FLAG =#FINAL_NODE_FLAG#</isNotEmpty>
+		<isNotEmpty prepend="and " property="prmt">a.PRD_ID in (
+		   select a.PRD_ID from BASE_PRD_GROUP_DTL a 
+					        left join ERP_PRMT_PRD_GROUP b on a.PRD_GROUP_ID=b.PRD_GROUP_ID
+       						left join ERP_PRMT_PLAN c on b.PRMT_PLAN_ID=c.PRMT_PLAN_ID
+					       where c.PRMT_PLAN_ID in ($prmt$)  group by a.PRD_ID)
+       </isNotEmpty>
+       <isNotEmpty prepend="and " property="REBATE_PRD_NO">
+       		<!-- a.PAR_PRD_NO in ($REBATE_PRD_NO$) -->
+       		$REBATE_PRD_NO$
+       	</isNotEmpty>
+       	<isNotEmpty prepend="and " property="LARGESSPRD_NO">
+       		a.PAR_PRD_NO in ($LARGESSPRD_NO$)
+       	</isNotEmpty>
+       <isNotEmpty prepend="  " property="sql">$sql$  and IS_NO_STAND_FLAG=0</isNotEmpty>
+	</sql>
+    <sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField"> $orderField$,</isNotEmpty>PRD_NO
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[
+			select 
+				a.PRD_ID,
+				a.PRD_NO,
+				a.PRD_NAME,
+				a.PRD_SPEC,
+				a.PRD_COLOR,
+				a.BRAND,
+				a.PRD_TYPE,
+				a.LENGTH,
+				a.WIDTH,
+				a.HEIGHT,
+				a.FACT_PRICE,
+				a.PIC_PATH,
+				NVL(a.PRD_SUIT_FLAG,0)PRD_SUIT_FLAG,
+				a.STD_UNIT,
+				decode(NVL(b.PRMT_PRVD_PRICE,0),0,NVL(a.PRVD_PRICE, 0),NVL(b.PRMT_PRVD_PRICE,0)) PRVD_PRICE,
+				$DECT_RATE$ DECT_RATE,
+				 ( decode(NVL(b.PRMT_PRVD_PRICE,0),0,NVL(a.PRVD_PRICE, 0),NVL(b.PRMT_PRVD_PRICE,0)) * NVL($DECT_RATE$, 0)) DECT_PRICE
+			from BASE_PRODUCT a
+			 left join ERP_PRMT_PRICE b
+                    on a.PRD_ID=b.PRD_ID and b.EFFCT_DATE_BEG<=sysdate and  b.EFFCT_DATE_END>=sysdate and b.STATE=#STATE#
+                    
+			
+				]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	
+	
+	<!-- 主表分页查询 -->
+	<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+			<include refid="public.pageBegin" />
+			<include refid="coreSql" />
+			<include refid="public.pageEnd" />
+		</select>
+	<!-- 分页计数 -->
+	<!-- 0156474 start 刘曰刚 2014-06-17 -->
+	<!-- 去掉和渠道折扣扁平表和渠道表的关联 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+	      <![CDATA[select count(0) cnt FROM BASE_PRODUCT a 
+	    ]]>
+		<dynamic prepend="where">
+				<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+	<!-- 0156474 End 刘曰刚 2014-06-17 -->
+	
+	
+	
+	
+	
+	
+	<!-- 查询所有品牌 -->
+	<select id="findBRANDAll" resultClass="java.util.HashMap" parameterClass="map">
+		select BRAND from BASE_BRAND where STATE=#STATE# and DEL_FLAG=#DEL_FLAG# order by BRAND_ID ASC
+	</select>
+	<!-- 按货品id，删除标记，处理标记，来源类型查询是否有相同数据 -->
+	<select id="getByPrdInfo" resultClass="java.util.HashMap" parameterClass="map">
+		select SHOP_CART_ID,ORDER_NUM
+		 from DRP_SHOP_CART where PRD_ID=#PRD_ID# and DEL_FLAG=#DEL_FLAG# and DEAL_FLAG=#DEAL_FLAG# and SPCL_TECH_ID is  null  and LEDGER_ID=#LEDGER_ID# and SHOP_CART_TYPE=#SHOP_CART_TYPE#
+	</select>
+	<!-- 新增购物车 -->
+	<insert id="insert" parameterClass="map">
+		insert into DRP_SHOP_CART(
+			SHOP_CART_ID,
+			PRD_ID,
+			PRD_NO,
+			PRD_NAME,
+			PRD_SPEC,
+			PRD_COLOR,
+			BRAND,
+			STD_UNIT,
+			PRICE,
+			DECT_RATE,
+			DECT_PRICE,
+			ORDER_NUM,
+			ORDER_AMOUNT,
+			DEL_FLAG,
+			SESSION_ID,
+			DEAL_FLAG,
+			CREATOR,
+			CRE_NAME,
+			CRE_TIME,
+			DEPT_ID,
+			DEPT_NAME,
+			ORG_ID,
+			ORG_NAME,
+			LEDGER_ID,
+			LEDGER_NAME,
+			SHOP_CART_TYPE,
+			SPCL_TECH_ID,
+			VOLUME
+		)
+		select 
+			#SHOP_CART_ID#,
+			PRD_ID,
+			PRD_NO,
+			PRD_NAME,
+			PRD_SPEC,
+			PRD_COLOR,
+			BRAND,
+			STD_UNIT,
+			#PRICE#,
+			#DECT_RATE#,
+			#DECT_PRICE#,
+			#ORDER_NUM#,
+			#ORDER_AMOUNT#,
+			#DEL_FLAG#,
+			#SESSION_ID#,
+			#DEAL_FLAG#,
+			#CREATOR#,
+			#CRE_NAME#,
+			sysdate,
+			#DEPT_ID#,
+			#DEPT_NAME#,
+			#ORG_ID#,
+			#ORG_NAME#,
+			#LEDGER_ID#,
+			#LEDGER_NAME#,
+			#SHOP_CART_TYPE#,
+			#SPCL_TECH_ID#,
+			VOLUME
+		from BASE_PRODUCT where PRD_ID=#PRD_ID#
+		
+	</insert>
+	<!-- 当购物车里有同样的货品数据并且没有特殊工艺时 修改购物车里的数量和金额 -->
+	<update id="update" parameterClass="map">
+		<![CDATA[ update DRP_SHOP_CART ]]>
+		<dynamic prepend="set">
+	    	<isNotNull property="ORDER_NUM" prepend=","><![CDATA[ORDER_NUM = #ORDER_NUM#]]></isNotNull>
+	    	<isNotNull property="ORDER_AMOUNT" prepend=","><![CDATA[ORDER_AMOUNT = #ORDER_AMOUNT#]]></isNotNull>
+	    	<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+	    	<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+	    	<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+	    </dynamic>
+		<![CDATA[  where SHOP_CART_ID = #SHOP_CART_ID#]]>
+	</update>
+	<select id="findPRMT_PLANAll"  resultClass="java.util.HashMap" parameterClass="map">
+		<![CDATA[
+			select PRMT_PLAN_NAME,PRMT_PLAN_ID from ERP_PRMT_PLAN 
+				where STATE=#STATE#  
+					and EFFCT_DATE_BEG<sysdate 
+					and EFFCT_DATE_END>sysdate
+		       		and PRMT_PLAN_ID in (
+		       			select PRMT_PLAN_ID from ERP_PRMT_EFFCT_AREA where AREA_ID = (
+		       				select AREA_ID from BASE_CHANN where CHANN_ID=#CHANN_ID#
+		       			)
+		       		)
+		]]>
+		
+	</select>
+	<!-- // 0156143 End 刘曰刚 2014/06/16// -->
+		<select id="getChannDiscount" parameterClass="string" resultClass="string">
+		<![CDATA[
+			select DECT_RATE from BASE_CHANN_DSCT where CHANN_ID=#CHANN_ID#
+		]]>
+	</select>
+<!-- // 0156143 End 刘曰刚 2014/06/16// -->
+<!-- 查询货品分类 -->
+	<select id="findType" parameterClass="map" resultClass="string">
+		<![CDATA[
+			select 
+				distinct PAR_PRD_NAME 
+			from BASE_PRODUCT 
+			where STATE in ($STATE$) 
+			and DEL_FLAG=#DEL_FLAG# 
+			and FINAL_NODE_FLAG=#FINAL_NODE_FLAG#
+			and PAR_PRD_NAME is not null
+		]]>
+	</select>
+</sqlMap>

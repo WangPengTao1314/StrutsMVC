@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ *@module 基础资料
+ *@func 渠道折扣
+ *@version 1.1
+ *@author 刘曰刚
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Channdiscount">
+	<typeAlias type="com.hoperun.erp.sale.channdiscount.model.ChannDiscountModel"
+		alias="ChannDiscountModel" />
+
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="ChannDiscountModel" class="ChannDiscountModel">
+		<result column="CHANN_DSCT_ID" property="CHANN_DSCT_ID" />
+	</resultMap>
+	<!-- 动态查询 and 列表排序 -->
+	<sql id="queryDynSql"> 
+		<isNotEmpty prepend="and " property="CHANN_TYPE">temp.CHANN_TYPE=#CHANN_TYPE#</isNotEmpty>
+		<isNotEmpty prepend="and " property="AREA_NO">temp.AREA_NO like '%'||#AREA_NO#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="AREA_NAME">temp.AREA_NAME like '%'||#AREA_NAME#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="CHANN_TYPE">temp.CHANN_TYPE=#CHANN_TYPE#</isNotEmpty>
+		<isNotEmpty prepend="and " property="CHAA_LVL">temp.CHAA_LVL=#CHAA_LVL#</isNotEmpty>
+		<isNotEmpty prepend="and " property="CHANN_NO">temp.CHANN_NO like '%'||#CHANN_NO#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="CHANN_NAME">temp.CHANN_NAME  like '%'||#CHANN_NAME#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="sql">$sql$</isNotEmpty>
+	    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	   </isNotEmpty>
+	</sql>
+    <sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField"> $orderField$,</isNotEmpty>CHANN_NO
+	</sql>
+	<!-- 查询SQL -->
+	<select id="getChannInfo" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[
+		select *
+	  from (select b.CHANN_DSCT_ID,
+	               a.CHANN_ID,
+	               a.CHANN_NO,
+	               a.CHANN_NAME,
+	               a.CHANN_TYPE,
+	               a.CHAA_LVL,
+	               b.DECT_TYPE,
+	               b.DECT_RATE,
+	               a.AREA_NO,
+	               a.AREA_NAME,
+	               a.DEL_FLAG,
+	               a.STATE
+	          from BASE_CHANN a
+	          left join BASE_CHANN_DSCT b on a.CHANN_ID = b.CHANN_ID
+	         where a.DEL_FLAG = 0
+	           and a.STATE != #STATE#
+	           and b.DECT_TYPE = #DECT_TYPE#
+	        UNION
+	        select '',
+	               a.CHANN_ID,
+	               a.CHANN_NO,
+	               a.CHANN_NAME,
+	               a.CHANN_TYPE,
+	               a.CHAA_LVL,
+	               '',
+	               0,
+	               a.AREA_NO,
+	               a.AREA_NAME,
+	               a.DEL_FLAG,
+	               a.STATE
+	          from BASE_CHANN a
+	         where CHANN_ID not in (select CHANN_ID from BASE_CHANN_DSCT where DECT_TYPE = #DECT_TYPE#) and a.DEL_FLAG = 0 and a.STATE != #STATE#
+         ) temp
+		]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+	</select>
+	<delete id="delete" parameterClass="string">
+		<![CDATA[
+			delete from BASE_CHANN_DSCT where CHANN_DSCT_ID in ($CHANN_DSCT_IDS$)
+		]]>
+	</delete>
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+			insert into BASE_CHANN_DSCT(
+				CHANN_DSCT_ID,
+				CHANN_ID,
+				CHANN_NO,
+				CHANN_NAME,
+				CHANN_TYPE,
+				CHAA_LVL,
+				DECT_TYPE,
+				DECT_RATE
+			)values(
+				#CHANN_DSCT_ID#,
+				#CHANN_ID#,
+				#CHANN_NO#,
+				#CHANN_NAME#,
+				#CHANN_TYPE#,
+				#CHAA_LVL#,
+				#DECT_TYPE#,
+				#DECT_RATE#
+			)
+		]]>
+	</insert>
+	<update id="update" parameterClass="map">
+		<![CDATA[
+			update BASE_CHANN_DSCT set DECT_RATE=#DECT_RATE#  where CHANN_DSCT_ID=#CHANN_DSCT_ID#
+		]]>
+	</update>
+</sqlMap>

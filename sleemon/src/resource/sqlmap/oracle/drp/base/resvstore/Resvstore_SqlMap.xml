@@ -1,0 +1,252 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zzb
+@function  库存储备
+@version 2013-09-07 14:13:12
+-->
+<sqlMap  namespace="Resvstore">
+<typeAlias type="com.hoperun.drp.base.resvstore.model.ResvstoreModel" alias="ResvstoreModel"/>
+<!-- 使用Resvstore装载结果集 -->
+<resultMap id="ResvstoreModel" class="ResvstoreModel">
+    <result column="RESV_STOCK_ID" property="RESV_STOCK_ID" />
+</resultMap>
+<!-- 动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="PRD_COLOR">
+    u.PRD_COLOR like '%'||#PRD_COLOR#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STD_UNIT">
+    u.STD_UNIT like '%'||#STD_UNIT#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="PRD_SPEC">
+    u.PRD_SPEC like '%'||#PRD_SPEC#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="BRAND">
+    u.BRAND like '%'||#BRAND#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="PRD_NAME">
+    u.PRD_NAME like '%'||#PRD_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="PRD_NO">
+    u.PRD_NO like '%'||#PRD_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_BEG">
+     <![CDATA[u.CRE_TIME >= to_date(#CRE_TIME_BEG#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+     <![CDATA[u.CRE_TIME <= to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="DEL_FLAG">
+        u.DEL_FLAG=#DEL_FLAG#
+ </isNotEmpty>
+   <isNotEmpty prepend="and " property="QXJBCON">
+        $QXJBCON$
+ </isNotEmpty>
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.RESV_STOCK_ID,
+		u.PRD_ID,
+		u.PRD_NO,
+		u.PRD_NAME,
+		u.PRD_SPEC,
+		u.PRD_COLOR,
+		u.BRAND,
+		u.STD_UNIT,
+		u.SAFE_STORE_NUM,
+		u.MIN_STORE_NUM,
+		u.REMARK,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG
+       from DRP_RESV_STOCK u 
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt 
+            from DRP_RESV_STOCK u 
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+ <!-- 查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_RESV_STOCK(
+		 RESV_STOCK_ID,
+		 PRD_ID,
+         PRD_NO,
+         PRD_NAME,
+         PRD_SPEC,
+         PRD_COLOR,
+         BRAND,
+         STD_UNIT,
+         SAFE_STORE_NUM,
+         MIN_STORE_NUM,
+         REMARK,
+         CRE_NAME,
+         CREATOR,
+         CRE_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         STATE,
+         DEL_FLAG
+	   )values(
+		#RESV_STOCK_ID#,
+		#PRD_ID#,
+        #PRD_NO#,
+        #PRD_NAME#,
+        #PRD_SPEC#,
+        #PRD_COLOR#,
+        #BRAND#,
+        #STD_UNIT#,
+        #SAFE_STORE_NUM#,
+        #MIN_STORE_NUM#,
+        #REMARK#,
+        #CRE_NAME#,
+        #CREATOR#,
+		sysdate, 
+        #DEPT_ID#,
+        #DEPT_NAME#,
+        #ORG_ID#,
+        #ORG_NAME#,
+        #LEDGER_ID#,
+        #LEDGER_NAME#,
+        #STATE#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update DRP_RESV_STOCK ]]>
+	<dynamic prepend="set">
+    <isNotNull property="PRD_NO" prepend=","><![CDATA[PRD_NO = #PRD_NO# ]]></isNotNull>
+    <isNotNull property="PRD_NAME" prepend=","><![CDATA[PRD_NAME = #PRD_NAME# ]]></isNotNull>
+    <isNotNull property="PRD_SPEC" prepend=","><![CDATA[PRD_SPEC = #PRD_SPEC# ]]></isNotNull>
+    <isNotNull property="PRD_COLOR" prepend=","><![CDATA[PRD_COLOR = #PRD_COLOR# ]]></isNotNull>
+    <isNotNull property="BRAND" prepend=","><![CDATA[BRAND = #BRAND# ]]></isNotNull>
+    <isNotNull property="STD_UNIT" prepend=","><![CDATA[STD_UNIT = #STD_UNIT# ]]></isNotNull>
+    <isNotNull property="SAFE_STORE_NUM" prepend=","><![CDATA[SAFE_STORE_NUM = #SAFE_STORE_NUM# ]]></isNotNull>
+    <isNotNull property="MIN_STORE_NUM" prepend=","><![CDATA[MIN_STORE_NUM = #MIN_STORE_NUM# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+     <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where RESV_STOCK_ID = #RESV_STOCK_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update DRP_RESV_STOCK 
+	               set DEL_FLAG = #DEL_FLAG#
+                      ,UPD_NAME=#UPD_NAME#
+                     ,UPDATOR=#UPDATOR#
+                      ,UPD_TIME=sysdate
+ 	  where 
+	     RESV_STOCK_ID = #RESV_STOCK_ID:VARCHAR# 
+    ]]>
+</delete>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.RESV_STOCK_ID,
+		u.PRD_ID,
+		u.PRD_NO,
+		u.PRD_NAME,
+		u.PRD_SPEC,
+		u.PRD_COLOR,
+		u.BRAND,
+		u.STD_UNIT,
+		u.SAFE_STORE_NUM,
+		u.MIN_STORE_NUM,
+		u.REMARK,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG
+            from DRP_RESV_STOCK u 
+	  where 
+		u.RESV_STOCK_ID = #RESV_STOCK_ID#
+	]]>
+</select>
+<!--启用/停用-->
+<update id="updStusById" parameterClass="map">	
+     <![CDATA[ 
+	  update DRP_RESV_STOCK 
+	       set STATE = #STATE#
+              ,UPD_NAME=#UPD_NAME#
+              ,UPDATOR=#UPDATOR#
+              ,UPD_TIME=sysdate
+ 	  where 
+	     RESV_STOCK_ID = #RESV_STOCK_ID:VARCHAR# 
+    ]]>
+</update>
+
+<!-- 查询重复 -->
+<select id="queryBhForInt" parameterClass="map" resultClass="int">
+   select count(u.PRD_ID) from DRP_RESV_STOCK u 
+     where u.LEDGER_ID=#LEDGER_ID#
+     and u.PRD_ID =#PRD_ID#
+     and u.DEL_FLAG=#DEL_FLAG#
+     <isNotEmpty prepend="and" property="RESV_STOCK_ID">
+        u.RESV_STOCK_ID != #RESV_STOCK_ID#
+     </isNotEmpty>
+     
+</select>
+
+
+
+</sqlMap>

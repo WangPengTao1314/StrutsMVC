@@ -1,0 +1,366 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zzb
+@function 
+@version 2013-09-05 14:00:34
+-->
+<sqlMap  namespace="StateChange">
+<!-- 定义StateChangeModel,StateChangeModelChild -->
+<typeAlias type="com.hoperun.drp.store.statechange.model.StateChangeModel" alias="StateChangeModel"/>
+<typeAlias type="com.hoperun.drp.store.statechange.model.StateChangeModelChild" alias="StateChangeModelChild" />
+<!-- 使用StateChangeModel装载结果集 -->
+<resultMap id="StateChangeModel" class="StateChangeModel">
+    <result column="STATE_CHANGE_ID" property="STATE_CHANGE_ID" />
+</resultMap>
+<!-- 使用StateChangeModelChild装载结果集 -->
+<resultMap id="StateChangeModelChild" class="StateChangeModelChild">
+    <result column="STATE_CHANGE_DTL_ID" property="STATE_CHANGE_DTL_ID" />
+</resultMap>
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="STATE_CHANGE_NO">
+    u.STATE_CHANGE_NO like '%'||#STATE_CHANGE_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_BEG">
+     <![CDATA[u.CRE_TIME >=to_date(#CRE_TIME_BEG#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+     <![CDATA[u.CRE_TIME <=  to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE = #STATE#
+  </isNotEmpty>
+	<isNotEmpty prepend="and " property="DEL_FLAG">
+	        u.DEL_FLAG=#DEL_FLAG#
+	</isNotEmpty>
+    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	</isNotEmpty>
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.STATE_CHANGE_ID,
+		u.STATE_CHANGE_NO,
+		u.STATE,
+		u.REMARK,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.DEL_FLAG,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.AUDIT_NAME,
+		u.AUDIT_ID
+      from DRP_STATE_CHANGE u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM DRP_STATE_CHANGE u ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_STATE_CHANGE(
+		 STATE_CHANGE_ID,
+         STATE_CHANGE_NO,
+         REMARK,
+         STATE,
+         CREATOR,
+         CRE_NAME,
+         CRE_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         DEL_FLAG
+	   )values(
+		#STATE_CHANGE_ID#,
+        #STATE_CHANGE_NO#,
+        #REMARK#,
+        #STATE#,
+        #CREATOR#,
+        #CRE_NAME#,
+        sysdate,
+        #DEPT_ID#,
+        #DEPT_NAME#,
+        #ORG_ID#,
+        #ORG_NAME#,
+        #LEDGER_ID#,
+        #LEDGER_NAME#,
+        #DEL_FLAG#
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update DRP_STATE_CHANGE ]]>
+	<dynamic prepend="set">
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    <isNotNull property="AUDIT_ID" prepend=","><![CDATA[AUDIT_ID = #AUDIT_ID#]]></isNotNull>
+    <isNotNull property="AUDIT_NAME" prepend=","><![CDATA[AUDIT_NAME = #AUDIT_NAME#]]></isNotNull>
+    <isNotNull property="AUDIT_TIME" prepend=","><![CDATA[AUDIT_TIME = sysdate]]></isNotNull>
+	<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+	<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+	<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where STATE_CHANGE_ID = #STATE_CHANGE_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update DRP_STATE_CHANGE 
+	          set 
+	          UPD_NAME=#UPD_NAME#,UPDATOR=#UPDATOR#,UPD_TIME=sysdate,
+              DEL_FLAG = #DEL_FLAG#
+	               
+ 	  where 
+	     STATE_CHANGE_ID = #STATE_CHANGE_ID# 
+    ]]>
+</delete>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.STATE_CHANGE_ID,
+		u.STATE_CHANGE_NO,
+		u.REMARK,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.AUDIT_NAME,
+		u.AUDIT_ID
+	  from
+       DRP_STATE_CHANGE u 
+	  where 
+		u.STATE_CHANGE_ID = #STATE_CHANGE_ID#
+	]]>
+</select>
+<!-- 明细操作开始-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+     select 
+    u.STATE_CHANGE_DTL_ID,
+    u.STATE_CHANGE_ID,
+    u.STORE_ID,
+      u.STORE_NO,
+      u.STORE_NAME,
+      u.PAR_CHANGE_PRD_ID,
+      u.PAR_CHANGE_PRD_NO,
+      u.PAR_CHANGE_PRD_NAME,
+      u.PAR_CHANGE_SPCL_TECH_ID,
+      a.SPCL_TECH_FLAG PAR_SPCL_TECH_FLAG,
+      a.DM_SPCL_TECH_NO PAR_DM_SPCL_TECH_NO,
+      u.CHANGED_PRD_ID,
+      u.CHANGED_PRD_NO,
+      u.CHANGED_PRD_NAME,
+      u.CHANGED_SPCL_TECH_ID,
+      b.SPCL_TECH_FLAG CHANGED_SPCL_TECH_FLAG,
+      b.DM_SPCL_TECH_NO CHANGED_DM_SPCL_TECH_NO,
+      u.CHANGE_NUM,
+      NVL(acct.STORE_NUM,0)-NVL(acct.FREEZE_NUM,0) SAFE_NUM,
+      u.DEL_FLAG
+       from DRP_STATE_CHANGE_DTL u 
+       left join DRP_STORE_ACCT acct on acct.PRD_ID=u.PAR_CHANGE_PRD_ID and acct.STORE_ID=u.STORE_ID 
+        and NVL(u.PAR_CHANGE_SPCL_TECH_ID,'NULL')=NVL(acct.SPCL_TECH_ID,'NULL')
+          left join DRP_SPCL_TECH a on   a.SPCL_TECH_ID = u.PAR_CHANGE_SPCL_TECH_ID and a.USE_FLAG = 1
+          left join DRP_SPCL_TECH b on   b.SPCL_TECH_ID = u.CHANGED_SPCL_TECH_ID and b.USE_FLAG = 1
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.STATE_CHANGE_ID=#STATE_CHANGE_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+	        u.STATE_CHANGE_DTL_ID in ($STATE_CHANGE_DTL_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+<!--明细表插入 -->
+<insert id="insertChld" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_STATE_CHANGE_DTL(
+		STATE_CHANGE_DTL_ID,
+		STATE_CHANGE_ID,
+		STORE_ID,
+	    STORE_NO,
+	    STORE_NAME,
+	    PAR_CHANGE_PRD_ID,
+	    PAR_CHANGE_PRD_NO,
+	    PAR_CHANGE_PRD_NAME,
+	    PAR_CHANGE_SPCL_TECH_ID,
+	    CHANGED_PRD_ID,
+	    CHANGED_PRD_NO,
+	    CHANGED_PRD_NAME,
+	    CHANGED_SPCL_TECH_ID,
+	    CHANGE_NUM,
+		DEL_FLAG
+	   )values(
+		#STATE_CHANGE_DTL_ID#,
+		#STATE_CHANGE_ID#,
+		#STORE_ID#,
+	    #STORE_NO#,
+	    #STORE_NAME#,
+	    #PAR_CHANGE_PRD_ID#,
+	    #PAR_CHANGE_PRD_NO#,
+	    #PAR_CHANGE_PRD_NAME#,
+	    #PAR_CHANGE_SPCL_TECH_ID#,
+	    #CHANGED_PRD_ID#,
+	    #CHANGED_PRD_NO#,
+	    #CHANGED_PRD_NAME#,
+	    #CHANGED_SPCL_TECH_ID#,
+	    #CHANGE_NUM#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+<!--明细表更新 -->
+<update id="updateChldById" parameterClass="map">
+	<![CDATA[ update DRP_STATE_CHANGE_DTL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="STORE_ID" prepend=","><![CDATA[STORE_ID = #STORE_ID# ]]></isNotNull>
+    <isNotNull property="STORE_NO" prepend=","><![CDATA[STORE_NO = #STORE_NO# ]]></isNotNull>
+    <isNotNull property="STORE_NAME" prepend=","><![CDATA[STORE_NAME = #STORE_NAME# ]]></isNotNull>
+    <isNotNull property="PAR_CHANGE_PRD_ID" prepend=","><![CDATA[PAR_CHANGE_PRD_ID = #PAR_CHANGE_PRD_ID# ]]></isNotNull>
+    <isNotNull property="PAR_CHANGE_PRD_NO" prepend=","><![CDATA[PAR_CHANGE_PRD_NO = #PAR_CHANGE_PRD_NO# ]]></isNotNull>
+    <isNotNull property="PAR_CHANGE_PRD_NAME" prepend=","><![CDATA[PAR_CHANGE_PRD_NAME = #PAR_CHANGE_PRD_NAME# ]]></isNotNull>
+    <isNotNull property="PAR_CHANGE_SPCL_TECH_ID" prepend=","><![CDATA[PAR_CHANGE_SPCL_TECH_ID = #PAR_CHANGE_SPCL_TECH_ID# ]]></isNotNull>
+    <isNotNull property="CHANGED_PRD_ID" prepend=","><![CDATA[CHANGED_PRD_ID = #CHANGED_PRD_ID# ]]></isNotNull>
+    <isNotNull property="CHANGED_PRD_NO" prepend=","><![CDATA[CHANGED_PRD_NO = #CHANGED_PRD_NO# ]]></isNotNull>
+    <isNotNull property="CHANGED_PRD_NAME" prepend=","><![CDATA[CHANGED_PRD_NAME = #CHANGED_PRD_NAME# ]]></isNotNull>
+    <isNotNull property="CHANGED_SPCL_TECH_ID" prepend=","><![CDATA[CHANGED_SPCL_TECH_ID = #CHANGED_SPCL_TECH_ID# ]]></isNotNull>
+    <isNotNull property="CHANGE_NUM" prepend=","><![CDATA[CHANGE_NUM = #CHANGE_NUM# ]]></isNotNull>
+    <isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where STATE_CHANGE_DTL_ID = #STATE_CHANGE_DTL_ID#]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteChldByIds" parameterClass="map">
+	<![CDATA[ update DRP_STATE_CHANGE_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      STATE_CHANGE_DTL_ID in ($STATE_CHANGE_DTL_IDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细 -->
+<delete id="delChldByFkId" parameterClass="map">
+	<![CDATA[ update DRP_STATE_CHANGE_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      STATE_CHANGE_ID = #STATE_CHANGE_ID:VARCHAR#
+    ]]>
+</delete>
+
+<update id="updateParAcctById" parameterClass="map">
+<![CDATA[ 
+   update DRP_STORE_ACCT acct set acct.STORE_NUM= (acct.STORE_NUM-
+   (  select NVL(t.CHANGE_NUM,0)CHANGE_NUM from DRP_STATE_CHANGE_DTL t where  t.PAR_CHANGE_PRD_ID=acct.PRD_ID
+      and t.STORE_ID=acct.STORE_ID
+      and t.PAR_CHANGE_SPCL_TECH_ID=acct.SPCL_TECH_ID
+       and t.STATE_CHANGE_ID=#STATE_CHANGE_ID#
+    )
+  )
+  where  exists (select 1
+  from DRP_STATE_CHANGE_DTL t where  t.PAR_CHANGE_PRD_ID=acct.PRD_ID
+  and t.STORE_ID=acct.STORE_ID
+  and t.PAR_CHANGE_SPCL_TECH_ID=acct.SPCL_TECH_ID
+  and t.STATE_CHANGE_ID=#STATE_CHANGE_ID#
+	)
+]]>
+	 
+</update>
+
+<!-- 转换后的 -->
+<update id="updateChangeAcctById" parameterClass="map">
+<![CDATA[ 
+   update DRP_STORE_ACCT acct set acct.STORE_NUM= (acct.STORE_NUM+
+   (  select NVL(t.CHANGE_NUM,0)CHANGE_NUM from DRP_STATE_CHANGE_DTL t where  t.CHANGED_PRD_ID=acct.PRD_ID
+      and t.STORE_ID=acct.STORE_ID
+      and t.CHANGED_SPCL_TECH_ID=acct.SPCL_TECH_ID
+      and t.STATE_CHANGE_ID=#STATE_CHANGE_ID#
+    )
+  )
+  where  exists (select 1
+  from DRP_STATE_CHANGE_DTL t where t.CHANGED_PRD_ID=acct.PRD_ID
+  and t.STORE_ID=acct.STORE_ID
+  and t.CHANGED_SPCL_TECH_ID=acct.SPCL_TECH_ID
+  and t.STATE_CHANGE_ID=#STATE_CHANGE_ID#
+	)
+]]>
+	 
+</update>
+
+
+
+</sqlMap>

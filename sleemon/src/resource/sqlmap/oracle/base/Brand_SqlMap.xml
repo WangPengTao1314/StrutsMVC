@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="BRAND">
+	<!-- 
+		*@module 系统管理
+		*@func 品牌信息维护
+		*@version 1.1
+		*@author 郭利伟
+	-->
+	<typeAlias type="com.hoperun.base.brand.model.BrandModel" alias="BrandModel" />
+
+	<!-- 使用BRAND装载结果集 -->
+	<resultMap id="BrandModel" class="BrandModel">
+		<result column="BRAND_ID" property="BRAND_ID" />
+	</resultMap>
+
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="BRAND_EN">
+			<![CDATA[BRAND_EN like '%'||#BRAND_EN#||'%']]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="BRAND">
+			<![CDATA[BRAND like '%'||#BRAND#||'%']]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CRE_TIME_FROM">
+			<![CDATA[CRE_TIME >= to_date(#CRE_TIME_FROM#,'yyyy-MM-DD HH24:MI:SS')]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CRE_TIME_TO">
+			<![CDATA[CRE_TIME <= to_date(#CRE_TIME_TO#,'yyyy-MM-DD HH24:MI:SS')]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="STATE">
+			STATE = #STATE#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="DEL_FLAG">
+			DEL_FLAG = #DEL_FLAG#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="QXJBCON">
+			$QXJBCON$
+		</isNotEmpty>			
+	</sql>
+
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField">
+			$orderField$
+		</isNotEmpty>
+	</sql>
+
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[select 
+					u.BRAND_ID,
+					u.BRAND,
+					u.BRAND_EN,
+					u.STATE,
+					u.CREATOR,
+					u.CRE_NAME,
+					to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+					u.UPDATOR,
+					u.UPD_NAME,
+					to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+					u.DEPT_ID,
+					u.DEPT_NAME,
+					u.ORG_ID,
+					u.ORG_NAME,
+					u.REMARK
+				from 
+					${SYSSCHEMA}.BASE_BRAND u 
+		]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql" />
+		</dynamic>
+	</sql>
+
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[select 
+					count(BRAND_ID) cnt 
+				 from 
+					${SYSSCHEMA}.BASE_BRAND
+		]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+
+	<!-- 查询 -->
+	<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+			<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+	</select>
+	
+	<!-- 根据ID查找 -->
+	<select id="loadById" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[select 
+					u.BRAND_ID,
+					u.BRAND,
+					u.BRAND_EN,
+					u.STATE,
+					u.CREATOR,
+					u.CRE_NAME,
+					to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+					u.UPDATOR,
+					u.UPD_NAME,
+					to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+					u.DEPT_ID,
+					u.DEPT_NAME,
+					u.ORG_ID,
+					u.ORG_NAME,
+					u.REMARK
+				from 
+					${SYSSCHEMA}.BASE_BRAND u 
+				where
+					u.BRAND_ID = #BRAND_ID#
+		]]>
+	</select>
+	
+	<!-- 新增 -->
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 	insert into  BASE_BRAND( 
+					BRAND_ID,
+					BRAND,
+					BRAND_EN,
+					STATE,
+					CREATOR,
+					CRE_NAME,
+					CRE_TIME,
+					DEPT_ID,
+					DEPT_NAME,
+					ORG_ID,
+					ORG_NAME,
+					REMARK,
+					DEL_FLAG
+		 	)values(
+					#BRAND_ID#,
+					#BRAND#,
+					#BRAND_EN#,
+					#STATE#,
+					#CREATOR#,
+					#CRE_NAME#,
+					sysdate,
+					#DEPT_ID#,
+					#DEPT_NAME#,
+					#ORG_ID#,
+					#ORG_NAME#,
+					#REMARK#,
+					0
+					 )
+		]]>
+	</insert>
+	
+	<!-- 根据ID修改 -->
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.BASE_BRAND ]]>
+		<!-- CHANAME, CHADES,CHADATE,CHASTU     -->
+		<dynamic prepend="set">
+			<isNotNull property="BRAND" prepend=","><![CDATA[BRAND = #BRAND#]]></isNotNull>
+			<isNotNull property="BRAND_EN" prepend=","><![CDATA[BRAND_EN = #BRAND_EN#]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+			<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where BRAND_ID = #BRAND_ID# ]]>
+	</update>
+	
+	<!-- 删除 -->
+	<delete id="delete" parameterClass="map">
+		<![CDATA[ 
+		 update ${SYSSCHEMA}.BASE_BRAND 
+		   set 
+		   UPDATOR = #UPDATOR#,
+		   UPD_NAME = #UPD_NAME#,
+		   UPD_TIME = sysdate,
+		   DEL_FLAG = #DEL_FLAG#,
+		   BRAND_ID = #BRAND_ID_UUID#,
+		   REMARK = REMARK ||'   BRAND_ID：'||$BRAND_ID$
+	      where BRAND_ID = #BRAND_ID#
+	     ]]>
+	</delete>
+	
+</sqlMap>
+

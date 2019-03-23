@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd"
+	default-autowire="byName">
+	<!-- 通用组件 仅做示例用，版本正式发布时删除 -->
+	<bean name="/sample/sample" class="com.hoperun.commons.sample.action.SampleAction"
+		scope="singleton">
+		<property name="sampleService" ref="sampleService"></property>
+	</bean>
+	<bean name="/sample/singletree"
+		class="com.hoperun.sample.singletable.action.SingleTableAction" scope="singleton">
+		<property name="singleTableService" ref="singleTableService"></property>
+	</bean>
+	<!-- 1.1版本新单表 add by zhuxw -->
+	<bean name="/sample/newsingletable"
+		class="com.hoperun.sample.newsingletable.action.NewSingleTableAction"
+		scope="singleton">
+		<property name="newsingleTableService" ref="newsingleTableService"></property>
+	</bean>
+	<!-- 1.1版本新主从表 add by zhuxw -->
+	<bean name="/sample/newmasterslave"
+		class="com.hoperun.sample.newmasterslave.action.NewMasterSlaveAction"
+		scope="singleton">
+		<property name="newMasterSlaveService" ref="newMasterSlaveService"></property>
+	</bean>
+	<bean name="/grant" class="com.hoperun.sample.grant.action.GrantAction"
+		scope="singleton">
+		<property name="grantService" ref="grantService"></property>
+	</bean>
+
+	<!-- 生产基地维护 add by wzg-->
+	<bean name="/base/factory" class="com.hoperun.base.factory.action.FactoryAction"
+		scope="singleton">
+		<property name="factoryService" ref="FactoryService"></property>
+	</bean>
+
+	<!-- 发货点维护 add by wzg-->
+	<bean name="/base/shipPoint" class="com.hoperun.base.shipPoint.action.ShipPointAction"
+		scope="singleton">
+		<property name="shipPointService" ref="ShipPointService"></property>
+	</bean>
+	<!-- 渠道信息 -->
+	<bean name="/base/chann" class="com.hoperun.base.chann.action.ChannAction"
+		scope="singleton">
+		<property name="channService" ref="channService"></property>
+	</bean>	
+	<!-- 区域信息 -->
+	<bean name="/base/area" class="com.hoperun.base.area.action.AreaAction"
+		scope="singleton">
+		<property name="areaService" ref="areaService"></property>
+		<property name="areaChrgService" ref="areaChrgService"></property>
+	</bean>
+	<!--区域分管信息-->
+	<bean name="/base/areaChrg" class="com.hoperun.base.area.action.AreaChrgAction"
+		scope="singleton">
+		<property name="areaChrgService" ref="areaChrgService"></property>
+		<property name="areaService" ref="areaService"></property>
+	</bean>
+	<!-- 行政区划 -->
+	<bean name="/base/zone" class="com.hoperun.base.zone.action.ZoneAction"
+		scope="singleton">
+		<property name="zoneService" ref="zoneService"></property>
+	</bean>
+	<!-- 供应商信息 -->
+	<bean name="/base/provider" class="com.hoperun.base.provider.action.ProviderAction" scope="singleton">
+		<property name="providerService" ref="providerService"></property>
+	</bean>
+	<!-- 单位维护 -->
+	<bean name="/system/unit" class="com.hoperun.base.unit.action.UnitAction"
+		scope="singleton">
+		<property name="unitService" ref="unitService"></property>
+	</bean>
+	<!-- 品牌信息-->
+	<bean name="/base/brand" class="com.hoperun.base.brand.action.BrandAction"
+		scope="singleton">
+		<property name="brandService" ref="brandService"></property>
+	</bean>
+	<!--货品信息 -->
+	<bean name="/base/product" class="com.hoperun.base.product.action.ProductAction"
+		scope="singleton">
+		<property name="productService" ref="productService"></property>
+	</bean>
+	<!-- 路线信息 -->
+	<bean name="/base/haulway" class="com.hoperun.base.haulway.action.HaulwayAction"
+		scope="singleton">
+		<property name="haulwayService" ref="haulwayService"></property>
+	</bean>
+
+    <!--货品组信息 -->
+	<bean name="/base/prdgroup" class="com.hoperun.base.prdgroup.action.PrdGroupAction" scope="singleton">
+		<property name="prdGroupService" ref="prdGroupService"></property>
+	</bean>
+	
+	<!-- 终端信息 -->
+	<bean name="/base/terminal" class="com.hoperun.base.terminal.action.TerminalAction"
+		scope="singleton">
+		<property name="terminalService" ref="terminalService"></property>
+	</bean>
+	
+	<!-- 供应商信息 -->
+	<bean name="/base/logicprvd" class="com.hoperun.base.logicprvd.action.LogicprvdAction" scope="singleton">
+		<property name="logicprvdService" ref="logicprvdService"></property>
+	</bean>
+	<!--货品分类 -->
+	<bean name="/base/pdtmenu" class="com.hoperun.base.pdtmenu.action.PdtmenuAction"
+		scope="singleton">
+		<property name="pdtmenuService" ref="pdtmenuService"></property>
+	</bean>
+	
+	<!-- 系统日志 -->
+	<bean name="/base/syslog" class="com.hoperun.base.syslog.action.SyslogAction" scope="singleton">
+		<property name="syslogService" ref="syslogService"></property>
+	</bean>
+	
+	
+	<bean name="/base/channchrg" class="com.hoperun.base.channchrg.action.ChannChrgAction"
+		scope="singleton">
+		<property name="channChrgService" ref="channChrgService"></property>
+	</bean>
+	
+	<!-- 分销渠道信息 -->
+	<bean name="/base/distributor" class="com.hoperun.base.distributor.action.DistributorAction"
+		scope="singleton">
+		<property name="distributorService" ref="distributorService"></property>
+	</bean>	
+	
+	<!-- 系统业务表 -->
+	<bean name="/base/table" class="com.hoperun.base.table.action.TableAction"
+		scope="singleton">
+		<property name="tableService" ref="tableService"></property>
+	</bean>	
+	
+</beans>

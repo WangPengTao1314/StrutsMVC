@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ *@module 信用管理
+ *@func 临时额度调整申请
+ *@version 1.1
+ *@author 刘曰刚
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="temp_credit_req">
+	<typeAlias type="com.hoperun.erp.sale.tempcreditreq.model.TempCreditReqModel"
+		alias="TempCreditReqModel" />
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="TempCreditReqModel" class="TempCreditReqModel">
+		<result column="TEMP_CREDIT_REQ_ID" property="TEMP_CREDIT_REQ_ID" />
+	</resultMap>
+	<!-- 动态查询 and 列表排序 -->
+	<sql id="queryDynSql"> 
+		<isNotEmpty prepend="and " property="TEMP_CREDIT_REQ_ID">TEMP_CREDIT_REQ_ID like '%'||#TEMP_CREDIT_REQ_ID#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="CHANN_NO">CHANN_NO like '%'||#CHANN_NO#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="CHANN_NAME">CHANN_NAME like '%'||#CHANN_NAME#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="AREA_NO">AREA_NO like '%'||#AREA_NO#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="STATE">STATE=#STATE#</isNotEmpty>
+		<isNotEmpty prepend="and " property="AREA_NAME">AREA_NAME like '%'||#AREA_NAME#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="BEGIN_CRE_TIME">CRE_TIME&gt;= to_date(#BEGIN_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')</isNotEmpty>
+		<isNotEmpty prepend="and " property="END_CRE_TIME">CRE_TIME&lt;= to_date(#END_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')</isNotEmpty>
+		<isNotEmpty prepend="and " property="DEL_FLAG"><![CDATA[DEL_FLAG=#DEL_FLAG#]]></isNotEmpty>
+		<isNotEmpty prepend="and " property="LEDGER_ID"><![CDATA[LEDGER_ID=#LEDGER_ID#]]></isNotEmpty>
+		<isNotEmpty prepend="and" property="CHANNS_CHARG">
+	     CHANN_ID in $CHANNS_CHARG$
+	  </isNotEmpty>
+	    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	    </isNotEmpty>
+	</sql>
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField"> $orderField$ </isNotEmpty>
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[
+		select 
+		    u.TEMP_CREDIT_REQ_ID,
+		    u.CHANN_NO,
+			u.CHANN_NAME,
+			u.AREA_NO,
+			u.AREA_NAME,
+			u.TEMP_CREDIT_REQ,
+			to_char(u.TEMP_CREDIT_VALDT,'yyyy-mm-dd') TEMP_CREDIT_VALDT,
+			u.REQ_PSON_NAME,
+			u.CRE_NAME,
+			to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+			u.DEPT_NAME,
+			u.STATE,
+			temp.OPERATORNAME,
+			to_char(temp.OPERATETIME,'yyyy-MM-DD HH24:MI:SS') OPERATETIME
+			from ERP_TEMP_CREDIT_REQ u left join
+			(select s.OPERATORNAME,max(s.OPERATETIME)OPERATETIME,s.BUSINESSID
+			  FROM  T_SYS_FLOWTRACE s  
+			  where  s.operator in
+			  (select a.xtyhid from T_SYS_XTYHJS a left join T_SYS_XTJS b on a.xtjsid=b.xtjsid where  b.jsbh=#JSBH#
+			  )and s.operation='审核' group by s.BUSINESSID,s.OPERATORNAME) temp on u.TEMP_CREDIT_REQ_ID = temp.BUSINESSID
+		]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[select count(u.TEMP_CREDIT_REQ_ID) cnt from ${SYSSCHEMA}.ERP_TEMP_CREDIT_REQ u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+	<!-- 根据ID查找 -->
+	<select id="loadById" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+		 select 
+		 TEMP_CREDIT_REQ_ID,CHANN_ID,CHANN_NO,CHANN_NAME,AREA_NO,AREA_NAME,TEMP_CREDIT_REQ,to_char(TEMP_CREDIT_VALDT,'yyyy-mm-dd') TEMP_CREDIT_VALDT,REQ_PSON_NAME,STATE,REMARK,CRE_NAME,
+		 to_char(CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,UPD_NAME,to_char(UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,AUDIT_NAME,
+		 to_char(AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,DEPT_NAME,ORG_NAME,LEDGER_NAME
+		 from ${SYSSCHEMA}.ERP_TEMP_CREDIT_REQ where TEMP_CREDIT_REQ_ID = #TEMP_CREDIT_REQ_ID# and DEL_FLAG=0]]>
+	</select>
+	<!-- 新增 -->
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.ERP_TEMP_CREDIT_REQ(
+		 	TEMP_CREDIT_REQ_ID,CHANN_ID,CHANN_NO,CHANN_NAME,AREA_NO,AREA_NAME,TEMP_CREDIT_REQ,TEMP_CREDIT_VALDT,
+		 	REQ_PSON_ID,REQ_PSON_NAME,STATE,REMARK,CREATOR,CRE_NAME,CRE_TIME,
+		 	DEPT_ID,DEPT_NAME,ORG_ID,ORG_NAME,LEDGER_ID,LEDGER_NAME,DEL_FLAG
+		 	)
+		 values(
+			#TEMP_CREDIT_REQ_ID#,#CHANN_ID#,#CHANN_NO#,#CHANN_NAME#,#AREA_NO#,#AREA_NAME#,#TEMP_CREDIT_REQ#,to_date(#TEMP_CREDIT_VALDT#,'yyyy-mm-dd'),
+			#REQ_PSON_ID#,#REQ_PSON_NAME#,#STATE#,#REMARK#,#CREATOR#,#CRE_NAME#,sysdate,
+			#DEPT_ID#,#DEPT_NAME#,#ORG_ID#,#ORG_NAME#,#LEDGER_ID#,#LEDGER_NAME#,#DEL_FLAG#
+		 )
+		]]>
+	</insert>
+	<!-- 修改 -->
+	<update id="updateById" parameterClass="map">
+		 <![CDATA[ update ${SYSSCHEMA}.ERP_TEMP_CREDIT_REQ ]]>
+		<dynamic prepend="set">
+			<isNotNull property="CHANN_ID" prepend=","><![CDATA[CHANN_ID = #CHANN_ID#]]></isNotNull>
+			<isNotNull property="CHANN_NO" prepend=","><![CDATA[CHANN_NO = #CHANN_NO#]]></isNotNull>
+			<isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME#]]></isNotNull>
+			<isNotNull property="AREA_NO" prepend=","><![CDATA[AREA_NO = #AREA_NO#]]></isNotNull>
+			<isNotNull property="AREA_NAME" prepend=","><![CDATA[AREA_NAME = #AREA_NAME#]]></isNotNull>
+			<isNotNull property="REQ_PSON_ID" prepend=","><![CDATA[REQ_PSON_ID = #REQ_PSON_ID#]]></isNotNull>
+			<isNotNull property="REQ_PSON_NAME" prepend=","><![CDATA[REQ_PSON_NAME = #REQ_PSON_NAME#]]></isNotNull>
+			<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK#]]></isNotNull>
+			<isNotNull property="LEDGER_ID" prepend=","><![CDATA[LEDGER_ID = #LEDGER_ID#]]></isNotNull>
+			<isNotNull property="LEDGER_NAME" prepend=","><![CDATA[LEDGER_NAME = #LEDGER_NAME#]]></isNotNull>
+			<isNotNull property="TEMP_CREDIT_REQ" prepend=","><![CDATA[TEMP_CREDIT_REQ = #TEMP_CREDIT_REQ#]]></isNotNull>
+			<isNotNull property="TEMP_CREDIT_VALDT" prepend=","><![CDATA[TEMP_CREDIT_VALDT = to_date(#TEMP_CREDIT_VALDT#,'yyyy-mm-dd')]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where TEMP_CREDIT_REQ_ID = #TEMP_CREDIT_REQ_ID# ]]>
+	</update>
+	<!-- 软删除 -->
+	<delete id="delete" parameterClass="map">
+	<![CDATA[ update ${SYSSCHEMA}.ERP_TEMP_CREDIT_REQ ]]>
+		<dynamic prepend="set">
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where TEMP_CREDIT_REQ_ID=#TEMP_CREDIT_REQ_ID# ]]>		
+	</delete>
+	<!-- 审核后修改审核人和审核时间>
+	<update id="updateAUDIT" parameterClass="map">
+		<![CDATA[update ${SYSSCHEMA}.ERP_TEMP_CREDIT_REQ ]]>
+			<dynamic prepend="set">
+				<isNotNull property="AUDIT_ID" prepend=","><![CDATA[AUDIT_ID = #AUDIT_ID#]]></isNotNull>
+				<isNotNull property="AUDIT_NAME" prepend=","><![CDATA[AUDIT_NAME = #AUDIT_NAME#]]></isNotNull>
+				<isNotNull property="AUDIT_TIME" prepend=","><![CDATA[AUDIT_TIME =to_char(sysdate,'yyyy-mm-dd')]]></isNotNull>
+				<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME =to_char(sysdate,'yyyy-mm-dd')]]></isNotNull>
+			</dynamic>
+			<![CDATA[ where TEMP_CREDIT_REQ_ID=#TEMP_CREDIT_REQ_ID# ]]>	
+	</update -->
+	<update id="upTEMP_CREDIT_VALDT" parameterClass="map">
+		<![CDATA[
+			update ERP_TEMP_CREDIT_REQ set TEMP_CREDIT_VALDT=to_date(#TEMP_CREDIT_VALDT#,'yyyy-mm-dd') where TEMP_CREDIT_REQ_ID=#TEMP_CREDIT_REQ_ID#
+		]]>
+	</update>
+</sqlMap>

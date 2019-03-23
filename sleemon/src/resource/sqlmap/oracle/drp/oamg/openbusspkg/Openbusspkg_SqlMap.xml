@@ -1,0 +1,252 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author ghx
+@function 
+@version 2014-05-26 
+-->
+<sqlMap  namespace="Openbusspkg">
+
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.OPEN_BUSS_PKG_ID,
+		u.OPEN_BUSS_PKG_NO,		
+		u.TERM_ID,
+		u.TERM_NO,
+		u.TERM_NAME,		
+		u.AREA_NAME, 
+		u.AREA_MANAGE_NAME,
+		u.CHANN_NAME,
+		to_char(u.BEG_SBUSS_DATE,'yyyy-MM-DD') BEG_SBUSS_DATE,
+		u.BUSS_SCOPE,
+		u.REQ_NAME,				
+		to_char(u.REQ_DATE,'yyyy-MM-DD') REQ_DATE,		
+		u.STATE,
+		u.DEL_FLAG
+        from DRP_OPEN_BUSS_PKG u left join  PROJECT_DATA_DICTIONARY_DTL  dt on dt.data_dtl_name = u.buss_scope 
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+
+
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="CHANNS_CHARG">
+     u.CHANN_ID in $CHANNS_CHARG$
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="AUDIT_ID">
+    u.AUDIT_ID =#AUDIT_ID#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="OPEN_BUSS_PKG_NO">
+    u.OPEN_BUSS_PKG_NO like '%'||#OPEN_BUSS_PKG_NO#||'%'
+  </isNotEmpty>
+   <isNotEmpty prepend="and" property="CHANN_NO">
+    u.CHANN_NO like '%'||#CHANN_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="TERM_NO">
+    u.TERM_NO like '%'||#TERM_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="TERM_NAME">
+    u.TERM_NAME like '%'||#TERM_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="AREA_NO">
+  	u.AREA_NO like '%'||#AREA_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="AREA_MANAGE_NAME">
+  	u.AREA_MANAGE_NAME like '%'||#AREA_MANAGE_NAME#||'%'
+  </isNotEmpty>
+   <isNotEmpty prepend="and" property="BUSS_SCOPE">
+    dt.data_dtl_code  = #BUSS_SCOPE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE =#STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="REQ_DATE_BEG">
+     <![CDATA[u.REQ_DATE>=to_date(#REQ_DATE_BEG#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="REQ_DATE_END">
+     <![CDATA[u.REQ_DATE<=to_date(#REQ_DATE_END#,'yyyy-MM-DD')]]>
+  </isNotEmpty>  
+  <isNotEmpty prepend="and" property="LEDGER_ID">
+  	u.LEDGER_ID=#LEDGER_ID#
+  </isNotEmpty>  
+  <isNotEmpty prepend="and " property="DEL_FLAG">
+	u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>	 
+  <isNotEmpty prepend="and " property="QXJBCON">
+	$QXJBCON$
+  </isNotEmpty>
+</sql>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM DRP_OPEN_BUSS_PKG u left join  PROJECT_DATA_DICTIONARY_DTL  dt on dt.data_dtl_name = u.buss_scope ]]>
+	  <dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	  </dynamic>
+</select>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+</select>
+
+<!-- 根据ID查找 -->
+<select id="loadById" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<![CDATA[SELECT 
+			u.OPEN_BUSS_PKG_ID,
+			u.OPEN_BUSS_PKG_NO,
+			u.REQ_DATE,
+			u.TERM_ID,
+			u.TERM_NO,
+			u.TERM_NAME,
+			u.TERM_TYPE,
+			to_char(u.BEG_SBUSS_DATE,'yyyy-MM-DD') BEG_SBUSS_DATE,
+			u.CHANN_ID,
+			u.CHANN_NO,
+			u.CHANN_NAME,
+			u.CHANN_PERSON_CON,
+			u.CHANN_TEL,
+			u.AREA_ID,
+			u.AREA_NO,
+			u.AREA_NAME,
+			u.AREA_MANAGE_ID,
+			u.AREA_MANAGE_NAME,
+			u.AREA_MANAGE_TEL,
+			u.SALE_STORE_ID,
+			u.SALE_STORE_NAME,
+			u.LOCAL_TYPE,
+			u.ZONE_ID,
+			u.ZONE_ADDR,
+			u.BUSS_SCOPE,
+			u.BUSS_AREA,
+			u.REQ_ID,
+			u.REQ_NAME,
+			u.RNVTN_REIT_REQ_ID,
+			u.RNVTN_REIT_REQ_NO,
+			u.TOTAL_REIT_AMOUNT,
+			u.ADDRESS,
+			u.REMARK,
+			u.REQ_RSON,
+			u.CREATOR,
+			u.CRE_NAME,
+			to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+			u.UPDATOR,
+			u.UPD_NAME,
+			to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+			u.AUDIT_ID,
+			u.AUDIT_NAME,
+			to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+			u.DEPT_ID,
+			u.DEPT_NAME,
+			u.ORG_ID,
+			u.ORG_NAME,
+			u.LEDGER_ID,
+			u.LEDGER_NAME,
+			u.DEL_FLAG,
+			u.STATE,
+			b.ATT_PATH
+					
+			FROM DRP_OPEN_BUSS_PKG u 
+			left join BASE_ATT b on u.OPEN_BUSS_PKG_ID = b.FROM_BILL_ID
+			WHERE u.OPEN_BUSS_PKG_ID = #OPEN_BUSS_PKG_ID# 
+		]]>
+</select>
+
+<!-- 新增 -->
+<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.DRP_OPEN_BUSS_PKG(
+		 	OPEN_BUSS_PKG_ID,OPEN_BUSS_PKG_NO,REQ_DATE,TERM_ID,TERM_NO,TERM_NAME,TERM_TYPE,
+			BEG_SBUSS_DATE,CHANN_ID,CHANN_NO,CHANN_NAME,CHANN_PERSON_CON,CHANN_TEL,
+			AREA_ID,AREA_NO,AREA_NAME,AREA_MANAGE_ID,AREA_MANAGE_NAME,AREA_MANAGE_TEL,
+			SALE_STORE_ID,SALE_STORE_NAME,LOCAL_TYPE,ZONE_ID,ZONE_ADDR,BUSS_SCOPE,BUSS_AREA,
+			REQ_ID,REQ_NAME,RNVTN_REIT_REQ_ID,RNVTN_REIT_REQ_NO,TOTAL_REIT_AMOUNT,
+			ADDRESS,REMARK,REQ_RSON,
+			CREATOR,CRE_NAME,CRE_TIME,DEPT_ID,DEPT_NAME,ORG_ID,ORG_NAME,LEDGER_ID,LEDGER_NAME,DEL_FLAG,STATE
+		 	)
+		 values(
+		 	#OPEN_BUSS_PKG_ID#,#OPEN_BUSS_PKG_NO#,to_date(#REQ_DATE#,'yyyy-MM-DD'),#TERM_ID#,#TERM_NO#,#TERM_NAME#,#TERM_TYPE#,
+			to_date(#BEG_SBUSS_DATE#,'yyyy-MM-DD'),#CHANN_ID#,#CHANN_NO#,#CHANN_NAME#,#CHANN_PERSON_CON#,#CHANN_TEL#,
+			#AREA_ID#,#AREA_NO#,#AREA_NAME#,#AREA_MANAGE_ID#,#AREA_MANAGE_NAME#,#AREA_MANAGE_TEL#,
+			#SALE_STORE_ID#,#SALE_STORE_NAME#,#LOCAL_TYPE#,#ZONE_ID#,#ZONE_ADDR#,#BUSS_SCOPE#,#BUSS_AREA#,
+			#REQ_ID#,#REQ_NAME#,#RNVTN_REIT_REQ_ID#,#RNVTN_REIT_REQ_NO#,#TOTAL_REIT_AMOUNT#,
+			#ADDRESS#,#REMARK#,#REQ_RSON#,
+			#CREATOR#,#CRE_NAME#,sysdate,#DEPT_ID#,#DEPT_NAME#,#ORG_ID#,#ORG_NAME#,#LEDGER_ID#,#LEDGER_NAME#,#DEL_FLAG#,#STATE#	 
+		 )
+		]]>
+</insert>
+
+<!-- 修改 -->
+<update id="updateById" parameterClass="map">
+		 <![CDATA[ update ${SYSSCHEMA}.DRP_OPEN_BUSS_PKG ]]>
+		<dynamic prepend="set">
+			<isNotNull property="OPEN_BUSS_PKG_ID" prepend=","><![CDATA[OPEN_BUSS_PKG_ID = #OPEN_BUSS_PKG_ID#]]></isNotNull>
+			<isNotNull property="OPEN_BUSS_PKG_NO" prepend=","><![CDATA[OPEN_BUSS_PKG_NO = #OPEN_BUSS_PKG_NO#]]></isNotNull>
+			<isNotNull property="REQ_DATE" prepend=","><![CDATA[REQ_DATE = to_date(#REQ_DATE#,'yyyy-MM-DD')]]></isNotNull>
+			<isNotNull property="TERM_ID" prepend=","><![CDATA[TERM_ID = #TERM_ID#]]></isNotNull>
+			<isNotNull property="TERM_NO" prepend=","><![CDATA[TERM_NO = #TERM_NO#]]></isNotNull>
+			<isNotNull property="TERM_NAME" prepend=","><![CDATA[TERM_NAME = #TERM_NAME#]]></isNotNull>
+			<isNotNull property="TERM_TYPE" prepend=","><![CDATA[TERM_TYPE = #TERM_TYPE#]]></isNotNull>	
+			<isNotNull property="BEG_SBUSS_DATE" prepend=","><![CDATA[BEG_SBUSS_DATE = to_date(#BEG_SBUSS_DATE#,'yyyy-MM-DD')]]></isNotNull>
+			<isNotNull property="CHANN_ID" prepend=","><![CDATA[CHANN_ID = #CHANN_ID#]]></isNotNull>
+			<isNotNull property="CHANN_NO" prepend=","><![CDATA[CHANN_NO = #CHANN_NO#]]></isNotNull>
+			<isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME#]]></isNotNull>
+			<isNotNull property="CHANN_PERSON_CON" prepend=","><![CDATA[CHANN_PERSON_CON = #CHANN_PERSON_CON#]]></isNotNull>
+			<isNotNull property="CHANN_TEL" prepend=","><![CDATA[CHANN_TEL = #CHANN_TEL#]]></isNotNull>
+			<isNotNull property="AREA_ID" prepend=","><![CDATA[AREA_ID = #AREA_ID#]]></isNotNull>
+			<isNotNull property="AREA_NO" prepend=","><![CDATA[AREA_NO = #AREA_NO#]]></isNotNull>
+			<isNotNull property="AREA_NAME" prepend=","><![CDATA[AREA_NAME = #AREA_NAME#]]></isNotNull>
+			<isNotNull property="AREA_MANAGE_ID" prepend=","><![CDATA[AREA_MANAGE_ID = #AREA_MANAGE_ID#]]></isNotNull>
+			<isNotNull property="AREA_MANAGE_NAME" prepend=","><![CDATA[AREA_MANAGE_NAME = #AREA_MANAGE_NAME#]]></isNotNull>
+			<isNotNull property="AREA_MANAGE_TEL" prepend=","><![CDATA[AREA_MANAGE_TEL = #AREA_MANAGE_TEL#]]></isNotNull>
+			<isNotNull property="SALE_STORE_ID" prepend=","><![CDATA[SALE_STORE_ID = #SALE_STORE_ID#]]></isNotNull>
+			<isNotNull property="SALE_STORE_NAME" prepend=","><![CDATA[SALE_STORE_NAME = #SALE_STORE_NAME#]]></isNotNull>
+			<isNotNull property="LOCAL_TYPE" prepend=","><![CDATA[LOCAL_TYPE = #LOCAL_TYPE#]]></isNotNull>
+			<isNotNull property="ZONE_ID" prepend=","><![CDATA[ZONE_ID = #ZONE_ID#]]></isNotNull>
+			<isNotNull property="ZONE_ADDR" prepend=","><![CDATA[ZONE_ADDR = #ZONE_ADDR#]]></isNotNull>
+			<isNotNull property="BUSS_SCOPE" prepend=","><![CDATA[BUSS_SCOPE = #BUSS_SCOPE#]]></isNotNull>
+			<isNotNull property="BUSS_AREA" prepend=","><![CDATA[BUSS_AREA = #BUSS_AREA#]]></isNotNull>
+			<isNotNull property="REQ_ID" prepend=","><![CDATA[REQ_ID = #REQ_ID#]]></isNotNull>
+			<isNotNull property="REQ_NAME" prepend=","><![CDATA[REQ_NAME = #REQ_NAME#]]></isNotNull>
+			<isNotNull property="RNVTN_REIT_REQ_ID" prepend=","><![CDATA[RNVTN_REIT_REQ_ID = #RNVTN_REIT_REQ_ID#]]></isNotNull>
+			<isNotNull property="RNVTN_REIT_REQ_NO" prepend=","><![CDATA[RNVTN_REIT_REQ_NO = #RNVTN_REIT_REQ_NO#]]></isNotNull>
+			<isNotNull property="TOTAL_REIT_AMOUNT" prepend=","><![CDATA[TOTAL_REIT_AMOUNT = #TOTAL_REIT_AMOUNT#]]></isNotNull>
+			<isNotNull property="ADDRESS" prepend=","><![CDATA[ADDRESS = #ADDRESS#]]></isNotNull>
+			<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK#]]></isNotNull>
+			<isNotNull property="REQ_RSON" prepend=","><![CDATA[REQ_RSON = #REQ_RSON#]]></isNotNull>
+			
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>						
+		</dynamic>
+		<![CDATA[ where OPEN_BUSS_PKG_ID = #OPEN_BUSS_PKG_ID# ]]>
+</update>
+
+<!-- 软删除 -->
+<update id="delete" parameterClass="map">
+	<![CDATA[ update ${SYSSCHEMA}.DRP_OPEN_BUSS_PKG ]]>
+		<dynamic prepend="set">
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where OPEN_BUSS_PKG_ID = #OPEN_BUSS_PKG_ID# ]]>		
+</update>
+
+
+
+</sqlMap>

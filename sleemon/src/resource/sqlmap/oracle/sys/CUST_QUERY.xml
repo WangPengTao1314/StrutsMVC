@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="CUST">
+	<typeAlias type="com.hoperun.sys.model.CustomQueryBean" alias="CustomQueryBean" />
+	<typeAlias type="com.hoperun.sys.model.CustomQueryDtlBean" alias="CustomQueryDtlBean" />
+	
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="selRptCode">
+			a.rpt_code like '%'||#selRptCode#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="selRptName">
+			a.rpt_name like '%'||#selRptName#||'%'
+		</isNotEmpty> 
+	</sql>
+	
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[Select a.RPTMODELID,a.rpt_code,a.rpt_name,a.crename,to_char(a.cretime,'yyyy-MM-DD HH24:MI:SS') as cretime,a.rpt_sql,a.remark,a.state,IS_PRIVILEGE From ${SYSSCHEMA}.T_SYS_RPTMODEL a ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic> 
+		ORDER BY RPT_CODE
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageCustQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+	
+	<!-- 分页计数 -->
+	<select id="pageCustQueryCount" parameterClass="map" resultClass="int">
+		<![CDATA[Select count(*) From ${SYSSCHEMA}.T_SYS_RPTMODEL a]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+	
+	<!-- 更新自定义报表状态 -->
+	<update id="updateRptState" parameterClass="map">
+		<![CDATA[
+			UPDATE ${SYSSCHEMA}.T_SYS_RPTMODEL SET STATE = #rptState# WHERE RPTMODELID = #rptPk#
+		]]>
+	</update>
+	
+	<!-- 删除自定义报表 -->
+	<delete id="DELETE_RPT_ROW_ID" parameterClass="map">
+		DELETE FROM ${SYSSCHEMA}.T_SYS_RPTMODEL WHERE RPTMODELID = #rptPk#
+	</delete>
+	
+	<!-- 根据自定义报表主键查询明细信息 -->
+	<resultMap id="CUSTOMQUERY_BEAN" class="CustomQueryBean" >
+	    <result column="RPT_CODE" jdbcType="VARCHAR" property="rptCode" />
+	    <result column="RPT_NAME" jdbcType="VARCHAR" property="rptName" />
+	    <result column="RPT_SQL" jdbcType="VARCHAR" property="rptSql" />
+	    <result column="IS_ROLE" jdbcType="VARCHAR" property="isRole" />
+	    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+	    <result column="USER_PRIVILEGE" jdbcType="VARCHAR" property="roleUser" />
+	    <result column="ROLE_PRIVILEGE" jdbcType="VARCHAR" property="roleCode" />
+	    <result column="GROUP_PRIVILEGE" jdbcType="VARCHAR" property="workGroupCode" />
+	    <result column="USER_PRIVILEGE_NAME" jdbcType="VARCHAR" property="roleUserName" />
+	    <result column="ROLE_PRIVILEGE_NAME" jdbcType="VARCHAR" property="roleName" />
+	    <result column="GROUP_PRIVILEGE_NAME" jdbcType="VARCHAR" property="workGroupName" />
+	</resultMap>
+	
+	<select id="loadRptQueryDetal" parameterClass="map" resultMap="CUSTOMQUERY_BEAN">
+		Select A.RPT_CODE,A.RPT_NAME,A.RPT_SQL,A.IS_PRIVILEGE As Is_ROLE,A.REMARK,a.User_privilege ,a.ROLE_privilege ,a.group_privilege,a.USER_PRIVILEGE_NAME,a.ROLE_privilege_name,a.group_privilege_name
+		From ${SYSSCHEMA}.T_SYS_RPTMODEL A where RPTMODELID = #hidRptPk#
+	</select>
+	
+	<!-- 新增报表基础数据 -->
+	<insert id="insertRptMain" parameterClass="map">
+		<![CDATA[
+		 	Insert Into ${SYSSCHEMA}.T_SYS_RPTMODEL
+		 	(RPTMODELID,RPT_CODE,RPT_NAME,RPT_SQL,STATE,REMARK,IS_PRIVILEGE,CREATER,CRENAME,CRETIME,UPDATER,UPDTIME,User_privilege,ROLE_privilege,group_privilege,User_privilege_name,ROLE_privilege_name,group_privilege_name)
+		 	values(#hidRptPk#,'RPT'||SEQ_T_SYS_RPTMODEL.Nextval,#rptName#,#rptSql#,#state#,#remark#,#isRole#,#crePerson#,#crePersonName#,sysdate,#uptPerson#,sysdate,
+		 	#roleUser#,#roleCode#,#workGroupCode#,#roleUserName#, #roleName#,#workGroupName#
+		 	)
+	 	]]>
+	</insert>
+	
+	<!-- 更新报表基础数据 -->
+	<update id="updateRptMain" parameterClass="map">
+		<![CDATA[
+			UPDATE ${SYSSCHEMA}.T_SYS_RPTMODEL SET 
+				RPT_CODE = #rptCode#,
+				RPT_NAME = #rptName#,
+				RPT_SQL = #rptSql#,
+				REMARK = #remark#,
+				IS_PRIVILEGE = #isRole#,
+				UPDATER = #uptPerson#,
+				UPDTIME = sysdate,
+				User_privilege = #roleUser#,
+				User_privilege_name = #roleUserName#,
+				ROLE_privilege = #roleCode#,
+				ROLE_privilege_name = #roleName#,
+				group_privilege = #workGroupCode#,
+				group_privilege_name = #workGroupName#
+			WHERE RPTMODELID = #hidRptPk#
+		]]>
+	</update>
+	
+	<!-- 校验报表SQL是否正确 -->
+	<select id="checkRptSql" parameterClass="map" resultClass="java.util.HashMap" remapResults="true" >
+			<![CDATA[Select b.*
+					From Dual
+					Left Join (
+						$rptSql$
+					) b On 1=1
+			]]>
+	</select>
+	
+	<!-- 根据自定义报表主键查询明细详细信息 -->
+	<resultMap id="CUSTOMQUERY_DTL_BEAN" class="CustomQueryDtlBean" >
+	    <result column="RPTCOLCONFID" jdbcType="VARCHAR" property="rptColPk" />
+	    <result column="RPTMODELID" jdbcType="VARCHAR" property="rptPk" />
+	    <result column="PHYSICNAME" jdbcType="VARCHAR" property="physicName" />
+	    <result column="LOGICNAME" jdbcType="VARCHAR" property="logicName" />
+	    <result column="COL_TYPE" jdbcType="VARCHAR" property="colType" />
+	    <result column="ISCONDITION" jdbcType="VARCHAR" property="isCondition" />
+	    <result column="MUSTINPUT" jdbcType="VARCHAR" property="mustInput" />
+	    <result column="MATCH_MODEL" jdbcType="VARCHAR" property="matchModel" />
+	    <result column="COMPONENTTYPE" jdbcType="VARCHAR" property="compoentType" />
+	    <result column="COMPONENTCONDITION" jdbcType="VARCHAR" property="componentCondition" />
+	    <result column="HEADDISPLAY" jdbcType="VARCHAR" property="headDisplay" />
+	    <result column="COL_INDEX" jdbcType="VARCHAR" property="colIndex" />
+	    <result column="DISPLAY" jdbcType="VARCHAR" property="display" />
+	</resultMap> 
+	
+	<select id="queryRptDtlSql" parameterClass="map" resultMap="CUSTOMQUERY_DTL_BEAN">
+		SELECT RPTCOLCONFID,
+			   RPTMODELID,
+			   PHYSICNAME,
+			   LOGICNAME,
+			   COL_TYPE,
+			   ISCONDITION,
+			   MUSTINPUT,
+			   MATCH_MODEL,
+			   COMPONENTTYPE,
+			   COMPONENTCONDITION,
+			   HEADDISPLAY,
+			   COL_INDEX,
+			   DISPLAY
+		FROM ${SYSSCHEMA}.T_SYS_RPTCOLCONF  
+		WHERE RPTMODELID = #hidRptPk#
+		<isEmpty prepend=" " property="init">
+			<isNotEmpty prepend="and " property="type">
+				ISCONDITION = '1'
+			</isNotEmpty>
+			<isEmpty prepend="and " property="type">
+				HEADDISPLAY = '1'
+			</isEmpty>
+		</isEmpty>
+		ORDER BY TO_NUMBER(NVL(COL_INDEX,0))
+	</select>
+	
+	<!-- 删除自定义报表选配 -->
+	<delete id="doDelRptDtl" parameterClass="map">
+		DELETE FROM ${SYSSCHEMA}.T_SYS_RPTCOLCONF WHERE RPTMODELID = #hidRptPk# 
+	</delete>
+	
+	<!-- 插入自定义报表选配 -->
+	<insert id="doInsertRptDtl" parameterClass="map">
+		INSERT INTO ${SYSSCHEMA}.T_SYS_RPTCOLCONF(
+			   RPTCOLCONFID,
+			   RPTMODELID,
+			   PHYSICNAME,
+			   LOGICNAME,
+			   COL_TYPE,
+			   ISCONDITION,
+			   MUSTINPUT,
+			   MATCH_MODEL,
+			   COMPONENTTYPE,
+			   COMPONENTCONDITION,
+			   HEADDISPLAY,
+			   COL_INDEX,
+			   DISPLAY
+		)VALUES(
+			   #RPTCOLCONFID#,
+			   #RPTMODELID#,
+			   #PHYSICNAME#,
+			   #LOGICNAME#,
+			   #COL_TYPE#,
+			   #ISCONDITION#,
+			   #MUSTINPUT#,
+			   #MATCH_MODEL#,
+			   #COMPONENTTYPE#,
+			   #COMPONENTCONDITION#,
+			   #HEADDISPLAY#,
+			   #COL_INDEX#,
+			   #DISPLAY#
+		)
+	</insert> 
+	
+	<!-- 分页查询(最终报表数据) -->
+	<select id="displayPageCustQuery" parameterClass="map" resultClass="java.util.HashMap"  remapResults="true">
+		<include refid="public.pageBegin" />
+			<![CDATA[$displaySql$]]>
+		<include refid="public.pageEnd" />
+	</select>
+	
+	<!-- 分页计数 -->
+	<select id="displayPageCustQueryCount" parameterClass="map" resultClass="int" remapResults="true">
+		<![CDATA[Select count(*) From ( $displaySql$ )]]> 
+	</select>
+	
+	<!-- 分页查询(导出最终报表数据) -->
+	<select id="rptExportCustQuery" parameterClass="map" resultClass="java.util.HashMap"  remapResults="true"> 
+		<![CDATA[$displaySql$]]> 
+	</select>
+	
+	<!-- 分页计数 -->
+	<select id="rptExportQueryCount" parameterClass="map" resultClass="int"  remapResults="true">
+		<![CDATA[Select count(*) From ( $displaySql$ )]]> 
+	</select>
+	
+	<!-- 分页查询报表展示 -->
+	<select id="pageCustQueryDisplay" parameterClass="map" resultClass="java.util.HashMap"> 
+		<![CDATA[
+			SELECT * FROM (
+				Select a.RPTMODELID,a.rpt_code,a.rpt_name,a.crename,to_char(a.cretime,'yyyy-mm-dd') as cretime,a.rpt_sql,a.remark,a.state,IS_PRIVILEGE 
+				From ${SYSSCHEMA}.T_SYS_RPTMODEL a 
+				WHERE IS_Privilege = '0'
+				UNION ALL
+				Select a.RPTMODELID,a.rpt_code,a.rpt_name,a.crename,to_char(a.cretime,'yyyy-mm-dd') as cretime,a.rpt_sql,a.remark,a.state,IS_PRIVILEGE 
+				From ${SYSSCHEMA}.T_SYS_RPTMODEL a 
+				WHERE IS_Privilege = '1'
+				AND EXISTS (SELECT RPTMODELID FROM ${SYSSCHEMA}.T_SYS_RPTPRIVILEGE B WHERE A.RPTMODELID = B.RPTMODELID AND B.USER_ID = #userPk#)
+			)
+			ORDER BY RPT_CODE
+		]]>
+		
+	</select>
+	
+	<!-- 分页计数 -->
+	<select id="pageCustQueryDisplayCount" parameterClass="map" resultClass="int">
+		<![CDATA[
+			SELECT COUNT(*) FROM (
+				Select a.RPTMODELID,a.rpt_code,a.rpt_name,a.crename,to_char(a.cretime,'yyyy-mm-dd') as cretime,a.rpt_sql,a.remark,a.state,IS_PRIVILEGE 
+				From ${SYSSCHEMA}.T_SYS_RPTMODEL a 
+				WHERE IS_Privilege = '0'
+				UNION ALL
+				Select a.RPTMODELID,a.rpt_code,a.rpt_name,a.crename,to_char(a.cretime,'yyyy-mm-dd') as cretime,a.rpt_sql,a.remark,a.state,IS_PRIVILEGE 
+				From ${SYSSCHEMA}.T_SYS_RPTMODEL a 
+				WHERE IS_Privilege = '1'
+				AND EXISTS (SELECT RPTMODELID FROM T_SYS_RPTPRIVILEGE B WHERE A.RPTMODELID = B.RPTMODELID AND B.USER_ID = #userPk#)
+			)
+			ORDER BY RPT_CODE
+		]]>
+	</select>
+	
+	<delete id="DELETE_RPT_ROLE_DATE" parameterClass="map">
+		DELETE FROM ${SYSSCHEMA}.T_SYS_RPTPRIVILEGE WHERE RPTMODELID = #hidRptPk#
+	</delete>
+	
+	<insert id="insertRptRoleUserCode" parameterClass="map">
+		INSERT INTO ${SYSSCHEMA}.T_SYS_RPTPRIVILEGE(RPTPRIVILEGEID,RPTMODELID,USER_ID)VALUES(#rolePk#,#hidRptPk#,#userPk#)
+	</insert>
+	
+	<insert id="insertRptRole" parameterClass="map">
+		INSERT INTO ${SYSSCHEMA}.T_SYS_RPTPRIVILEGE(RPTPRIVILEGEID,RPTMODELID,USER_ID)
+		Select SEQ_T_SYS_RPTPRIVILEGE.NEXTVAL,#hidRptPk#,d.Yhbh From ${SYSSCHEMA}.T_SYS_XTYH d
+		Left Join ${SYSSCHEMA}.T_SYS_XTYHjs b  On b.Xtyhid = d.Xtyhid
+		Where b.XTJSID in ${XTJSID} And b.Delflag = 0
+	</insert>
+	
+	<insert id="insertRptRoleWorkGroup" parameterClass="map">
+		INSERT INTO ${SYSSCHEMA}.T_SYS_RPTPRIVILEGE(RPTPRIVILEGEID,RPTMODELID,USER_ID)
+		Select SEQ_T_SYS_RPTPRIVILEGE.NEXTVAL,#hidRptPk#,b.Yhbh
+		From ${SYSSCHEMA}.T_SYS_GZZCY a
+		Left Join ${SYSSCHEMA}.T_SYS_XTYH b On a.Xtyhid = b.Xtyhid And b.Delflag = 0
+		Left Join ${SYSSCHEMA}.T_SYS_GZZXX d On a.Gzzxxid = d.Gzzxxid
+		Where a.Delflag = 0 And d.Gzzbh = '001' And b.Yhbh Is Not Null 
+	</insert>
+	
+	<!-- 分页查询数据库表字段 -->
+	<select id="pageQueryTableCol" parameterClass="map" resultClass="java.util.HashMap" remapResults="true"> 
+		<![CDATA[ 
+			Select column_name as col_name,data_length as col_length From user_tab_cols a Where a.Table_Name = #tableName#
+		]]>
+	</select>
+	
+	<select id="pageQueryTableColOther" parameterClass="map" resultClass="java.util.HashMap" remapResults="true"> 
+		<![CDATA[ 
+			Select column_name From user_tab_cols a Where a.Table_Name = #tableName#
+		]]>
+	</select> 
+	
+	<select id="pageQueryTableColKey" parameterClass="map" resultClass="java.util.HashMap" remapResults="true"> 
+		<![CDATA[ 
+			select COLUMN_NAME from dba_cons_columns where table_name=#tableName# And POSITION =1
+		]]>
+	</select>
+	
+	<!-- 分页查询数据库表字段数据 -->
+	<select id="pageQueryTable" parameterClass="map" resultClass="java.util.HashMap" remapResults="true"> 
+		<include refid="public.pageBegin" />
+			<![CDATA[$querySql$]]>  
+		<include refid="public.pageEnd" />
+	</select>
+	
+	<!-- 分页计数 -->
+	<select id="pageQueryTableCount" parameterClass="map" resultClass="int" remapResults="true">
+		<![CDATA[
+			SELECT COUNT(*) FROM (
+				$querySql$
+			) 
+		]]>
+	</select>
+	
+	<update id="updateTableData" parameterClass="map">
+		<![CDATA[$upateTableData$]]>  
+	</update>
+	
+	<select id="pageQueryTableNameFromWhereSql" parameterClass="map" resultClass="java.util.HashMap" remapResults="true"> 
+		<![CDATA[ 
+			Select TABLE_NAME From user_tables Where table_name In ($tableNames$)
+		]]>
+	</select>
+	
+	<select id="pageEnAnbleEditTableColumn" parameterClass="map" resultClass="java.util.HashMap" remapResults="true"> 
+		 select  t.COLUMN_NAME
+		 from user_tab_columns  t,user_col_comments  c
+		 where t.table_name = c.table_name and t.column_name = c.column_name 
+		 And t.table_name= #tableName# And (c.comments Not Like '%NO_EDIT%' Or c.comments Is Null)
+	</select>
+	<select id="getRptCol" parameterClass="String" resultClass="java.util.HashMap" remapResults="true"> 
+		 select 
+		     RPTCOLCONFID,RPTMODELID,PHYSICNAME,LOGICNAME, COL_TYPE, ISCONDITION , MUSTINPUT,
+		     MATCH_MODEL,COMPONENTTYPE,COMPONENTCONDITION,HEADDISPLAY, COL_INDEX, DISPLAY
+		 from T_SYS_RPTCOLCONF u 
+		where u.RPTMODELID=#RPTMODELID#
+	</select>
+	 
+</sqlMap>

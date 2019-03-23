@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="employee">
+	<!-- 
+		*@module 系统管理
+		*@func 人员信息
+		*@version 1.1
+		*@author lyg
+		*  -->
+	<typeAlias type="com.hoperun.drp.base.employee.model.EmployeeModel" alias="employeeModel" />
+
+	<!-- 使用RYXX装载结果集 -->
+	<resultMap id="employeeModel" class="employeeModel">
+		<result column="RYXXID" property="RYXXID" />
+	</resultMap>
+
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="RYBH">
+			r.RYBH =#RYBH#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="XM">
+			r.XM like '%'||#XM#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="XB">
+			r.XB like '%'||#XB#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="BMBH">
+			b.BMBH like '%'||#BMBH#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="BMMC">
+			b.BMMC like '%'||#BMMC#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="DELFLAG">
+			r.DELFLAG = #DELFLAG#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="RYZT">
+			r.RYZT = #RYZT#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="ZTXXID">
+			j.ZTXXID = #ZTXXID#
+		</isNotEmpty>
+		 <isNotEmpty prepend="and" property="BEGIN_CRE_TIME">
+		     <![CDATA[r.CRETIME>=to_date(#BEGIN_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')]]>
+		 </isNotEmpty>
+		  <isNotEmpty prepend="and" property="END_CRE_TIME">
+		     <![CDATA[r.CRETIME<=to_date(#END_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')]]>
+		  </isNotEmpty>
+		  <isNotEmpty prepend="and" property="JSBH">
+		  		r.RYXXID in (select RYXXID from T_SYS_XTYH c left join T_SYS_XTYHJS d on c.XTYHID=d.XTYHID left join T_SYS_XTJS e on e.XTJSID=d.XTJSID where  e.JSBH like '%'||#JSBH#||'%')
+		  </isNotEmpty>
+		  <isNotEmpty prepend="and" property="JSMC">
+		  		r.RYXXID in (select RYXXID from T_SYS_XTYH c left join T_SYS_XTYHJS d on c.XTYHID=d.XTYHID left join T_SYS_XTJS e on e.XTJSID=d.XTJSID where  e.JSMC like '%'||#JSMC#||'%')
+		  </isNotEmpty>
+	</sql>
+
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField">
+			$orderField$
+		</isNotEmpty>
+	</sql>
+
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[
+		select 
+			r.RYXXID,
+			r.RYBH,
+			r.XM,
+			r.XB,
+			r.SFZH,
+			r.ZW,
+			r.GSDH,
+			r.SJ,
+			r.DZYJ,
+			r.RYZT,
+			r.RYJB,
+			r.JGXXID,
+			r.BMXXID,
+			b.BMBH,
+			b.BMMC,
+			j.ZTXXID,
+			r.DELFLAG,
+			r.RYLB,
+			r.RYSM,
+			r.CREATER,
+			r.CRENAME,
+			to_char(r.CRETIME,'yyyy-MM-DD HH24:MI:SS') CRETIME,
+			r.TERM_DECT_FROM,
+			r.TERM_DECT_END,
+			a.YHM
+			from T_SYS_RYXX r left join T_SYS_BMXX b on r.BMXXID=b.BMXXID
+				  			  left join T_SYS_JGXX j on r.JGXXID = j.JGXXID
+				  			  left join T_SYS_XTYH a on a.RYXXID=r.RYXXID
+			 ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql" />
+		</dynamic>
+	</sql>
+
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[select count(RYXXID) cnt from T_SYS_RYXX r left join T_SYS_BMXX b on r.BMXXID=b.BMXXID left join T_SYS_JGXX j on r.JGXXID = j.JGXXID ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+
+	<!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+
+	<!-- 新增 -->
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into T_SYS_RYXX(
+		 	RYXXID,
+			RYBH,
+			XM,
+			XB,
+			GSDH,
+			SJ,
+			DZYJ,
+			RYZT,
+			JGXXID,
+			BMXXID,
+			DELFLAG,
+			CREATER,
+			CRENAME,
+			CRETIME,
+			IS_DRP_LEDGER,
+			TERM_DECT_FROM,
+			TERM_DECT_END,
+			RYLB,
+			RYJB,
+			ZW
+		 )values(
+		 	#RYXXID#,
+			#RYBH#,
+			#XM#,
+			#XB#,
+			#GSDH#,
+			#SJ#,
+			#DZYJ#,
+			#RYZT#,
+			#JGXXID#,
+			#BMXXID#,
+			#DELFLAG#,
+			#CREATER#,
+			#CRENAME#,
+			sysdate,
+			#IS_DRP_LEDGER#,
+			#TERM_DECT_FROM#,
+			#TERM_DECT_END#,
+			#RYLB#,
+			#RYJB#,
+			#ZW#
+		 )
+		]]>
+	</insert>
+
+	<!-- 修改 -->
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_RYXX ]]>
+		<dynamic prepend="set">
+			<isNotNull property="XM" prepend=","><![CDATA[XM = #XM#]]></isNotNull>
+			<isNotNull property="XB" prepend=","><![CDATA[XB = #XB#]]></isNotNull>
+			<isNotNull property="RYJB" prepend=","><![CDATA[RYJB = #RYJB#]]></isNotNull>
+			<isNotNull property="RYLB" prepend=","><![CDATA[RYLB = #RYLB#]]></isNotNull>
+			<isNotNull property="SFZH" prepend=","><![CDATA[SFZH = #SFZH#]]></isNotNull>
+			<isNotNull property="ZW" prepend=","><![CDATA[ZW = #ZW#]]></isNotNull>
+			<isNotNull property="GSDH" prepend=","><![CDATA[GSDH = #GSDH#]]></isNotNull>
+			<isNotNull property="SJ" prepend=","><![CDATA[SJ = #SJ#]]></isNotNull>
+			<isNotNull property="DZYJ" prepend=","><![CDATA[DZYJ = #DZYJ#]]></isNotNull>
+			<isNotNull property="BMXXID" prepend=","><![CDATA[BMXXID = #BMXXID#]]></isNotNull>
+			<isNotNull property="JGXXID" prepend=","><![CDATA[JGXXID = #JGXXID#]]></isNotNull>
+			<isNotNull property="SBJS" prepend=","><![CDATA[SBJS = #SBJS#]]></isNotNull>
+			<isNotNull property="CWDZM" prepend=","><![CDATA[CWDZM = #CWDZM#]]></isNotNull>
+			<isNotNull property="RYZT" prepend=","><![CDATA[RYZT = #RYZT#]]></isNotNull>
+			<isNotNull property="UPDATER" prepend=","><![CDATA[UPDATER = #UPDATER#]]></isNotNull>
+			<isNotNull property="UPDTIME" prepend=","><![CDATA[UPDTIME = sysdate]]></isNotNull>
+			<isNotNull property="DELFLAG" prepend=","><![CDATA[DELFLAG = #DELFLAG#]]></isNotNull>
+			<isNotNull property="TERM_DECT_FROM" prepend=","><![CDATA[TERM_DECT_FROM = #TERM_DECT_FROM#]]></isNotNull>
+			<isNotNull property="TERM_DECT_END" prepend=","><![CDATA[TERM_DECT_END = #TERM_DECT_END#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where RYXXID = #RYXXID# ]]>
+	</update>
+	
+	<update id="updateByNo" parameterClass="map">
+		<![CDATA[ update T_SYS_RYXX ]]>
+		<dynamic prepend="set">
+			<isNotNull property="XM" prepend=","><![CDATA[XM = #XM#]]></isNotNull>
+			<isNotNull property="XB" prepend=","><![CDATA[XB = #XB#]]></isNotNull>
+			<isNotNull property="RYJB" prepend=","><![CDATA[RYJB = #RYJB#]]></isNotNull>
+			<isNotNull property="RYLB" prepend=","><![CDATA[RYLB = #RYLB#]]></isNotNull>
+			<isNotNull property="SFZH" prepend=","><![CDATA[SFZH = #SFZH#]]></isNotNull>
+			<isNotNull property="ZW" prepend=","><![CDATA[ZW = #ZW#]]></isNotNull>
+			<isNotNull property="GSDH" prepend=","><![CDATA[GSDH = #GSDH#]]></isNotNull>
+			<isNotNull property="SJ" prepend=","><![CDATA[SJ = #SJ#]]></isNotNull>
+			<isNotNull property="DZYJ" prepend=","><![CDATA[DZYJ = #DZYJ#]]></isNotNull>
+			<isNotNull property="BMXXID" prepend=","><![CDATA[BMXXID = #BMXXID#]]></isNotNull>
+			<isNotNull property="JGXXID" prepend=","><![CDATA[JGXXID = #JGXXID#]]></isNotNull>
+			<isNotNull property="SBJS" prepend=","><![CDATA[SBJS = #SBJS#]]></isNotNull>
+			<isNotNull property="CWDZM" prepend=","><![CDATA[CWDZM = #CWDZM#]]></isNotNull>
+			<isNotNull property="RYZT" prepend=","><![CDATA[RYZT = #RYZT#]]></isNotNull>
+			<isNotNull property="UPDATER" prepend=","><![CDATA[UPDATER = #UPDATER#]]></isNotNull>
+			<isNotNull property="UPDTIME" prepend=","><![CDATA[UPDTIME = sysdate]]></isNotNull>
+			<isNotNull property="DELFLAG" prepend=","><![CDATA[DELFLAG = #DELFLAG#]]></isNotNull>
+			<isNotNull property="TERM_DECT_FROM" prepend=","><![CDATA[TERM_DECT_FROM = #TERM_DECT_FROM#]]></isNotNull>
+			<isNotNull property="TERM_DECT_END" prepend=","><![CDATA[TERM_DECT_END = #TERM_DECT_END#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where RYBH = #RYBH# ]]>
+	</update>
+	
+	<update id="updateXTYH" parameterClass="map">
+		<![CDATA[ update T_SYS_XTYH ]]>
+		<dynamic prepend="set">
+			<isNotNull property="YHM" prepend=","><![CDATA[YHM = #YHM#]]></isNotNull>
+			<isNotNull property="DELFLAG" prepend=","><![CDATA[DELFLAG = #DELFLAG#]]></isNotNull>
+			<isNotNull property="RYZT" prepend=","><![CDATA[YHZT = #RYZT#]]></isNotNull>
+			<isNotNull property="BMXXID" prepend=","><![CDATA[BMXXID = #BMXXID#]]></isNotNull>
+			<isNotNull property="JGXXID" prepend=","><![CDATA[JGXXID = #JGXXID#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where RYXXID = #RYXXID# ]]>
+	</update>
+	<insert id="insertXTYHZTDZ" parameterClass="map">
+		insert into T_SYS_XTYHZTDZ(
+			XTYHZTDZID,
+			ZTXXID,
+			XTYHID
+		)values(
+			#XTYHZTDZID#,
+			#ZTXXID#,
+			#XTYHID#
+		)
+	</insert>
+    <insert id="insertXTYH" parameterClass="map">
+        insert into T_SYS_XTYH (
+        	XTYHID,
+  			ZTXXID,
+			JGXXID,
+			BMXXID,
+			RYXXID,
+			YHBH,
+			YHM,
+			YHKL,
+			YHZT,
+			YHLB,
+			DELFLAG,
+			IS_DRP_LEDGER
+		)values(
+			#XTYHID#,
+  			#ZTXXID#,
+			#JGXXID#,
+			#BMXXID#,
+			#RYXXID#,
+			#RYBH#,
+			#YHM#,
+			#YHKL#,
+			#YHZT#,
+			#YHLB#,
+			#DELFLAG#,
+			#IS_DRP_LEDGER#
+		)
+
+    </insert>
+	<!-- 根据ID查找 -->
+	<select id="loadById" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+		select 
+			r.RYBH,
+			r.XM,
+			r.XB,
+			r.SJ,
+			b.BMXXID,
+			b.BMBH,
+			b.BMMC,
+			b.BMJC,
+			j.JGXXID,
+			j.JGBH,
+			j.JGMC,
+			r.GSDH,
+			r.SBJS,
+			r.DZYJ,
+			r.CRENAME,
+			to_char(r.CRETIME,'yyyy-MM-DD HH24:MI:SS') CRETIME,
+			r.RYZT,
+			r.RYSM,
+			z.ZTMC,
+			r.TERM_DECT_FROM,
+			r.TERM_DECT_END,
+			r.RYJB,
+			r.RYLB,
+			x.YHM
+		from T_SYS_RYXX r left join T_SYS_BMXX b on r.BMXXID=b.BMXXID 
+						  left join T_SYS_JGXX j on r.JGXXID = j.JGXXID 
+						  left join T_SYS_ZTXX z on j.ZTXXID=z.ZTXXID
+						  left join T_SYS_XTYH x on x.RYXXID=r.RYXXID
+		where r.RYXXID = #RYXXID#]]>
+	</select>
+
+	<!-- 判断RYBH是否存在 -->
+	<select id="getExits" parameterClass="String" resultClass="int">
+		<![CDATA[select count(RYBH) from ${SYSSCHEMA}.T_SYS_RYXX T where t.RYBH=#RYBH#]]>
+	</select>
+	<!-- 判断YHM是否存在 -->
+	<select id="getRHMExits" parameterClass="String" resultClass="int">
+		<![CDATA[select count(YHM) from ${SYSSCHEMA}.T_SYS_XTYH T where t.YHM=#YHM#]]>
+	</select>
+	 <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <![CDATA[
+	  	select a.XTJSID,   b.XTYHJSID,   a.JSBH,   a.JSMC,   a.JSSM,   a.DELFLAG 
+       from   T_SYS_XTJS a left join T_SYS_XTYHJS b on  a.XTJSID=b.XTJSID
+                           left join T_SYS_XTYH c on c.XTYHID=b.XTYHID
+       where  c.RYXXID = #RYXXID# and b.DELFLAG=#DELFLAG#
+	  ]]>
+  </select>
+
+<!-- 用户角色表插入 -->
+<insert id="insertChld" parameterClass="map">
+  <![CDATA[
+	  insert into T_SYS_XTYHJS(
+		XTYHJSID,
+		XTJSID,
+		XTYHID,
+		STATE,
+		DELFLAG
+	   )values(
+		#XTYHJSID#,
+		#XTJSID#,
+		(select XTYHID from T_SYS_XTYH where RYXXID=#RYXXID#),
+		#STATE#,
+		#DELFLAG#
+		)
+   ]]>
+</insert>
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+      select 
+    	a.XTJSID,
+		b.XTYHJSID,
+		a.JSBH,
+		a.JSMC,
+		a.JSSM,
+		a.DELFLAG
+    from T_SYS_XTJS a left join T_SYS_XTYHJS b on a.XTJSID=b.XTJSID
+    where XTYHJSID in ($XTYHJSIDS$)
+   ]]>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+  <!--明细表更新 -->
+<update id="updateChldById" parameterClass="map">
+	<![CDATA[ update T_SYS_XTYHJS ]]>
+	<dynamic prepend="set">
+    <isNotNull property="XTJSID" prepend=","><![CDATA[XTJSID = #XTJSID# ]]></isNotNull>
+    <isNotNull property="DELFLAG" prepend=","><![CDATA[DELFLAG = #DELFLAG# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where XTYHJSID = #XTYHJSID#]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteChldByIds" parameterClass="map">
+	<![CDATA[ update T_SYS_XTYHJS 
+	               set DELFLAG = #DELFLAG#	 
+ 	  where 
+	      XTYHJSID in ($XTYHJSIDS$)
+    ]]>
+</delete>
+<!-- 通过当前登录人的渠道id获取终端销售折扣控制标记 -->
+<select id="getTERM_DECT_CTR_FLAG" parameterClass="string" resultClass="string">
+	select TERM_DECT_CTR_FLAG from BASE_CHANN where CHANN_ID=#CHANN_ID#
+</select>
+
+	<update id="updatePassword" parameterClass="map">
+	    update ${SYSSCHEMA}.T_SYS_XTYH
+	    set YHKL=#password#
+	    where ryxxid=#ryxxid#
+	</update>
+</sqlMap>
+

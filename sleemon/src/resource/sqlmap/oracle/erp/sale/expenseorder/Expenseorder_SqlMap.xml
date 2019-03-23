@@ -1,0 +1,879 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zzb
+@function 报销单
+@version 2013-09-15 10:35:10
+-->
+<sqlMap  namespace="Expenseorder">
+<!-- 定义  -->
+<typeAlias type="com.hoperun.erp.sale.expenseorder.model.ExpenseorderModel" alias="ExpenseorderModel"/>
+<typeAlias type="com.hoperun.erp.sale.expenseorder.model.ExpenseorderChildModel" alias="ExpenseorderChildModel" />
+ 
+
+<!-- 使用ExpenseorderModel装载结果集 -->
+<resultMap id="ExpenseorderModel" class="ExpenseorderModel">
+    <result column="EXPENSE_ORDER_ID" property="EXPENSE_ORDER_ID" />
+</resultMap>
+
+
+<!-- 使用ExpenseorderChildModel装载结果集 -->
+<resultMap id="ExpenseorderChildModel" class="ExpenseorderChildModel">
+    <result column="EXPENSE_ORDER_DTL_ID" property="EXPENSE_ORDER_DTL_ID" />
+</resultMap>
+ 
+
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  u.DEL_FLAG = 0 
+  <isNotEmpty prepend=" " property="EXPENSE_ORDER_NO">
+    and u.EXPENSE_ORDER_NO like '%'||#EXPENSE_ORDER_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend=" " property="RELATE_ORDER_NOS">
+    and u.RELATE_ORDER_NOS like '%'||#RELATE_ORDER_NOS#||'%'
+  </isNotEmpty>
+  
+  <isNotEmpty prepend=" " property="EXPENSE_TYPE">
+    and u.EXPENSE_TYPE = #EXPENSE_TYPE#
+  </isNotEmpty>
+  <isNotEmpty prepend=" " property="CHANN_NO">
+    and u.CHANN_NO = #CHANN_NO#
+  </isNotEmpty>
+  <isNotEmpty prepend=" " property="BUDGET_ITEM_NO">
+    and u.BUDGET_ITEM_NO like '%'||#BUDGET_ITEM_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend=" " property="BUDGET_ITEM_NAME">
+    and u.BUDGET_ITEM_NAME like '%'||#BUDGET_ITEM_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend=" " property="BUDGET_ITEM_TYPE">
+    and u.BUDGET_ITEM_TYPE = #BUDGET_ITEM_TYPE#
+  </isNotEmpty>
+  <isNotEmpty prepend=" " property="EXPENSE_PSON_NAME">
+    and u.EXPENSE_PSON_NAME like '%'|| #EXPENSE_PSON_NAME# ||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend=" " property="EXPENSE_DEPT_NO">
+    and u.EXPENSE_DEPT_NO like '%'|| #EXPENSE_DEPT_NO# ||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend=" " property="EXPENSE_DEPT_NAME">
+    and u.EXPENSE_DEPT_NAME like '%'|| #EXPENSE_DEPT_NAME# ||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend=" " property="YEAR">
+    and u.YEAR = #YEAR#
+  </isNotEmpty>
+   <isNotEmpty prepend=" " property="QUARTER">
+    and u.QUARTER = #QUARTER#
+  </isNotEmpty>
+  <isNotEmpty prepend=" " property="DEPT_NAME">
+    and u.DEPT_NAME = #DEPT_NAME#
+  </isNotEmpty>
+   <isNotEmpty prepend=" " property="MONTH">
+    and u.MONTH = #MONTH#
+  </isNotEmpty>
+  <isNotEmpty prepend=" " property="EXPENSE_DATE_BEG">
+	  <![CDATA[ and u.EXPENSE_DATE >= to_date(#EXPENSE_DATE_BEG#,'yyyy-MM-DD')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend=" " property="EXPENSE_DATE_END">
+	  <![CDATA[ and u.EXPENSE_DATE <= to_date(#EXPENSE_DATE_END#,'yyyy-MM-DD')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend=" " property="CRE_TIME_BEGIN">
+	  <![CDATA[ and  u.CRE_TIME >= to_date(#CRE_TIME_BEGIN#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend=" " property="CRE_TIME_END">
+	  <![CDATA[ and  u.CRE_TIME <= to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>  
+  <isNotEmpty prepend=" " property="CHANNS_CHARG">
+     and u.CHANN_ID in $CHANNS_CHARG$
+  </isNotEmpty>
+  <isNotEmpty prepend=" " property="STATE">
+     and u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend=" " property="DEL_FLAG">
+     and u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+  <isNotEmpty prepend=" " property="QXJBCON">
+      and  $QXJBCON$
+  </isNotEmpty>
+  <isNotEmpty prepend=" " property="CHANN_NO">
+  	and u.CHANN_NO like '%'|| #CHANN_NO# ||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend=" " property="CHANN_NAME">
+  	and u.CHANN_NAME like '%'|| #CHANN_NAME# ||'%'
+  </isNotEmpty>
+</sql>
+
+<sql id="qDynSql">
+    and   temp.CORRELATIONID = u.EXPENSE_ORDER_ID
+  <isNotEmpty prepend="and" property="EXPENSE_ORDER_NO">
+    u.EXPENSE_ORDER_NO like '%'||#EXPENSE_ORDER_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="RELATE_ORDER_NOS">
+    u.RELATE_ORDER_NOS like '%'||#RELATE_ORDER_NOS#||'%'
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and" property="EXPENSE_TYPE">
+    u.EXPENSE_TYPE = #EXPENSE_TYPE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CHANN_NO">
+    u.CHANN_NO = #CHANN_NO#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="BUDGET_ITEM_NO">
+    u.BUDGET_ITEM_NO like '%'||#BUDGET_ITEM_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="BUDGET_ITEM_NAME">
+    u.BUDGET_ITEM_NAME like '%'||#BUDGET_ITEM_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="BUDGET_ITEM_TYPE">
+    u.BUDGET_ITEM_TYPE = #BUDGET_ITEM_TYPE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="EXPENSE_PSON_NAME">
+   u.EXPENSE_PSON_NAME like '%'|| #EXPENSE_PSON_NAME# ||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="EXPENSE_DEPT_NO">
+   u.EXPENSE_DEPT_NO like '%'|| #EXPENSE_DEPT_NO# ||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="EXPENSE_DEPT_NAME">
+   u.EXPENSE_DEPT_NAME like '%'|| #EXPENSE_DEPT_NAME# ||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="YEAR">
+   u.YEAR = #YEAR#
+  </isNotEmpty>
+   <isNotEmpty prepend="and" property="QUARTER">
+   u.QUARTER = #QUARTER#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="DEPT_NAME">
+   u.DEPT_NAME = #DEPT_NAME#
+  </isNotEmpty>
+   <isNotEmpty prepend="and" property="MONTH">
+   u.MONTH = #MONTH#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="EXPENSE_DATE_BEG">
+	  <![CDATA[  u.EXPENSE_DATE >= to_date(#EXPENSE_DATE_BEG#,'yyyy-MM-DD')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="EXPENSE_DATE_END">
+	  <![CDATA[  u.EXPENSE_DATE <= to_date(#EXPENSE_DATE_END#,'yyyy-MM-DD')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="CRE_TIME_BEGIN">
+	  <![CDATA[  u.CRE_TIME >= to_date(#CRE_TIME_BEGIN#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+	  <![CDATA[  u.CRE_TIME <= to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>  
+  <isNotEmpty prepend="and" property="CHANNS_CHARG">
+     u.CHANN_ID in $CHANNS_CHARG$
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="DEL_FLAG">
+    u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CHANN_NO">
+   	u.CHANN_ID in (select chann_id from base_chann where CHANN_NO like '%'|| #CHANN_NO# ||'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CHANN_NAME">
+   	u.CHANN_ID in (select chann_id from base_chann where CHANN_NAME like '%'|| #CHANN_NAME# ||'%')
+  </isNotEmpty>
+</sql>
+
+<sql id="qDynSqlT">
+  <isNotEmpty prepend="and" property="EXPENSE_ORDER_NO">
+    u.EXPENSE_ORDER_NO like '%'||#EXPENSE_ORDER_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="RELATE_ORDER_NOS">
+    u.RELATE_ORDER_NOS like '%'||#RELATE_ORDER_NOS#||'%'
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and" property="EXPENSE_TYPE">
+    u.EXPENSE_TYPE = #EXPENSE_TYPE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CHANN_NO">
+    u.CHANN_NO = #CHANN_NO#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="BUDGET_ITEM_NO">
+    u.BUDGET_ITEM_NO like '%'||#BUDGET_ITEM_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="BUDGET_ITEM_NAME">
+    u.BUDGET_ITEM_NAME like '%'||#BUDGET_ITEM_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="BUDGET_ITEM_TYPE">
+    u.BUDGET_ITEM_TYPE = #BUDGET_ITEM_TYPE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="EXPENSE_PSON_NAME">
+   u.EXPENSE_PSON_NAME like '%'|| #EXPENSE_PSON_NAME# ||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="EXPENSE_DEPT_NO">
+   u.EXPENSE_DEPT_NO like '%'|| #EXPENSE_DEPT_NO# ||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="EXPENSE_DEPT_NAME">
+   u.EXPENSE_DEPT_NAME like '%'|| #EXPENSE_DEPT_NAME# ||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="YEAR">
+   u.YEAR = #YEAR#
+  </isNotEmpty>
+   <isNotEmpty prepend="and" property="QUARTER">
+   u.QUARTER = #QUARTER#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="DEPT_NAME">
+   u.DEPT_NAME = #DEPT_NAME#
+  </isNotEmpty>
+   <isNotEmpty prepend="and" property="MONTH">
+   u.MONTH = #MONTH#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="EXPENSE_DATE_BEG">
+	  <![CDATA[  u.EXPENSE_DATE >= to_date(#EXPENSE_DATE_BEG#,'yyyy-MM-DD')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="EXPENSE_DATE_END">
+	  <![CDATA[  u.EXPENSE_DATE <= to_date(#EXPENSE_DATE_END#,'yyyy-MM-DD')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="CRE_TIME_BEGIN">
+	  <![CDATA[  u.CRE_TIME >= to_date(#CRE_TIME_BEGIN#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+	  <![CDATA[  u.CRE_TIME <= to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>  
+  <isNotEmpty prepend="and" property="CHANNS_CHARG">
+     u.CHANN_ID in $CHANNS_CHARG$
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="DEL_FLAG">
+    u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CHANN_NO">
+   	u.CHANN_ID in (select chann_id from base_chann where CHANN_NO like '%'|| #CHANN_NO# ||'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CHANN_NAME">
+   	u.CHANN_ID in (select chann_id from base_chann where CHANN_NAME like '%'|| #CHANN_NAME# ||'%')
+  </isNotEmpty>
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+	    DISTINCT
+	    u.EXPENSE_ORDER_ID,
+	    u.EXPENSE_ORDER_NO,
+	    u.EXPENSE_TYPE,
+	    u.BUDGET_QUOTA_ID,
+		u.BUDGET_ITEM_ID,
+		u.BUDGET_ITEM_NO,
+		u.BUDGET_ITEM_NAME,
+		u.BUDGET_ITEM_TYPE,
+		u.MONTH,
+		u.YEAR,
+		u.QUARTER,
+		u.EXPENSE_PSON_ID,
+		u.EXPENSE_PSON_NAME,
+		u.EXPENSE_DEPT_ID,
+		u.EXPENSE_DEPT_NO,
+		u.EXPENSE_DEPT_NAME,
+		u.EXPENSE_AMOUNT,
+		to_char(u.EXPENSE_DATE,'yyyy-MM-DD') EXPENSE_DATE,
+		u.RELATE_ORDER_NOS,
+		u.RELATE_AMOUNT_REQ,
+		u.REMARK,
+		u.STATE,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.DEL_FLAG,
+		u.CHANN_ID,
+		u.CHANN_NO,
+		u.CHANN_NAME
+      from ERP_EXPENSE_ORDER u
+      
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+</sql>
+
+<sql id="coreSqlSH">
+  <![CDATA[ 
+	select 
+	    DISTINCT
+	    u.EXPENSE_ORDER_ID,
+	    u.EXPENSE_ORDER_NO,
+	    u.EXPENSE_TYPE,
+	    u.BUDGET_QUOTA_ID,
+		u.BUDGET_ITEM_ID,
+		u.BUDGET_ITEM_NO,
+		u.BUDGET_ITEM_NAME,
+		u.BUDGET_ITEM_TYPE,
+		u.MONTH,
+		u.YEAR,
+		u.QUARTER,
+		u.EXPENSE_PSON_ID,
+		u.EXPENSE_PSON_NAME,
+		u.EXPENSE_DEPT_ID,
+		u.EXPENSE_DEPT_NO,
+		u.EXPENSE_DEPT_NAME,
+		u.EXPENSE_AMOUNT,
+		to_char(u.EXPENSE_DATE,'yyyy-MM-DD') EXPENSE_DATE,
+		u.RELATE_ORDER_NOS,
+		u.RELATE_AMOUNT_REQ,
+		u.REMARK,
+		u.STATE,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.DEL_FLAG
+      from ERP_EXPENSE_ORDER u,
+      
+   ]]>
+    <isNotEmpty prepend="" property="QXJBCON">
+	   $QXJBCON$  
+    </isNotEmpty>
+    <include refid="qDynSql" />
+</sql>
+
+
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+</select>
+
+<select id="pageQuerySH" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSqlSH" />
+		<include refid="public.pageEnd" />
+</select>
+
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM ERP_EXPENSE_ORDER u ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<select id="pageCountSH" parameterClass="map" resultClass="int">
+	<![CDATA[
+	     SELECT COUNT(*) FROM (select DISTINCT *
+            from ERP_EXPENSE_ORDER u,
+		   ]]>
+	<isNotEmpty prepend="" property="QXJBCON">
+       $QXJBCON$  
+    </isNotEmpty>
+	<include refid="qDynSql" />
+	<![CDATA[
+	   ) u
+	]]>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+
+ 
+	
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_EXPENSE_ORDER(
+		 EXPENSE_ORDER_ID,
+	     EXPENSE_ORDER_NO,
+	     EXPENSE_TYPE,
+	     BUDGET_QUOTA_ID,
+		 BUDGET_ITEM_ID,
+		 BUDGET_ITEM_NO,
+		 BUDGET_ITEM_NAME,
+		 BUDGET_ITEM_TYPE,
+		 MONTH,
+		 YEAR,
+		 QUARTER,
+		 EXPENSE_PSON_ID,
+		 EXPENSE_PSON_NAME,
+		 EXPENSE_DEPT_ID,
+		 EXPENSE_DEPT_NO,
+		 EXPENSE_DEPT_NAME,
+		 EXPENSE_AMOUNT,
+		 EXPENSE_DATE,
+		 RELATE_ORDER_NOS,
+		 RELATE_AMOUNT_REQ,
+		 REMARK,
+		 STATE,
+         CRE_NAME,
+         CREATOR,
+         CRE_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         DEL_FLAG,
+         CHANN_ID,
+         CHANN_NO,
+         CHANN_NAME
+	   )values(
+		#EXPENSE_ORDER_ID#,
+	     #EXPENSE_ORDER_NO#,
+	     #EXPENSE_TYPE#,
+	     #BUDGET_QUOTA_ID#,
+		 #BUDGET_ITEM_ID#,
+		 #BUDGET_ITEM_NO#,
+		 #BUDGET_ITEM_NAME#,
+		 #BUDGET_ITEM_TYPE#,
+		 #MONTH#,
+		 #YEAR#,
+		 #QUARTER#,
+		 #EXPENSE_PSON_ID#,
+		 #EXPENSE_PSON_NAME#,
+		 #EXPENSE_DEPT_ID#,
+		 #EXPENSE_DEPT_NO#,
+		 #EXPENSE_DEPT_NAME#,
+		 #EXPENSE_AMOUNT#,
+		 to_date(#EXPENSE_DATE#,'yyyy-MM-DD'),
+		 #RELATE_ORDER_NOS#,
+		 #RELATE_AMOUNT_REQ#,
+		 #REMARK#,
+		#STATE#,
+        #CRE_NAME#,
+        #CREATOR#,
+	    sysdate, 
+        #DEPT_ID#,
+        #DEPT_NAME#,
+        #ORG_ID#,
+        #ORG_NAME#,
+        #LEDGER_ID#,
+        #LEDGER_NAME#,
+		#DEL_FLAG#,
+		#CHANN_ID#,
+        #CHANN_NO#,
+        #CHANN_NAME#
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update ERP_EXPENSE_ORDER ]]>
+	<dynamic prepend="set">
+	<isNotNull property="EXPENSE_TYPE" prepend=","><![CDATA[EXPENSE_TYPE = #EXPENSE_TYPE#]]></isNotNull>
+	<isNotNull property="EXPENSE_DATE" prepend=","><![CDATA[EXPENSE_DATE = to_date(#EXPENSE_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+	<isNotNull property="BUDGET_ITEM_ID" prepend=","><![CDATA[BUDGET_ITEM_ID = #BUDGET_ITEM_ID# ]]></isNotNull>
+    <isNotNull property="BUDGET_ITEM_NO" prepend=","><![CDATA[BUDGET_ITEM_NO = #BUDGET_ITEM_NO# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    <isNotNull property="BUDGET_ITEM_NAME" prepend=","><![CDATA[BUDGET_ITEM_NAME = #BUDGET_ITEM_NAME# ]]></isNotNull>
+    <isNotNull property="BUDGET_ITEM_TYPE" prepend=","><![CDATA[BUDGET_ITEM_TYPE = #BUDGET_ITEM_TYPE# ]]></isNotNull>
+    <isNotNull property="MONTH" prepend=","><![CDATA[MONTH = #MONTH# ]]></isNotNull>
+    <isNotNull property="YEAR" prepend=","><![CDATA[YEAR = #YEAR# ]]></isNotNull>
+    <isNotNull property="QUARTER" prepend=","><![CDATA[QUARTER = #QUARTER# ]]></isNotNull>
+    <isNotNull property="BUDGET_QUOTA_ID" prepend=","><![CDATA[BUDGET_QUOTA_ID = #BUDGET_QUOTA_ID# ]]></isNotNull>
+    <isNotNull property="EXPENSE_PSON_ID" prepend=","><![CDATA[EXPENSE_PSON_ID = #EXPENSE_PSON_ID# ]]></isNotNull>
+    <isNotNull property="EXPENSE_PSON_NAME" prepend=","><![CDATA[EXPENSE_PSON_NAME = #EXPENSE_PSON_NAME# ]]></isNotNull>
+    <isNotNull property="EXPENSE_DEPT_ID" prepend=","><![CDATA[EXPENSE_DEPT_ID = #EXPENSE_DEPT_ID# ]]></isNotNull>
+    <isNotNull property="EXPENSE_DEPT_NO" prepend=","><![CDATA[EXPENSE_DEPT_NO = #EXPENSE_DEPT_NO# ]]></isNotNull>
+    <isNotNull property="EXPENSE_DEPT_NAME" prepend=","><![CDATA[EXPENSE_DEPT_NAME = #EXPENSE_DEPT_NAME# ]]></isNotNull>
+    <isNotNull property="EXPENSE_AMOUNT" prepend=","><![CDATA[EXPENSE_AMOUNT = #EXPENSE_AMOUNT# ]]></isNotNull>
+    <isNotNull property="RELATE_ORDER_NOS" prepend=","><![CDATA[RELATE_ORDER_NOS = #RELATE_ORDER_NOS# ]]></isNotNull>
+    <isNotNull property="RELATE_AMOUNT_REQ" prepend=","><![CDATA[RELATE_AMOUNT_REQ = #RELATE_AMOUNT_REQ# ]]></isNotNull>
+    <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+    <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    <isNotNull property="CHANN_ID" prepend=","><![CDATA[CHANN_ID = #CHANN_ID# ]]></isNotNull>
+    <isNotNull property="CHANN_NO" prepend=","><![CDATA[CHANN_NO = #CHANN_NO# ]]></isNotNull>
+    <isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where EXPENSE_ORDER_ID = #EXPENSE_ORDER_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update ERP_EXPENSE_ORDER 
+	               set DEL_FLAG = #DEL_FLAG#
+                      ,UPD_NAME=#UPD_NAME#
+                     ,UPDATOR=#UPDATOR#
+                      ,UPD_TIME=sysdate
+ 	  where 
+	     EXPENSE_ORDER_ID = #EXPENSE_ORDER_ID# 
+    ]]>
+</delete>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	 select 
+	    u.EXPENSE_ORDER_ID,
+	    u.EXPENSE_ORDER_NO,
+	    u.EXPENSE_TYPE,
+	    u.BUDGET_QUOTA_ID,
+		u.BUDGET_ITEM_ID,
+		u.BUDGET_ITEM_NO,
+		u.BUDGET_ITEM_NAME,
+		u.BUDGET_ITEM_TYPE,
+		u.MONTH,
+		u.YEAR,
+		u.QUARTER,
+		u.EXPENSE_PSON_ID,
+		u.EXPENSE_PSON_NAME,
+		u.EXPENSE_DEPT_ID,
+		u.EXPENSE_DEPT_NO,
+		u.EXPENSE_DEPT_NAME,
+		u.EXPENSE_AMOUNT,
+		to_char(u.EXPENSE_DATE,'yyyy-MM-DD') EXPENSE_DATE,
+		u.RELATE_ORDER_NOS,
+		u.RELATE_AMOUNT_REQ,
+		u.REMARK,
+		u.STATE,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+	    a.ATT_PATH,
+		u.DEL_FLAG,
+		u.CHANN_ID,
+		u.CHANN_NO,
+		u.CHANN_NAME
+      from ERP_EXPENSE_ORDER u
+      left join BASE_ATT a on u.EXPENSE_ORDER_ID = a.FROM_BILL_ID and a.DEL_FLAG=0
+	  where 
+		u.EXPENSE_ORDER_ID = #EXPENSE_ORDER_ID#
+	]]>
+</select>
+
+<select id="loadByNum" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	 select 
+	    u.EXPENSE_ORDER_ID,
+	    u.EXPENSE_ORDER_NO,
+	    u.EXPENSE_TYPE,
+	    u.BUDGET_QUOTA_ID,
+		u.BUDGET_ITEM_ID,
+		u.BUDGET_ITEM_NO,
+		u.BUDGET_ITEM_NAME,
+		u.BUDGET_ITEM_TYPE,
+		u.MONTH,
+		u.YEAR,
+		u.QUARTER,
+		u.EXPENSE_PSON_ID,
+		u.EXPENSE_PSON_NAME,
+		u.EXPENSE_DEPT_ID,
+		u.EXPENSE_DEPT_NO,
+		u.EXPENSE_DEPT_NAME,
+		u.EXPENSE_AMOUNT,
+		to_char(u.EXPENSE_DATE,'yyyy-MM-DD') EXPENSE_DATE,
+		u.RELATE_ORDER_NOS,
+		u.RELATE_AMOUNT_REQ,
+		u.REMARK,
+		u.STATE,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+	    a.ATT_PATH,
+		u.DEL_FLAG,
+		u.CHANN_ID,
+		u.CHANN_NO,
+		u.CHANN_NAME
+      from ERP_EXPENSE_ORDER u
+      left join BASE_ATT a on u.EXPENSE_ORDER_ID = a.FROM_BILL_ID and a.DEL_FLAG=0
+	  where 
+		u.EXPENSE_ORDER_ID = #EXPENSE_ORDER_ID#
+	]]>
+</select>
+
+<!-- 导出 -->
+<select id="downData" parameterClass="map" resultClass="java.util.HashMap">
+	select 
+	    u.EXPENSE_ORDER_ID,
+	    u.EXPENSE_ORDER_NO,
+	    u.EXPENSE_TYPE,
+	    u.BUDGET_QUOTA_ID,
+		u.BUDGET_ITEM_ID,
+		u.BUDGET_ITEM_NO,
+		u.BUDGET_ITEM_NAME,
+		u.BUDGET_ITEM_TYPE,
+		u.MONTH,
+		u.YEAR,
+		u.QUARTER,
+		u.EXPENSE_PSON_ID,
+		u.EXPENSE_PSON_NAME,
+		u.EXPENSE_DEPT_ID,
+		u.EXPENSE_DEPT_NO,
+		u.EXPENSE_DEPT_NAME,
+		u.EXPENSE_AMOUNT,
+		to_char(u.EXPENSE_DATE,'yyyy-MM-DD') EXPENSE_DATE,
+		u.RELATE_ORDER_NOS,
+		u.RELATE_AMOUNT_REQ,
+		u.REMARK,
+		u.STATE,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.DEL_FLAG,
+		u.CHANN_ID,
+		u.CHANN_NO,
+		u.CHANN_NAME
+        from ERP_EXPENSE_ORDER u
+	<dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+</select>
+
+<select id="downDataSH" parameterClass="map" resultClass="java.util.HashMap">
+	select 
+	    u.EXPENSE_ORDER_ID,
+	    u.EXPENSE_ORDER_NO,
+	    u.EXPENSE_TYPE,
+	    u.BUDGET_QUOTA_ID,
+		u.BUDGET_ITEM_ID,
+		u.BUDGET_ITEM_NO,
+		u.BUDGET_ITEM_NAME,
+		u.BUDGET_ITEM_TYPE,
+		u.MONTH,
+		u.YEAR,
+		u.QUARTER,
+		u.EXPENSE_PSON_ID,
+		u.EXPENSE_PSON_NAME,
+		u.EXPENSE_DEPT_ID,
+		u.EXPENSE_DEPT_NO,
+		u.EXPENSE_DEPT_NAME,
+		u.EXPENSE_AMOUNT,
+		to_char(u.EXPENSE_DATE,'yyyy-MM-DD') EXPENSE_DATE,
+		u.RELATE_ORDER_NOS,
+		u.RELATE_AMOUNT_REQ,
+		u.REMARK,
+		u.STATE,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.DEL_FLAG,
+		u.CHANN_ID,
+		u.CHANN_NO,
+		u.CHANN_NAME
+        from ERP_EXPENSE_ORDER u WHERE
+	 <isNotEmpty prepend="" property="QXJBCON">
+	   $QXJBCON$  
+     </isNotEmpty>
+     <include refid="qDynSqlT" />
+	 <dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	 </dynamic>
+</select>
+
+<!-- ==========================================================明细操作开始================-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+     select 
+		 u.EXPENSE_ORDER_DTL_ID,
+		 u.EXPENSE_ORDER_ID,
+		 u.EXPENSE_TYPE,
+		 u.EXPENSE_REMARK,
+		 u.BUSS_DATE,
+		 u.EXPENSE_AMOUNT,
+		 u.OTHER_REMARK,
+		 a.ATT_PATH EXPENSE_ATT,
+		 u.DEL_FLAG
+       from ERP_EXPENSE_ORDER_DTL u
+       left join BASE_ATT a on u.EXPENSE_ORDER_DTL_ID = a.FROM_BILL_ID and a.DEL_FLAG=0
+       	 
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.EXPENSE_ORDER_ID=#EXPENSE_ORDER_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+  </select>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+	        u.EXPENSE_ORDER_DTL_ID in ($EXPENSE_ORDER_DTL_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+  </select>
+  
+  <select id="queryRelateOrder" parameterClass="map" resultClass="ExpenseorderModel">
+	<![CDATA[  
+	  select a.EXPENSE_AMOUNT
+	  from ERP_EXPENSE_ORDER a
+	  where a.DEL_FLAG = 0
+	  and a.RELATE_ORDER_NOS = #RELATE_ORDER_NOS#
+   ]]>
+</select>
+
+<select id="expenseOrderQuery" parameterClass="map" resultClass="ExpenseorderModel">
+ 		<![CDATA[
+ 			select 
+ 				u.RELATE_ORDER_NOS,
+ 				u.RELATE_AMOUNT_REQ,
+ 				u.EXPENSE_AMOUNT
+ 			    from ERP_EXPENSE_ORDER u
+ 			    where 
+ 				u.EXPENSE_ORDER_ID=#EXPENSE_ORDER_ID#
+ 				and u.DEL_FLAG=#DEL_FLAG#
+ 		]]>
+</select>
+
+<select id="queryChannExpenseAmount" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[      
+      SELECT (SUM(r.EXPENSE_AMOUNT)/10000) EXPENSE_AMOUNT FROM ERP_EXPENSE_ORDER r where r.DEL_FLAG = 0 AND r.STATE != '否决'
+             AND r.CHANN_ID = #CHANN_ID#   AND to_char(r.CRE_TIME, 'yyyy') = #YEAR#
+    ]]>
+</select>
+  
+<!--明细表插入 -->
+<insert id="insertChld" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_EXPENSE_ORDER_DTL(
+		 EXPENSE_ORDER_DTL_ID,
+		 EXPENSE_ORDER_ID,
+		 EXPENSE_TYPE,
+		 EXPENSE_REMARK,
+		 BUSS_DATE,
+		 EXPENSE_AMOUNT,
+		 OTHER_REMARK,
+		 DEL_FLAG
+	   )values(
+		 #EXPENSE_ORDER_DTL_ID#,
+		 #EXPENSE_ORDER_ID#,
+		 #EXPENSE_TYPE#,
+		 #EXPENSE_REMARK#,
+		 to_date(#BUSS_DATE#,'yyyy-MM-DD'),
+		 #EXPENSE_AMOUNT#,
+		 #OTHER_REMARK#,
+		 #DEL_FLAG#
+		)
+   ]]>
+</insert>
+<!--明细表更新 -->
+<update id="updateChldById" parameterClass="map">
+	<![CDATA[ update ERP_EXPENSE_ORDER_DTL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="EXPENSE_TYPE" prepend=","><![CDATA[EXPENSE_TYPE = #EXPENSE_TYPE# ]]></isNotNull>
+    <isNotNull property="EXPENSE_REMARK" prepend=","><![CDATA[EXPENSE_REMARK = #EXPENSE_REMARK# ]]></isNotNull>
+    <isNotNull property="BUSS_DATE" prepend=","><![CDATA[BUSS_DATE = to_date(#BUSS_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+    <isNotNull property="EXPENSE_AMOUNT" prepend=","><![CDATA[EXPENSE_AMOUNT = #EXPENSE_AMOUNT# ]]></isNotNull>
+    <isNotNull property="OTHER_REMARK" prepend=","><![CDATA[OTHER_REMARK = #OTHER_REMARK# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where EXPENSE_ORDER_DTL_ID = #EXPENSE_ORDER_DTL_ID#]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteChldByIds" parameterClass="map">
+	<![CDATA[ update ERP_EXPENSE_ORDER_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      EXPENSE_ORDER_DTL_ID in ($EXPENSE_ORDER_DTL_IDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细 -->
+<delete id="delChldByFkId" parameterClass="map">
+	<![CDATA[ update ERP_EXPENSE_ORDER_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      EXPENSE_ORDER_ID = #EXPENSE_ORDER_ID#
+    ]]>
+</delete>
+
+<!-- 根据主表ID查询明细 -->
+  <select id="queryById" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSql"/>
+	  <dynamic prepend="and">
+			u.EXPENSE_ORDER_ID=#EXPENSE_ORDER_ID#
+	  </dynamic>
+  </select>
+
+<!-- 更新主表的报销金额 -->
+<update id="updateMainExpAmount" parameterClass="String">
+
+update ERP_EXPENSE_ORDER t
+   set t.EXPENSE_AMOUNT =
+       (select sum(d.EXPENSE_AMOUNT)
+          from ERP_EXPENSE_ORDER_DTL d
+         where d.EXPENSE_ORDER_ID = t.EXPENSE_ORDER_ID
+           and d.DEL_FLAG = 0)
+ where t.EXPENSE_ORDER_ID=#EXPENSE_ORDER_ID#
+
+</update>
+
+</sqlMap>

@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ * @module 系统管理
+ * @func 分销渠道信息
+ * @version 1.0
+ * @author gu_hongxiu
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="distributor">
+
+	<typeAlias type="com.hoperun.base.distributor.model.DistributorModel" alias="DistributorModel" />
+
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="DistributorModel" class="DistributorModel">
+		<result column="DISTRIBUTOR_ID" property="DISTRIBUTOR_ID" />
+	</resultMap>
+	
+	<!-- 动态查询 and 列表排序 -->
+	<sql id="queryDynSql"> 		
+		<isNotEmpty prepend="and " property="DISTRIBUTOR_NO">c.DISTRIBUTOR_NO like '%'||#DISTRIBUTOR_NO#||'%'</isNotEmpty>		
+		<isNotEmpty prepend="and " property="DISTRIBUTOR_NAME">c.DISTRIBUTOR_NAME like '%'||#DISTRIBUTOR_NAME#||'%'</isNotEmpty>
+    	<isNotEmpty prepend="and " property="DISTRIBUTOR_TYPE">c.DISTRIBUTOR_TYPE=#DISTRIBUTOR_TYPE#</isNotEmpty>
+    	<isNotEmpty prepend="and " property="AREA_NAME_P">c.AREA_ID in (select a.AREA_ID from BASE_AREA a where a.AREA_NAME_P=#AREA_NAME_P# and a.del_flag = 0)</isNotEmpty>
+    	<isNotEmpty prepend="and " property="CHANN_NO">c.CHANN_NO like '%'||#CHANN_NO#||'%'</isNotEmpty>
+    	<isNotEmpty prepend="and " property="CHANN_NAME">c.CHANN_NAME like '%'||#CHANN_NAME#||'%'</isNotEmpty>
+    	<isNotEmpty prepend="and " property="BEGIN_CRE_TIME">c.CRE_TIME &gt;= to_date(#BEGIN_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')</isNotEmpty>
+		<isNotEmpty prepend="and " property="END_CRE_TIME">c.CRE_TIME &lt;= to_date(#END_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')</isNotEmpty>
+		<isNotEmpty prepend="and " property="AREA_MANAGE_NAME">c.AREA_MANAGE_NAME like '%'||#AREA_MANAGE_NAME#||'%'</isNotEmpty>
+    	<isNotEmpty prepend="and " property="PROV"><![CDATA[c.PROV like '%'||#PROV#||'%']]></isNotEmpty>
+    	<isNotEmpty prepend="and " property="CITY"><![CDATA[c.CITY like '%'||#CITY#||'%']]></isNotEmpty>
+		<isNotEmpty prepend="and " property="COUNTY"><![CDATA[c.COUNTY like '%'||#COUNTY#||'%']]></isNotEmpty>
+		<isNotEmpty prepend="and " property="PERSON_CON">c.PERSON_CON like '%'||#PERSON_CON#||'%'</isNotEmpty>
+    	<isNotEmpty prepend="and " property="STATE">c.STATE=#STATE#</isNotEmpty>
+		<isNotEmpty prepend="and " property="DEL_FLAG"><![CDATA[c.DEL_FLAG=#DEL_FLAG#]]></isNotEmpty>
+	    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	   </isNotEmpty>
+	</sql>
+    <sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField"> $orderField$</isNotEmpty>
+	</sql>
+	
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[
+				select c.DISTRIBUTOR_ID,
+			       c.DISTRIBUTOR_NO,
+			       c.DISTRIBUTOR_NAME,			       
+			       c.DISTRIBUTOR_TYPE,
+			       c.TEL,			       
+			       c.CHANN_NO,
+			       c.CHANN_NAME,
+			       c.CREATOR,
+			       c.CRE_NAME,
+			       to_char(c.CRE_TIME, 'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+			       c.DEPT_ID,
+			       c.DEPT_NAME,
+			       c.STATE,
+			       (select a.AREA_NAME_P from BASE_AREA a where a.AREA_ID = c.AREA_ID and a.del_flag = 0) AREA_NAME_P       
+			       from BASE_DISTRIBUTOR c			       
+				]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>	
+	
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(DISTRIBUTOR_ID) cnt FROM ${SYSSCHEMA}.BASE_DISTRIBUTOR c ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+
+   <!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	<!-- 根据ID查找 -->	
+	<select id="loadById" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+				select 
+					AREA_MANAGE_NAME,
+		 			NATION,
+		 			PROV,
+		 			CITY,
+		 			COUNTY,		 			
+		 			PERSON_CON,		 			
+		 			MOBILE,
+		 			TAX,
+		 			EMAIL,
+		 			SALE_STORE_NAME,
+		 			SALE_STORE_LOCAL,
+		 			BUSS_BRAND,
+		 			BUSS_CLASS,
+		 			to_char(COOPER_DATE,'yyyy-MM-DD') COOPER_DATE,		 			
+				 	STATE,
+				 	CREATOR,
+				 	CRE_NAME, 
+				 	to_char(CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+				 	UPDATOR,
+				 	UPD_NAME,
+				 	to_char(UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+				 	DEPT_ID,
+				 	DEPT_NAME,
+				 	ORG_ID,
+				 	ORG_NAME,
+				 	LEDGER_ID,
+				 	LEDGER_NAME,
+				 	DISTRIBUTOR_ID,
+					DISTRIBUTOR_NO,
+					DISTRIBUTOR_NAME,
+					DISTRIBUTOR_TYPE,
+					TEL,
+					CHANN_NO,
+					CHANN_NAME,
+					CHANN_ID,
+					AREA_ID,
+					AREA_NO,
+					AREA_NAME,
+					ZONE_ID,
+					AREA_MANAGE_ID,
+					AREA_MANAGE_TEL,
+					(select a.AREA_NAME_P from BASE_AREA a where a.AREA_ID = c.AREA_ID and a.del_flag = 0) AREA_NAME_P				 	
+				from ${SYSSCHEMA}.BASE_DISTRIBUTOR c where c.DISTRIBUTOR_ID = #DISTRIBUTOR_ID# and DEL_FLAG=0
+		]]>
+	</select>
+		
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.BASE_DISTRIBUTOR(
+		 	DISTRIBUTOR_ID,DISTRIBUTOR_NO,DISTRIBUTOR_NAME,DISTRIBUTOR_TYPE,TEL,
+			CHANN_ID,CHANN_NO,CHANN_NAME,AREA_MANAGE_ID,AREA_MANAGE_NAME,AREA_MANAGE_TEL,PROV,CITY,COUNTY,AREA_ID,AREA_NO,AREA_NAME,ZONE_ID,
+			PERSON_CON,MOBILE,TAX,EMAIL,SALE_STORE_NAME,SALE_STORE_LOCAL,BUSS_BRAND,BUSS_CLASS,COOPER_DATE,
+			STATE,CREATOR,CRE_NAME,CRE_TIME,DEPT_ID,DEPT_NAME,ORG_ID,ORG_NAME,LEDGER_ID,LEDGER_NAME,DEL_FLAG
+		 	)
+		 values(		 	
+			#DISTRIBUTOR_ID#,#DISTRIBUTOR_NO#,#DISTRIBUTOR_NAME#,#DISTRIBUTOR_TYPE#,#TEL#,
+			#CHANN_ID#,#CHANN_NO#,#CHANN_NAME#,#AREA_MANAGE_ID#,#AREA_MANAGE_NAME#,#AREA_MANAGE_TEL#,#PROV#,#CITY#,#COUNTY#,#AREA_ID#,#AREA_NO#,#AREA_NAME#,#ZONE_ID#,
+			#PERSON_CON#,#MOBILE#,#TAX#,#EMAIL#,#SALE_STORE_NAME#,#SALE_STORE_LOCAL#,#BUSS_BRAND#,#BUSS_CLASS#,to_date(#COOPER_DATE#,'yyyy-MM-DD'),
+			#STATE#,#CREATOR#,#CRE_NAME#,sysdate,#DEPT_ID#,#DEPT_NAME#,#ORG_ID#,#ORG_NAME#,#LEDGER_ID#,#LEDGER_NAME#,#DEL_FLAG#			
+		 )
+		]]>
+	</insert>
+	
+	<update id="updateById" parameterClass="map">
+		 <![CDATA[ update ${SYSSCHEMA}.BASE_DISTRIBUTOR ]]>
+		<dynamic prepend="set">
+			<isNotNull property="DISTRIBUTOR_NAME" prepend=","><![CDATA[DISTRIBUTOR_NAME = #DISTRIBUTOR_NAME#]]></isNotNull>
+			<isNotNull property="DISTRIBUTOR_TYPE" prepend=","><![CDATA[DISTRIBUTOR_TYPE = #DISTRIBUTOR_TYPE#]]></isNotNull>
+			<isNotNull property="TEL" prepend=","><![CDATA[TEL = #TEL#]]></isNotNull>
+			<isNotNull property="CHANN_ID" prepend=","><![CDATA[CHANN_ID = #CHANN_ID#]]></isNotNull>
+			<isNotNull property="CHANN_NO" prepend=","><![CDATA[CHANN_NO = #CHANN_NO#]]></isNotNull>
+			<isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME#]]></isNotNull>
+			<isNotNull property="AREA_MANAGE_ID" prepend=","><![CDATA[AREA_MANAGE_ID = #AREA_MANAGE_ID#]]></isNotNull>
+			<isNotNull property="AREA_MANAGE_NAME" prepend=","><![CDATA[AREA_MANAGE_NAME = #AREA_MANAGE_NAME#]]></isNotNull>
+			<isNotNull property="AREA_MANAGE_TEL" prepend=","><![CDATA[AREA_MANAGE_TEL = #AREA_MANAGE_TEL#]]></isNotNull>
+			<isNotNull property="PROV" prepend=","><![CDATA[PROV = #PROV#]]></isNotNull>
+			<isNotNull property="CITY" prepend=","><![CDATA[CITY = #CITY#]]></isNotNull>
+			<isNotNull property="COUNTY" prepend=","><![CDATA[COUNTY = #COUNTY#]]></isNotNull>
+			<isNotNull property="AREA_ID" prepend=","><![CDATA[AREA_ID = #AREA_ID#]]></isNotNull>
+			<isNotNull property="AREA_NO" prepend=","><![CDATA[AREA_NO = #AREA_NO#]]></isNotNull>
+			<isNotNull property="AREA_NAME" prepend=","><![CDATA[AREA_NAME = #AREA_NAME#]]></isNotNull>
+			<isNotNull property="ZONE_ID" prepend=","><![CDATA[ZONE_ID = #ZONE_ID#]]></isNotNull>
+			
+			<isNotNull property="PERSON_CON" prepend=","><![CDATA[PERSON_CON = #PERSON_CON#]]></isNotNull>
+			<isNotNull property="MOBILE" prepend=","><![CDATA[MOBILE = #MOBILE#]]></isNotNull>
+			<isNotNull property="TAX" prepend=","><![CDATA[TAX = #TAX#]]></isNotNull>
+			<isNotNull property="EMAIL" prepend=","><![CDATA[EMAIL = #EMAIL#]]></isNotNull>
+			<isNotNull property="SALE_STORE_NAME" prepend=","><![CDATA[SALE_STORE_NAME = #SALE_STORE_NAME#]]></isNotNull>
+			<isNotNull property="SALE_STORE_LOCAL" prepend=","><![CDATA[SALE_STORE_LOCAL = #SALE_STORE_LOCAL#]]></isNotNull>
+			<isNotNull property="BUSS_BRAND" prepend=","><![CDATA[BUSS_BRAND = #BUSS_BRAND#]]></isNotNull>
+			<isNotNull property="BUSS_CLASS" prepend=","><![CDATA[BUSS_CLASS = #BUSS_CLASS#]]></isNotNull>
+			<isNotNull property="COOPER_DATE" prepend=","><![CDATA[COOPER_DATE = to_date(#COOPER_DATE#,'yyyy-MM-DD')]]></isNotNull>
+			
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where DISTRIBUTOR_ID = #DISTRIBUTOR_ID# ]]>
+	</update>
+	<update id="delete" parameterClass="map">
+	<![CDATA[ update ${SYSSCHEMA}.BASE_DISTRIBUTOR ]]>
+		<dynamic prepend="set">
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where DISTRIBUTOR_ID = #DISTRIBUTOR_ID# ]]>	
+	</update>
+	
+	<update id="updateStateById" parameterClass="map">	
+		<![CDATA[ update ${SYSSCHEMA}.BASE_DISTRIBUTOR ]]>
+		<dynamic prepend="set">
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME =sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where DISTRIBUTOR_ID = #DISTRIBUTOR_ID# ]]>	
+	</update>
+	
+<select id="qryExp" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[
+				select DISTRIBUTOR_ID,
+				       DISTRIBUTOR_NO,
+				       DISTRIBUTOR_NAME,
+				       DISTRIBUTOR_TYPE,
+				       TEL,
+				       CHANN_ID,
+				       CHANN_NO,
+				       CHANN_NAME,
+				       AREA_MANAGE_ID,
+				       AREA_MANAGE_NAME,
+				       AREA_MANAGE_TEL,
+				       PROV,
+				       CITY,
+				       COUNTY,
+				       AREA_ID,
+				       AREA_NO,
+				       AREA_NAME,
+				       ZONE_ID,
+				       PERSON_CON,
+				       MOBILE,
+				       TAX,
+				       EMAIL,
+				       SALE_STORE_NAME,
+				       SALE_STORE_LOCAL,
+				       BUSS_BRAND,
+				       BUSS_CLASS,
+				       to_char(COOPER_DATE, 'yyyy-MM-DD') COOPER_DATE,
+				       STATE,
+				       CREATOR,
+				       CRE_NAME,
+				       to_char(CRE_TIME, 'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+				       DEPT_ID,
+				       DEPT_NAME,
+				       ORG_ID,
+				       ORG_NAME,
+				       LEDGER_ID,
+				       LEDGER_NAME,
+				       DEL_FLAG,       
+				       UPDATOR,
+				       UPD_NAME,
+				       to_char(UPD_TIME, 'yyyy-MM-DD HH24:MI:SS') UPD_TIME
+				  from BASE_DISTRIBUTOR c
+				]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+</select>
+
+<select id="queryMaxNo" parameterClass="map" resultClass="String">
+	<![CDATA[ 
+	   select max(t.DISTRIBUTOR_NO) from  BASE_DISTRIBUTOR t where t.DEL_FLAG=0
+	]]>
+</select>
+
+<select id="queryMaxNoT" parameterClass="String" resultClass="DistributorModel">
+	<![CDATA[ 
+	  select 
+		  max(t.DISTRIBUTOR_NO) DISTRIBUTOR_NO
+	      from  BASE_DISTRIBUTOR t where t.DEL_FLAG=0
+	]]>
+</select>
+
+</sqlMap>

@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+	<!--
+		*@module 预算科目设置维护 
+		*@func  
+		*@version 1.1 
+		*@author  
+	-->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Budgetitem">
+	<typeAlias type="com.hoperun.erp.sale.budgetitem.model.BudgetitemModel" alias="BudgetitemModel" />
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="BudgetitemModel" class="BudgetitemModel">
+		<result column="BUDGET_ITEM_ID" property="BUDGET_ITEM_ID" />
+	</resultMap>
+
+<!-- 动态查询 and 列表排序 -->
+<sql id="queryDynSql">
+<isNotEmpty prepend=" and " property="BUDGET_ITEM_ID">
+<![CDATA[ u.BUDGET_ITEM_ID=#BUDGET_ITEM_ID#]]>
+</isNotEmpty>
+<isNotEmpty prepend=" and " property="STATE">
+<![CDATA[ u.STATE=#STATE#]]>
+</isNotEmpty>
+<isNotEmpty prepend=" and " property="BUDGET_ITEM_NO">
+<![CDATA[ u.BUDGET_ITEM_NO like '%'||#BUDGET_ITEM_NO#||'%']]>
+</isNotEmpty>
+
+<isNotEmpty prepend=" and " property="BUDGET_ITEM_NAME">
+<![CDATA[ u.BUDGET_ITEM_NAME like '%'||#BUDGET_ITEM_NAME#||'%']]>
+</isNotEmpty>
+
+<isNotEmpty prepend=" and " property="PAR_BUDGET_ITEM_NO">
+<![CDATA[ u.PAR_BUDGET_ITEM_NO like '%'||#PAR_BUDGET_ITEM_NO#||'%']]>
+</isNotEmpty>
+
+<isNotEmpty prepend=" and " property="PAR_BUDGET_ITEM_NAME">
+<![CDATA[ u.PAR_BUDGET_ITEM_NAME like '%'||#PAR_BUDGET_ITEM_NAME#||'%']]>
+</isNotEmpty>
+
+<isNotEmpty prepend=" and " property="BUDGET_ITEM_TYPE">
+<![CDATA[ u.BUDGET_ITEM_TYPE = #BUDGET_ITEM_TYPE# ]]>
+</isNotEmpty>
+
+<isNotEmpty prepend=" and " property="BEGIN_CRE_TIME">
+ <![CDATA[  u.CRE_TIME >= to_date(#BEGIN_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')]]>
+</isNotEmpty>
+ 
+<isNotEmpty prepend=" and " property="END_CRE_TIME">
+ <![CDATA[  u.CRE_TIME <= to_date(#END_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')]]>
+</isNotEmpty>
+
+<isNotEmpty prepend=" and " property="DEL_FLAG">
+	u.DEL_FLAG = #DEL_FLAG#
+</isNotEmpty>
+
+<isNotEmpty prepend=" and " property="QXJBCON">
+	$QXJBCON$
+</isNotEmpty>
+</sql>
+<sql id="orderSql">
+	<isNotEmpty prepend=" " property="orderField"> $orderField$</isNotEmpty>
+</sql>
+<!-- 查询SQL -->
+<sql id="coreSql">
+<![CDATA[ 
+   select 
+   u.BUDGET_ITEM_ID,
+	    u.BUDGET_ITEM_NO,
+	    u.BUDGET_ITEM_NAME,
+	    u.BUDGET_ITEM_TYPE,
+	    u.PAR_BUDGET_ITEM_ID,
+	    u.PAR_BUDGET_ITEM_NO,
+	    u.PAR_BUDGET_ITEM_NAME,
+	    u.FINAL_NODE_FLAG,
+		u.STATE,
+		u.REMARK,
+		u.CREATOR,
+		u.CRE_NAME,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPDATOR,
+		u.UPD_NAME,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.DEL_FLAG,
+		u.LEDGER_ID,
+	    u.LEDGER_NAME
+   from ERP_BUDGET_ITEM u
+]]>
+<dynamic prepend="where">
+	<include refid="queryDynSql" />
+</dynamic>
+<dynamic prepend="order by ">
+	<include refid="orderSql" />
+</dynamic>
+</sql>
+
+<!-- 分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="public.pageBegin" />
+	<include refid="coreSql" />
+	<include refid="public.pageEnd" />
+</select>
+
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+	<![CDATA[SELECT count(0) cnt FROM ERP_BUDGET_ITEM u ]]>
+	<dynamic prepend="where">
+		<include refid="queryDynSql" />
+	</dynamic>
+</select>
+
+<!-- 查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<!-- 根据ID查找 -->
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[
+	SELECT
+        BUDGET_ITEM_ID,
+	    BUDGET_ITEM_NO,
+	    BUDGET_ITEM_NAME,
+	    BUDGET_ITEM_TYPE,
+	    PAR_BUDGET_ITEM_ID,
+	    PAR_BUDGET_ITEM_NO,
+	    PAR_BUDGET_ITEM_NAME,
+	    FINAL_NODE_FLAG,
+		STATE,
+		REMARK,
+		CREATOR,
+		CRE_NAME,
+		to_char(CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		UPDATOR,
+		UPD_NAME,
+		to_char(UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		DEPT_ID,
+		DEPT_NAME,
+		ORG_ID,
+		ORG_NAME,
+		DEL_FLAG,
+		LEDGER_ID,
+	    LEDGER_NAME
+		 FROM ERP_BUDGET_ITEM  where BUDGET_ITEM_ID=#BUDGET_ITEM_ID#
+ ]]>
+</select>
+
+
+
+
+
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ERP_BUDGET_ITEM(
+		 BUDGET_ITEM_ID,
+		 BUDGET_ITEM_NO,
+		 BUDGET_ITEM_NAME,
+		 BUDGET_ITEM_TYPE,
+		 PAR_BUDGET_ITEM_ID,
+		 PAR_BUDGET_ITEM_NO,
+		 PAR_BUDGET_ITEM_NAME,
+		 FINAL_NODE_FLAG,
+		 STATE,
+		 REMARK,
+		 CREATOR,
+		 CRE_NAME,
+		 CRE_TIME,
+		 DEPT_ID,
+		 DEPT_NAME,
+		 ORG_ID,
+		 ORG_NAME,
+		 DEL_FLAG,
+		 LEDGER_ID,
+		 LEDGER_NAME
+		 )values(
+		 #BUDGET_ITEM_ID#,
+		 #BUDGET_ITEM_NO#,
+		 #BUDGET_ITEM_NAME#,
+		 #BUDGET_ITEM_TYPE#,
+		 #PAR_BUDGET_ITEM_ID#,
+		 #PAR_BUDGET_ITEM_NO#,
+		 #PAR_BUDGET_ITEM_NAME#,
+		 #FINAL_NODE_FLAG#,
+		 #STATE#,
+		 #REMARK#,
+		 #CREATOR#,
+		 #CRE_NAME#,
+		 sysdate,
+		 #DEPT_ID#,
+		 #DEPT_NAME#,
+		 #ORG_ID#,
+		 #ORG_NAME#,
+		 #DEL_FLAG#,
+		 #LEDGER_ID#,
+		 #LEDGER_NAME#
+	 
+		 )
+		]]>
+	</insert>
+ 
+
+<update id="updateById" parameterClass="map">
+	 <![CDATA[ update ERP_BUDGET_ITEM]]>
+	<dynamic prepend="set">
+		<isNotNull property="BUDGET_ITEM_NO" prepend=","><![CDATA[BUDGET_ITEM_NO = #BUDGET_ITEM_NO#]]></isNotNull>
+		<isNotNull property="BUDGET_ITEM_NAME" prepend=","><![CDATA[BUDGET_ITEM_NAME = #BUDGET_ITEM_NAME#]]></isNotNull>
+		<isNotNull property="BUDGET_ITEM_TYPE" prepend=","><![CDATA[BUDGET_ITEM_TYPE = #BUDGET_ITEM_TYPE#]]></isNotNull>
+		<isNotNull property="PAR_BUDGET_ITEM_ID" prepend=","><![CDATA[PAR_BUDGET_ITEM_ID = #PAR_BUDGET_ITEM_ID#]]></isNotNull>
+		<isNotNull property="PAR_BUDGET_ITEM_NO" prepend=","><![CDATA[PAR_BUDGET_ITEM_NO = #PAR_BUDGET_ITEM_NO#]]></isNotNull>
+		<isNotNull property="PAR_BUDGET_ITEM_NAME" prepend=","><![CDATA[PAR_BUDGET_ITEM_NAME = #PAR_BUDGET_ITEM_NAME#]]></isNotNull>
+		<isNotNull property="FINAL_NODE_FLAG" prepend=","><![CDATA[FINAL_NODE_FLAG = #FINAL_NODE_FLAG#]]></isNotNull>
+		<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+		<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK#]]></isNotNull>
+		<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+		<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+		<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME=sysdate]]></isNotNull>
+	</dynamic>
+	<![CDATA[ where BUDGET_ITEM_ID = #BUDGET_ITEM_ID# ]]>
+</update>
+
+<!-- 软删除 -->
+<update id="delete" parameterClass="map">	
+	<![CDATA[ update  ERP_BUDGET_ITEM set DEL_FLAG=#DEL_FLAG#
+	where BUDGET_ITEM_ID in(select BUDGET_ITEM_ID from ERP_BUDGET_ITEM
+                          start with BUDGET_ITEM_ID = #BUDGET_ITEM_ID#
+                         connect by prior BUDGET_ITEM_ID = PAR_BUDGET_ITEM_ID) ]]>
+</update>
+
+<!-- 修改状态 -->
+<update id="updateStateById" parameterClass="map">	
+	<![CDATA[ update  ERP_BUDGET_ITEM ]]>
+	<dynamic prepend="set">
+		<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+		<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+		<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+		<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME=sysdate]]></isNotNull>
+	</dynamic>
+	<![CDATA[ where BUDGET_ITEM_ID in(select BUDGET_ITEM_ID from ERP_BUDGET_ITEM
+                          start with BUDGET_ITEM_ID = #BUDGET_ITEM_ID#
+                         connect by prior BUDGET_ITEM_ID = PAR_BUDGET_ITEM_ID) ]]>
+</update>
+
+
+<!-- 查询树 -->
+<select id="queryTree" parameterClass="String"
+	resultClass="com.hoperun.erp.sale.budgetitem.model.BudgetitemTree">
+ 		<![CDATA[
+ 		  SELECT DISTINCT u.BUDGET_ITEM_ID id , '【' || u.BUDGET_ITEM_NO || '】' || u.BUDGET_ITEM_NAME name,u.BUDGET_ITEM_NO,
+ 		  u.PAR_BUDGET_ITEM_ID pid
+      FROM ERP_BUDGET_ITEM u WHERE u.DEL_FLAG = 0  
+       order by u.BUDGET_ITEM_NO
+		]]>
+</select>
+
+<select id="isRepeat" parameterClass="map" resultClass="int">
+<![CDATA[
+  select count(1) from ERP_BUDGET_ITEM u where u.BUDGET_ITEM_NO=#BUDGET_ITEM_NO# and u.del_flag=0
+]]>
+</select>	 
+	 
+	
+
+</sqlMap>

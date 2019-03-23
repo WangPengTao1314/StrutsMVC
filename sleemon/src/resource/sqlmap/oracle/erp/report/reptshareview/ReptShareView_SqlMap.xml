@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="ReptShareView">
+	<typeAlias type="com.hoperun.erp.report.reptshareview.model.ReptShareViewModel" alias="ReptShareViewModel"/>
+	<resultMap id="ReptShareViewModel" class="ReptShareViewModel">
+	    <result column="RPT_SCHE_SHAR_ID" property="RPT_SCHE_SHAR_ID" />
+	</resultMap>
+	<!--主表动态查询 and 列表分页 -->
+	<sql id="orderSql">
+	   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+	</sql>
+	<!--主表动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+	  <isNotEmpty prepend="and" property="RPT_SCHE_SHAR_NO">
+	    u.RPT_SCHE_SHAR_NO like '%'||#RPT_SCHE_SHAR_NO#||'%'
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="RPT_NAME">
+	    u.RPT_NAME like '%'||#RPT_NAME#||'%'
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="SHAR_PSON_NAME">
+	    u.SHAR_PSON_NAME like '%'||#SHAR_PSON_NAME#||'%'
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="STATE">
+	  	u.STATE=#STATE#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="DEL_FLAG">
+	  	u.DEL_FLAG=#DEL_FLAG#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="SHARED_PSON_ID">
+	  	u.SHARED_PSON_ID=#SHARED_PSON_ID#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="SHAR_PSON_ID">
+	  	u.SHAR_PSON_ID=#SHAR_PSON_ID#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="BEGIN_SHAR_TIME">
+	     <![CDATA[u.SHAR_TIME>=to_date(#BEGIN_SHAR_TIME#,'yyyy-MM-DD HH24:MI:SS')]]>
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="END_SHAR_TIME">
+	     <![CDATA[u.SHAR_TIME<=to_date(#END_SHAR_TIME#,'yyyy-MM-DD HH24:MI:SS')]]>
+	  </isNotEmpty>
+	</sql>
+	<!-- 主表查询SQL -->
+	<sql id="coreSql">
+	  <![CDATA[ 
+	  	select
+	  		u.RPT_SCHE_SHAR_ID,
+			u.RPT_SCHE_SHAR_NO,
+			u.SHAR_NAME,
+			u.RPT_NAME,
+			u.SCHE_PARAMS,
+			u.SCHE_URL,
+			u.SHAR_PSON_ID,
+			u.SHAR_PSON_NAME,
+			to_char(u.SHAR_TIME,'yyyy-MM-DD HH24:MI:SS') SHAR_TIME,
+			u.SHARED_PSON_ID,
+			u.SHARED_PSON_NAME,
+			u.STATE
+		from BASE_RPT_SCHE_SHAR u
+	   ]]>
+	    <dynamic prepend="where">
+		   <include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+		   <include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	<!-- 主表分页查询 -->
+	<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+			<include refid="public.pageBegin" />
+			<include refid="coreSql" />
+			<include refid="public.pageEnd" />
+		</select>
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+	      <![CDATA[select count(0) cnt FROM BASE_RPT_SCHE_SHAR u ]]>
+		<dynamic prepend="where">
+				<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+	<!-- 主表查询 -->
+	<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update BASE_RPT_SCHE_SHAR ]]>
+		<dynamic prepend="set">
+    		<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    		<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG# ]]></isNotNull>
+    	</dynamic>
+		<![CDATA[  where RPT_SCHE_SHAR_ID = #RPT_SCHE_SHAR_ID#]]>
+	</update>
+</sqlMap>
+

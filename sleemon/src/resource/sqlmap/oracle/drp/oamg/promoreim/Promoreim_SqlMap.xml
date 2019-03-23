@@ -1,0 +1,307 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author chenj
+@function 
+@version 2014-01-25 19:49:05
+-->
+<sqlMap  namespace="Promoreim">
+<typeAlias type="com.hoperun.drp.oamg.promoreim.model.PromoreimModel" alias="PromoreimModel"/>
+<!-- 使用Promoreim装载结果集 -->
+<resultMap id="PromoreimModel" class="PromoreimModel">
+    <result column="PRMT_COST_REIT_ID" property="PRMT_COST_REIT_ID" />
+</resultMap>
+<!-- 动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="CHANNS_CHARG">
+     u.CHANN_ID in $CHANNS_CHARG$
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="AUDIT_ID">
+    u.AUDIT_ID =#AUDIT_ID#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="PRMT_COST_REIT_NO">
+    u.PRMT_COST_REIT_NO like '%'||#PRMT_COST_REIT_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="PRMT_COST_REQ_NO">
+    u.PRMT_COST_REQ_NO like '%'||#PRMT_COST_REQ_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CHANN_NAME">
+    u.CHANN_NAME like '%'||#CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="ZONE_ADDR">
+    u.ZONE_ADDR like '%'||#ZONE_ADDR#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="AREA_MANAGE_NAME">
+    u.AREA_MANAGE_NAME like '%'||#AREA_MANAGE_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="COST_TYPE">
+    u.COST_TYPE like '%'||#COST_TYPE#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="searchSTATE">
+    u.STATE in $searchSTATE$ 
+  </isNotEmpty>
+	<isNotEmpty prepend="and " property="DEL_FLAG">
+	        u.DEL_FLAG=#DEL_FLAG#
+	</isNotEmpty>
+    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	</isNotEmpty>
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.PRMT_COST_REIT_ID,
+		u.PRMT_COST_REIT_NO,
+		u.PRMT_COST_REQ_ID,
+		u.PRMT_COST_REQ_NO,
+		u.CHANN_ID,
+		u.CHANN_NO,
+		u.CHANN_NAME,
+		u.CHANN_PERSON_CON,
+		u.CHANN_TEL,
+		u.ZONE_ID,
+		u.ZONE_ADDR,
+		u.AREA_MANAGE_ID,
+		u.AREA_MANAGE_NAME,
+		u.AREA_MANAGE_TEL,
+		u.REQ_ID,
+		u.REQ_NAME,
+		to_char(u.REQ_DATE,'yyyy-MM-DD') REQ_DATE,
+		u.EXCT_SMRZ,
+		u.TOTAL_PRMT_COST,
+		u.REIT_REQ_AMOUNT,
+		u.COST_TYPE,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG,
+		b.AREA_NAME
+       from ERP_PRMT_COST_REIT u 
+       	left join ERP_PRMT_COST_REQ b on u.PRMT_COST_REQ_ID = b.PRMT_COST_REQ_ID
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt 
+            from ERP_PRMT_COST_REIT u 
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+ <!-- 查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_PRMT_COST_REIT(
+		 PRMT_COST_REIT_ID,
+		 CHANN_ID,
+         CHANN_NO,
+         CHANN_NAME,
+         CHANN_PERSON_CON,
+         CHANN_TEL,
+         EXCT_SMRZ,
+         COST_TYPE,
+         REQ_ID,
+         REQ_NAME,
+         AREA_MANAGE_ID,
+         AREA_MANAGE_NAME,
+         AREA_MANAGE_TEL,
+         PRMT_COST_REQ_ID,
+         PRMT_COST_REQ_NO,
+         PRMT_COST_REIT_NO,
+         REIT_REQ_AMOUNT,
+         TOTAL_PRMT_COST,
+         ZONE_ID,
+         ZONE_ADDR,
+         REQ_DATE,
+         CRE_NAME,
+         CREATOR,
+         CRE_TIME,
+         UPD_NAME,
+         UPDATOR,
+         UPD_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         STATE,
+         DEL_FLAG
+	   )values(
+		#PRMT_COST_REIT_ID#,
+		#CHANN_ID#,
+        #CHANN_NO#,
+        #CHANN_NAME#,
+        #CHANN_PERSON_CON#,
+        #CHANN_TEL#,
+        #EXCT_SMRZ#,
+        #COST_TYPE#,
+        #REQ_ID#,
+        #REQ_NAME#,
+        #AREA_MANAGE_ID#,
+        #AREA_MANAGE_NAME#,
+        #AREA_MANAGE_TEL#,
+        #PRMT_COST_REQ_ID#,
+        #PRMT_COST_REQ_NO#,
+        #PRMT_COST_REIT_NO#,
+        #REIT_REQ_AMOUNT#,
+        #TOTAL_PRMT_COST#,
+        #ZONE_ID#,
+        #ZONE_ADDR#,
+		to_date(#REQ_DATE#,'yyyy-MM-DD'),
+        #CRE_NAME#,
+        #CREATOR#,
+	    sysdate, 
+        #UPD_NAME#,
+        #UPDATOR#,
+		sysdate, 
+        #DEPT_ID#,
+        #DEPT_NAME#,
+        #ORG_ID#,
+        #ORG_NAME#,
+        #LEDGER_ID#,
+        #LEDGER_NAME#,
+        #STATE#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update ERP_PRMT_COST_REIT ]]>
+	<dynamic prepend="set">
+		<isNotNull property="CHANN_ID" prepend=","><![CDATA[CHANN_ID = #CHANN_ID# ]]></isNotNull>
+	    <isNotNull property="CHANN_NO" prepend=","><![CDATA[CHANN_NO = #CHANN_NO# ]]></isNotNull>
+	    <isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME# ]]></isNotNull>
+	    <isNotNull property="CHANN_PERSON_CON" prepend=","><![CDATA[CHANN_PERSON_CON = #CHANN_PERSON_CON# ]]></isNotNull>
+	    <isNotNull property="CHANN_TEL" prepend=","><![CDATA[CHANN_TEL = #CHANN_TEL# ]]></isNotNull>
+	    <isNotNull property="EXCT_SMRZ" prepend=","><![CDATA[EXCT_SMRZ = #EXCT_SMRZ# ]]></isNotNull>
+	    <isNotNull property="COST_TYPE" prepend=","><![CDATA[COST_TYPE = #COST_TYPE# ]]></isNotNull>
+	    <isNotNull property="REQ_NAME" prepend=","><![CDATA[REQ_NAME = #REQ_NAME# ]]></isNotNull>
+	    <isNotNull property="AREA_MANAGE_ID" prepend=","><![CDATA[AREA_MANAGE_ID = #AREA_MANAGE_ID# ]]></isNotNull>
+	    <isNotNull property="AREA_MANAGE_NAME" prepend=","><![CDATA[AREA_MANAGE_NAME = #AREA_MANAGE_NAME# ]]></isNotNull>
+	    <isNotNull property="AREA_MANAGE_TEL" prepend=","><![CDATA[AREA_MANAGE_TEL = #AREA_MANAGE_TEL# ]]></isNotNull>
+	    <isNotNull property="PRMT_COST_REQ_ID" prepend=","><![CDATA[PRMT_COST_REQ_ID = #PRMT_COST_REQ_ID# ]]></isNotNull>
+	    <isNotNull property="PRMT_COST_REQ_NO" prepend=","><![CDATA[PRMT_COST_REQ_NO = #PRMT_COST_REQ_NO# ]]></isNotNull>
+	    <isNotNull property="PRMT_COST_REIT_NO" prepend=","><![CDATA[PRMT_COST_REIT_NO = #PRMT_COST_REIT_NO# ]]></isNotNull>
+	    <isNotNull property="REIT_REQ_AMOUNT" prepend=","><![CDATA[REIT_REQ_AMOUNT = #REIT_REQ_AMOUNT# ]]></isNotNull>
+	    <isNotNull property="TOTAL_PRMT_COST" prepend=","><![CDATA[TOTAL_PRMT_COST = #TOTAL_PRMT_COST# ]]></isNotNull>
+	    <isNotNull property="ZONE_ID" prepend=","><![CDATA[ZONE_ID = #ZONE_ID# ]]></isNotNull>
+	    <isNotNull property="ZONE_ADDR" prepend=","><![CDATA[ZONE_ADDR = #ZONE_ADDR# ]]></isNotNull>
+	    <isNotNull property="REQ_DATE" prepend=","><![CDATA[REQ_DATE =to_date(#REQ_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+	    <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+	    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+	    <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+	    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where PRMT_COST_REIT_ID = #PRMT_COST_REIT_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update ERP_PRMT_COST_REIT 
+	               set DEL_FLAG = #DEL_FLAG#
+                      ,UPD_NAME=#UPD_NAME#
+                     ,UPDATOR=#UPDATOR#
+                      ,UPD_TIME=sysdate
+ 	  where 
+	     PRMT_COST_REIT_ID = #PRMT_COST_REIT_ID:VARCHAR# 
+    ]]>
+</delete>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.PRMT_COST_REIT_ID,
+		u.PRMT_COST_REIT_NO,
+		u.PRMT_COST_REQ_ID,
+		u.PRMT_COST_REQ_NO,
+		u.CHANN_ID,
+		u.CHANN_NO,
+		u.CHANN_NAME,
+		u.CHANN_PERSON_CON,
+		u.CHANN_TEL,
+		u.ZONE_ID,
+		u.ZONE_ADDR,
+		u.AREA_MANAGE_ID,
+		u.AREA_MANAGE_NAME,
+		u.AREA_MANAGE_TEL,
+		u.REQ_ID,
+		u.REQ_NAME,
+		to_char(u.REQ_DATE,'yyyy-MM-DD') REQ_DATE,
+		u.EXCT_SMRZ,
+		u.TOTAL_PRMT_COST,
+		u.REIT_REQ_AMOUNT,
+		u.COST_TYPE,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG,
+		b.AREA_NO,
+		b.AREA_NAME
+            from ERP_PRMT_COST_REIT u 
+            	left join ERP_PRMT_COST_REQ b on u.PRMT_COST_REQ_ID = b.PRMT_COST_REQ_ID
+	  where 
+		u.PRMT_COST_REIT_ID = #PRMT_COST_REIT_ID#
+	]]>
+</select>
+<!--启用/停用-->
+<update id="updStusById" parameterClass="map">	
+     <![CDATA[ 
+	  update ERP_PRMT_COST_REIT 
+	       set STATE = #STATE#
+              ,UPD_NAME=#UPD_NAME#
+              ,UPDATOR=#UPDATOR#
+              ,UPD_TIME=sysdate
+ 	  where 
+	     PRMT_COST_REIT_ID = #PRMT_COST_REIT_ID:VARCHAR# 
+    ]]>
+</update>
+</sqlMap>

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zcx
+@function 
+@version 2014-11-06 10:49:05
+-->
+<sqlMap  namespace="shoppGuideTran">
+<typeAlias type="com.hoperun.drp.oamg.mkmdayreport.model.ShoppGuideTranModel" alias="ShoppGuideTranModel"/>
+<!-- 使用Promoreim装载结果集 -->
+<resultMap id="ShoppGuideTranModel" class="ShoppGuideTranModel">
+    <result column="SHOPP_GUIDE_TRAN_ID" property="SHOPP_GUIDE_TRAN_ID" />
+</resultMap>
+<!-- 动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  u.DEL_FLAG = 0 
+  <isNotEmpty prepend="" property="MKM_DAY_RPT_NO">
+       <![CDATA[ and u.MKM_DAY_RPT_NO = #MKM_DAY_RPT_NO#]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CRE_TIME_FROM">
+       <![CDATA[ and u.CRE_TIME >=to_date(#CRE_TIME_FROM#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CRE_TIME_TO">
+       <![CDATA[ and u.CRE_TIME <=to_date(#CRE_TIME_TO#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="" property="LAST_DECOR_TIME_BEG">
+       <![CDATA[ and u.LAST_DECOR_TIME >=to_date(#LAST_DECOR_TIME_BEG#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="LAST_DECOR_TIME_END">
+       <![CDATA[ and u.LAST_DECOR_TIME <=to_date(#LAST_DECOR_TIME_END#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="QXJBCON">
+	  and   $QXJBCON$  
+  </isNotEmpty>
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+	   u.SHOPP_GUIDE_TRAN_ID,
+       u.MKM_DAY_RPT_ID,
+       u.TRAN_NUM,
+       u.TRAN_TITLE,
+       u.TRAN_TYPE,
+       u.TRAN_DATE,
+       u.TRAN_PIC
+       from DRP_SHOPP_GUIDE_TRAN u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+<!-- 分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+</select>
+ 
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt 
+              from DRP_SHOPP_GUIDE_TRAN u
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+ 
+<!-- 查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_SHOPP_GUIDE_TRAN(
+					 SHOPP_GUIDE_TRAN_ID,
+					 MKM_DAY_RPT_ID,
+					 TRAN_NUM,
+					 TRAN_TITLE,
+					 TRAN_TYPE,
+					 TRAN_DATE,
+					 DEL_FLAG
+				   )values(
+				     #SHOPP_GUIDE_TRAN_ID#,
+					 #MKM_DAY_RPT_ID#,
+					 #TRAN_NUM#,
+					 #TRAN_TITLE#,
+					 #TRAN_TYPE#,
+					 to_date(#TRAN_DATE#,'yyyy-MM-DD HH24:MI:SS'),
+					 #DEL_FLAG#
+					)
+   ]]>
+</insert> 
+
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update DRP_SHOPP_GUIDE_TRAN ]]>
+	<dynamic prepend="set">
+    <isNotNull property="MKM_DAY_RPT_ID"       prepend=","><![CDATA[MKM_DAY_RPT_ID   = #MKM_DAY_RPT_ID# ]]></isNotNull>
+    <isNotNull property="TRAN_NUM"         prepend=","><![CDATA[TRAN_NUM     = #TRAN_NUM# ]]></isNotNull>
+    <isNotNull property="TRAN_TITLE"       prepend=","><![CDATA[TRAN_TITLE   = #TRAN_TITLE# ]]></isNotNull>
+    <isNotNull property="TRAN_TYPE"        prepend=","><![CDATA[TRAN_TYPE    = #TRAN_TYPE# ]]></isNotNull>
+    <isNotNull property="TRAN_DATE"        prepend=","><![CDATA[TRAN_DATE    = to_date(#TRAN_DATE#,'yyyy-MM-DD HH24:MI:SS') ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where SHOPP_GUIDE_TRAN_ID = #SHOPP_GUIDE_TRAN_ID#]]>
+</update>
+
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+	   u.SHOPP_GUIDE_TRAN_ID,
+       u.MKM_DAY_RPT_ID,
+       u.TRAN_NUM,
+       u.TRAN_TITLE,
+       u.TRAN_TYPE,
+       u.TRAN_DATE,
+       b.ATT_PATH TRAN_PIC
+       from DRP_SHOPP_GUIDE_TRAN u
+       left join BASE_ATT b on u.SHOPP_GUIDE_TRAN_ID = b.from_bill_id
+       WHERE
+       u.MKM_DAY_RPT_ID = #MKM_DAY_RPT_ID#
+       and u.DEL_FLAG = 0
+	]]>
+</select>
+
+<select id="queryTranId" parameterClass="map" resultClass="String">
+	<![CDATA[ 
+	    select u.SHOPP_GUIDE_TRAN_ID
+	    from DRP_SHOPP_GUIDE_TRAN u
+	    where u.MKM_DAY_RPT_ID = #MKM_DAY_RPT_ID#
+	]]>
+</select>
+
+<!-- 删除 -->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update DRP_SHOPP_GUIDE_TRAN ]]>
+	<dynamic prepend="set">
+		<isNotNull property="DEL_FLAG"><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+	</dynamic>
+	<![CDATA[ where SHOPP_GUIDE_TRAN_ID = #SHOPP_GUIDE_TRAN_ID# ]]>
+</delete>
+
+</sqlMap>

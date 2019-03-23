@@ -1,0 +1,780 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author lyg
+@function 
+@version 2014-01-26 14:46:31
+-->
+<sqlMap  namespace="Termrefinecheck">
+<!-- 定义TermrefinecheckModel,TermrefinecheckModelChld -->
+<typeAlias type="com.hoperun.drp.oamg.termrefinecheck.model.TermrefinecheckModel" alias="TermrefinecheckModel"/>
+<typeAlias type="com.hoperun.drp.oamg.termrefinecheck.model.TermrefinecheckModelChld" alias="TermrefinecheckModelChld" />
+<!-- 使用TermrefinecheckModel装载结果集 -->
+<resultMap id="TermrefinecheckModel" class="TermrefinecheckModel">
+    <result column="TERM_REFINE_CHECK_ID" property="TERM_REFINE_CHECK_ID" />
+</resultMap>
+<!-- 使用TermrefinecheckModelChld装载结果集 -->
+<resultMap id="TermrefinecheckModelChld" class="TermrefinecheckModelChld">
+    <result column="TERM_REFINE_CHECK_DTL_ID" property="TERM_REFINE_CHECK_DTL_ID" />
+</resultMap>
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="CHANNS_CHARG">
+    u.CHANN_ID in $CHANNS_CHARG$
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="TERM_REFINE_CHECK_NO">
+    u.TERM_REFINE_CHECK_NO like '%'||#TERM_REFINE_CHECK_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="TERM_NO">
+    u.TERM_NO like '%'||#TERM_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="TERM_NAME">
+    u.TERM_NAME like '%'||#TERM_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="AREA_NAME">
+    u.AREA_NAME like '%'||#AREA_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="AREA_MANAGE_NAME">
+    u.AREA_MANAGE_NAME like '%'||#AREA_MANAGE_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CHECK_ORG_NAME">
+    u.CHECK_ORG_NAME like '%'||#CHECK_ORG_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CHANN_NAME">
+    u.CHANN_NAME like '%'||#CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="TERM_VERSION">
+    t.TERM_VERSION like '%'||#TERM_VERSION#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="DEL_FLAG">
+    u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and " property="WAREA_NO">
+    a.AREA_NO_P=#WAREA_NO#
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="WAREA_NAME">
+    a.AREA_NAME_P=#WAREA_NAME#
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and " property="BUSS_SCOPE">
+    t.BUSS_SCOPE=#BUSS_SCOPE#
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and " property="QXJBCON">
+        $QXJBCON$
+  </isNotEmpty>
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.TERM_REFINE_CHECK_ID,
+		u.TERM_REFINE_CHECK_NO,
+		u.TERM_ID,
+		u.TERM_NO,
+		u.TERM_NAME,
+		u.BUSS_SCOPE,
+		u.CHANN_ID,
+		u.CHANN_NO,
+		u.CHANN_NAME,
+		u.AREA_ID,
+		u.AREA_NO,
+		u.AREA_NAME,
+		u.AREA_MANAGE_ID,
+		u.AREA_MANAGE_NAME,
+		u.CHECK_ORG_ID,
+		u.CHECK_ORG_NAME,
+		to_char(u.CHECK_DATE,'yyyy-MM-DD HH24:MI:SS') CHECK_DATE,
+		u.REMARK,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG,
+		u.CHECK_TOTAL_SCORE,
+		u.CHECK_PROGRAM_NO CHANN_CHECK_PLAN_NO,
+		TERM_REFINE_TASK_NO
+        from TERM_REFINE_CHECK u left join BASE_TERMINAL t on t.term_id = u.term_id 
+        left join BASE_AREA a on a.AREA_ID=u.AREA_ID
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM TERM_REFINE_CHECK u 
+      left join BASE_TERMINAL t on t.term_id = u.term_id  
+       left join BASE_AREA a on a.AREA_ID=u.AREA_ID
+       ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into TERM_REFINE_CHECK(
+		 TERM_REFINE_CHECK_ID,
+         TERM_ID,
+         AREA_NO,
+         AREA_ID,
+         CHECK_ORG_ID,
+         AREA_MANAGE_ID,
+         TERM_REFINE_CHECK_NO,
+         TERM_NO,
+         TERM_NAME,
+         BUSS_SCOPE,
+         AREA_NAME,
+         AREA_MANAGE_NAME,
+         CHECK_ORG_NAME,
+         CHECK_DATE,
+         REMARK,
+         CRE_NAME,
+         CREATOR,
+         CRE_TIME,
+         UPD_NAME,
+         UPDATOR,
+         UPD_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         STATE,
+         DEL_FLAG,
+         CHANN_ID,
+		 CHANN_NO,
+		 CHANN_NAME,
+		 TERM_REFINE_TASK_NO,
+		 CHECK_TOTAL_SCORE,
+		 MYSTIC_CMNR,
+		 MAIN_DEDUCT_SCORE_REMARK,
+		 CHECK_PROGRAM_NO
+	   )values(
+		#TERM_REFINE_CHECK_ID#,
+        #TERM_ID#,
+        #AREA_NO#,
+        #AREA_ID#,
+        #CHECK_ORG_ID#,
+        #AREA_MANAGE_ID#,
+        #TERM_REFINE_CHECK_NO#,
+        #TERM_NO#,
+        #TERM_NAME#,
+        #BUSS_SCOPE#,
+        #AREA_NAME#,
+        #AREA_MANAGE_NAME#,
+        #CHECK_ORG_NAME#,
+		to_date(#CHECK_DATE#,'yyyy-MM-DD HH24:MI:SS'),
+        #REMARK#,
+        #CRE_NAME#,
+        #CREATOR#,
+	    sysdate, 
+        #UPD_NAME#,
+        #UPDATOR#,
+		sysdate, 
+        #DEPT_ID#,
+        #DEPT_NAME#,
+        #ORG_ID#,
+        #ORG_NAME#,
+        #LEDGER_ID#,
+        #LEDGER_NAME#,
+        #STATE#,
+		#DEL_FLAG#,
+		#CHANN_ID#,
+		#CHANN_NO#,
+		#CHANN_NAME#,
+		#TERM_REFINE_TASK_NO#,
+		#CHECK_TOTAL_SCORE#,
+		#MYSTIC_CMNR#,
+		#MAIN_DEDUCT_SCORE_REMARK#,
+		#CHECK_PROGRAM_NO#
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update TERM_REFINE_CHECK ]]>
+	<dynamic prepend="set">
+    <isNotNull property="TERM_ID" prepend=","><![CDATA[TERM_ID = #TERM_ID# ]]></isNotNull>
+    <isNotNull property="TERM_NO" prepend=","><![CDATA[TERM_NO = #TERM_NO# ]]></isNotNull>
+    <isNotNull property="TERM_NAME" prepend=","><![CDATA[TERM_NAME = #TERM_NAME# ]]></isNotNull>
+    <isNotNull property="AREA_NO" prepend=","><![CDATA[AREA_NO = #AREA_NO# ]]></isNotNull>
+    <isNotNull property="AREA_ID" prepend=","><![CDATA[AREA_ID = #AREA_ID# ]]></isNotNull>
+    <isNotNull property="AREA_NAME" prepend=","><![CDATA[AREA_NAME = #AREA_NAME# ]]></isNotNull>
+    
+    <isNotNull property="CHANN_ID" prepend=","><![CDATA[CHANN_ID = #CHANN_ID# ]]></isNotNull>
+    <isNotNull property="CHANN_NO" prepend=","><![CDATA[CHANN_NO = #CHANN_NO# ]]></isNotNull>
+    <isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME# ]]></isNotNull>
+    
+    <isNotNull property="CHECK_ORG_ID" prepend=","><![CDATA[CHECK_ORG_ID = #CHECK_ORG_ID# ]]></isNotNull>
+    <isNotNull property="AREA_MANAGE_ID" prepend=","><![CDATA[AREA_MANAGE_ID = #AREA_MANAGE_ID# ]]></isNotNull>
+    <isNotNull property="TERM_REFINE_CHECK_NO" prepend=","><![CDATA[TERM_REFINE_CHECK_NO = #TERM_REFINE_CHECK_NO# ]]></isNotNull>
+    <isNotNull property="BUSS_SCOPE" prepend=","><![CDATA[BUSS_SCOPE = #BUSS_SCOPE# ]]></isNotNull>
+    <isNotNull property="AREA_MANAGE_NAME" prepend=","><![CDATA[AREA_MANAGE_NAME = #AREA_MANAGE_NAME# ]]></isNotNull>
+    <isNotNull property="CHECK_ORG_NAME" prepend=","><![CDATA[CHECK_ORG_NAME = #CHECK_ORG_NAME# ]]></isNotNull>
+    <isNotNull property="CHECK_DATE" prepend=","><![CDATA[CHECK_DATE =to_date(#CHECK_DATE#,'yyyy-MM-DD HH24:MI:SS') ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+    <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    <isNotNull property="TERM_REFINE_TASK_NO" prepend=","><![CDATA[TERM_REFINE_TASK_NO = #TERM_REFINE_TASK_NO# ]]></isNotNull>
+    <isNotNull property="CHECK_TOTAL_SCORE" prepend=","><![CDATA[CHECK_TOTAL_SCORE = #CHECK_TOTAL_SCORE# ]]></isNotNull>
+    <isNotNull property="CHECK_PROGRAM_NO" prepend=","><![CDATA[CHECK_PROGRAM_NO = #CHECK_PROGRAM_NO# ]]></isNotNull>
+    
+    <isNotNull property="MYSTIC_CMNR" prepend=","><![CDATA[MYSTIC_CMNR = #MYSTIC_CMNR# ]]></isNotNull>
+    <isNotNull property="MAIN_DEDUCT_SCORE_REMARK" prepend=","><![CDATA[MAIN_DEDUCT_SCORE_REMARK = #MAIN_DEDUCT_SCORE_REMARK# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where TERM_REFINE_CHECK_ID = #TERM_REFINE_CHECK_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update TERM_REFINE_CHECK 
+	               set DEL_FLAG = #DEL_FLAG#
+                      ,UPD_NAME=#UPD_NAME#
+                     ,UPDATOR=#UPDATOR#
+                      ,UPD_TIME=sysdate
+ 	  where 
+	     TERM_REFINE_CHECK_ID = #TERM_REFINE_CHECK_ID:VARCHAR# 
+    ]]>
+</delete>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.TERM_REFINE_CHECK_ID,
+		u.TERM_REFINE_CHECK_NO,
+		u.TERM_ID,
+		u.TERM_NO,
+		u.TERM_NAME,
+		u.BUSS_SCOPE,
+		u.AREA_ID,
+		u.AREA_NO,
+		u.CHANN_ID,
+		u.CHANN_NO,
+		u.CHANN_NAME,
+		u.AREA_NAME,
+		u.AREA_MANAGE_ID,
+		u.AREA_MANAGE_NAME,
+		u.CHECK_ORG_ID,
+		u.CHECK_ORG_NAME,
+		to_char(u.CHECK_DATE,'yyyy-MM-DD') CHECK_DATE,
+		u.REMARK,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG,
+		u.CHECK_TOTAL_SCORE,
+		TERM_REFINE_TASK_NO
+	  from
+       TERM_REFINE_CHECK u 
+	  where 
+		u.TERM_REFINE_CHECK_ID = #TERM_REFINE_CHECK_ID#
+	]]>
+</select>
+
+
+<select id="loadByConf" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	      select 
+		    u.TERM_REFINE_CHECK_ID,
+		    u.TERM_REFINE_CHECK_NO,
+		    u.TERM_ID,
+		    u.TERM_NO,
+		    u.TERM_NAME,
+		    u.BUSS_SCOPE,
+		    u.AREA_ID,
+		    u.AREA_NO,
+		    u.CHANN_ID,
+		    u.CHANN_NO,
+		    u.CHANN_NAME,
+		    u.AREA_NAME,
+		    u.AREA_MANAGE_ID,
+		    u.AREA_MANAGE_NAME,
+		    u.CHECK_ORG_ID,
+		    u.CHECK_ORG_NAME,
+		    to_char(u.CHECK_DATE,'yyyy-MM-DD HH24:MI:SS') CHECK_DATE,
+		    u.REMARK,
+		    u.CRE_NAME,
+		    u.CREATOR,
+		    to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		    u.UPD_NAME,
+		    u.UPDATOR,
+		    to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		    u.DEPT_ID,
+		    u.DEPT_NAME,
+		    u.ORG_ID,
+		    u.ORG_NAME,
+		    u.LEDGER_ID,
+		    u.LEDGER_NAME,
+		    u.STATE,
+		    u.DEL_FLAG,
+		    u.CHECK_TOTAL_SCORE,
+		    t.TERM_VERSION,
+		    c.tel CHANN_TEL,
+		    u.MYSTIC_CMNR,
+		    u.MAIN_DEDUCT_SCORE_REMARK,
+		    u.CHECK_PROGRAM_NO CHANN_CHECK_PLAN_NO,
+		    a.att_path  ATT_PATH,
+		    TERM_REFINE_TASK_NO
+		    from
+		    TERM_REFINE_CHECK u  left join BASE_TERMINAL t on t.term_id = u.term_id  left join BASE_CHANN  c  on  c.chann_id = t.chann_id_p
+			left join BASE_ATT  a on a.from_bill_id = u.term_refine_check_id 
+			where 
+			u.TERM_REFINE_CHECK_ID = #TERM_REFINE_CHECK_ID#
+	]]>
+</select>
+
+<!--明细操作开始-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+     select 
+		u.TERM_REFINE_CHECK_DTL_ID,
+		u.TERM_REFINE_CHECK_ID,
+		u.PRJ_TYPE,
+		u.PRJ_CODE,
+		u.PRJ_NAME,
+		u.PRJ_SCORE,
+		u.CHECK_SCORE,
+		u.CHECK_REMARK,
+		u.CHECK_FINISH_SCORE,
+		u.DEL_FLAG
+       from TERM_REFINE_CHECK_DTL u 
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.TERM_REFINE_CHECK_ID=#TERM_REFINE_CHECK_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+	        u.TERM_REFINE_CHECK_DTL_ID in ($TERM_REFINE_CHECK_DTL_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+<!--明细表插入 -->
+<insert id="insertChld" parameterClass="map">
+  <![CDATA[
+	  insert into TERM_REFINE_CHECK_DTL(
+		 TERM_REFINE_CHECK_DTL_ID,
+		 TERM_REFINE_CHECK_ID,
+         PRJ_TYPE,
+         PRJ_CODE,
+         PRJ_NAME,
+         PRJ_SCORE,
+         CHECK_REMARK,
+         CHECK_SCORE,
+         DEL_FLAG
+	   )values(
+		#TERM_REFINE_CHECK_DTL_ID#,
+		#TERM_REFINE_CHECK_ID#,
+        #PRJ_TYPE#,
+        #PRJ_CODE#,
+        #PRJ_NAME#,
+        #PRJ_SCORE#,
+        #CHECK_REMARK#,
+        #CHECK_SCORE#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+<!--明细表更新 -->
+<update id="updateChldById" parameterClass="map">
+	<![CDATA[ update TERM_REFINE_CHECK_DTL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="TERM_REFINE_CHECK_ID" prepend=","><![CDATA[TERM_REFINE_CHECK_ID = #TERM_REFINE_CHECK_ID# ]]></isNotNull>
+    <isNotNull property="TERM_REFINE_CHECK_DTL_ID" prepend=","><![CDATA[TERM_REFINE_CHECK_DTL_ID = #TERM_REFINE_CHECK_DTL_ID# ]]></isNotNull>
+    <isNotNull property="PRJ_TYPE" prepend=","><![CDATA[PRJ_TYPE = #PRJ_TYPE# ]]></isNotNull>
+    <isNotNull property="PRJ_CODE" prepend=","><![CDATA[PRJ_CODE = #PRJ_CODE# ]]></isNotNull>
+    <isNotNull property="PRJ_NAME" prepend=","><![CDATA[PRJ_NAME = #PRJ_NAME# ]]></isNotNull>
+    <isNotNull property="PRJ_SCORE" prepend=","><![CDATA[PRJ_SCORE = #PRJ_SCORE# ]]></isNotNull>
+    <isNotNull property="CHECK_REMARK" prepend=","><![CDATA[CHECK_REMARK = #CHECK_REMARK# ]]></isNotNull>
+    <isNotNull property="CHECK_SCORE" prepend=","><![CDATA[CHECK_SCORE = #CHECK_SCORE# ]]></isNotNull>
+    <isNotNull property="CHECK_FINISH_SCORE" prepend=","><![CDATA[CHECK_FINISH_SCORE = #CHECK_FINISH_SCORE# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where TERM_REFINE_CHECK_DTL_ID = #TERM_REFINE_CHECK_DTL_ID#]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteChldByIds" parameterClass="map">
+	<![CDATA[ update TERM_REFINE_CHECK_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      TERM_REFINE_CHECK_DTL_ID in ($TERM_REFINE_CHECK_DTL_IDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细 -->
+<delete id="delChldByFkId" parameterClass="map">
+	<![CDATA[ update TERM_REFINE_CHECK_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      TERM_REFINE_CHECK_ID = #TERM_REFINE_CHECK_ID:VARCHAR#
+    ]]>
+</delete>
+
+<update id="updateChldByFkId" parameterClass="map">
+	<![CDATA[ update TERM_REFINE_CHECK_DTL 
+	               set CHECK_FINISH_SCORE = CHECK_SCORE
+ 	  where 
+	      TERM_REFINE_CHECK_ID = #TERM_REFINE_CHECK_ID:VARCHAR#
+    ]]>
+</update>
+
+<!-- 新增主表临时表 -->
+<insert id="insertTemp" parameterClass="map">
+	insert into TEMP_TERM_REFINE_CHECK(
+		TERM_REFINE_CHECK_ID,
+		TERM_REFINE_CHECK_NO,
+		TERM_REFINE_TASK_NO,
+		TERM_ID,
+		TERM_NO,
+		TERM_NAME,
+		BUSS_SCOPE,
+		AREA_ID,
+		AREA_NO,
+		AREA_NAME,
+		AREA_MANAGE_ID,
+		AREA_MANAGE_NAME,
+		CHECK_ORG_ID,
+		CHECK_ORG_NAME,
+		CHECK_DATE,
+		STATE,
+		REMARK,
+		CREATOR,
+		CRE_NAME,
+		CRE_TIME,
+		DEPT_ID,
+		DEPT_NAME,
+		ORG_ID,
+		ORG_NAME,
+		LEDGER_ID,
+		LEDGER_NAME,
+		DEL_FLAG,
+		CHANN_ID,
+		CHANN_NO,
+		CHANN_NAME
+	)
+	select
+		#TERM_REFINE_CHECK_ID#,
+		#TERM_REFINE_CHECK_NO#,
+		#TERM_REFINE_TASK_NO#,
+		a.TERM_ID,
+		a.TERM_NO,
+		a.TERM_NAME,
+		a.BUSS_SCOPE,
+		a.AREA_ID,
+		a.AREA_NO,
+		a.AREA_NAME,
+		temp.RYXXID,
+		temp.XM,
+		#ORG_ID#,
+		#ORG_NAME#,
+		sysdate,
+		#STATE#,
+		#REMARK#,
+		#CREATOR#,
+		#CRE_NAME#,
+		sysdate,
+		#DEPT_ID#,
+		#DEPT_NAME#,
+		#ORG_ID#,
+		#ORG_NAME#,
+		#LEDGER_ID#,
+		#LEDGER_NAME#,
+		#DEL_FLAG#,
+		a.CHANN_ID_P,
+		a.CHANN_NO_P,
+		a.CHANN_NAME_P
+	from BASE_TERMINAL a 
+	left join BASE_AREA_CHRG_FLAT b on a.AREA_ID=b.AREA_ID and b.CHRG_TYPE='区域经理'
+	left join (select d.RYXXID, d.XM, c.XTYHID
+               from T_SYS_XTYH c
+               left join T_SYS_RYXX d on c.RYXXID = d.RYXXID
+               ) temp on b.CHRG_PSON_ID = temp.XTYHID
+	where a.TERM_NO=#TERM_NO# and rownum=1
+</insert>
+
+<select id="queryHasTerm" parameterClass="map" resultClass="int">
+	select count(1) from BASE_TERMINAL a where a.TERM_NO=#TERM_NO#
+</select>
+
+<insert id="insertChldTemp" parameterClass="map">
+	<![CDATA[
+	  insert into TEMP_TERM_REFINE_CHECK_DTL(
+		 TERM_REFINE_CHECK_DTL_ID,
+		 TERM_REFINE_CHECK_ID,
+         PRJ_TYPE,
+         PRJ_CODE,
+         PRJ_NAME,
+         PRJ_SCORE,
+         CHECK_REMARK,
+         CHECK_SCORE,
+         DEL_FLAG
+	   )values(
+		#TERM_REFINE_CHECK_DTL_ID#,
+		#TERM_REFINE_CHECK_ID#,
+        #PRJ_TYPE#,
+        #PRJ_CODE#,
+        #PRJ_NAME#,
+        #PRJ_SCORE#,
+        #CHECK_REMARK#,
+        #CHECK_SCORE#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+
+<!-- 判断表里面是否有重复记录 -->
+<select id="checkRule" parameterClass="map" resultClass="java.util.HashMap">
+	select TERM_REFINE_TASK_NO,TERM_NO from TERM_REFINE_CHECK where TERM_REFINE_TASK_NO = #TERM_REFINE_TASK_NO# and TERM_NO=#TERM_NO#
+</select>
+
+<select id="queryTypeAndName" parameterClass="map" resultClass="TermrefinecheckModelChld">
+	      select dt.TERM_REFINE_CHECK_DTL_ID,
+                 dt.TERM_REFINE_CHECK_ID
+                 from TEMP_TERM_REFINE_CHECK_DTL dt 
+                 where dt.PRJ_CODE =#PRJ_CODE# and dt.PRJ_NAME=#PRJ_NAME# and dt.del_flag=0
+                 and dt.TERM_REFINE_CHECK_ID=#TERM_REFINE_CHECK_ID#
+</select>
+
+<!-- 判断临时表中是否有重复记录 -->
+<select id="checkTempRule" parameterClass="map" resultClass="int">
+	select count(1) from TEMP_TERM_REFINE_CHECK A GROUP BY A.TERM_REFINE_TASK_NO,A.TERM_NO HAVING COUNT(1)>1
+</select>
+
+<!-- 查询SQL -->
+<select id="selectBrothers" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[  
+ 	 select s.PRJ_TYPE,s.PRJ_CODE,s.PRJ_NAME,s.PRJ_SCORE from ERP_CHANN_CHECK_PLAN_DTL s  left join ERP_CHANN_CHECK_PLAN t 
+            on t.chann_check_plan_id = s.chann_check_plan_id  left join PROJECT_DATA_DICTIONARY_DTL d 
+            on d.DATA_DTL_CODE = t.PLAN_TYPE
+            where s.DEL_FLAG=0 and d.DATA_DTL_NAME = #BUSS_SCOPE# and s.CHANN_CHECK_PLAN_ID=#CHANN_CHECK_PLAN_ID#]]>
+</select>
+
+<select id="checkOtherChild" parameterClass="map" resultClass="java.util.HashMap">
+	select *
+  from TEMP_TERM_REFINE_CHECK
+ where TERM_REFINE_CHECK_ID in
+       (select TERM_REFINE_CHECK_ID
+          from TEMP_TERM_REFINE_CHECK_DTL
+         GROUP BY TERM_REFINE_CHECK_ID, PRJ_CODE
+        HAVING COUNT(1) > 1)
+</select>
+
+<select id="checkRepeatPrjNo" parameterClass="map" resultClass="int">
+	select count(1) from TERM_REFINE_CHECK_DTL where PRJ_CODE = #PRJ_CODE# and TERM_REFINE_CHECK_ID = #TERM_REFINE_CHECK_ID# and DEL_FLAG = 0
+</select>
+
+<select id="queryTermcheckDtl" parameterClass="map" resultClass="TermrefinecheckModelChld">
+	select t.term_refine_check_dtl_id  from  TERM_REFINE_CHECK_DTL t where t.del_flag = 0 and t.TERM_REFINE_CHECK_ID = #TERM_REFINE_CHECK_ID#
+</select>
+
+<insert id="insertMain">
+	insert into TERM_REFINE_CHECK(
+		TERM_REFINE_CHECK_ID,
+		TERM_REFINE_CHECK_NO,
+		TERM_REFINE_TASK_NO,
+		TERM_ID,
+		TERM_NO,
+		TERM_NAME,
+		BUSS_SCOPE,
+		AREA_ID,
+		AREA_NO,
+		AREA_NAME,
+		AREA_MANAGE_ID,
+		AREA_MANAGE_NAME,
+		CHECK_ORG_ID,
+		CHECK_ORG_NAME,
+		CHECK_DATE,
+		STATE,
+		REMARK,
+		CREATOR,
+		CRE_NAME,
+		CRE_TIME,
+		DEPT_ID,
+		DEPT_NAME,
+		ORG_ID,
+		ORG_NAME,
+		LEDGER_ID,
+		LEDGER_NAME,
+		DEL_FLAG,
+		CHANN_ID,
+		CHANN_NO,
+		CHANN_NAME
+	)
+	select
+		TERM_REFINE_CHECK_ID,
+		TERM_REFINE_CHECK_NO,
+		TERM_REFINE_TASK_NO,
+		TERM_ID,
+		TERM_NO,
+		TERM_NAME,
+		BUSS_SCOPE,
+		AREA_ID,
+		AREA_NO,
+		AREA_NAME,
+		AREA_MANAGE_ID,
+		AREA_MANAGE_NAME,
+		CHECK_ORG_ID,
+		CHECK_ORG_NAME,
+		CHECK_DATE,
+		STATE,
+		REMARK,
+		CREATOR,
+		CRE_NAME,
+		CRE_TIME,
+		DEPT_ID,
+		DEPT_NAME,
+		ORG_ID,
+		ORG_NAME,
+		LEDGER_ID,
+		LEDGER_NAME,
+		DEL_FLAG,
+		CHANN_ID,
+		CHANN_NO,
+		CHANN_NAME
+	from TEMP_TERM_REFINE_CHECK
+</insert>
+
+<insert id="insertDtl">
+	insert into TERM_REFINE_CHECK_DTL(
+		 TERM_REFINE_CHECK_DTL_ID,
+		 TERM_REFINE_CHECK_ID,
+         PRJ_TYPE,
+         PRJ_CODE,
+         PRJ_NAME,
+         PRJ_SCORE,
+         CHECK_REMARK,
+         CHECK_SCORE,
+         DEL_FLAG
+	   )
+	   select
+		TERM_REFINE_CHECK_DTL_ID,
+		 TERM_REFINE_CHECK_ID,
+         PRJ_TYPE,
+         PRJ_CODE,
+         PRJ_NAME,
+         PRJ_SCORE,
+         CHECK_REMARK,
+         CHECK_SCORE,
+         DEL_FLAG
+	from TEMP_TERM_REFINE_CHECK_DTL
+		
+</insert>
+
+<delete id="delTempMain">
+	delete from TEMP_TERM_REFINE_CHECK
+</delete>
+
+<delete id="delTempDtl">
+	delete from TEMP_TERM_REFINE_CHECK_DTL
+</delete>
+
+<!-- 回填精致化得分 -->
+<update id="updateScore">
+	update TERM_REFINE_CHECK a
+   set CHECK_TOTAL_SCORE =
+       (select sum(b.CHECK_SCORE)
+          from TERM_REFINE_CHECK_DTL b
+         where a.TERM_REFINE_CHECK_ID = b.TERM_REFINE_CHECK_ID)
+ where a.CHECK_TOTAL_SCORE is null
+</update>
+
+<!-- 回填精致化得分 -->
+<update id="updateScoreByMainId" parameterClass="String">
+	update TERM_REFINE_CHECK a
+   set CHECK_TOTAL_SCORE =
+       (select decode(sum(b.CHECK_SCORE),null,0,sum(b.CHECK_SCORE)) 
+          from TERM_REFINE_CHECK_DTL b
+         where a.TERM_REFINE_CHECK_ID = b.TERM_REFINE_CHECK_ID and DEL_FLAG=0)
+ where a.TERM_REFINE_CHECK_ID = #TERM_REFINE_CHECK_ID#
+</update>
+
+<!-- 删除 -->
+<delete id="deletebyCheck" parameterClass="map">
+	<![CDATA[ delete from TERM_REFINE_CHECK_DTL where TERM_REFINE_CHECK_DTL_ID= #TERM_REFINE_CHECK_DTL_ID# ]]>
+</delete>
+
+<select id="loadByChkId" parameterClass="map"
+		resultClass="TermrefinecheckModelChld">
+		<![CDATA[ 
+	          select t.TERM_REFINE_CHECK_DTL_ID
+	          from TERM_REFINE_CHECK_DTL t
+	          where 
+		      t.DEL_FLAG=0 and t.TERM_REFINE_CHECK_ID = #TERM_REFINE_CHECK_ID#
+	]]>
+</select>
+
+<select id="queryPro" parameterClass="String"
+		resultClass="String">
+		<![CDATA[ 
+           select t.CHANN_CHECK_PLAN_ID from
+             ERP_CHANN_CHECK_PLAN  t
+              where t.CHANN_CHECK_PLAN_NO = #CHANN_CHECK_PLAN_NO#
+	]]>
+</select>
+
+</sqlMap>

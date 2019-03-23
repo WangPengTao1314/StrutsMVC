@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="JOB">
+	 <!-- 新增 add by zhuxw for sys jobs -->
+  <insert id="insertJob" parameterClass="com.hoperun.commons.job.model.JobModel">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.T_SYS_JOB(JOB_ID,BILL_TYPE,FUN_PARAM,CALL_BACK,CRENAME,CRETIME,STATE,APP_ID)
+		 values(#JOB_ID#,#BILL_TYPE#,#FUN_PARAM#,#CALL_BACK#,#CRENAME#,sysdate,#STATE#,#APP_ID#)
+		]]>
+  </insert>
+  <update id="lockJobsByIp" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_JOB ]]>
+		<dynamic prepend="set">
+			<isNotNull property="APP_ID" prepend=","><![CDATA[APP_ID = #APP_ID#]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+		</dynamic>
+		<![CDATA[,START_TIME=sysdate  where JOB_ID in (select JOB_ID from (select * from T_SYS_JOB where STATE='待处理' order by CRETIME desc)tmp where rownum<#JOBS#)  ]]>
+   </update>
+   <select id="qryAppJobs" parameterClass="map"  resultClass="com.hoperun.commons.job.model.JobModel">
+		<![CDATA[
+		  select 
+               a.JOB_ID,b.BILL_TYPE,a.FUN_PARAM,a.CALL_BACK,a.APP_ID,b.FUN_NAME,b.FUN_TYPE
+          from 
+               T_SYS_JOB a  left join  T_SYS_JOBFUN b on a.BILL_TYPE=b.BILL_TYPE
+          where 
+               a.STATE=#STATE# and a.APP_ID=#APP_ID#
+		]]>
+	</select>
+	<update id="finishJobById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_JOB ]]>
+		<dynamic prepend="set">
+			<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK#]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ ,FINISH_TIME=sysdate  where JOB_ID =#JOB_ID# ]]>
+   </update>
+	<!--end for sys jobs -->
+</sqlMap>
+

@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="XTYH">
+
+	<typeAlias type="com.hoperun.sys.model.XTYHBean"
+		alias="XTYHBean" />
+
+	<!-- 使用UserInfo装载结果集 -->
+	<resultMap id="XTYHBean" class="XTYHBean">
+		<result column="XTYHID" property="XTYHID" />
+	</resultMap>
+
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="XTYHID"> u.XTYHID = #XTYHID#</isNotEmpty>
+		<isNotEmpty prepend="and" property="YHBH">	u.YHBH like '%'||#YHBH#||'%'	</isNotEmpty>
+		<isNotEmpty prepend="and" property="YHM">	u.YHM like '%'||#YHM#||'%' </isNotEmpty>
+		<isNotEmpty prepend="and" property="JGMC">	u.JGMC like '%'||#JGMC#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and" property="BMMC">	u.BMMC like '%'||#BMMC#||'%'</isNotEmpty>
+		
+		<isNotEmpty prepend="and " property="QXJBCON">$QXJBCON$</isNotEmpty>
+	</sql>
+  <sql id="queryDynSql1">			
+		<isNotEmpty prepend="and" property="YHBH">	a.yhbh like '%'||#YHBH#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and" property="YHMC">	a.yhm like '%'||#YHMC#||'%' </isNotEmpty>		
+		<isNotEmpty prepend="and" property="RYBH">	d.rybh like '%'||#RYBH#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and" property="RYMC">	d.xm like '%'||#RYMC#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and" property="YHZT">	a.yhzt like '%'||#YHZT#||'%' </isNotEmpty> 
+		
+		<isNotEmpty prepend="and" property="JGMC">	c.JGMC like '%'||#JGMC#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and" property="BMMC">	b.BMMC like '%'||#BMMC#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="QXJBCON">$QXJBCON$</isNotEmpty>
+	</sql> 
+    <sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField">
+			 $orderField$
+		</isNotEmpty>
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[  select  u.*, ROW_NUMBER() OVER(ORDER BY XTYHID) AS rn from ${SYSSCHEMA}.V_XTYH_JGXX_BMXX_RYXX u  ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</sql>
+
+<!-- 查询SQL -->
+	<sql id="coreSqll">
+		<![CDATA[  select 
+						a.XTYHID,
+						a.YHBH,
+						a.YHM,
+						d.RYXXID,
+						d.RYBH,
+						d.XM,
+						b.BMMC,
+						b.BMXXID,
+						c.JGMC,
+						c.JGXXID,
+						a.YHZT,
+						a.YHLB,
+						NVL(a.IS_FG_ALL_CHANN,0)IS_FG_ALL_CHANN                    
+					from (select * from T_SYS_XTYH where delflag=0) a 
+					left join T_SYS_BMXX b on  a.bmxxid=b.bmxxid 
+					left join T_SYS_JGXX c on   a.jgxxid=c.jgxxid 
+					left join T_SYS_RYXX d  on  a.ryxxid=d.ryxxid]]>
+        <dynamic prepend="where">
+			<include refid="queryDynSql1" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页查询 -->
+	<select id="pageQueryy" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSqll" />
+		<include refid="public.pageEnd" />
+	</select>
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(XTYHID) cnt                   
+from (select * from T_SYS_XTYH where delflag=0) a left join T_SYS_BMXX b on  a.bmxxid=b.bmxxid left join T_SYS_JGXX c on   a.jgxxid=c.jgxxid left join T_SYS_RYXX d  on  a.ryxxid=d.ryxxid
+		]]>      
+	 	<dynamic prepend="where">
+			<include refid="queryDynSql1"/>
+		</dynamic> 
+	</select>
+
+   <!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+<!-- 查询 -->
+	<select id="queryy" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSqll" />
+	</select>
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.T_SYS_XTYH
+		  (XTYHID,
+		   YHBH,
+		   YHM,
+		   YHKL,
+		   YHZT,
+		   RYXXID,
+		   JGXXID,
+		   BMXXID,
+		   YHLB,
+		   ZTXXID,
+		   delflag,
+		   CREATOR,CRE_NAME,CRE_TIME,PORTAL_URL)
+		values
+		  (#XTYHID#,
+		   #YHBH#,
+		   #YHM#,
+		   #YHKL#,
+		   #YHZT#,
+		   #RYXXID#,
+		   #JGXXID#,
+		   #BMXXID#,
+		   #YHLB#,
+		   #ZTXXID#,
+		   #DELFLAG#,
+		   #CREATOR#,#CRE_NAME#,sysdate,#PORTAL_URL#)
+		]]>
+	</insert>
+
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_XTYH ]]>
+		<!-- CHANAME, CHADES,CHADATE,CHASTU     ,,,,,-->
+		<dynamic prepend="set">
+			<isNotNull property="YHM" prepend=","><![CDATA[YHM = #YHM#]]></isNotNull>
+			<isNotNull property="RYXXID" prepend=","><![CDATA[RYXXID = #RYXXID#]]></isNotNull>
+			<isNotNull property="BMXXID" prepend=","><![CDATA[BMXXID = #BMXXID#]]></isNotNull>
+			<isNotNull property="JGXXID" prepend=","><![CDATA[JGXXID = #JGXXID#]]></isNotNull>
+			<isNotNull property="ZTXXID" prepend=","><![CDATA[ZTXXID = #ZTXXID#]]></isNotNull>
+			<isNotNull property="YHLB" prepend=","><![CDATA[YHLB = #YHLB#]]></isNotNull>
+			<isNotNull property="PORTAL_URL" prepend=","><![CDATA[PORTAL_URL = #PORTAL_URL#]]></isNotNull>
+			
+		</dynamic>
+		<![CDATA[ where XTYHID = #XTYHID# ]]>
+	</update>
+	<update id="updateByNo" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_XTYH ]]>
+		<!-- CHANAME, CHADES,CHADATE,CHASTU     ,,,,,-->
+		<dynamic prepend="set">
+			<isNotNull property="YHM" prepend=","><![CDATA[YHM = #YHM#]]></isNotNull>
+			<isNotNull property="RYXXID" prepend=","><![CDATA[RYXXID = #RYXXID#]]></isNotNull>
+			<isNotNull property="BMXXID" prepend=","><![CDATA[BMXXID = #BMXXID#]]></isNotNull>
+			<isNotNull property="JGXXID" prepend=","><![CDATA[JGXXID = #JGXXID#]]></isNotNull>
+			<isNotNull property="ZTXXID" prepend=","><![CDATA[ZTXXID = #ZTXXID#]]></isNotNull>
+			<isNotNull property="YHLB" prepend=","><![CDATA[YHLB = #YHLB#]]></isNotNull>
+			<isNotNull property="PORTAL_URL" prepend=","><![CDATA[PORTAL_URL = #PORTAL_URL#]]></isNotNull>
+			<isNotNull property="YHZT" prepend=","><![CDATA[YHZT = #YHZT#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where YHBH = #YHBH# ]]>
+	</update>
+		<!-- 删除菜单 -->
+	<delete id="updateOne" parameterClass="String">
+		<![CDATA[ delete  ${SYSSCHEMA}.T_SYS_XTYH  where XTYHID = #XTYHID:VARCHAR# and YHZT='制定']]>
+	</delete>
+	
+	<insert id="insertXTYH" parameterClass="map">
+	    insert into ${SYSSCHEMA}.t_sys_datarecycle(DATARECYCLEID,DELETOR,DELTIME,BUSINESSTYPE,DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10,DF11,DF12,DF13)
+	    select #DATARECYCLEID#,#DELETOR#,sysdate,'用户信息维护',XTYHID,XTYHCSSID,ZTXXID,JGXXID,BMXXID,RYXXID,YHBH,YHM,YHKL,YHZT,XTYHQXZT,YHLB,DELFLAG
+        from ${SYSSCHEMA}.T_SYS_XTYH  where XTYHID = #XTYHID:VARCHAR#
+	</insert>
+	<select id="loadById" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+			select a.XTYHID,
+			       a.YHBH,
+			       a.YHM,
+			       d.RYXXID,
+			       d.RYBH,
+			       d.XM,
+			       b.BMMC,
+			       b.BMXXID,
+			       c.JGMC,
+			       c.JGXXID,
+			       a.YHZT,
+			       a.YHLB,
+			       a.IS_FG_ALL_CHANN,
+			       e.SJXMC PORTAL_URL_NAME,
+			       a.PORTAL_URL
+			  from ${SYSSCHEMA}.T_SYS_XTYH a
+			  left join ${SYSSCHEMA}.T_SYS_BMXX b
+			    on a.bmxxid = b.bmxxid
+			  left join ${SYSSCHEMA}.T_SYS_JGXX c
+			    on a.jgxxid = c.jgxxid
+			  left join ${SYSSCHEMA}.T_SYS_RYXX d
+			    on a.ryxxid = d.ryxxid
+			  left join T_SYS_SJZDMX e on e.SJXZ=a.PORTAL_URL and e.SJZDID='PORTAL_URL'
+			 where a.xtyhid = #XTYHID#
+			 
+		]]>
+	</select>
+	
+	<update id="updateUserStatusById" parameterClass="map">
+	   update ${SYSSCHEMA}.T_SYS_XTYH
+	   set YHZT=#yhzt#
+	   where xtyhid=#xtyhid#
+	</update>
+	
+	<update id="updatePassword" parameterClass="map">
+	    update ${SYSSCHEMA}.T_SYS_XTYH
+	    set YHKL=#password#
+	    where xtyhid=#xtyhid#
+	</update>
+	
+	<select id="selectAllYhbh"  resultClass="XTYHBean">
+	   select YHBH,YHM   from ${SYSSCHEMA}.T_SYS_XTYH where delflag=0
+	</select>
+	
+	<typeAlias type="com.hoperun.sys.model.ZTWHModel" alias="ZTWHModel" />
+	<select id="getZtxx" parameterClass="string" resultClass="ZTWHModel">
+		   SELECT distinct B.ZTMC,B.ZTXXID FROM ${SYSSCHEMA}.T_SYS_XTYHZTDZ A,${SYSSCHEMA}.T_SYS_ZTXX B,${SYSSCHEMA}.T_SYS_XTYH C
+		   WHERE A.XTYHID = C.XTYHID AND B.ZTXXID = A.ZTXXID
+		   AND B.STATE = '启用' AND C.YHZT='启用'  AND B.DELFLAG=0
+		   AND C.YHM = #YHM#
+	</select>
+	
+	<select id="getNotices" parameterClass="string" resultClass="HashMap">
+		 select NOTICE from ${SYSSCHEMA}.T_SYS_NOTICE
+		 WHERE STATE='启用' AND DELFLAG=0 AND SYSDATE BETWEEN STATIME AND ENDTIME
+		 AND ZTXXID = #ZTXXID#
+		 ORDER BY UPDTIME DESC
+	</select>
+	<!-- 根据系统用户ID取机构分管信息 -->
+	<select id="queryJgfgMxByXtyhid" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[ SELECT A.XTYHJGFGID,B.YHBH,B.YHM,C.JGBH,C.JGMC 
+					FROM ${SYSSCHEMA}.T_SYS_XTYHJGFG A 
+						LEFT JOIN ${SYSSCHEMA}.T_SYS_XTYH B ON A.XTYHID=B.XTYHID 
+						LEFT JOIN ${SYSSCHEMA}.T_SYS_JGXX C ON A.JGXXID=C.JGXXID
+					WHERE A.XTYHID=#XTYHID#]]>
+	</select>
+	<!-- 根据系统用户ID取部门分管信息 -->
+	<select id="queryBmfgMxByXtyhid" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[ SELECT A.XTYHBMFGID,B.YHBH,B.YHM,C.BMBH,C.BMMC 
+					FROM ${SYSSCHEMA}.T_SYS_XTYHBMFG A 
+						LEFT JOIN ${SYSSCHEMA}.T_SYS_XTYH B ON A.XTYHID=B.XTYHID 
+						LEFT JOIN ${SYSSCHEMA}.T_SYS_BMXX C ON A.BMXXID=C.BMXXID
+					WHERE A.XTYHID=#XTYHID#]]>
+	</select>
+	<!-- 根据系统用户ID取部门分管信息 -->
+	<select id="queryZtfgMxByXtyhid" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[ SELECT A.XTYHZTDZID,B.YHBH,B.YHM,C.ZTBH,C.ZTMC 
+					FROM ${SYSSCHEMA}.T_SYS_XTYHZTDZ A 
+						LEFT JOIN ${SYSSCHEMA}.T_SYS_XTYH B ON A.XTYHID = B.XTYHID 
+						LEFT JOIN ${SYSSCHEMA}.T_SYS_ZTXX C ON A.ZTXXID=C.ZTXXID
+					WHERE A.XTYHID=#XTYHID#]]>
+	</select>
+	<!-- 根据系统用户ID取部门分管信息 -->
+	<select id="getXTYHBH" parameterClass="String" resultClass="String">
+		<![CDATA[ SELECT LPAD(ERP_JC_XTYHBH.NEXTVAL,'4','0') 
+					FROM dual]]>
+	</select>
+	<!-- 插入机构分管明细表 -->
+	<insert id="insertJgfgMx" parameterClass="map">
+		<![CDATA[ INSERT INTO ${SYSSCHEMA}.T_SYS_XTYHJGFG (XTYHJGFGID,XTYHID,JGXXID)
+					VALUES(#XTYHJGFGID#,#XTYHID#,#JGXXID#) ]]>
+	</insert>
+	<!-- 插入部门分管明细表 -->
+	<insert id="insertBmfgMx" parameterClass="map">
+		<![CDATA[ INSERT INTO ${SYSSCHEMA}.T_SYS_XTYHBMFG (XTYHBMFGID,XTYHID,BMXXID)
+					VALUES(#XTYHBMFGID#,#XTYHID#,#BMXXID#) ]]>
+	</insert>
+	<!-- 插入帐套分管明细表 -->
+	<insert id="insertZtfgMx" parameterClass="map">
+		<![CDATA[ INSERT INTO ${SYSSCHEMA}.T_SYS_XTYHZTDZ (XTYHZTDZID,XTYHID,ZTXXID)
+					VALUES(#XTYHZTDZID#,#XTYHID#,#ZTXXID#) ]]>
+	</insert>
+	<!-- 删除机构分管明细表 -->
+	<insert id="deleteJgfgMx" parameterClass="String">
+		<![CDATA[ DELETE FROM ${SYSSCHEMA}.T_SYS_XTYHJGFG WHERE XTYHJGFGID IN ($XTYHJGFGID$) ]]>
+	</insert>
+	<!-- 删除部门分管明细表 -->
+	<insert id="deleteBmfgMx" parameterClass="String">
+		<![CDATA[ DELETE FROM ${SYSSCHEMA}.T_SYS_XTYHBMFG WHERE XTYHBMFGID IN ($XTYHBMFGID$) ]]>
+	</insert>
+	<!-- 删除帐套分管明细表 -->
+	<insert id="deleteZtfgMx" parameterClass="String">
+		<![CDATA[ DELETE FROM ${SYSSCHEMA}.T_SYS_XTYHZTDZ WHERE XTYHZTDZID IN ($XTYHZTDZID$) ]]>
+	</insert>
+	<insert id="insertCGDD" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.T_CGDDBH(DDBH,DDRQ,GYSMC,SL,DJ,JE)
+		 values(#DDBH#,#DDRQ#,#GYSMC#,#SL#,#DJ#,#JE#)
+		]]>
+	</insert>
+	
+	<select id="getRyxxidByXtyhid" parameterClass="String" resultClass="String">
+	   select RYXXID   from ${SYSSCHEMA}.T_SYS_XTYH where DELFLAG=0 and XTYHID=#XTYHID#
+	</select>
+	<!-- 删除机构分管明细表 -->
+	<delete id="deleteJgfg" parameterClass="map">
+		<![CDATA[ DELETE FROM ${SYSSCHEMA}.T_SYS_XTYHJGFG WHERE XTYHID = #XTYHID# and JGXXID = #JGXXID# ]]>
+	</delete>
+	<!-- 删除部门分管明细表 -->
+	<delete id="deleteBmfg" parameterClass="map">
+		<![CDATA[ DELETE FROM ${SYSSCHEMA}.T_SYS_XTYHBMFG WHERE XTYHID = #XTYHID# and BMXXID = #BMXXID# ]]>
+	</delete>
+	<!-- 删除帐套分管明细表 -->
+	<delete id="deleteZtfg" parameterClass="map">
+		<![CDATA[ DELETE FROM ${SYSSCHEMA}.T_SYS_XTYHZTDZ WHERE XTYHID = #XTYHID# and ZTXXID = #ZTXXID# ]]>
+	</delete>
+	<!-- 根据用户ID查询帐套、部门、机构ID -->
+	<select id="loadIdById" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[  select ZTXXID,BMXXID,JGXXID                   
+                     from ${SYSSCHEMA}.T_SYS_XTYH 
+					where XTYHID = #XTYHID#]]>
+	</select>
+	
+	
+		
+	
+	
+	<select id="loadUserByIDS" parameterClass="string" resultClass="java.util.HashMap">
+	select * from  BASE_USER_CHARG_PRD a left join BASE_PRODUCT b on a.PRD_ID=b.PRD_ID where USER_CHARG_PRD_ID in ($USER_CHARG_PRD_IDS$)
+</select>
+<delete id="delUserByIDS" parameterClass="string">
+	delete from BASE_USER_CHARG_PRD where USER_CHARG_PRD_ID in ($USER_CHARG_PRD_IDS$)
+</delete>
+<select id="checkPRD" parameterClass="map" resultClass="int">
+	select count(0) from BASE_USER_CHARG_PRD where XTYHID=#XTYHID# and PRD_ID in ($PRD_IDS$)
+</select>
+<insert id="addCharg" parameterClass="map">
+	insert into BASE_USER_CHARG_PRD(
+		USER_CHARG_PRD_ID,
+		XTYHID,
+		PRD_ID
+	)
+	values(
+		#USER_CHARG_PRD_ID#,
+		#XTYHID#,
+		#PRD_ID#
+	)
+</insert>
+<update id="upCharg" parameterClass="map">
+	<![CDATA[ update BASE_USER_CHARG_PRD ]]>
+	<dynamic prepend="set">
+    <isNotNull property="PRD_ID" prepend=","><![CDATA[PRD_ID = #PRD_ID#]]></isNotNull>
+    </dynamic>
+	<![CDATA[  where USER_CHARG_PRD_ID = #USER_CHARG_PRD_ID#]]>
+</update>
+<select id="queryChld" parameterClass="string" resultClass="java.util.HashMap">
+	select b.PRD_NO,b.PRD_NAME,a.USER_CHARG_PRD_ID
+	from BASE_USER_CHARG_PRD a 
+	left join BASE_PRODUCT b  on a.PRD_ID=b.PRD_ID and b.DEL_FLAG=0
+	where XTYHID=#XTYHID#
+</select>
+
+
+<!-- 设置分管所有渠道 -->
+<insert id="upUserChannCharg" parameterClass="map">
+	<![CDATA[ insert into
+	   BASE_USER_CHANN_CHRG(
+	   USER_CHANN_CHRG_ID,
+	   CHANN_ID,
+	   USER_ID
+	   )select 
+	   sys_guid(),
+	   CHANN_ID,
+	   #XTYHID#
+	   from BASE_CHANN c where c.STATE='启用' and c.DEL_FLAG=0
+	 ]]>
+ 
+</insert>
+
+
+
+<!-- 取消设置分管所有渠道 -->
+<delete id="delUserChannCharg" parameterClass="map">
+  delete from BASE_USER_CHANN_CHRG where USER_ID =  #XTYHID#
+</delete>
+
+
+<update id="upXtyhChargFlag" parameterClass="map">
+	<![CDATA[ update T_SYS_XTYH  set IS_FG_ALL_CHANN=#IS_FG_ALL_CHANN# where XTYHID=#XTYHID# ]]>
+</update>
+
+
+<!-- 渠道启动时 -->
+<insert id="insertUserChannChargByChangeChann" parameterClass="map">
+	<![CDATA[ insert into
+	   BASE_USER_CHANN_CHRG(
+	   USER_CHANN_CHRG_ID,
+	   CHANN_ID,
+	   USER_ID
+	   )select 
+	   sys_guid(),
+	   #CHANN_ID#,
+	   XTYHID
+	   from T_SYS_XTYH  where IS_FG_ALL_CHANN=1 and DELFLAG=0
+	   
+	 ]]>
+</insert>
+<!-- 渠道停用时 -->
+<delete id="delChannChargByChangeChann" parameterClass="map">
+  delete from BASE_USER_CHANN_CHRG a
+  where a.USER_ID in
+        (select b.XTYHID from T_SYS_XTYH b where b.IS_FG_ALL_CHANN = 1)
+    and a.CHANN_ID = #CHANN_ID#
+</delete>
+
+
+
+<select id="queryUserList" parameterClass="map" resultClass="java.util.HashMap">
+ select a.*, b.XM, b.ZW, c.JGMC, d.BMMC,temp.PAR_YHBH,temp.PAR_YHM,temp.PAR_XM
+  from T_SYS_XTYH a
+  left join T_SYS_RYXX b
+    on a.RYXXID = b.RYXXID
+   and RYZT = '启用'
+  left join T_SYS_JGXX c
+    on a.JGXXID = c.JGXXID
+   and c.DELFLAG = 0
+  LEFT JOIN T_SYS_BMXX d
+    on a.BMXXID = d.BMXXID
+   and d.BMZT = '启用'
+   and d.DELFLAG = 0
+   left join 
+  ( select e.USER_ID,e.PAR_USER_ID,f.XTYHID,f.YHBH PAR_YHBH,f.YHM PAR_YHM,g.XM PAR_XM
+    from T_SYS_USER_REL e 
+    left join T_SYS_XTYH f 
+    on e.PAR_USER_ID=f.XTYHID
+     left join T_SYS_RYXX g
+    on g.RYXXID = f.RYXXID
+    and g.RYZT = '启用'
+    )temp
+  on temp.USER_ID=a.XTYHID
+ where a.YHZT = '启用'
+   and a.DELFLAG = 0
+   and NVL(a.IS_DRP_LEDGER,0)=0
+   <isNotEmpty prepend=" " property="QX">	
+  	    $QX$
+  	</isNotEmpty>
+  	<isNotEmpty prepend="and" property="YHBH">	
+  	    a.YHBH=#YHBH#
+  	</isNotEmpty>
+    <isNotEmpty prepend="and" property="XM">	
+  	    b.XM  like '%'||#XM#||'%'
+  	</isNotEmpty>
+  	<isNotEmpty prepend="and" property="YHM">	
+  	    a.YHM  like '%'||#YHM#||'%'
+  	</isNotEmpty>
+  	<isNotEmpty prepend="and" property="BMMC">	
+  	    d.BMMC  like '%'||#BMMC#||'%'
+  	</isNotEmpty>
+	<isNotEmpty prepend="and" property="JGMC">	
+  	    c.JGMC  like '%'||#JGMC#||'%'
+  	</isNotEmpty>	
+</select>
+
+
+<delete id="deleteStepUser" parameterClass="map">
+    delete from T_SYS_USER_REL where USER_ID in ($USER_IDS$)
+</delete>
+
+<insert id="insertStepUser" parameterClass="map">
+<![CDATA[ INSERT INTO 
+  T_SYS_USER_REL 
+  (
+	USER_REL_ID,
+	USER_ID,
+	PAR_USER_ID
+	)VALUES(
+	#USER_REL_ID#,
+	#USER_ID#,
+	#PAR_USER_ID#
+	) 
+]]>
+</insert>
+	
+	
+
+</sqlMap>
+

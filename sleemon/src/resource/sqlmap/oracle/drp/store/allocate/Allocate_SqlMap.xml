@@ -1,0 +1,412 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author lyg
+@function 
+@version 2013-09-05 13:29:12
+-->
+<sqlMap  namespace="Allocate">
+<!-- 定义AllocateModel,AllocateModelChld -->
+<typeAlias type="com.hoperun.drp.store.allocate.model.AllocateModel" alias="AllocateModel"/>
+<typeAlias type="com.hoperun.drp.store.allocate.model.AllocateModelChld" alias="AllocateModelChld" />
+<!-- 使用AllocateModel装载结果集 -->
+<resultMap id="AllocateModel" class="AllocateModel">
+    <result column="ALLOCATE_ID" property="ALLOCATE_ID" />
+</resultMap>
+<!-- 使用AllocateModelChld装载结果集 -->
+<resultMap id="AllocateModelChld" class="AllocateModelChld">
+    <result column="ALLOCATE_DTL_ID" property="ALLOCATE_DTL_ID" />
+</resultMap>
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="ALLOCATE_NO">
+    u.ALLOCATE_NO like '%'||#ALLOCATE_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="ALLOC_IN_CHANN_NO">
+    u.ALLOC_IN_CHANN_NO like '%'||#ALLOC_IN_CHANN_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="ALLOC_IN_CHANN_NAME">
+    u.ALLOC_IN_CHANN_NAME like '%'||#ALLOC_IN_CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="ALLOC_OUT_STORE_NO">
+    u.ALLOC_OUT_STORE_NO like '%'||#ALLOC_OUT_STORE_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="ALLOC_OUT_STORE_NAME">
+    u.ALLOC_OUT_STORE_NAME like '%'||#ALLOC_OUT_STORE_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_BEG">
+     <![CDATA[u.CRE_TIME >=to_date(#CRE_TIME_BEG#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+     <![CDATA[u.CRE_TIME <=  to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STORAGE_FLAG">
+    	u.STORAGE_FLAG =#STORAGE_FLAG#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="module">
+    	u.STATE in ($module$)
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="SHmodule">
+    	u.STATE != #SHmodule#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="LEDGER_ID">
+    	u.LEDGER_ID =#LEDGER_ID#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STATE">
+    	u.STATE =#STATE#
+  </isNotEmpty>
+	<isNotEmpty prepend="and " property="DEL_FLAG">
+	        u.DEL_FLAG=#DEL_FLAG#
+	</isNotEmpty>
+	   <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	</isNotEmpty>
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.ALLOCATE_ID,
+		u.ALLOCATE_NO,
+		u.BILL_TYPE,
+		u.ALLOC_OUT_CHANN_ID,
+		u.ALLOC_OUT_CHANN_NO,
+		u.ALLOC_OUT_CHANN_NAME,
+		u.ALLOC_IN_CHANN_ID,
+		u.ALLOC_IN_CHANN_NO,
+		u.ALLOC_IN_CHANN_NAME,
+		u.ALLOC_OUT_STORE_ID,
+		u.ALLOC_OUT_STORE_NO,
+		u.ALLOC_OUT_STORE_NAME,
+		u.STORAGE_FLAG,
+		u.REMARK,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME
+      from DRP_ALLOCATE u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM DRP_ALLOCATE u ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_ALLOCATE(
+		 ALLOCATE_ID,
+         ALLOC_OUT_STORE_ID,
+         ALLOC_OUT_CHANN_ID,
+         ALLOC_IN_CHANN_ID,
+         ALLOCATE_NO,
+         BILL_TYPE,
+         ALLOC_OUT_CHANN_NO,
+         ALLOC_OUT_CHANN_NAME,
+         ALLOC_IN_CHANN_NO,
+         ALLOC_IN_CHANN_NAME,
+         ALLOC_OUT_STORE_NO,
+         ALLOC_OUT_STORE_NAME,
+         STORAGE_FLAG,
+         REMARK,
+         CRE_NAME,
+         CREATOR,
+         CRE_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         STATE,
+         DEL_FLAG
+	   )values(
+		#ALLOCATE_ID#,
+        #ALLOC_OUT_STORE_ID#,
+        #ALLOC_OUT_CHANN_ID#,
+        #ALLOC_IN_CHANN_ID#,
+        #ALLOCATE_NO#,
+        #BILL_TYPE#,
+        #ALLOC_OUT_CHANN_NO#,
+        #ALLOC_OUT_CHANN_NAME#,
+        #ALLOC_IN_CHANN_NO#,
+        #ALLOC_IN_CHANN_NAME#,
+        #ALLOC_OUT_STORE_NO#,
+        #ALLOC_OUT_STORE_NAME#,
+        #STORAGE_FLAG#,
+        #REMARK#,
+        #CRE_NAME#,
+        #CREATOR#,
+	    sysdate, 
+        #DEPT_ID#,
+        #DEPT_NAME#,
+        #ORG_ID#,
+        #ORG_NAME#,
+        #LEDGER_ID#,
+        #LEDGER_NAME#,
+        #STATE#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update DRP_ALLOCATE ]]>
+	<dynamic prepend="set">
+    <isNotNull property="ALLOC_OUT_STORE_ID" prepend=","><![CDATA[ALLOC_OUT_STORE_ID = #ALLOC_OUT_STORE_ID# ]]></isNotNull>
+    <isNotNull property="ALLOC_OUT_CHANN_ID" prepend=","><![CDATA[ALLOC_OUT_CHANN_ID = #ALLOC_OUT_CHANN_ID# ]]></isNotNull>
+    <isNotNull property="ALLOC_IN_CHANN_ID" prepend=","><![CDATA[ALLOC_IN_CHANN_ID = #ALLOC_IN_CHANN_ID# ]]></isNotNull>
+    <isNotNull property="ALLOCATE_NO" prepend=","><![CDATA[ALLOCATE_NO = #ALLOCATE_NO# ]]></isNotNull>
+    <isNotNull property="BILL_TYPE" prepend=","><![CDATA[BILL_TYPE = #BILL_TYPE# ]]></isNotNull>
+    <isNotNull property="ALLOC_OUT_CHANN_NO" prepend=","><![CDATA[ALLOC_OUT_CHANN_NO = #ALLOC_OUT_CHANN_NO# ]]></isNotNull>
+    <isNotNull property="ALLOC_OUT_CHANN_NAME" prepend=","><![CDATA[ALLOC_OUT_CHANN_NAME = #ALLOC_OUT_CHANN_NAME# ]]></isNotNull>
+    <isNotNull property="ALLOC_IN_CHANN_NO" prepend=","><![CDATA[ALLOC_IN_CHANN_NO = #ALLOC_IN_CHANN_NO# ]]></isNotNull>
+    <isNotNull property="ALLOC_IN_CHANN_NAME" prepend=","><![CDATA[ALLOC_IN_CHANN_NAME = #ALLOC_IN_CHANN_NAME# ]]></isNotNull>
+    <isNotNull property="ALLOC_OUT_STORE_NO" prepend=","><![CDATA[ALLOC_OUT_STORE_NO = #ALLOC_OUT_STORE_NO# ]]></isNotNull>
+    <isNotNull property="ALLOC_OUT_STORE_NAME" prepend=","><![CDATA[ALLOC_OUT_STORE_NAME = #ALLOC_OUT_STORE_NAME# ]]></isNotNull>
+    <isNotNull property="STORAGE_FLAG" prepend=","><![CDATA[STORAGE_FLAG = #STORAGE_FLAG# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+     <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where ALLOCATE_ID = #ALLOCATE_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update DRP_ALLOCATE 
+	               set DEL_FLAG = #DEL_FLAG#
+                      ,UPD_NAME=#UPD_NAME#
+                     ,UPDATOR=#UPDATOR#
+                      ,UPD_TIME=sysdate
+ 	  where 
+	     ALLOCATE_ID = #ALLOCATE_ID:VARCHAR# 
+    ]]>
+</delete>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.ALLOCATE_ID,
+		u.ALLOCATE_NO,
+		u.BILL_TYPE,
+		u.ALLOC_OUT_CHANN_ID,
+		u.ALLOC_OUT_CHANN_NO,
+		u.ALLOC_OUT_CHANN_NAME,
+		u.ALLOC_IN_CHANN_ID,
+		u.ALLOC_IN_CHANN_NO,
+		u.ALLOC_IN_CHANN_NAME,
+		u.ALLOC_OUT_STORE_ID,
+		u.ALLOC_OUT_STORE_NO,
+		u.ALLOC_OUT_STORE_NAME,
+		u.STORAGE_FLAG,
+		u.REMARK,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME
+	  from
+       DRP_ALLOCATE u 
+	  where 
+		u.ALLOCATE_ID = #ALLOCATE_ID#
+	]]>
+</select>
+<!-- 明细操作开始-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+     select 
+		u.ALLOCATE_DTL_ID,
+		u.ALLOCATE_ID,
+		u.PRD_ID,
+		u.PRD_NO,
+		u.PRD_NAME,
+		u.PRD_SPEC,
+		u.PRD_COLOR,
+		u.BRAND,
+		u.STD_UNIT,
+		u.PRICE,
+		u.DECT_RATE,
+		u.DECT_PRICE,
+		u.ALLOC_NUM,
+		u.DECT_AMOUNT,
+		u.REMARK,
+		u.DEL_FLAG,
+		u.SPCL_TECH_ID,
+		a.SPCL_TECH_FLAG,
+		a.DM_SPCL_TECH_NO
+       from DRP_ALLOCATE_DTL u 
+       	left join DRP_SPCL_TECH a on u.SPCL_TECH_ID = a.SPCL_TECH_ID and a.USE_FLAG = 1
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.ALLOCATE_ID=#ALLOCATE_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+	        u.ALLOCATE_DTL_ID in ($ALLOCATE_DTL_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+<!--明细表插入 -->
+<insert id="insertChld" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_ALLOCATE_DTL(
+		 ALLOCATE_DTL_ID,
+		 ALLOCATE_ID,
+         PRD_ID,
+         REMARK,
+         PRD_NO,
+         PRD_NAME,
+         PRD_SPEC,
+         PRD_COLOR,
+         BRAND,
+         STD_UNIT,
+         PRICE,
+         DECT_RATE,
+         DECT_PRICE,
+         ALLOC_NUM,
+         DECT_AMOUNT,
+         DEL_FLAG,
+         SPCL_TECH_ID
+	   )values(
+		#ALLOCATE_DTL_ID#,
+		#ALLOCATE_ID#,
+        #PRD_ID#,
+        #REMARK#,
+        #PRD_NO#,
+        #PRD_NAME#,
+        #PRD_SPEC#,
+        #PRD_COLOR#,
+        #BRAND#,
+        #STD_UNIT#,
+        #PRICE#,
+        #DECT_RATE#,
+        #DECT_PRICE#,
+        #ALLOC_NUM#,
+        #DECT_AMOUNT#,
+		#DEL_FLAG#,
+		#SPCL_TECH_ID#
+		)
+   ]]>
+</insert>
+<!--明细表更新 -->
+<update id="updateChldById" parameterClass="map">
+	<![CDATA[ update DRP_ALLOCATE_DTL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="PRD_ID" prepend=","><![CDATA[PRD_ID = #PRD_ID# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    <isNotNull property="PRD_NO" prepend=","><![CDATA[PRD_NO = #PRD_NO# ]]></isNotNull>
+    <isNotNull property="PRD_NAME" prepend=","><![CDATA[PRD_NAME = #PRD_NAME# ]]></isNotNull>
+    <isNotNull property="PRD_SPEC" prepend=","><![CDATA[PRD_SPEC = #PRD_SPEC# ]]></isNotNull>
+    <isNotNull property="PRD_COLOR" prepend=","><![CDATA[PRD_COLOR = #PRD_COLOR# ]]></isNotNull>
+    <isNotNull property="BRAND" prepend=","><![CDATA[BRAND = #BRAND# ]]></isNotNull>
+    <isNotNull property="STD_UNIT" prepend=","><![CDATA[STD_UNIT = #STD_UNIT# ]]></isNotNull>
+    <isNotNull property="PRICE" prepend=","><![CDATA[PRICE = #PRICE# ]]></isNotNull>
+    <isNotNull property="DECT_RATE" prepend=","><![CDATA[DECT_RATE = #DECT_RATE# ]]></isNotNull>
+    <isNotNull property="DECT_PRICE" prepend=","><![CDATA[DECT_PRICE = #DECT_PRICE# ]]></isNotNull>
+    <isNotNull property="ALLOC_NUM" prepend=","><![CDATA[ALLOC_NUM = #ALLOC_NUM# ]]></isNotNull>
+    <isNotNull property="DECT_AMOUNT" prepend=","><![CDATA[DECT_AMOUNT = #DECT_AMOUNT# ]]></isNotNull>
+    <isNotNull property="SPCL_TECH_ID" prepend=","><![CDATA[SPCL_TECH_ID = #SPCL_TECH_ID# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where ALLOCATE_DTL_ID = #ALLOCATE_DTL_ID#]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteChldByIds" parameterClass="map">
+	<![CDATA[ update DRP_ALLOCATE_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      ALLOCATE_DTL_ID in ($ALLOCATE_DTL_IDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细 -->
+<delete id="delChldByFkId" parameterClass="map">
+	<![CDATA[ update DRP_ALLOCATE_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      ALLOCATE_ID = #ALLOCATE_ID:VARCHAR#
+    ]]>
+</delete>
+<select id="checkAllocNum" parameterClass="map" resultClass="int">
+	select  sum(round(NVL(STORE_NUM,0) - NVL(FREEZE_NUM,0))) count
+	from DRP_STORE_ACCT where STORE_ID=#STORE_ID# and PRD_ID=#PRD_ID#
+</select>
+<delete id="delChld" parameterClass="string">
+	<![CDATA[
+		update DRP_ALLOCATE_DTL 
+	               set DEL_FLAG = 1
+ 	  where 
+	      ALLOCATE_ID = #ALLOCATE_ID#
+	]]>
+</delete>
+</sqlMap>

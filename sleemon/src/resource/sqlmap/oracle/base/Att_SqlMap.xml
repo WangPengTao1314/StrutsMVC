@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ *@module 基础数据
+ *@func  附件信息
+ *@version 1.1
+ *@author  
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Att">
+
+<!-- 查找图片 -->
+<select id="loadAtt" parameterClass="map"
+		resultClass="String">
+		<![CDATA[SELECT ATT_PATH								
+			FROM ${SYSSCHEMA}.BASE_ATT c 
+			WHERE c.FROM_BILL_ID = #FROM_BILL_ID# and DEL_FLAG=0 and rownum = 1]]>
+</select>
+
+<!-- 新增附件表 -->
+<insert id="insertAtt" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.BASE_ATT(
+		 	ATT_ID,ATT_PATH,FROM_BILL_ID,CREATOR,CRE_NAME,CRE_TIME,DEL_FLAG
+		 	)
+		 values(
+		 	#ATT_ID#,#ATT_PATH#,#FROM_BILL_ID#,#CREATOR#,#CRE_NAME#,sysdate,#DEL_FLAG#					 
+		 )
+		]]>
+</insert>
+<!-- 更新附件表 -->
+<update id="updateAtt" parameterClass="map">
+	<![CDATA[ update ${SYSSCHEMA}.BASE_ATT ]]>
+		<dynamic prepend="set">
+			<isNotNull property="ATT_PATH" prepend=","><![CDATA[ATT_PATH = #ATT_PATH#]]></isNotNull>			
+		</dynamic>
+		<![CDATA[ where FROM_BILL_ID = #FROM_BILL_ID# ]]>		
+</update>
+
+<!-- 软删除(附件表) -->
+<update id="deleteAtt" parameterClass="map">
+	<![CDATA[ update ${SYSSCHEMA}.BASE_ATT ]]>
+		<dynamic prepend="set">
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>			
+		</dynamic>
+		<![CDATA[ where FROM_BILL_ID = #FROM_BILL_ID# ]]>		
+</update>
+	
+</sqlMap>
+

@@ -1,0 +1,494 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author lyg
+@function 
+@version 2013-08-11 17:38:52
+-->
+<sqlMap  namespace="Advctoout">
+	<typeAlias type="com.hoperun.drp.sale.advctoout.model.AdvctooutModel" alias="AdvctooutModel"/>
+	<typeAlias type="com.hoperun.drp.sale.advctoout.model.AdvctooutModelChld" alias="AdvctooutModelChld" />
+	<!-- 使用AdvctoorderModel装载结果集 -->
+	<resultMap id="AdvctooutModel" class="AdvctooutModel">
+	    <result column="ADVC_ORDER_ID" property="ADVC_ORDER_ID" />
+	</resultMap>
+	<!-- 使用AdvctoorderModelChld装载结果集 -->
+	<resultMap id="AdvctooutModelChld" class="AdvctooutModelChld">
+	    <result column="ADVC_ORDER_DTL_ID" property="ADVC_ORDER_DTL_ID" />
+	</resultMap>
+	<!--主表动态查询 and 列表分页 -->
+	<sql id="orderSql">
+	   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+	</sql>
+	<!--主表动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+	  <isNotEmpty prepend="and" property="ADVC_ORDER_NO">
+	    u.ADVC_ORDER_NO like '%'||#ADVC_ORDER_NO#||'%'
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="TERM_NO">
+	    u.TERM_NO like '%'||#TERM_NO#||'%'
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="TERM_NAME">
+	    u.TERM_NAME like '%'||#TERM_NAME#||'%'
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="LEDGER_ID">
+	  	u.LEDGER_ID=#LEDGER_ID#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="BILL_TYPE">
+	  	u.BILL_TYPE=#BILL_TYPE#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="SALE_DATE_BEG">
+	     <![CDATA[u.SALE_DATE>=to_date(#SALE_DATE_BEG#,'yyyy-MM-DD')]]>
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="SALE_DATE_END">
+	     <![CDATA[u.SALE_DATE<=to_date(#SALE_DATE_END#,'yyyy-MM-DD')]]>
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="SALE_PSON_NAME">
+	    u.SALE_PSON_NAME like '%'||#SALE_PSON_NAME#||'%'
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="CUST_NAME">
+	    u.CUST_NAME like '%'||#CUST_NAME#||'%'
+	  </isNotEmpty>
+	   <isNotEmpty prepend="and" property="BEGIN_CRE_TIME">
+	     <![CDATA[u.CRE_TIME>=to_date(#BEGIN_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')]]>
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="END_CRE_TIME">
+	     <![CDATA[u.CRE_TIME<=to_date(#END_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')]]>
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="STATE">
+	    u.STATE =#STATE#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="STATES">
+	    u.STATE in ($STATES$)
+	  </isNotEmpty>
+		<isNotEmpty prepend="and " property="DEL_FLAG">
+		        u.DEL_FLAG=#DEL_FLAG# 
+		</isNotEmpty>
+	    <isNotEmpty prepend="and " property="QXJBCON">
+		        $QXJBCON$
+		</isNotEmpty>
+	</sql>
+	<!-- 主表查询SQL -->
+	<sql id="coreSql">
+	  <![CDATA[ 
+		select 
+		   distinct u.ADVC_ORDER_ID,
+            ADVC_ORDER_NO,
+            TERM_NO,
+            TERM_NAME,
+            CUST_NAME,
+            ADVC_AMOUNT,
+            u.DEL_FLAG,
+            LEDGER_ID,
+            BILL_TYPE,
+            u.PAYABLE_AMOUNT,
+            SALE_PSON_NAME,
+            DEPT_NAME,
+            to_char(SALE_DATE, 'yyyy-MM-DD') SALE_DATE,
+            CRE_NAME,
+            CREATOR,
+            to_char(CRE_TIME, 'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+            STATE,
+            ORG_ID,
+            DEPT_ID,
+            b.ORDER_RECV_DATE
+            from DRP_ADVC_ORDER u
+            left join  DRP_ADVC_ORDER_DTL b on u.ADVC_ORDER_ID=b.ADVC_ORDER_ID and b.DEL_FLAG=0
+    
+	   ]]>
+	    <dynamic prepend="where">
+		   <include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+		   <include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	<!-- 主表分页查询 -->
+	<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+	      <![CDATA[select count(0) cnt FROM DRP_ADVC_ORDER u ]]>
+		<dynamic prepend="where">
+				<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+	<insert id="insert" parameterClass="map">
+	  <![CDATA[
+		  insert into DRP_STOREOUT(
+			STOREOUT_ID,
+			STOREOUT_NO,
+			BILL_TYPE,
+			FROM_BILL_ID,
+			FROM_BILL_NO,
+			SEND_CHANN_ID,
+			SEND_CHANN_NO,
+			SEND_CHANN_NAME,
+			STOREOUT_STORE_ID,
+			STOREOUT_STORE_NO,
+			STOREOUT_STORE_NAME,
+			STORAGE_FLAG,
+			RECV_CHANN_ID,
+			RECV_CHANN_NO,
+			RECV_CHANN_NAME,
+			TERM_ID,
+			TERM_NO,
+			TERM_NAME,
+			SALE_DATE,
+			SALE_PSON_ID,
+			SALE_PSON_NAME,
+			CUST_NAME,
+			TEL,
+			RECV_ADDR,
+			ORDER_RECV_DATE,
+			STOREOUT_AMOUNT,
+			ADVC_AMOUNT,
+			STOREIN_ID,
+			STOREIN_NO,
+			STATE,
+			REMARK,
+			CREATOR,
+			CRE_NAME,
+			CRE_TIME,
+			DEPT_ID,
+			DEPT_NAME,
+			ORG_ID,
+			ORG_NAME,
+			LEDGER_ID,
+			LEDGER_NAME,
+			DEL_FLAG,
+			YEAR_MONTH,
+		)values(
+			#STOREOUT_ID#,
+			#STOREOUT_NO#,
+			#BILL_TYPE#,
+			#FROM_BILL_ID#,
+			#FROM_BILL_NO#,
+			#SEND_CHANN_ID#,
+			#SEND_CHANN_NO#,
+			#SEND_CHANN_NAME#,
+			#STOREOUT_STORE_ID#,
+			#STOREOUT_STORE_NO#,
+			#STOREOUT_STORE_NAME#,
+			#STORAGE_FLAG#,
+			#RECV_CHANN_ID#,
+			#RECV_CHANN_NO#,
+			#RECV_CHANN_NAME#,
+			#TERM_ID#,
+			#TERM_NO#,
+			#TERM_NAME#,
+			to_date(#SALE_DATE#,'yyyy-mm-dd'),
+			#SALE_PSON_ID#,
+			#SALE_PSON_NAME#,
+			#CUST_NAME#,
+			#TEL#,
+			#RECV_ADDR#,
+			to_date(#ORDER_RECV_DATE#,'yyyy-mm-dd'),
+			#STOREOUT_AMOUNT#,
+			#ADVC_AMOUNT#,
+			#STOREIN_ID#,
+			#STOREIN_NO#,
+			#STATE#,
+			#REMARK#,
+			#CREATOR#,
+			#CRE_NAME#,
+			sysdate,
+			#DEPT_ID#,
+			#DEPT_NAME#,
+			#ORG_ID#,
+			#ORG_NAME#,
+			#LEDGER_ID#,
+			#LEDGER_NAME#,
+			#DEL_FLAG#,
+			#YEAR_MONTH#,
+			)
+	   ]]>
+	</insert>
+	<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[ 
+		  select 
+			u.ADVC_ORDER_ID,
+			u.GOODS_ORDER_ID,
+			u.ADVC_ORDER_NO,
+			u.TERM_ID,
+			u.TERM_NO,
+			u.TERM_NAME,
+			to_char(u.SALE_DATE,'yyyy-MM-DD') SALE_DATE,
+			u.SALE_PSON_ID,
+			u.SALE_PSON_NAME,
+			u.CUST_NAME,
+			u.TEL,
+			u.RECV_ADDR,
+			to_char(u.ORDER_RECV_DATE,'yyyy-MM-DD') ORDER_RECV_DATE,
+			u.ADVC_AMOUNT,
+			u.PAYABLE_AMOUNT,
+			u.REMARK,
+			to_char(u.PFMC_DATE,'yyyy-MM-DD') PFMC_DATE,
+			u.DEAL_FLAG,
+			u.STTLE_FLAG,
+			u.CRE_NAME,
+			u.CREATOR,
+			to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+			u.UPD_NAME,
+			u.UPDATOR,
+			to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+			u.DEPT_ID,
+			u.DEPT_NAME,
+			u.ORG_ID,
+			u.ORG_NAME,
+			u.LEDGER_ID,
+			u.LEDGER_NAME,
+			u.STATE,
+			u.DEL_FLAG,
+			u.PAYED_TOTAL_AMOUNT,
+			u.DEDUCTED_TOTAL_AMOUNT
+		  from
+	       DRP_ADVC_ORDER u 
+		  where 
+			u.ADVC_ORDER_ID = #ADVC_ORDER_ID#
+		]]>
+	</select>
+	<!--明细查询条件定义 -->
+	<sql id="coreSqlChld">
+		<![CDATA[ 
+	     select 
+			u.ADVC_ORDER_DTL_ID,
+			u.ADVC_ORDER_ID,
+			u.PRD_ID,
+			u.PRD_NO,
+			u.PRD_NAME,
+			u.PRD_SPEC,
+			u.PRD_COLOR,
+			u.BRAND,
+			u.STD_UNIT,
+			u.PRICE,
+			u.DECT_RATE,
+			u.DECT_PRICE,
+			u.ORDER_NUM,
+			u.PAYABLE_AMOUNT,
+			u.REMARK,
+			u.DEL_FLAG,
+			u.SEND_NUM,
+			(select SPCL_TECH_FLAG from DRP_SPCL_TECH where SPCL_TECH_ID = u.SPCL_TECH_ID and USE_FLAG = #USE_FLAG#) SPCL_TECH_FLAG
+	       from DRP_ADVC_ORDER_DTL u 
+	   ]]>
+	   <dynamic prepend="where">
+			<include refid="queryDynSqlChld" />
+		</dynamic>
+		<isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+		</isNotNull>
+	</sql>
+	<sql id="queryDynSqlChld">
+	  <isNotEmpty prepend="and" property="DEL_FLAG">
+	     u.DEL_FLAG=#DEL_FLAG#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="ADVC_ORDER_ID">
+	  	u.ADVC_ORDER_ID=#ADVC_ORDER_ID#
+	  </isNotEmpty>
+	</sql>
+	<sql id="orderSqlChld">
+		<isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+	</sql>
+    <!-- 子表分页查询 -->
+	<select id="pageQueryChld" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSqlChld" />
+		<include refid="public.pageEnd" />
+	</select>
+	<!--明细表插入 -->
+	<insert id="insertChld" parameterClass="map">
+	  <![CDATA[
+		  insert into DRP_STOREOUT_DTL(
+			STOREOUT_DTL_ID,
+			STOREOUT_ID,
+			PRD_ID,
+			PRD_NO,
+			PRD_NAME,
+			PRD_SPEC,
+			PRD_COLOR,
+			BRAND,
+			STD_UNIT,
+			NOTICE_NUM,
+			REAL_NUM,
+			PRICE,
+			DECT_RATE,
+			DECT_PRICE,
+			DECT_AMOUNT,
+			REMARK,
+			DEL_FLAG,
+			FROM_BILL_DTL_ID,
+			YEAR_MONTH
+		   )values(
+			#STOREOUT_DTL_ID#,
+			#STOREOUT_ID#,
+			#PRD_ID#,
+			#PRD_NO#,
+			#PRD_NAME#,
+			#PRD_SPEC#,
+			#PRD_COLOR#,
+			#BRAND#,
+			#STD_UNIT#,
+			#NOTICE_NUM#,
+			#REAL_NUM#,
+			#PRICE#,
+			#DECT_RATE#,
+			#DECT_PRICE#,
+			#DECT_AMOUNT#,
+			#REMARK#,
+			#DEL_FLAG#,
+			#FROM_BILL_DTL_ID#,
+			to_char((select CRE_TIME from DRP_STOREOUT where STOREOUT_ID=#STOREOUT_ID#),'yy-mm-dd')
+			)
+	   ]]>
+	</insert>
+	<!-- 根据货品id和当前登录帐套查找库存信息 -->
+	<select id="loadProduct" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[ 
+		 select
+		 	a.PRD_ID,
+		 	b.PRD_NO,
+			a.STD_UNIT,
+			a.MEAS_UNIT,
+			a.STORE_NUM,
+			a.FREEZE_NUM,
+			a.MEAS_STORE_NUM
+		 from  DRP_STORE_ACCT a left join BASE_PRODUCT b on a.PRD_ID=b.PRD_ID where a.LEDGER_ID=#LEDGER_ID#  and  a.PRD_ID in ($PRD_IDS$)
+		]]>
+	</select>
+	<!-- 根据货品id和库房id查找库存数量 -->
+	<select id="loadProductNum" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[ 
+		 select
+		 	round(STORE_NUM-FREEZE_NUM) NUM,b.PRD_NO,b.VOLUME
+		 from  DRP_STORE_ACCT a left join BASE_PRODUCT b on a.PRD_ID=b.PRD_ID where a.STORE_ID=#STORE_ID#  and  a.PRD_ID =#PRD_ID# and a.LEDGER_ID=#LEDGER_ID#
+		]]>
+	</select>
+	<insert id="insertSpcl" parameterClass="map">
+	  <![CDATA[
+		  insert into DRP_ORDER_SPCL_TECH(
+			ORDER_SPCL_TECH_ID,
+			GOODS_ORDER_DTL_ID
+			)values(
+			#ORDER_SPCL_TECH_ID#,
+			#GOODS_ORDER_DTL_ID#
+			)
+	   ]]>
+	</insert>
+	<select id="findSTOREOUT" resultClass="java.util.HashMap" parameterClass="map">
+		<![CDATA[
+			select STORE_ID,STORE_NO,STORE_NAME,STORAGE_FLAG from DRP_STORE
+			where 1=1
+		]]>
+		<isNotEmpty prepend="and" property="STOREOUT_STORE_NO">
+	    	STORE_NO=#STOREOUT_STORE_NO#
+	  	</isNotEmpty>
+	  	<isNotEmpty prepend="and" property="STOREOUT_STORE_NAME">
+	    	STORE_NAME=#STOREOUT_STORE_NAME#
+	  	</isNotEmpty>
+	</select>
+	<!-- 子表分页计数 -->
+	<select id="pageCountChld" parameterClass="map" resultClass="int">
+	      <![CDATA[select count(0) cnt FROM DRP_ADVC_ORDER_DTL u ]]>
+		<dynamic prepend="where">
+				<include refid="queryDynSqlChld"/>
+		</dynamic>
+	</select>
+	<select id="loadChld" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[ 
+	     select 
+			u.ADVC_ORDER_DTL_ID,
+			u.ADVC_ORDER_ID,
+			u.PRD_ID,
+			u.PRD_NO,
+			u.PRD_NAME,
+			u.PRD_SPEC,
+			u.PRD_COLOR,
+			u.BRAND,
+			u.STD_UNIT,
+			u.PRICE,
+			u.DECT_RATE,
+			u.DECT_PRICE,
+			u.ORDER_NUM,
+			u.PAYABLE_AMOUNT,
+			u.REMARK,
+			u.DEL_FLAG,
+			u.SEND_NUM,
+			u.SPCL_TECH_ID,
+	       (select SPCL_TECH_FLAG from DRP_SPCL_TECH where SPCL_TECH_ID = u.SPCL_TECH_ID and USE_FLAG = #USE_FLAG#) SPCL_TECH_FLAG
+	       from DRP_ADVC_ORDER_DTL u 
+	       where u.ADVC_ORDER_ID=#ADVC_ORDER_ID# and u.DEL_FLAG=#DEL_FLAG# 
+	   ]]>
+	</select>
+	<!-- 按主表id更新信息 -->
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update DRP_ADVC_ORDER ]]>
+		<dynamic prepend="set">
+	    <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+	    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+	     <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+	    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+	    </dynamic>
+		<![CDATA[  where ADVC_ORDER_ID = #ADVC_ORDER_ID#]]>
+	</update>
+	<select id="getDtl" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[
+				select 
+					a.ADVC_ORDER_DTL_ID,
+					a.ADVC_ORDER_ID,
+					a.PRD_ID,
+					a.PRD_NO,
+					a.PRD_NAME,
+					a.PRD_SPEC,
+					a.PRD_COLOR,
+					a.BRAND,
+					a.STD_UNIT,
+					a.PRICE,
+					a.DECT_RATE,
+					a.DECT_PRICE,
+					a.ORDER_NUM,
+					a.PAYABLE_AMOUNT,
+					a.SPCL_TECH_ID,
+					(select SPCL_TECH_FLAG from DRP_SPCL_TECH where SPCL_TECH_ID = a.SPCL_TECH_ID and USE_FLAG = #USE_FLAG#) SPCL_TECH_FLAG,
+					a.SEND_NUM,
+          (select sum(round(STORE_NUM-FREEZE_NUM)) num
+          from DRP_STORE_ACCT 
+          where prd_id=a.prd_id 
+          		 and  LEDGER_ID=#LEDGER_ID#)  
+	         as num
+			from DRP_ADVC_ORDER_DTL a
+			where ADVC_ORDER_ID=#ADVC_ORDER_ID# and DEL_FLAG=#DEL_FLAG#
+		]]>
+	</select>
+	<select id="getCountQual" resultClass="int" parameterClass="map">
+		<![CDATA[
+			select count(u.ADVC_ORDER_ID) from DRP_ADVC_ORDER u,DRP_ADVC_ORDER_DTL b,DRP_STORE_ACCT c
+			 
+		]]> 
+		<dynamic prepend="where">
+			<![CDATA[
+				u.ADVC_ORDER_ID=b.ADVC_ORDER_ID 
+				and b.PRD_ID=c.PRD_ID
+				and round(c.STORE_NUM - c.FREEZE_NUM)>=b.ORDER_NUM
+				and trunc(b.ORDER_RECV_DATE-to_date(to_char(sysdate,'yyyy-mm-dd'),'yyyy-mm-dd'))<=3 and trunc(b.ORDER_RECV_DATE-to_date(to_char(sysdate,'yyyy-mm-dd'),'yyyy-mm-dd'))>0
+   				and c.LEDGER_ID=#LEDGER_ID#
+   				and u.STATE='提交'
+   				and 
+			]]>
+		   <include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+		   <include refid="orderSql"/>
+		</dynamic>
+	</select>
+	<update id="upUSE_FLAG" parameterClass="map">
+	<![CDATA[ update DRP_SPCL_TECH ]]>
+	<dynamic prepend="set">
+		<isNotNull property="USE_FLAG" prepend=","><![CDATA[USE_FLAG = #USE_FLAG#]]></isNotNull>
+	</dynamic>
+	<![CDATA[ where SPCL_TECH_ID in ($SPCL_TECH_IDS$) ]]>	
+</update>
+</sqlMap>

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="MenuInfo">
+	
+	<typeAlias type="com.hoperun.sys.model.MenuInfo" alias="menuinfo" />
+
+	<resultMap id="menu-info" class="menuinfo">
+		<result column="MENU_ID" property="menuId" />
+		<result column="MENU_NAME" property="menuName" />
+		<result column="MENU_PAR_ID" property="menuParId" />
+		<result column="MENU_SORT" property="menuSort" jdbcType="INTEGER" />
+		<result column="MENU_URL" property="menuUrl" />
+		<result column="MENU_IMG" property="menuImg" /> 
+	</resultMap>
+	
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="menuId">
+			m.MENU_ID like '%'+#menuId#+'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="menuName">
+			m.MENU_NAME like '%'+#menuName#+'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="menuParId">
+			m.MENU_PAR_ID like '%'+#menuParId#+'%'
+		</isNotEmpty>
+	</sql>
+
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+	
+		<!--  [CDATA[ select m.* ,from ${SYSSCHEMA}.T_SYS_MENUINFO m ]]-->
+		<![CDATA[ select  m.* ,row_number() over(order by m.MENU_ID ) rownum_  from ${SYSSCHEMA}.T_SYS_MENUINFO m ]]>
+		
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</sql>
+
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(menu_id) cnt FROM ${SYSSCHEMA}.T_SYS_MENUINFO m  ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.T_SYS_MENUINFO(MENU_ID, MENU_NAME, MENU_PAR_ID, MENU_URL, MENU_IMG, MENU_SORT, MENU_DESC,MENU_QXCODE,BUSINESSTYPE)
+		 values(#menuId#, #menuName#, #menuParId:VARCHAR:NULL#, #menuUrl:VARCHAR:NULL#, #menuImg:VARCHAR:NULL#, 
+		 #menuSort#, #menuDesc:VARCHAR:NULL#, #menuQxCode:VARCHAR:NULL#,#BUSINESSTYPE#)
+		]]>
+	</insert>
+
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_MENUINFO ]]>
+		<!-- CHANAME, CHADES,CHADATE,CHASTU -->
+		<dynamic prepend="set">
+			<isNotNull property="menuName" prepend=","><![CDATA[MENU_NAME = #menuName#]]></isNotNull>
+			<isNotNull property="menuParId" prepend=","><![CDATA[MENU_PAR_ID = #menuParId#]]></isNotNull>
+			<isNotNull property="menuUrl" prepend=","><![CDATA[MENU_URL = #menuUrl#]]></isNotNull>
+			<isNotNull property="menuSort" prepend=","><![CDATA[MENU_SORT = #menuSort#]]></isNotNull>
+			<isNotNull property="menuImg" prepend=","><![CDATA[MENU_IMG = #menuImg#]]></isNotNull>
+			<isNotNull property="menuDesc" prepend=","><![CDATA[MENU_DESC = #menuDesc#]]></isNotNull>
+			<isNotNull property="menuQxCode" prepend=","><![CDATA[MENU_QXCODE = #menuQxCode#]]></isNotNull>
+			<isNotNull property="BUSINESSTYPE" prepend=","><![CDATA[BUSINESSTYPE = #BUSINESSTYPE#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where MENU_ID = #menuId# ]]>
+	</update>
+
+	<!-- 删除菜单 -->
+	<delete id="delete" parameterClass="map">
+		<![CDATA[ delete from ${SYSSCHEMA}.T_SYS_MENUINFO where MENU_ID = #menuId:VARCHAR# ]]>
+	</delete>
+
+<insert id="insertdata" parameterClass="map">
+    insert into ${SYSSCHEMA}.t_sys_datarecycle(DATARECYCLEID,DELETOR,DELTIME,BUSINESSTYPE,DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10,DF11)
+	    select #DATARECYCLEID#+convert(varchar,row_number() over(order by MENU_ID)),#DELETOR#,convert(varchar, getdate(), 20),'菜单信息维护',MENU_ID,MENU_NAME,MENU_PAR_ID,MENU_URL,MENU_IMG,
+  MENU_INDEX,MENU_DESC,MENU_LOG,MENU_SORT,MENU_QXCODE,BUSINESSTYPE
+        from ${SYSSCHEMA}.T_SYS_MENUINFO where MENU_ID = #menuId:VARCHAR#
+</insert>
+	<!-- 查询所有 -->
+	<select id="findAll" resultMap="menu-info">
+		<![CDATA[ select m.MENU_ID, m.MENU_NAME, m.MENU_PAR_ID, m.MENU_URL, m.MENU_IMG, m.MENU_SORT,m.MENU_QXCODE from ${SYSSCHEMA}.T_SYS_MENUINFO m order by m.MENU_ID ]]>
+	</select>
+	<!-- 加载菜单 -->
+	<select id="findByUserId" parameterClass="map" resultMap="menu-info">
+		<![CDATA[ 
+   WITH MenuCTE AS
+     (
+        SELECT  m.MENU_ID, m.MENU_NAME, m.MENU_PAR_ID, m.MENU_URL,m.MENU_IMG, m.MENU_SORT,m.MENU_QXCODE
+          FROM dbo.T_SYS_MENUINFO m
+            WHERE  MENU_QXCODE in 
+            (select XTMKID
+                  from dbo.T_SYS_YHQX b
+                              where b.XTYHID = #userId#
+                             union all
+                             select XTMKID
+                               from dbo.T_SYS_JSQX
+                              where XTJSID in (select a.XTJSID
+                                                 from T_SYS_XTJS a, T_SYS_XTYHJS b
+                                                where a.XTJSID = b.XTJSID
+                                                  and a.DELFLAG = 0
+                                                  and b.DELFLAG = 0
+                                                  and a.STATE = '启用'
+                                                  and b.XTYHID = #userId#)
+                             union all
+                             select XTMKID
+                               from dbo.T_SYS_GZZQX a
+                              where GZZXXID in
+                                    (select a.GZZXXID
+                                       from T_SYS_GZZXX a, T_SYS_GZZCY b
+                                      where a.GZZXXID = b.GZZXXID
+                                        and a.DELFLAG = 0
+                                        and b.DELFLAG = 0
+                                        and a.GZZZT = '启用'
+                             and b.XTYHID = #userId#))
+    UNION ALL
+       SELECT m.MENU_ID, m.MENU_NAME, m.MENU_PAR_ID, m.MENU_URL,m.MENU_IMG, m.MENU_SORT,m.MENU_QXCODE
+     FROM  MenuCTE  
+       JOIN dbo.T_SYS_MENUINFO m
+       ON MenuCTE.MENU_PAR_ID  = m.MENU_ID )
+     SELECT distinct  MENU_ID, MENU_NAME, MENU_PAR_ID, MENU_URL,MENU_IMG, MENU_SORT,MENU_QXCODE FROM MenuCTE
+	]]>
+	</select>
+
+	<!-- 加载菜单 -->
+	<select id="findByRoleId" parameterClass="string" resultMap="menu-info">
+		<![CDATA[ select m.MENU_ID, m.MENU_NAME, m.MENU_PAR_ID, m.MENU_URL, m.MENU_IMG, m.MENU_SORT,m.MENU_QXCODE
+			from ${SYSSCHEMA}.ROLE_MENU rm 
+			left join ${SYSSCHEMA}.T_SYS_MENUINFO m on rm.MENU_ID=m.MENU_ID 
+			where rm.ROLE_ID = #roleId:VARCHAR# ]]>
+	</select> 	
+
+	<select id="query" parameterClass="map" resultClass="java.util.HashMap"> 
+		select m.* from ${SYSSCHEMA}.T_SYS_MENUINFO m
+		where MENU_ID=#menuId#
+	</select>
+	
+</sqlMap>
+

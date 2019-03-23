@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zcx
+@function  渠道参数设置
+@version 2014-05-20 11:13:12
+-->
+<sqlMap  namespace="Advreit">
+<typeAlias type="com.hoperun.drp.oamg.advreit.model.AdvreitModel" alias="AdvreitModel"/>
+<!-- 使用Resvstore装载结果集 -->
+<resultMap id="AdvreitModel" class="AdvreitModel">
+    <result column="ERP_ADV_REIT_ID" property="ERP_ADV_REIT_ID" />
+</resultMap>
+<!-- 动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  u.DEL_FLAG = 0 
+  <isNotEmpty  property="ERP_ADV_REIT_NO">
+    and  u.ERP_ADV_REIT_NO like '%'||#ERP_ADV_REIT_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty  property="CHANNS_CHARG">
+    and  u.CHANN_ID in $CHANNS_CHARG$
+  </isNotEmpty>  
+  <isNotEmpty  property="STATE">
+    and  u.STATE = #STATE# 
+  </isNotEmpty>
+  <isNotEmpty  property="ERP_ADV_REQ_NO">
+    and  u.ERP_ADV_REQ_NO like '%'||#ERP_ADV_REQ_NO#||'%'
+  </isNotEmpty>
+  
+  <isNotEmpty  property="CHANN_NO">
+    and  u.CHANN_NO like '%'||#CHANN_NO#||'%'
+  </isNotEmpty>
+  
+  <isNotEmpty  property="CHANN_NAME">
+    and  u.CHANN_NAME like '%'||#CHANN_NAME#||'%'
+  </isNotEmpty>
+  
+  <isNotEmpty  property="AREA_NAME">
+    and  u.AREA_NAME like '%'||#AREA_NAME#||'%'
+  </isNotEmpty>
+  
+  <isNotEmpty  property="AREA_MANAGE_NAME">
+    and  u.AREA_MANAGE_NAME like '%'||#AREA_MANAGE_NAME#||'%'
+  </isNotEmpty>
+  
+  <isNotEmpty  property="RNVTN_REQ_NAME">
+    and  u.RNVTN_REQ_NAME = #RNVTN_REQ_NAME#
+  </isNotEmpty>
+  <isNotEmpty  property="QXJBCON">
+	and     $QXJBCON$
+  </isNotEmpty> 
+</sql>
+
+
+<sql id="queryDynSqlT">
+  u.DEL_FLAG = 0 
+  <isNotEmpty  property="ERP_ADV_REIT_NO">
+    and  u.ERP_ADV_REIT_NO like '%'||#ERP_ADV_REIT_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty  property="CHANNS_CHARG">
+    and  u.CHANN_ID in $CHANNS_CHARG$
+  </isNotEmpty>  
+  <isNotEmpty  property="STATE">
+    and  u.STATE = #STATE# 
+  </isNotEmpty>
+  <isNotEmpty  property="ERP_ADV_REQ_NO">
+    and  u.ERP_ADV_REQ_NO like '%'||#ERP_ADV_REQ_NO#||'%'
+  </isNotEmpty>
+  
+  <isNotEmpty  property="CHANN_NO">
+    and  u.CHANN_NO like '%'||#CHANN_NO#||'%'
+  </isNotEmpty>
+  
+  <isNotEmpty  property="CHANN_NAME">
+    and  u.CHANN_NAME like '%'||#CHANN_NAME#||'%'
+  </isNotEmpty>
+  
+  <isNotEmpty  property="AREA_NAME">
+    and  u.AREA_NAME like '%'||#AREA_NAME#||'%'
+  </isNotEmpty>
+  
+  <isNotEmpty  property="AREA_MANAGE_NAME">
+    and  u.AREA_MANAGE_NAME like '%'||#AREA_MANAGE_NAME#||'%'
+  </isNotEmpty>
+  
+  <isNotEmpty  property="RNVTN_REQ_NAME">
+    and  u.RNVTN_REQ_NAME = #RNVTN_REQ_NAME#
+  </isNotEmpty>
+  <isNotEmpty  property="QXJBCON">
+	and     $QXJBCON$
+  </isNotEmpty> 
+</sql>
+ 
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+
+<select id="getRowcount" parameterClass="string" resultClass="int">
+  select count(0) from drp_rnvtn_reit_dtl t where t.del_flag=0 and t.CHANN_RNVTN_ID = #CHANN_RNVTN_ID#
+</select>
+
+<!-- 查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+	  u.ERP_ADV_REIT_ID,
+	  u.ERP_ADV_REIT_NO,
+	  u.ERP_ADV_REQ_ID,
+	  u.ERP_ADV_REQ_NO,
+	  u.CHANN_ID,
+	  u.CHANN_NO,
+	  u.CHANN_NAME,
+	  u.AREA_ID,
+	  u.AREA_NO,
+	  u.AREA_NAME,
+	  u.AREA_MANAGE_ID,
+	  u.AREA_MANAGE_NAME,
+	  u.ADV_CONTENT,
+	  u.ADV_ADDR,
+	  u.REIT_AMOUNT,
+	  u.RNVTN_REQ_NAME,
+	  u.RNVTN_REQ_DATE,
+	  u.STATE  
+	  from ERP_ADV_REQ_REIT u 
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+<sql id="coreSqlT">
+  <![CDATA[ 
+	select 
+	  u.ERP_ADV_REIT_ID,
+	  u.ERP_ADV_REIT_NO,
+	  u.ERP_ADV_REQ_ID,
+	  u.ERP_ADV_REQ_NO,
+	  u.CHANN_ID,
+	  u.CHANN_NO,
+	  u.CHANN_NAME,
+	  u.AREA_ID,
+	  u.AREA_NO,
+	  u.AREA_NAME,
+	  u.AREA_MANAGE_ID,
+	  u.AREA_MANAGE_NAME,
+	  u.ADV_CONTENT,
+	  u.ADV_ADDR,
+	  u.REIT_AMOUNT,
+	  u.RNVTN_REQ_NAME,
+	  u.RNVTN_REQ_DATE,
+	  u.STATE  
+	  from ERP_ADV_REQ_REIT u 
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSqlT" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+</select>
+
+<select id="pageQueryT" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSqlT" />
+		<include refid="public.pageEnd" />
+</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt 
+            from ERP_ADV_REQ_REIT u 
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+
+<select id="pageCountT" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt 
+            from ERP_ADV_REQ_REIT u 
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSqlT"/>
+	</dynamic>
+</select>
+ <!-- 查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_ADV_REQ_REIT(
+		 ERP_ADV_REIT_ID,
+		 ERP_ADV_REIT_NO,
+		 ERP_ADV_REQ_ID,
+		 ERP_ADV_REQ_NO,
+		 CHANN_ID,
+		 CHANN_NO,
+		 CHANN_NAME,
+		 AREA_ID,
+		 AREA_NO,
+		 AREA_NAME,
+		 AREA_MANAGE_ID,
+		 AREA_MANAGE_NAME,
+		 CHANN_RANK,
+		 ADV_CO_NAME,
+		 ADV_CO_CONTACT,
+		 ADV_CO_TEL,
+		 ADV_CONTENT,
+		 ADV_ADDR,
+		 ADV_TOTAL_AMOUNT,
+		 HAS_REIM_AMOUNT,
+		 STATE,
+		 CREATOR,
+		 CRE_NAME,
+		 CRE_TIME,
+		 LEDGER_ID,
+		 LEDGER_NAME,
+		 DEL_FLAG,
+		 DEPT_ID,
+		 DEPT_NAME,
+		 ORG_ID,
+		 ORG_NAME,
+		 REIT_REASON,
+		 REIT_AMOUNT,
+		 RNVTN_REQ_NAME,
+		 RNVTN_REQ_DATE
+	   )values(
+		 #ERP_ADV_REIT_ID#,
+		 #ERP_ADV_REIT_NO#,
+		 #ERP_ADV_REQ_ID#,
+		 #ERP_ADV_REQ_NO#,
+		 #CHANN_ID#,
+		 #CHANN_NO#,
+		 #CHANN_NAME#,
+		 #AREA_ID#,
+		 #AREA_NO#,
+		 #AREA_NAME#,
+		 #AREA_MANAGE_ID#,
+		 #AREA_MANAGE_NAME#,
+		 #CHANN_RANK#,
+		 #ADV_CO_NAME#,
+		 #ADV_CO_CONTACT#,
+		 #ADV_CO_TEL#,
+		 #ADV_CONTENT#,
+		 #ADV_ADDR#,
+		 #ADV_TOTAL_AMOUNT#,
+		 #HAS_REIM_AMOUNT#,
+		 #STATE#,
+		 #CREATOR#,
+		 #CRE_NAME#,
+		 sysdate,
+		 #LEDGER_ID#,
+		 #LEDGER_NAME#,
+		 #DEL_FLAG#,
+		 #DEPT_ID#,
+		 #DEPT_NAME#,
+		 #ORG_ID#,
+		 #ORG_NAME#,
+		 #REIT_REASON#,
+		 #REIT_AMOUNT#,
+		 #RNVTN_REQ_NAME#,
+		 sysdate
+		)
+   ]]>
+</insert>
+<update id="update" parameterClass="map">
+	<![CDATA[ update ERP_ADV_REQ_REIT ]]>
+	<dynamic prepend="set">
+    <isNotNull property="ERP_ADV_REIT_NO" prepend=","><![CDATA[ERP_ADV_REIT_NO = #ERP_ADV_REIT_NO# ]]></isNotNull>
+    <isNotNull property="ERP_ADV_REQ_ID" prepend=","><![CDATA[ERP_ADV_REQ_ID = #ERP_ADV_REQ_ID# ]]></isNotNull>
+    <isNotNull property="ERP_ADV_REQ_NO" prepend=","><![CDATA[ERP_ADV_REQ_NO = #ERP_ADV_REQ_NO# ]]></isNotNull>
+    <isNotNull property="CHANN_ID" prepend=","><![CDATA[CHANN_ID = #CHANN_ID# ]]></isNotNull>
+    <isNotNull property="CHANN_NO" prepend=","><![CDATA[CHANN_NO = #CHANN_NO# ]]></isNotNull>
+    <isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME# ]]></isNotNull>
+    <isNotNull property="AREA_NO" prepend=","><![CDATA[AREA_NO = #AREA_NO# ]]></isNotNull>
+    <isNotNull property="AREA_NAME" prepend=","><![CDATA[AREA_NAME = #AREA_NAME# ]]></isNotNull>
+    <isNotNull property="AREA_ID" prepend=","><![CDATA[AREA_ID = #AREA_ID# ]]></isNotNull>
+    <isNotNull property="AREA_MANAGE_ID" prepend=","><![CDATA[AREA_MANAGE_ID = #AREA_MANAGE_ID# ]]></isNotNull>
+    <isNotNull property="AREA_MANAGE_NAME" prepend=","><![CDATA[AREA_MANAGE_NAME = #AREA_MANAGE_NAME# ]]></isNotNull>
+    <isNotNull property="CHANN_RANK" prepend=","><![CDATA[CHANN_RANK = #CHANN_RANK# ]]></isNotNull>
+    <isNotNull property="ADV_CO_NAME" prepend=","><![CDATA[ADV_CO_NAME = #ADV_CO_NAME# ]]></isNotNull>
+    <isNotNull property="ADV_CO_CONTACT" prepend=","><![CDATA[ADV_CO_CONTACT = #ADV_CO_CONTACT# ]]></isNotNull>
+    <isNotNull property="ADV_CO_TEL" prepend=","><![CDATA[ADV_CO_TEL = #ADV_CO_TEL# ]]></isNotNull>
+    <isNotNull property="ADV_CONTENT" prepend=","><![CDATA[ADV_CONTENT = #ADV_CONTENT# ]]></isNotNull>
+    <isNotNull property="ADV_ADDR" prepend=","><![CDATA[ADV_ADDR = #ADV_ADDR# ]]></isNotNull>
+    <isNotNull property="ADV_TOTAL_AMOUNT" prepend=","><![CDATA[ADV_TOTAL_AMOUNT = #ADV_TOTAL_AMOUNT# ]]></isNotNull>
+    <isNotNull property="HAS_REIM_AMOUNT" prepend=","><![CDATA[HAS_REIM_AMOUNT = #HAS_REIM_AMOUNT# ]]></isNotNull>
+    <isNotNull property="REIT_REASON" prepend=","><![CDATA[REIT_REASON = #REIT_REASON# ]]></isNotNull>
+    <isNotNull property="REIT_AMOUNT" prepend=","><![CDATA[REIT_AMOUNT = #REIT_AMOUNT# ]]></isNotNull>
+    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+    <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where ERP_ADV_REIT_ID = #ERP_ADV_REIT_ID#]]>
+</update>
+
+<select id="loadPath" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	   select e.ERP_ADV_REQ_ID, b.ATT_PATH REQPATH
+	   from ERP_ADV_REQ  e  left join BASE_ATT b  on e.erp_adv_req_id  = b.from_bill_id
+       where  e.del_flag=0 and b.del_flag=0 
+	   and    e.ERP_ADV_REQ_ID = #ERP_ADV_REQ_ID# 
+	]]>
+</select>
+
+<select id="queryReitAmount" parameterClass="String" resultClass="String">
+       select 
+         sum(e.REIT_AMOUNT) REIT_AMOUNT
+         from ERP_ADV_REQ_REIT  e 
+         where e.del_flag=0 and e.state='审核通过'
+               and e.ERP_ADV_REQ_ID = #ERP_ADV_REQ_ID#
+</select>
+
+<select id="loadByConfId" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	 select 
+	   e.ERP_ADV_REIT_ID,
+       e.ERP_ADV_REIT_NO,
+       e.ERP_ADV_REQ_ID,
+       e.ERP_ADV_REQ_NO,
+       e.CHANN_ID,
+       e.CHANN_NO,
+       e.CHANN_NAME,
+       e.AREA_ID,
+       e.AREA_NO,
+       e.AREA_NAME,
+       e.AREA_MANAGE_ID,
+       e.AREA_MANAGE_NAME,
+       e.CHANN_RANK,
+       e.ADV_CO_NAME,
+       e.ADV_CO_CONTACT,
+       e.ADV_CO_TEL,
+       e.ADV_CONTENT,
+       e.ADV_ADDR,
+       e.ADV_TOTAL_AMOUNT,
+       e.HAS_REIM_AMOUNT,
+       e.REIT_REASON,
+       e.REIT_AMOUNT,
+       e.RNVTN_REQ_NAME,
+       e.RNVTN_REQ_DATE,
+       t.ATT_ID,
+       t.ATT_PATH  REQREITPATH
+       from  ERP_ADV_REQ_REIT e left join BASE_ATT t on e.erp_adv_reit_id  = t.from_bill_id  
+       where e.del_flag=0 and t.del_flag=0 
+	   and  e.ERP_ADV_REIT_ID = #ERP_ADV_REIT_ID# 
+	]]>
+</select>
+
+<!-- 删除 -->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update ERP_ADV_REQ_REIT ]]>
+	<dynamic prepend="set">
+		<isNotNull property="DEL_FLAG"><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+	</dynamic>
+	<![CDATA[ where ERP_ADV_REIT_ID = #ERP_ADV_REIT_ID# ]]>
+</delete>
+</sqlMap>

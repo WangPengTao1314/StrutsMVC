@@ -1,0 +1,77 @@
+
+#bs_bannerright {
+    background-image: url("../images/top/bs_bannercenter.jpg");
+    background-repeat: repeat-x;
+    height: 84px;
+}
+
+
+.bs_banner_logo {
+    background-image: url("../images/top/logo.jpg");
+    background-repeat: no-repeat;
+    height: 84px;
+    position: absolute;
+    width: 599px;
+}
+
+
+.bs_right {
+    position: absolute;
+    right: 26px;
+    top: 5px;
+}
+
+
+.info {
+    float: left;
+    height: 16px;
+    line-height: 16px;
+}
+
+
+
+.m_password a {
+    background: url("../images/top/lock.png") no-repeat scroll 0 0 transparent;
+    display: block;
+    float: left;
+    height: 16px;
+    line-height: 16px;
+    margin: 0 8px;
+    padding-left: 18px;
+}
+
+
+
+
+.out a {
+    background: url("../images/top/outdoor.png") no-repeat scroll 0 0 transparent;
+    display: block;
+    float: left;
+    height: 16px;
+    line-height: 16px;
+    margin: 0 8px;
+    padding-left: 18px;
+}
+
+.navbar {
+	background:url(../images/top/bg-bm.gif) repeat;
+	height:26px;
+	line-height:26px;
+	/*position:relative;*/
+	font-size: 14px;
+	color: black;
+}
+
+label.fontcss {
+	font-size: 13px;
+	color: black;
+	font-weight:bold;
+}
+
+.menubackground{
+	background:url(../images/top/mid.gif) repeat-x;
+	float:left;
+	height:26px;
+	line-height:26px;
+	vertical-align:middle;
+}

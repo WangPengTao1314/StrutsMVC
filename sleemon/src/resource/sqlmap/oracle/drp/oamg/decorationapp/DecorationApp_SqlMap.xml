@@ -1,0 +1,1203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zcx
+@function  渠道参数设置
+@version 2014-05-20 11:13:12
+-->
+<sqlMap  namespace="Decorationapp">
+<typeAlias type="com.hoperun.drp.oamg.decorationapp.model.DecorationappModel" alias="DecorationappModel"/>
+<!-- 使用Resvstore装载结果集 -->
+<resultMap id="DecorationappModel" class="DecorationappModel">
+    <result column="CHANN_RNVTN_ID" property="CHANN_RNVTN_ID" />
+</resultMap>
+<!-- 动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  u.DEL_FLAG = 0 AND d.DELFLAG=0
+  <isNotEmpty  property="OPEN_TERMINAL_REQ_NO">
+    and  u.OPEN_TERMINAL_REQ_NO like '%'||#OPEN_TERMINAL_REQ_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty  property="CHANN_RNVTN_NO">
+    and  u.CHANN_RNVTN_NO like '%'||#CHANN_RNVTN_NO#||'%'
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="" property="CHANN_ChargQuery">
+		  <![CDATA[ $CHANN_ChargQuery$ ]]> 
+  </isNotEmpty> 
+  <!--  
+  <isNotEmpty  property="CHANNS_CHARG">
+    and  u.CHANN_ID in $CHANNS_CHARG$  
+  </isNotEmpty>  
+  -->
+  <isNotEmpty  property="STATE">
+    and  u.STATE = #STATE# 
+  </isNotEmpty>
+  <isNotEmpty  property="CHANN_NAME">
+    and  u.CHANN_NAME like '%'||#CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty  property="TERM_NO">
+    and  u.TERM_NO like '%'||#TERM_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty  property="TERM_NAME">
+    and  u.TERM_NAME like '%'||#TERM_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty  property="AREA_NAME">
+    and  u.AREA_NAME like '%'||#AREA_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty  property="AREA_MANAGE_NAME">
+    and  u.AREA_MANAGE_NAME like '%'||#AREA_MANAGE_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty  property="BUSS_SCOPE">
+    and  u.BUSS_SCOPE like '%'||#BUSS_SCOPE#||'%'
+  </isNotEmpty>
+  <isNotEmpty  property="RNVTN_PROP">
+    and  u.RNVTN_PROP = #RNVTN_PROP#
+  </isNotEmpty>
+  <isNotEmpty  property="LEDGER_ID">
+    and  u.LEDGER_ID = #LEDGER_ID#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="searchSTATE">
+    and  u.STATE in ($searchSTATE$)
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="STATES">
+    and  u.STATE in ($STATES$)
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="RNVTN_REQ_NAME">
+    and  u.RNVTN_REQ_NAME like '%'||#RNVTN_REQ_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty  property="QXJBCON">
+	and     $QXJBCON$
+  </isNotEmpty> 
+</sql>
+
+<sql id="queryDynSql1">
+  u.DEL_FLAG = 0  
+  <isNotEmpty  property="OPEN_TERMINAL_REQ_NO">
+    and  u.OPEN_TERMINAL_REQ_NO like '%'||#OPEN_TERMINAL_REQ_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty  property="CHANN_RNVTN_NO">
+    and  u.CHANN_RNVTN_NO like '%'||#CHANN_RNVTN_NO#||'%'
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="" property="CHANN_ChargQuery">
+		  <![CDATA[ $CHANN_ChargQuery$ ]]> 
+  </isNotEmpty> 
+  <!--  
+  <isNotEmpty  property="CHANNS_CHARG">
+    and  u.CHANN_ID in $CHANNS_CHARG$  
+  </isNotEmpty>  
+  -->
+  <isNotEmpty  property="STATE">
+    and  u.STATE = #STATE# 
+  </isNotEmpty>
+  <isNotEmpty  property="CHANN_NAME">
+    and  u.CHANN_NAME like '%'||#CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty  property="TERM_NO">
+    and  u.TERM_NO like '%'||#TERM_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty  property="TERM_NAME">
+    and  u.TERM_NAME like '%'||#TERM_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty  property="AREA_NAME">
+    and  u.AREA_NAME like '%'||#AREA_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty  property="AREA_MANAGE_NAME">
+    and  u.AREA_MANAGE_NAME like '%'||#AREA_MANAGE_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty  property="BUSS_SCOPE">
+    and  u.BUSS_SCOPE like '%'||#BUSS_SCOPE#||'%'
+  </isNotEmpty>
+  <isNotEmpty  property="RNVTN_PROP">
+    and  u.RNVTN_PROP = #RNVTN_PROP#
+  </isNotEmpty>
+  <isNotEmpty  property="LEDGER_ID">
+    and  u.LEDGER_ID = #LEDGER_ID#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="searchSTATE">
+    and  u.STATE in ($searchSTATE$)
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="STATES">
+    and  u.STATE in ($STATES$)
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="RNVTN_REQ_NAME">
+    and  u.RNVTN_REQ_NAME like '%'||#RNVTN_REQ_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty  property="QXJBCON">
+	and     $QXJBCON$
+  </isNotEmpty> 
+</sql>
+
+<sql id="queryDynSqlDecor">
+   t.DEL_FLAG = 0
+   <isNotEmpty  property="CHANN_RNVTN_ID">
+    and  t.CHANN_RNVTN_ID = #CHANN_RNVTN_ID#
+  </isNotEmpty>
+  <isNotEmpty  property="QXJBCON">
+	and     $QXJBCON$
+  </isNotEmpty> 
+</sql>
+
+<sql id="queryDynSqlDecorT">
+   1=1
+  <isNotEmpty  property="QXJBCON">
+	and     $QXJBCON$s
+  </isNotEmpty> 
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+
+<select id="queryDecor" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[  
+          select t.rnvtn_reit_dtl_id,t.rnvtn_reit_no,t.rnvtn_scale,t.reit_remark  from drp_rnvtn_reit_dtl t ]]>
+	 <dynamic prepend="where">
+	   <include refid="queryDynSqlDecor" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</select>
+
+<select id="queryReit" parameterClass="map" resultClass="DecorationappModel">
+	<![CDATA[  
+          select t.RNVTN_REIT_DTL_ID,t.rnvtn_reit_no,t.rnvtn_scale,t.reit_remark  from drp_rnvtn_reit_dtl t 
+          where t.del_flag=0 and t.CHANN_RNVTN_ID = #CHANN_RNVTN_ID#
+    ]]>
+</select>
+
+
+<select id="queryDecorT" parameterClass="map" resultClass="DecorationappModel">
+	<![CDATA[  
+        select d1.DATA_DTL_ID, d1.DATA_DTL_DES_1,d1.REMARK from PROJECT_DATA_DICTIONARY_DTL d1  left join PROJECT_DATA_DICTIONARY p1 on d1.data_id = p1.data_id  where p1.data_name='报销频次常规政策明细'
+    ]]>
+</select>
+
+<select id="queryBussScope" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[  
+	      select b.DATA_DTL_NAME BUSS_SCOPE,
+	          b.DATA_DTL_CODE  
+			  from project_data_dictionary a
+			  left join project_data_dictionary_dtl b
+			  on a.data_id = b.data_id
+			  and b.delflag = 0
+			  and a.delflag = 0
+			  where a.data_name = '经营品牌'
+     ]]>
+</select>
+
+<select id="queryRnvtnProp" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[  
+	      select b.DATA_DTL_NAME RNVTN_PROP,
+	          b.DATA_DTL_CODE  
+			  from project_data_dictionary a
+			  left join project_data_dictionary_dtl b
+			  on a.data_id = b.data_id
+			  and b.delflag = 0
+			  and a.delflag = 0
+			  where a.data_name = '装修性质'
+     ]]>
+</select>
+
+<select id="queryLocalType" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[  
+	      select b.DATA_DTL_NAME LOCAL_TYPE,
+	          b.DATA_DTL_CODE  
+			  from project_data_dictionary a
+			  left join project_data_dictionary_dtl b
+			  on a.data_id = b.data_id
+			  and b.delflag = 0
+			  and a.delflag = 0
+			  where a.data_name = '商场位置类别'
+     ]]>
+</select>
+
+<!-- 分页计数 -->
+<select id="pageCountT" parameterClass="map" resultClass="int">
+	<![CDATA[
+       select count(0) from drp_rnvtn_reit_dtl t 
+    ]]>
+</select>
+
+<select id="getRowcount" parameterClass="string" resultClass="int">
+  select count(0) from drp_rnvtn_reit_dtl t where t.del_flag=0 and t.CHANN_RNVTN_ID = #CHANN_RNVTN_ID#
+</select>
+
+<select id="queryZW" parameterClass="string" resultClass="int">
+   select count(0)
+          from T_SYS_RYXX t
+         where t.DELFLAG = 0
+         and t.RYZT = '启用'
+         and t.ZW like '%门店设计师%'
+         and t.RYXXID = #RYXXID#
+</select>
+
+<select id="queryZWT" parameterClass="map" resultClass="int">
+  SELECT  count(0)
+          FROM T_SYS_GZZCY U
+          LEFT JOIN T_SYS_XTYH T
+          ON U.XTYHID = T.XTYHID
+          left join T_SYS_RYXX a
+          on a.RYXXID = t.RYXXID
+          and a.DELFLAG = 0
+          where u.DELFLAG = 0
+          and u.GZZXXID = #GZZXXID#
+          and a.RYXXID = #RYXXID#
+</select>
+
+<select id="queryStoreManage" parameterClass="string" resultClass="int">
+     SELECT COUNT(*)
+            FROM T_SYS_GZZCY U
+            LEFT JOIN T_SYS_XTYH T
+              ON U.XTYHID = T.XTYHID
+            left join T_SYS_RYXX a
+              on a.RYXXID = t.RYXXID
+            LEFT JOIN T_SYS_GZZXX x
+              on x.Gzzxxid = u.gzzxxid
+             and a.DELFLAG = 0
+           where u.DELFLAG = 0
+             and x.Gzzmc like '%门店建设经理%'
+             and a.RYXXID = #RYXXID#
+</select>
+
+<!-- 查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	  select u.CHANN_RNVTN_ID,
+         u.CHANN_RNVTN_NO,
+         u.CHANN_ID,
+         u.CHANN_NO,
+         u.CHANN_NAME,
+         u.TERM_ID,
+         u.TERM_NO,
+         u.TERM_NAME,
+         u.RNVTN_REQ_ID,
+         u.RNVTN_REQ_NAME,
+         u.CHANN_PERSON_CON,
+         u.CHANN_TEL,
+         u.AREA_ID,
+         u.AREA_NO,
+         u.AREA_NAME,
+         u.AREA_MANAGE_ID,
+         u.AREA_MANAGE_NAME,
+         u.AREA_MANAGE_TEL,
+         u.SALE_STORE_ID,
+         u.SALE_STORE_NAME,
+         u.ZONE_ID,
+         u.ZONE_ADDR,
+         (SELECT p.DATA_DTL_NAME FROM PROJECT_DATA_DICTIONARY_DTL p WHERE p.DATA_DTL_CODE = u.BUSS_SCOPE and p.DELFLAG = 0 ) BUSS_SCOPE,
+         u.ADDRESS,
+         u.PLAN_SBUSS_DATE,
+         u.DMD_DRAW_DATE,
+         u.USE_AREA,
+         u.TERM_WHICH_NUM,
+         u.RNVTN_AREA,
+         u.MARKET_RENT,
+         u.EXP_YEAR_SALE,
+         u.SALE_STORE_ANALYSE,
+         u.REIT_POLICY,
+         u.REIT_AMOUNT_PS,
+         u.REIT_AMOUNT,
+         u.STATE,
+         u.REMARK,
+         u.ORG_ID,
+         u.ORG_NAME,
+         u.LEDGER_ID,
+         u.LEDGER_NAME,
+         u.DEL_FLAG,
+         d.DATA_DTL_NAME RNVTN_PROP,
+         u.IS_STAD_FLAG,
+         u.OPEN_TERMINAL_REQ_NO,
+         u.CRE_NAME,
+         to_char(u.CRE_TIME,'yyyy-MM-DD')CRE_DATE
+         from DRP_CHANN_RNVTN u
+         left join PROJECT_DATA_DICTIONARY_DTL d
+         on u.RNVTN_PROP = d.data_dtl_code
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt 
+            from DRP_CHANN_RNVTN u left join PROJECT_DATA_DICTIONARY_DTL d on u.RNVTN_PROP = d.data_dtl_code
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+ <!-- 查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_CHANN_RNVTN(
+		 CHANN_RNVTN_ID,
+		 CHANN_RNVTN_NO,
+		 RNVTN_REQ_DATE,
+		 CHANN_ID,
+		 CHANN_NO,
+		 CHANN_NAME,
+		 CHANN_PERSON_CON,
+		 CHANN_TEL,
+		 RNVTN_REQ_NAME,
+		 STATE,
+		 AREA_ID,
+		 AREA_NO,
+		 AREA_NAME,
+		 SALE_STORE_NAME,
+		 ZONE_ID,
+		 ADDRESS,
+		 BUSS_SCOPE,
+		 LOCAL_TYPE,
+		 PLAN_SBUSS_DATE,
+		 USE_AREA,
+		 RNVTN_AREA,
+		 MARKET_RENT,
+		 EXP_YEAR_SALE,
+		 SALE_STORE_ANALYSE,
+		 REIT_POLICY,
+		 REIT_AMOUNT_PS,
+		 REIT_AMOUNT,
+		 TERM_ID,
+		 TERM_NO,
+		 TERM_NAME,
+		 LEDGER_ID,
+		 DEL_FLAG,
+		 CREATOR,
+		 CRE_NAME,
+		 CRE_TIME,
+		 DEPT_ID,
+		 DEPT_NAME,
+		 ORG_ID,
+		 ORG_NAME,
+		 RNVTN_PROP,
+		 COMPACT_AMOUNT,
+		 IS_STAD_FLAG,
+		 AREA_MANAGE_NAME,
+		 AREA_MANAGE_TEL,
+		 ZONE_ADDR,
+		 LEDGER_NAME,
+		 BEAR_WAY,
+		 SPEC_CONTENT,
+		 OPEN_TERMINAL_REQ_ID,
+		 OPEN_TERMINAL_REQ_NO,
+		 DESIGN_PERSON,
+		 NATION,
+		 PROV,
+		 CITY,
+		 COUNTY,
+		 BUDGET_ITEM_ID,
+		 BUDGET_ITEM_NO,
+		 BUDGET_ITEM_NAME,
+		 BUDGET_ITEM_TYPE,
+         BUDGET_QUOTA_ID,
+         REMARK,
+         DESIGN_ID
+	   )values(
+		#CHANN_RNVTN_ID#,
+		#CHANN_RNVTN_NO#,
+		to_date(#RNVTN_REQ_DATE#,'yyyy-MM-DD'),
+		#CHANN_ID#,
+		#CHANN_NO#,
+		#CHANN_NAME#,
+		#CHANN_PERSON_CON#,
+		#CHANN_TEL#,
+		#RNVTN_REQ_NAME#,
+		#STATE#,
+		#AREA_ID#,
+		#AREA_NO#,
+		#AREA_NAME#,
+		#SALE_STORE_NAME#,
+		#ZONE_ID#,
+		#ADDRESS#,
+		#BUSS_SCOPE#,
+		#LOCAL_TYPE#,
+		to_date(#PLAN_SBUSS_DATE#,'yyyy-MM-DD'),
+		#USE_AREA#,
+		#RNVTN_AREA#,
+		#MARKET_RENT#,
+		#EXP_YEAR_SALE#,
+		#SALE_STORE_ANALYSE#,
+		#REIT_POLICY#,
+		#REIT_AMOUNT_PS#,
+		#REIT_AMOUNT#,
+		#TERM_ID#,
+		#TERM_NO#,
+		#TERM_NAME#,
+		#LEDGER_ID#,
+		#DEL_FLAG#,
+		#CREATOR#,
+		#CRE_NAME#,
+		to_date(#CRE_TIME#,'yyyy-MM-DD HH24:MI:SS'),
+		#DEPT_ID#,
+		#DEPT_NAME#,
+		#ORG_ID#,
+		#ORG_NAME#,
+		#RNVTN_PROP#,
+		#COMPACT_AMOUNT#,
+		#IS_STAD_FLAG#,
+		#AREA_MANAGE_NAME#,
+		#AREA_MANAGE_TEL#,
+		#ZONE_ADDR#,
+		#LEDGER_NAME#,
+		#BEAR_WAY#,
+		#SPEC_CONTENT#,
+		#OPEN_TERMINAL_REQ_ID#,
+		#OPEN_TERMINAL_REQ_NO#,
+		#DESIGN_PERSON#,
+		#NATION#,
+		#PROV#,
+		#CITY#,
+		#COUNTY#,
+		#BUDGET_ITEM_ID#,
+		#BUDGET_ITEM_NO#,
+		#BUDGET_ITEM_NAME#,
+		#BUDGET_ITEM_TYPE#,
+	    #BUDGET_QUOTA_ID#,
+	    #REMARK#,
+	    #DESIGN_ID#
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update DRP_CHANN_RNVTN ]]>
+	<dynamic prepend="set">
+    <isNotNull property="CHANN_ID" prepend=","><![CDATA[CHANN_ID = #CHANN_ID# ]]></isNotNull>
+    <isNotNull property="RNVTN_REQ_NAME" prepend=","><![CDATA[RNVTN_REQ_NAME = #RNVTN_REQ_NAME# ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    <isNotNull property="AREA_NO" prepend=","><![CDATA[AREA_NO = #AREA_NO# ]]></isNotNull>
+    <isNotNull property="AREA_NAME" prepend=","><![CDATA[AREA_NAME = #AREA_NAME# ]]></isNotNull>
+    <isNotNull property="SALE_STORE_NAME" prepend=","><![CDATA[SALE_STORE_NAME = #SALE_STORE_NAME# ]]></isNotNull>
+    <isNotNull property="ZONE_ID" prepend=","><![CDATA[ZONE_ID = #ZONE_ID# ]]></isNotNull>
+    <isNotNull property="ADDRESS" prepend=","><![CDATA[ADDRESS = #ADDRESS# ]]></isNotNull>
+    <isNotNull property="BUSS_SCOPE" prepend=","><![CDATA[BUSS_SCOPE = #BUSS_SCOPE# ]]></isNotNull>
+    <isNotNull property="LOCAL_TYPE" prepend=","><![CDATA[LOCAL_TYPE = #LOCAL_TYPE# ]]></isNotNull>
+    <isNotNull property="USE_AREA" prepend=","><![CDATA[USE_AREA = #USE_AREA# ]]></isNotNull>
+    <isNotNull property="TERM_WHICH_NUM" prepend=","><![CDATA[TERM_WHICH_NUM = #TERM_WHICH_NUM# ]]></isNotNull>
+    <isNotNull property="RNVTN_AREA" prepend=","><![CDATA[RNVTN_AREA = #RNVTN_AREA# ]]></isNotNull>
+    <isNotNull property="MARKET_RENT" prepend=","><![CDATA[MARKET_RENT = #MARKET_RENT# ]]></isNotNull>
+    <isNotNull property="EXP_YEAR_SALE" prepend=","><![CDATA[EXP_YEAR_SALE = #EXP_YEAR_SALE# ]]></isNotNull>
+    <isNotNull property="SALE_STORE_ANALYSE" prepend=","><![CDATA[SALE_STORE_ANALYSE = #SALE_STORE_ANALYSE# ]]></isNotNull>
+    <isNotNull property="REIT_POLICY" prepend=","><![CDATA[REIT_POLICY = #REIT_POLICY# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    <isNotNull property="LEDGER_ID" prepend=","><![CDATA[LEDGER_ID = #LEDGER_ID# ]]></isNotNull>
+    <isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG# ]]></isNotNull>
+    
+    <isNotNull property="RNVTN_PROP" prepend=","><![CDATA[RNVTN_PROP = #RNVTN_PROP# ]]></isNotNull>
+    <isNotNull property="PLAN_SBUSS_DATE" prepend=","><![CDATA[PLAN_SBUSS_DATE =to_date(#PLAN_SBUSS_DATE#,'yyyy-MM-DD HH24:MI:SS') ]]></isNotNull>
+    <isNotNull property="DMD_DRAW_DATE" prepend=","><![CDATA[DMD_DRAW_DATE =to_date(#DMD_DRAW_DATE#,'yyyy-MM-DD HH24:MI:SS') ]]></isNotNull>
+    <isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME# ]]></isNotNull>
+    <isNotNull property="CHANN_PERSON_CON" prepend=","><![CDATA[CHANN_PERSON_CON = #CHANN_PERSON_CON# ]]></isNotNull>
+    <isNotNull property="CHANN_TEL" prepend=","><![CDATA[CHANN_TEL = #CHANN_TEL# ]]></isNotNull>
+    <isNotNull property="AREA_ID" prepend=","><![CDATA[AREA_ID = #AREA_ID# ]]></isNotNull>
+    
+    <isNotNull property="RNVTN_REQ_DATE" prepend=","><![CDATA[RNVTN_REQ_DATE = to_date(#RNVTN_REQ_DATE#,'yyyy-MM-DD HH24:MI:SS') ]]></isNotNull>
+    <isNotNull property="COMPACT_AMOUNT" prepend=","><![CDATA[COMPACT_AMOUNT = #COMPACT_AMOUNT# ]]></isNotNull>
+    <isNotNull property="REIT_AMOUNT_PS" prepend=","><![CDATA[REIT_AMOUNT_PS = #REIT_AMOUNT_PS# ]]></isNotNull>
+    <isNotNull property="AMOUNT_DESC" prepend=","><![CDATA[AMOUNT_DESC = #AMOUNT_DESC# ]]></isNotNull>
+    
+    <isNotNull property="REIT_AMOUNT" prepend=","><![CDATA[REIT_AMOUNT = #REIT_AMOUNT# ]]></isNotNull>
+    <isNotNull property="AREA_MANAGE_NAME" prepend=","><![CDATA[AREA_MANAGE_NAME = #AREA_MANAGE_NAME# ]]></isNotNull>
+    <isNotNull property="AREA_MANAGE_TEL" prepend=","><![CDATA[AREA_MANAGE_TEL = #AREA_MANAGE_TEL# ]]></isNotNull>
+    <isNotNull property="ZONE_ADDR" prepend=","><![CDATA[ZONE_ADDR = #ZONE_ADDR# ]]></isNotNull>
+    <isNotNull property="IS_STAD_FLAG" prepend=","><![CDATA[IS_STAD_FLAG = #IS_STAD_FLAG# ]]></isNotNull>
+    <isNotNull property="BEAR_WAY" prepend=","><![CDATA[BEAR_WAY = #BEAR_WAY# ]]></isNotNull>
+    <isNotNull property="SPEC_CONTENT" prepend=","><![CDATA[SPEC_CONTENT = #SPEC_CONTENT# ]]></isNotNull>
+    <isNotNull property="BUDGET_ITEM_ID" prepend=","><![CDATA[BUDGET_ITEM_ID = #BUDGET_ITEM_ID# ]]></isNotNull>
+    <isNotNull property="BUDGET_ITEM_NO" prepend=","><![CDATA[BUDGET_ITEM_NO = #BUDGET_ITEM_NO# ]]></isNotNull>
+    <isNotNull property="BUDGET_ITEM_NAME" prepend=","><![CDATA[BUDGET_ITEM_NAME = #BUDGET_ITEM_NAME# ]]></isNotNull>
+    <isNotNull property="BUDGET_ITEM_TYPE" prepend=","><![CDATA[BUDGET_ITEM_TYPE = #BUDGET_ITEM_TYPE# ]]></isNotNull>
+    <isNotNull property="BUDGET_QUOTA_ID" prepend=","><![CDATA[BUDGET_QUOTA_ID = #BUDGET_QUOTA_ID# ]]></isNotNull>
+
+    <isNotNull property="OPEN_TERMINAL_REQ_ID" prepend=","><![CDATA[OPEN_TERMINAL_REQ_ID = #OPEN_TERMINAL_REQ_ID# ]]></isNotNull>
+    <isNotNull property="OPEN_TERMINAL_REQ_NO" prepend=","><![CDATA[OPEN_TERMINAL_REQ_NO = #OPEN_TERMINAL_REQ_NO# ]]></isNotNull>
+    <isNotNull property="DESIGN_PERSON" prepend=","><![CDATA[DESIGN_PERSON = #DESIGN_PERSON# ]]></isNotNull>
+    <isNotNull property="DESIGN_ID"     prepend=","><![CDATA[DESIGN_ID     = #DESIGN_ID# ]]></isNotNull>
+    <isNotNull property="NATION" prepend=","><![CDATA[NATION = #NATION# ]]></isNotNull>
+    <isNotNull property="PROV"   prepend=","><![CDATA[PROV = #PROV# ]]></isNotNull>
+    <isNotNull property="CITY"   prepend=","><![CDATA[CITYD  = #CITY# ]]></isNotNull>
+    <isNotNull property="COUNTY" prepend=","><![CDATA[COUNTY = #COUNTY# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where CHANN_RNVTN_ID = #CHANN_RNVTN_ID#]]>
+</update>
+ 
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.CHANN_RNVTN_ID,
+		u.CHANN_NAME,
+		u.REIT_POLICY
+            from DRP_CHANN_RNVTN u 
+	  where 
+		u.CHANN_RNVTN_ID = #CHANN_RNVTN_ID#
+	]]>
+</select>
+
+<select id="loadByIdT" parameterClass="map" resultClass="String">
+	<![CDATA[ 
+	  select 
+		u.REIT_POLICY
+            from DRP_CHANN_RNVTN u 
+	  where 
+		u.CHANN_RNVTN_ID = #CHANN_RNVTN_ID#
+	]]>
+</select>
+
+<select id="queryNum" parameterClass="map" resultClass="String">
+	<![CDATA[ 
+	    select p.DATA_DTL_NAME 
+	    from  PROJECT_DATA_DICTIONARY_DTL  p
+	    where p.DATA_DTL_CODE=#DATA_DTL_CODE#
+	    and p.DELFLAG=0
+	]]>
+</select>
+
+<select id="loadByDictionary" parameterClass="map" resultClass="DecorationappModel">
+    select t.DATA_DTL_ID,DATA_DTL_NAME
+    from project_data_dictionary_dtl t 
+    left join PROJECT_DATA_DICTIONARY d on t.data_id  = d.data_id where d.delflag=0 and t.delflag=0  and d.data_name = #DATA_NAME#
+</select>
+
+<select id="loadTypeByConfId" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+	     b.ATT_ID,
+         b.ATT_PATH,
+		 u.CHANN_RNVTN_ID,
+		 u.CHANN_RNVTN_NO,
+		 u.RNVTN_REQ_DATE,
+		 u.RNVTN_PROP,
+		 u.COMPACT_AMOUNT,
+		 u.RNVTN_REQ_NAME,
+		 u.CHANN_ID,
+		 u.CHANN_NO,
+		 u.CHANN_NAME,
+		 u.TERM_ID,
+		 u.TERM_NO,
+		 u.TERM_NAME,
+		 u.RNVTN_REQ_ID,
+		 u.RNVTN_REQ_NAME,
+		 u.CHANN_PERSON_CON,
+		 u.CHANN_TEL,
+		 u.AREA_ID,
+		 u.AREA_NO,
+		 u.AREA_NAME,
+		 u.AREA_MANAGE_ID,
+		 u.AREA_MANAGE_NAME,
+		 u.AREA_MANAGE_TEL,
+		 u.SALE_STORE_ID,
+		 u.SALE_STORE_NAME,
+		 u.ZONE_ID,
+		 u.ZONE_ADDR,
+		 u.ADDRESS,
+		 u.PLAN_SBUSS_DATE,
+		 u.DMD_DRAW_DATE,
+		 u.USE_AREA,
+		 u.TERM_WHICH_NUM,
+		 u.RNVTN_AREA,
+		 u.MARKET_RENT,
+		 u.EXP_YEAR_SALE,
+		 u.SALE_STORE_ANALYSE,
+		 u.REIT_POLICY,
+		 u.REIT_AMOUNT_PS,
+		 u.REIT_AMOUNT,
+		 u.STATE,
+		 u.REMARK,
+		 u.ORG_ID,
+		 u.ORG_NAME,
+		 u.LEDGER_ID,
+		 u.LEDGER_NAME,
+		 u.DEL_FLAG,
+		 u.LOCAL_TYPE,
+		 u.SALE_STORE_NAME,
+		 u.IS_STAD_FLAG
+         from DRP_CHANN_RNVTN u left join BASE_ATT b on u.chann_rnvtn_id = b.from_bill_id
+	     where 
+		 u.CHANN_RNVTN_ID = #CHANN_RNVTN_ID# 
+	]]>
+</select>
+
+<select id="loadByConfId" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+	     b.ATT_ID,
+         b.ATT_PATH,
+		 u.CHANN_RNVTN_ID,
+		 u.CHANN_RNVTN_NO,
+		 u.RNVTN_REQ_DATE,
+		 u.RNVTN_PROP,
+		 u.COMPACT_AMOUNT,
+		 u.RNVTN_REQ_NAME,
+		 u.CHANN_ID,
+		 u.CHANN_NO,
+		 u.CHANN_NAME,
+		 u.TERM_ID,
+		 u.TERM_NO,
+		 u.TERM_NAME,
+		 u.RNVTN_REQ_ID,
+		 u.RNVTN_REQ_NAME,
+		 u.CHANN_PERSON_CON,
+		 u.CHANN_TEL,
+		 u.AREA_ID,
+		 u.AREA_NO,
+		 u.AREA_NAME,
+		 u.AREA_MANAGE_ID,
+		 u.AREA_MANAGE_NAME,
+		 u.AREA_MANAGE_TEL,
+		 u.SALE_STORE_ID,
+		 u.SALE_STORE_NAME,
+		 u.ZONE_ID,
+		 u.ZONE_ADDR,
+		 u.BUSS_SCOPE,
+		 u.ADDRESS,
+		 u.PLAN_SBUSS_DATE,
+		 u.DMD_DRAW_DATE,
+		 u.USE_AREA,
+		 u.TERM_WHICH_NUM,
+		 u.RNVTN_AREA,
+		 u.MARKET_RENT,
+		 u.EXP_YEAR_SALE,
+		 u.SALE_STORE_ANALYSE,
+		 u.REIT_POLICY,
+		 u.REIT_AMOUNT_PS,
+		 u.REIT_AMOUNT,
+		 u.STATE,
+		 u.REMARK,
+		 u.ORG_ID,
+		 u.ORG_NAME,
+		 u.LEDGER_ID,
+		 u.LEDGER_NAME,
+		 u.DEL_FLAG,
+		 u.LOCAL_TYPE,
+		 u.SALE_STORE_NAME,
+		 u.IS_STAD_FLAG,
+		 u.BEAR_WAY,
+		 u.SPEC_CONTENT,
+		 u.OPEN_TERMINAL_REQ_ID,
+		 u.OPEN_TERMINAL_REQ_NO,
+		 u.DESIGN_PERSON,
+		 u.DESIGN_ID,
+		 u.NATION,
+		 u.PROV,
+		 u.CITY,
+		 u.COUNTY,
+		 u.BUDGET_ITEM_NAME,
+		 u.BUDGET_ITEM_ID,
+		 u.BUDGET_ITEM_NO,
+		 u.BUDGET_ITEM_TYPE,
+		 u.BUDGET_QUOTA_ID
+         from DRP_CHANN_RNVTN u left join BASE_ATT b on u.chann_rnvtn_id = b.from_bill_id  
+	     where  
+		 u.CHANN_RNVTN_ID = #CHANN_RNVTN_ID# 
+	]]>
+</select>
+
+
+<select id="loadByConfIdF" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+        select 
+	     b.ATT_ID,
+	     b.ATT_PATH,
+	     u.CHANN_RNVTN_ID,
+	     u.CHANN_RNVTN_NO,
+	     u.RNVTN_REQ_DATE,
+	     (SELECT d.DATA_DTL_NAME FROM  PROJECT_DATA_DICTIONARY_DTL d WHERE u.RNVTN_PROP = d.DATA_DTL_CODE AND d.DELFLAG=0) RNVTN_PROP,
+	     u.COMPACT_AMOUNT,
+	     u.RNVTN_REQ_NAME,
+	     u.CHANN_ID,
+	     u.CHANN_NO,
+	     u.CHANN_NAME,
+	     u.TERM_ID,
+	     u.TERM_NO,
+	     u.TERM_NAME,
+	     u.RNVTN_REQ_ID,
+	     u.RNVTN_REQ_NAME,
+	     u.CHANN_PERSON_CON,
+	     u.CHANN_TEL,
+	     u.AREA_ID,
+	     u.AREA_NO,
+	     u.AREA_NAME,
+	     u.AREA_MANAGE_ID,
+	     u.AREA_MANAGE_NAME,
+	     u.AREA_MANAGE_TEL,
+	     u.SALE_STORE_ID,
+	     u.SALE_STORE_NAME,
+	     u.ZONE_ID,
+	     u.ZONE_ADDR,
+ 	     u.ADDRESS,
+	     u.PLAN_SBUSS_DATE,
+	     u.DMD_DRAW_DATE,
+	     u.USE_AREA,
+	     u.TERM_WHICH_NUM,
+	     u.RNVTN_AREA,
+	     u.MARKET_RENT,
+	     u.EXP_YEAR_SALE,
+	     u.SALE_STORE_ANALYSE,
+	     u.REIT_POLICY,
+	     u.REIT_AMOUNT_PS,
+	     u.REIT_AMOUNT,
+	     u.STATE,
+	     u.REMARK,
+	     u.ORG_ID,
+	     u.ORG_NAME,
+	     u.LEDGER_ID,
+	     u.LEDGER_NAME,
+	     u.DEL_FLAG,
+	     (SELECT d.DATA_DTL_NAME FROM  PROJECT_DATA_DICTIONARY_DTL d WHERE U.LOCAL_TYPE = d.DATA_DTL_CODE  AND d.DELFLAG=0) LOCAL_TYPE,
+	     u.SALE_STORE_NAME,
+	     u.IS_STAD_FLAG,
+	     u.BEAR_WAY,
+	     u.SPEC_CONTENT,
+	     u.OPEN_TERMINAL_REQ_ID,
+	     u.OPEN_TERMINAL_REQ_NO,
+	     u.DESIGN_PERSON,
+	     u.DESIGN_ID,
+	     u.NATION,
+	     u.PROV,
+	     u.CITY,
+	     u.COUNTY,
+	     u.BUDGET_ITEM_NAME,
+	     u.BUDGET_ITEM_ID,
+	     u.BUDGET_ITEM_NO,
+	     u.BUDGET_ITEM_TYPE,
+	     u.BUDGET_QUOTA_ID,
+	     u.AMOUNT_DESC
+	     from DRP_CHANN_RNVTN u left join BASE_ATT b on u.chann_rnvtn_id = b.from_bill_id  
+	     where  
+	     u.CHANN_RNVTN_ID = #CHANN_RNVTN_ID# 
+	]]>
+</select>
+
+<select id="loadT" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	 select  
+	  u.BUSS_SCOPE
+	  from DRP_CHANN_RNVTN u
+	  left join BASE_ATT b
+	  on u.chann_rnvtn_id = b.from_bill_id
+	  where
+	  u.CHANN_RNVTN_ID = #CHANN_RNVTN_ID# 
+	  AND u.DEL_FLAG = 0
+	]]>
+</select>
+
+<select id="loadTt" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	   select 
+     b.ATT_ID,
+     b.ATT_PATH,
+     u.CHANN_RNVTN_ID,
+     u.CHANN_RNVTN_NO,
+     u.RNVTN_REQ_DATE,
+     d.DATA_DTL_NAME RNVTN_PROP,
+     u.COMPACT_AMOUNT,
+     u.RNVTN_REQ_NAME,
+     u.CHANN_ID,
+     u.CHANN_NO,
+     u.CHANN_NAME,
+     u.TERM_ID,
+     u.TERM_NO,
+     u.TERM_NAME,
+     u.RNVTN_REQ_ID,
+     u.RNVTN_REQ_NAME,
+     u.CHANN_PERSON_CON,
+     u.CHANN_TEL,
+     u.AREA_ID,
+     u.AREA_NO,
+     u.AREA_NAME,
+     u.AREA_MANAGE_ID,
+     u.AREA_MANAGE_NAME,
+     u.AREA_MANAGE_TEL,
+     u.SALE_STORE_ID,
+     u.SALE_STORE_NAME,
+     u.ZONE_ID,
+     u.ZONE_ADDR,
+     u.BUSS_SCOPE,
+     u.ADDRESS,
+     u.PLAN_SBUSS_DATE,
+     u.DMD_DRAW_DATE,
+     u.USE_AREA,
+     u.TERM_WHICH_NUM,
+     u.RNVTN_AREA,
+     u.MARKET_RENT,
+     u.EXP_YEAR_SALE,
+     u.SALE_STORE_ANALYSE,
+     u.REIT_POLICY,
+     u.REIT_AMOUNT_PS,
+     u.REIT_AMOUNT,
+     u.STATE,
+     u.REMARK,
+     u.ORG_ID,
+     u.ORG_NAME,
+     u.LEDGER_ID,
+     u.LEDGER_NAME,
+     u.DEL_FLAG,
+     u.SALE_STORE_NAME,
+     u.IS_STAD_FLAG,
+     u.BEAR_WAY,
+     u.SPEC_CONTENT,
+     u.OPEN_TERMINAL_REQ_ID,
+     u.OPEN_TERMINAL_REQ_NO,
+     u.DESIGN_PERSON,
+     u.DESIGN_ID,
+     u.NATION,
+     u.PROV,
+     u.CITY,
+     u.COUNTY,
+     u.BUDGET_ITEM_NAME,
+	 u.BUDGET_ITEM_ID,
+	 u.BUDGET_ITEM_NO,
+	 u.BUDGET_ITEM_TYPE,
+	 u.BUDGET_QUOTA_ID
+        from DRP_CHANN_RNVTN u left join BASE_ATT b on u.chann_rnvtn_id = b.from_bill_id  
+        left join PROJECT_DATA_DICTIONARY_DTL d on u.RNVTN_PROP = d.data_dtl_code  
+     where  
+	 u.CHANN_RNVTN_ID = #CHANN_RNVTN_ID# 
+	 AND d.DELFLAG = 0
+	]]>
+</select>
+
+
+<select id="loadByConfIdT" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+	     b.ATT_ID,
+         b.ATT_PATH,
+		 u.CHANN_RNVTN_ID,
+		 u.CHANN_RNVTN_NO,
+		 u.RNVTN_REQ_DATE,
+		 u.RNVTN_PROP,
+		 u.COMPACT_AMOUNT,
+		 u.RNVTN_REQ_NAME,
+		 u.CHANN_ID,
+		 u.CHANN_NO,
+		 u.CHANN_NAME,
+		 u.TERM_ID,
+		 u.TERM_NO,
+		 u.TERM_NAME,
+		 u.RNVTN_REQ_ID,
+		 u.RNVTN_REQ_NAME,
+		 u.CHANN_PERSON_CON,
+		 u.CHANN_TEL,
+		 u.AREA_ID,
+		 u.AREA_NO,
+		 u.AREA_NAME,
+		 u.AREA_MANAGE_ID,
+		 u.AREA_MANAGE_NAME,
+		 u.AREA_MANAGE_TEL,
+		 u.SALE_STORE_ID,
+		 u.SALE_STORE_NAME,
+		 u.ZONE_ID,
+		 u.ZONE_ADDR,
+		 u.BUSS_SCOPE,
+		 u.ADDRESS,
+		 u.PLAN_SBUSS_DATE,
+		 u.DMD_DRAW_DATE,
+		 u.USE_AREA,
+		 u.TERM_WHICH_NUM,
+		 u.RNVTN_AREA,
+		 u.MARKET_RENT,
+		 u.EXP_YEAR_SALE,
+		 u.SALE_STORE_ANALYSE,
+		 u.REIT_POLICY,
+		 u.REIT_AMOUNT_PS,
+		 u.REIT_AMOUNT,
+		 u.STATE,
+		 u.REMARK,
+		 u.ORG_ID,
+		 u.ORG_NAME,
+		 u.LEDGER_ID,
+		 u.LEDGER_NAME,
+		 u.DEL_FLAG,
+		 u.LOCAL_TYPE,
+		 u.SALE_STORE_NAME,
+		 u.IS_STAD_FLAG,
+		 u.BEAR_WAY,
+		 u.SPEC_CONTENT,
+		 u.OPEN_TERMINAL_REQ_ID,
+		 u.OPEN_TERMINAL_REQ_NO,
+		 u.DESIGN_PERSON,
+		 u.DESIGN_ID,
+		 u.NATION,
+		 u.PROV,
+		 u.CITY,
+		 u.COUNTY,
+		 u.BUDGET_ITEM_NAME,
+		 u.BUDGET_ITEM_ID,
+		 u.BUDGET_ITEM_NO,
+		 u.BUDGET_ITEM_TYPE,
+		 u.BUDGET_QUOTA_ID,
+		 u.AMOUNT_DESC 
+         from DRP_CHANN_RNVTN u left join BASE_ATT b on u.chann_rnvtn_id = b.from_bill_id  
+	     where 
+		 u.CHANN_RNVTN_ID = #CHANN_RNVTN_ID# 
+	]]>
+</select>
+
+
+<select id="loadByConfIdTt" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	   select 
+         b.ATT_ID,
+         b.ATT_PATH,
+	     u.CHANN_RNVTN_ID,
+	     u.CHANN_RNVTN_NO,
+	     u.RNVTN_REQ_DATE,
+	     u.RNVTN_PROP,
+	     u.COMPACT_AMOUNT,
+	     u.RNVTN_REQ_NAME,
+	     u.CHANN_ID,
+	     u.CHANN_NO,
+	     u.CHANN_NAME,
+	     u.TERM_ID,
+	     u.TERM_NO,
+	     u.TERM_NAME,
+	     u.RNVTN_REQ_ID,
+	     u.RNVTN_REQ_NAME,
+	     u.CHANN_PERSON_CON,
+	     u.CHANN_TEL,
+	     u.AREA_ID,
+	     u.AREA_NO,
+	     u.AREA_NAME,
+	     u.AREA_MANAGE_ID,
+	     u.AREA_MANAGE_NAME,
+	     u.AREA_MANAGE_TEL,
+	     u.SALE_STORE_ID,
+	     u.SALE_STORE_NAME,
+	     u.ZONE_ID,
+	     u.ZONE_ADDR,
+	     u.LOCAL_TYPE,
+	     u.ADDRESS,
+	     u.PLAN_SBUSS_DATE,
+	     u.DMD_DRAW_DATE,
+	     u.USE_AREA,
+	     u.TERM_WHICH_NUM,
+	     u.RNVTN_AREA,
+	     u.MARKET_RENT,
+	     u.EXP_YEAR_SALE,
+	     u.SALE_STORE_ANALYSE,
+	     u.REIT_POLICY,
+	     u.REIT_AMOUNT_PS,
+	     u.REIT_AMOUNT,
+	     u.STATE,
+	     u.REMARK,
+	     u.ORG_ID,
+	     u.ORG_NAME,
+	     u.LEDGER_ID,
+	     u.LEDGER_NAME,
+	     u.DEL_FLAG,
+	     u.SALE_STORE_NAME,
+	     u.IS_STAD_FLAG,
+	     u.BEAR_WAY,
+		 u.SPEC_CONTENT,
+		 u.BUDGET_ITEM_NAME,
+		 u.BUDGET_ITEM_ID,
+		 u.BUDGET_ITEM_NO,
+		 u.BUDGET_ITEM_TYPE,
+		 u.BUDGET_QUOTA_ID,
+		 u.AMOUNT_DESC 
+	     from DRP_CHANN_RNVTN u left join BASE_ATT b on u.chann_rnvtn_id = b.from_bill_id
+		 where 
+		 u.CHANN_RNVTN_ID = #CHANN_RNVTN_ID# 
+	]]>
+</select>
+
+
+
+<update id="updateReitById" parameterClass="String">	
+     <![CDATA[ 
+	  update DRP_RNVTN_REIT_DTL
+	         set DEL_FLAG = 1
+ 	  where 
+	     RNVTN_REIT_DTL_ID = #RNVTN_REIT_DTL_ID#
+    ]]>
+</update>
+
+
+<!--启用/停用-->
+<update id="updStusById" parameterClass="map">	
+     <![CDATA[ 
+	  update DRP_CHANN_RNVTN
+	         set CHANN_RNVTN_ID = #CHANN_RNVTN_ID#
+ 	  where 
+	     CHANN_RNVTN_ID = #CHANN_RNVTN_ID:VARCHAR# 
+    ]]>
+</update>
+
+<!-- 修改状态 -->
+<update id="updState" parameterClass="map">	
+     <![CDATA[ 
+	  update DRP_CHANN_RNVTN
+	         set STATE = #STATE#
+ 	  where 
+	     CHANN_RNVTN_ID = #CHANN_RNVTN_ID:VARCHAR# 
+    ]]>
+</update>
+
+<update id="updateTerm" parameterClass="map">
+	<![CDATA[ update BASE_TERMINAL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="LOCAL_TYPE" prepend=","><![CDATA[LOCAL_TYPE = #LOCAL_TYPE# ]]></isNotNull>
+    <isNotNull property="BUSS_AREA" prepend=","><![CDATA[BUSS_AREA = #BUSS_AREA# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where TERM_ID = #TERM_ID#]]>
+</update>
+
+<!--审核之后，应该往表DRP_RNVTN_REIT_DTL里插记 -->
+<insert id="insertReitDtl" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_RNVTN_REIT_DTL(
+		 RNVTN_REIT_DTL_ID,
+		 CHANN_RNVTN_ID,
+		 RNVTN_REIT_NO,
+		 RNVTN_SCALE,
+		 REIT_DAYS_CON,
+		 REIT_REMARK,
+		 DEL_FLAG
+	   )values(
+		#RNVTN_REIT_DTL_ID#,
+		#CHANN_RNVTN_ID#,
+		#RNVTN_REIT_NO#,
+		#RNVTN_SCALE#,
+		#REIT_DAYS_CON#,
+		#REIT_REMARK#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+
+
+
+<!-- 查询申请报销 -->
+<select id="queryReitDtl" parameterClass="String" resultClass="int">
+   select count(u.CHANN_RNVTN_ID) from DRP_RNVTN_REIT_DTL u 
+     where  u.del_flag = 0 and  u.CHANN_RNVTN_ID=#CHANN_RNVTN_ID#
+</select>
+
+
+<select id="queryRvinState" parameterClass="String" resultClass="int">
+    select  count(*) from DRP_CHANN_RNVTN  r 
+    where r.del_flag=0 and r.state='审核通过'
+    and  r.CHANN_RNVTN_ID=#CHANN_RNVTN_ID#
+</select>
+
+
+<!-- 查询重复 -->
+<select id="queryBhForInt" parameterClass="map" resultClass="int">
+   select count(u.CHANN_RNVTN_ID) from DRP_CHANN_RNVTN u 
+     where u.CHANN_RNVTN_ID=#CHANN_RNVTN_ID#
+     <isNotEmpty prepend="and" property="CHANN_NAME">
+        u.CHANN_NAME != #CHANN_NAME#
+     </isNotEmpty>
+</select>
+
+<select id="selectBrothers" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[  
+ 	   select p.DATA_DTL_NAME RNVTN_PROP from  PROJECT_DATA_DICTIONARY_DTL  p where p.DATA_DTL_CODE = #RNVTN_PROP#
+ 	   and p.DELFLAG = 0
+    ]]>
+</select>
+
+<select id="selectBrothers1" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[  
+ 	   select p.DATA_DTL_CODE CODE from  PROJECT_DATA_DICTIONARY_DTL  p where p.DATA_DTL_NAME = #DATA_DTL_NAME#
+ 	   and p.DELFLAG = 0
+    ]]>
+</select>
+
+<select id="queryReitAmountPS" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[  
+ 	  SELECT u.REIT_AMOUNT_PS FROM DRP_CHANN_RNVTN u where u.CHANN_RNVTN_ID = #CHANN_RNVTN_ID#
+    ]]>
+</select>
+
+
+<select id="expertExcel" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+	   select u.CHANN_RNVTN_NO,
+           u.RNVTN_REQ_NAME,
+           to_char(u.RNVTN_REQ_DATE,'yyyy-MM-DD') RNVTN_REQ_DATE,
+           u.STATE,
+           u.OPEN_TERMINAL_REQ_NO,
+           u.AREA_NAME,
+           u.CHANN_NO,
+           u.CHANN_NAME,
+           u.TERM_NO,
+           u.TERM_NAME,
+           u.DESIGN_PERSON,
+           u.SALE_STORE_NAME,
+           (SELECT p.DATA_DTL_NAME FROM PROJECT_DATA_DICTIONARY_DTL p WHERE p.DATA_DTL_CODE = u.BUSS_SCOPE and p.DELFLAG=0) BUSS_SCOPE,
+           (SELECT p.DATA_DTL_NAME FROM PROJECT_DATA_DICTIONARY_DTL p WHERE p.DATA_DTL_CODE = u.RNVTN_PROP and p.DELFLAG=0) RNVTN_PROP,
+           to_char(u.PLAN_SBUSS_DATE,'yyyy-MM-DD') PLAN_SBUSS_DATE,
+           u.USE_AREA,
+           u.AREA_MANAGE_NAME,
+           u.ADDRESS,
+           (SELECT p.DATA_DTL_NAME FROM PROJECT_DATA_DICTIONARY_DTL p WHERE p.DATA_DTL_CODE = u.LOCAL_TYPE AND p.DELFLAG=0) LOCAL_TYPE,
+           u.REIT_AMOUNT_PS,
+           u.REIT_AMOUNT,
+           u.REMARK
+           from DRP_CHANN_RNVTN u
+	]]>
+	<dynamic prepend="where">
+	   <include refid="queryDynSql1" />
+	</dynamic>
+</select>
+
+ <select id="queryReitAmount" parameterClass="map" resultClass="String">
+	<![CDATA[ 
+	     SELECT 
+	     u.REIT_AMOUNT_PS
+	     from DRP_CHANN_RNVTN u
+	     where
+	     u.CHANN_RNVTN_ID = #CHANN_RNVTN_ID#
+	     AND u.DEL_FLAG=0
+	]]>
+</select>
+
+<select id="queryGZZXXID" parameterClass="map" resultClass="String">
+    <![CDATA[ 
+	   select distinct u.GZZXXID
+			  from T_SYS_GZZXX u
+			  left join (select a.Gzzxxid, b.YHBH, b.YHM
+              from T_SYS_GZZCY a
+              left join T_SYS_XTYH b
+              on a.xtyhid = b.xtyhid
+              and b.delflag = 0
+              where a.delflag = 0
+              order by a.xtyhid) c
+              on u.Gzzxxid = c.Gzzxxid
+              WHERE u.GZZMC LIKE '%门店建设经理%'
+	]]>
+</select>
+
+ <!-- 根据主表ID查询明细 -->
+ <select id="queryById" parameterClass="map" resultClass="java.util.HashMap">
+  <include refid="coreSql"/>
+  <dynamic prepend="and">
+		u.CHANN_RNVTN_ID=#CHANN_RNVTN_ID#
+  </dynamic>
+ </select>
+
+<!-- 删除 -->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update DRP_CHANN_RNVTN ]]>
+	<dynamic prepend="set">
+		<isNotNull property="DEL_FLAG"><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+	</dynamic>
+	<![CDATA[ where CHANN_RNVTN_ID = #CHANN_RNVTN_ID# ]]>
+</delete>
+</sqlMap>

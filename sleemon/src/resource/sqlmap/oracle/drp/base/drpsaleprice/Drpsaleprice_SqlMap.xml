@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ *@module 基础资料
+ *@func 
+ *@version 1.1
+ *@author 刘曰刚
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Drpsaleprice">
+
+	<typeAlias type="com.hoperun.drp.base.drpsaleprice.model.DrpsalepriceModel" alias="DrpsalepriceModel" />
+
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="DrpsalepriceModel" class="DrpsalepriceModel">
+		<result column="SALE_PRICE_ID" property="SALE_PRICE_ID" />
+	</resultMap>
+	<!-- 动态查询 and 列表排序 -->
+	<sql id="queryDynSql"> 
+	   <isNotEmpty prepend="and" property="BEGIN_CRE_TIME">
+	     <![CDATA[u.CRE_TIME>=to_date(#BEGIN_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')]]>
+	  </isNotEmpty>
+	   <isNotEmpty prepend="and" property="END_CRE_TIME">
+	     <![CDATA[u.CRE_TIME<=to_date(#END_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')]]>
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	   </isNotEmpty>
+	   <isNotEmpty prepend="and " property="DEL_FLAG">
+	         p.DEL_FLAG=0 and p.STATE='启用' and p.FINAL_NODE_FLAG=1 
+	        and (p.COMM_FLAG=1 or (p.COMM_FLAG=0 and p.LEDGER_ID=#LEDGER_ID#))   and p.IS_NO_STAND_FLAG=0
+	   </isNotEmpty>
+	   <isNotEmpty prepend="  " property="PAR_PRD_NAMEQuery">
+	        $PAR_PRD_NAMEQuery$
+	   </isNotEmpty>
+	   <isNotEmpty prepend="  " property="PRD_NOQuery">
+	        $PRD_NOQuery$
+	   </isNotEmpty>
+	   <isNotEmpty prepend="  " property="PRD_NAMEQuery">
+	       $PRD_NAMEQuery$
+	   </isNotEmpty>
+	   <isNotEmpty prepend="  " property="PRD_SPECQuery">
+	        $PRD_SPECQuery$
+	   </isNotEmpty>
+	   <isNotEmpty prepend="  " property="BRANDQuery">
+	        $BRANDQuery$
+	   </isNotEmpty>
+	   
+	</sql>
+    <sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField"> $orderField$</isNotEmpty>
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[
+			select 
+				u.SALE_PRICE_ID,
+				p.PRD_ID,
+				p.PRD_NO,
+				p.PRD_NAME,
+				p.PRD_SPEC,
+				p.BRAND,
+				(case when u.SALE_PRICE_ID is null then p.FACT_PRICE else u.FACT_PRICE end) FACT_PRICE,
+				(case when u.SALE_PRICE_ID is null then p.PRVD_PRICE else u.PRVD_PRICE end) PRVD_PRICE,
+				(case when u.SALE_PRICE_ID is null then p.FACT_PRICE*0.8 else u.DECT_PRICE end) DECT_PRICE,
+				u.CREATOR,
+				u.CRE_NAME,
+				to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS')CRE_TIME,
+				u.UPDATOR,
+				u.UPD_NAME,
+				to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS')UPD_TIME,
+				u.LEDGER_ID,
+				u.LEDGER_NAME,
+				u.DEL_FLAG
+			from BASE_PRODUCT p 
+			left join DRP_SALE_PRICE u on u.PRD_ID=p.PRD_ID and u.DEL_FLAG = 0 and u.LEDGER_ID=#LEDGER_ID#
+		]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(1) cnt from BASE_PRODUCT p left join DRP_SALE_PRICE u on u.PRD_ID=p.PRD_ID ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+
+   <!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	<!-- 根据ID查找 -->
+	<select id="loadById" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+			select 
+				u.SALE_PRICE_ID,
+				u.PRD_ID,
+				u.PRD_NO,
+				u.PRD_NAME,
+				u.PRD_SPEC,
+				u.BRAND,
+				u.FACT_PRICE,
+				u.CREATOR,
+				u.CRE_NAME,
+				to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS')CRE_TIME,
+				u.UPDATOR,
+				u.UPD_NAME,
+				to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS')UPD_TIME,
+				u.LEDGER_ID,
+				u.LEDGER_NAME,
+				u.DEL_FLAG
+			from DRP_SALE_PRICE u
+			where SALE_PRICE_ID=#SALE_PRICE_ID#
+		]]>
+	</select>
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+			insert into DRP_SALE_PRICE(
+				SALE_PRICE_ID,
+				PRD_ID,
+				PRD_NO,
+				PRD_NAME,
+				PRD_SPEC,
+				FACT_PRICE,
+				DECT_TYPE,
+				DECT_RATE,
+				DECT_PRICE,
+				PRVD_PRICE,
+				CREATOR,
+				CRE_NAME,
+				CRE_TIME,
+				LEDGER_ID,
+				LEDGER_NAME,
+				DEL_FLAG
+			)
+			select 
+				#SALE_PRICE_ID#,
+				PRD_ID,
+				PRD_NO,
+				PRD_NAME,
+				PRD_SPEC,
+				FACT_PRICE,
+				#DECT_TYPE#,
+				NVL(#DECT_PRICE#,0)/NVL(FACT_PRICE,0),
+				#DECT_PRICE#,
+				PRVD_PRICE,
+				#CREATOR#,
+				#CRE_NAME#,
+				sysdate,
+				#LEDGER_ID#,
+				#LEDGER_NAME#,
+				#DEL_FLAG#
+			from BASE_PRODUCT where PRD_ID=#PRD_ID#
+		]]>
+	</insert>
+	<!-- // 0156117 End 刘曰刚 2014/06/16// -->
+	<update id="updateById" parameterClass="map">
+		 <![CDATA[ update DRP_SALE_PRICE ]]>
+		<dynamic prepend="set">
+			<isNotNull property="DECT_PRICE" prepend=","><![CDATA[DECT_PRICE = #DECT_PRICE#]]></isNotNull>
+			<isNotNull property="PRVD_PRICE" prepend=","><![CDATA[PRVD_PRICE = NVL(PRVD_PRICE,0)/NVL(#DECT_PRICE#,0)]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where SALE_PRICE_ID = #SALE_PRICE_ID# ]]>
+	</update>
+	<select id="getCountPRD_ID" parameterClass="string" resultClass="string">
+		select PRD_NO
+		  from (select count(1) cnt,a.PRD_NO
+		          from DRP_SALE_PRICE a
+		         where a.LEDGER_ID = #LEDGER_ID#
+		         group by a.PRD_ID, a.LEDGER_ID)
+		 where cnt > 1
+	</select>
+<insert id="insertTemp" parameterClass="map">
+	insert into DRP_SALE_PRICE_TEMP
+	  (SALE_PRICE_ID, PRD_NO, DECT_PRICE, SESSION_ID)
+	values
+	  (#SALE_PRICE_ID#, #PRD_NO#, #DECT_PRICE#, #SESSION_ID#)
+</insert>
+<select id="checkMustFld" parameterClass="string" resultClass="int">
+	select count(1) cnt
+  	from DRP_SALE_PRICE_TEMP
+	where (PRD_NO is null or PRD_NO ='' )
+	or   (DECT_PRICE is null or DECT_PRICE ='' )
+	 and SESSION_ID = #SESSION_ID#
+</select>
+<!-- 检查是是否有重记录-->
+<select id="checkPdtRepeat" parameterClass="string" resultClass="java.util.HashMap">
+ select PRD_NO
+   from DRP_SALE_PRICE_TEMP
+  where SESSION_ID = #SESSION_ID#
+  group by PRD_NO
+ having count(PRD_NO) > 1
+</select>
+<select id="checkPrdLedger" parameterClass="map" resultClass="string">
+	select a.PRD_NO
+  from DRP_SALE_PRICE_TEMP a
+ where a.PRD_NO not in
+       (select b.PRD_NO
+          from BASE_PRODUCT b
+         where b.STATE in '启用'
+           and b.DEL_FLAG = 0
+           and b.FINAL_NODE_FLAG = 1
+           and (b.COMM_FLAG = 1 or
+               (b.COMM_FLAG = 0 and b.LEDGER_ID = #LEDGER_ID#))
+           and IS_NO_STAND_FLAG = 0)
+   and SESSION_ID = #SESSION_ID#
+
+</select>
+<update id="upDrpPriceInfo" parameterClass="map">
+	update DRP_SALE_PRICE a
+   set (a.DECT_RATE, a.DECT_PRICE, a.UPDATOR, a.UPD_NAME, a.UPD_TIME) =
+       (select (case when NVL(a.FACT_PRICE, 0)=0 then 0 else NVL(b.DECT_PRICE,0)/NVL(a.FACT_PRICE, 0) end) ,
+               b.DECT_PRICE,
+               #UPDATOR#,
+               #UPD_NAME#,
+               sysdate
+          from DRP_SALE_PRICE_TEMP b
+         where b.SESSION_ID = #SESSION_ID#
+           and a.PRD_NO = b.PRD_NO)
+ where a.PRD_NO in (select PRD_NO
+                      from DRP_SALE_PRICE_TEMP
+                     where SESSION_ID = #SESSION_ID#)
+   and a.LEDGER_ID = #LEDGER_ID#
+</update>
+<insert id="insertDrpPriceInfo" parameterClass="map">
+	insert into DRP_SALE_PRICE
+	  (SALE_PRICE_ID,
+		PRD_ID,
+		PRD_NO,
+		PRD_NAME,
+		PRD_SPEC,
+		FACT_PRICE,
+		DECT_TYPE,
+		DECT_RATE,
+		DECT_PRICE,
+		PRVD_PRICE,
+		CREATOR,
+		CRE_NAME,
+		CRE_TIME,
+		LEDGER_ID,
+		LEDGER_NAME,
+		DEL_FLAG)
+	  select b.SALE_PRICE_ID,
+		a.PRD_ID,
+		a.PRD_NO,
+		a.PRD_NAME,
+		a.PRD_SPEC,
+		a.FACT_PRICE,
+		'正常折扣',
+		(case when NVL(b.DECT_PRICE,0)=0 then 0 else NVL(b.DECT_PRICE,0)/a.FACT_PRICE end),
+		b.DECT_PRICE,
+		a.PRVD_PRICE,
+		#CREATOR#,
+		#CRE_NAME#,
+		sysdate,
+		#LEDGER_ID#,
+		#LEDGER_NAME#,
+		#DEL_FLAG#
+	    from BASE_PRODUCT a left join DRP_SALE_PRICE_TEMP b on a.PRD_NO=b.PRD_NO
+	   where b.SESSION_ID = #SESSION_ID#
+	     and b.PRD_NO not in (select PRD_NO from DRP_SALE_PRICE where LEDGER_ID = #LEDGER_ID#)
+</insert>
+<delete id="delPrdTemp" parameterClass="string">
+	delete from DRP_SALE_PRICE_TEMP where SESSION_ID = #SESSION_ID#
+</delete>
+</sqlMap>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ *@module  
+ *@func  预计量上报货品设置
+ *@version 1.1
+ *@author  
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="ForecastPrd">
+
+ <!-- 通过typeAlias使得我们在下面使用ProductModel实体类的时候不需要写包名 -->
+<typeAlias type="com.hoperun.base.product.model.ProductModel" alias="ProductModel" />
+
+<!-- 使用LLGL装载结果集 -->
+<resultMap id="ProductModel" class="ProductModel">
+	<result column="PRD_ID" property="PRD_ID" />
+</resultMap>
+ 
+
+
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+<isNotEmpty prepend="and" property="searchFlag">
+	<![CDATA[$searchFlag$]]>
+</isNotEmpty>
+<isNotEmpty prepend="and" property="sql">
+	<![CDATA[$sql$]]>
+</isNotEmpty>
+<isNotEmpty prepend=" " property="PRD_NO">
+	<![CDATA[ and p.PRD_NO like '%'|| #PRD_NO# ||'%']]>
+</isNotEmpty>
+<isNotEmpty prepend=" " property="PRD_NAME">
+	<![CDATA[and p.PRD_NAME like '%'|| #PRD_NAME# ||'%']]>
+</isNotEmpty>
+<isNotEmpty prepend=" " property="PRD_SPEC">
+	<![CDATA[and p.PRD_SPEC like '%'|| #PRD_SPEC# ||'%' ]]>
+</isNotEmpty>
+<!-- 显示未分管 -->
+<isNotEmpty prepend=" " property="notcharg">
+     and p.IS_REPORT_FLAG =0 
+</isNotEmpty>
+<!-- 显示已分管 -->
+<isNotEmpty prepend=" " property="havecharg">
+     and p.IS_REPORT_FLAG =1 
+</isNotEmpty> 
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	   select 
+		   p.PRD_ID, 
+		   p.PRD_NO, 
+		   p.PRD_NAME, 
+		   p.PRD_SPEC, 
+		   p.PAR_PRD_NAME,
+		   p.IS_REPORT_FLAG,
+		   decode(p.IS_REPORT_FLAG,0,'否',1,'是','否')IS_REPORT_FLAG_ZN
+	   from BASE_PRODUCT p
+	   where p.DEL_FLAG=0 
+	   and p.FINAL_NODE_FLAG = 1
+	   and p.IS_NO_STAND_FLAG=0
+	   and p.COMM_FLAG = 1
+	   and p.STATE='启用'
+   ]]>
+    <dynamic prepend="and">
+       1=1 
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[	select count(0) from BASE_PRODUCT p where p.DEL_FLAG=0 and p.FINAL_NODE_FLAG = 1
+	   and p.COMM_FLAG = 1 and p.STATE='启用'  ]]>
+	<dynamic prepend="and">
+	   1=1 
+		 <include refid="queryDynSql"/>
+	</dynamic>
+</select>
+
+
+
+<update id="deleteByIds" parameterClass="String">
+	<![CDATA[
+	  update BASE_PRODUCT p set p.IS_REPORT_FLAG=0 where p.PRD_ID in($DELETE_IDS$)
+	]]>
+</update>
+	
+<update id="updatePrd" parameterClass="map">
+	<![CDATA[
+	 update BASE_PRODUCT p set p.IS_REPORT_FLAG=1 where p.PRD_ID in($PRD_IDS$)
+	]]>
+</update>
+
+	
+<select id="queryPrdByparams" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+	  select p.PRD_ID, p.PRD_NO, p.PRD_NAME, p.PRD_SPEC, p.PAR_PRD_NAME,p.IS_REPORT_FLAG
+   from BASE_PRODUCT p
+   where p.DEL_FLAG=0 
+   and p.STATE='启用'
+	
+	]]> 
+	<![CDATA[  and 1=1   ]]>
+	<isNotEmpty prepend="and" property="searchFlag">
+		<![CDATA[$searchFlag$]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="PRD_NO">
+		<![CDATA[p.PRD_NO like '%'|| #PRD_NO# ||'%']]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="PRD_NAME">
+		<![CDATA[p.PRD_NAME like '%'|| #PRD_NAME# ||'%']]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="PRD_SPEC">
+		<![CDATA[p.PRD_SPEC like '%'|| #PRD_SPEC# ||'%' ]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="PAR_PRD_NAME">
+		<![CDATA[p.PAR_PRD_NAME like '%'|| #PAR_PRD_NAME#||'%' ]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="PAR_PRD_NO">
+		<![CDATA[p.PAR_PRD_NO = #PAR_PRD_NO#]]>
+	</isNotEmpty>
+	<!-- 显示未分管 -->
+	<isNotEmpty prepend="and" property="notcharg">
+	      p.IS_REPORT_FLAG =0 
+	</isNotEmpty>
+	<!-- 显示已分管 -->
+	<isNotEmpty prepend="and" property="havecharg">
+	      p.IS_REPORT_FLAG =1 
+	</isNotEmpty>
+ </select>
+	 
+ 
+</sqlMap>
+

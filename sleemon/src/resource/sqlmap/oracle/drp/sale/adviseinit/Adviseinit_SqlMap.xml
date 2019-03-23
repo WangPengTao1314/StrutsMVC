@@ -1,0 +1,346 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author wdb
+@function 
+@version 2013-08-17 10:29:35
+-->
+<sqlMap  namespace="Adviseinit">
+<!-- 定义AdviseinitModel -->
+<typeAlias type="com.hoperun.drp.sale.adviseinit.model.AdviseinitModel" alias="AdviseinitModel"/>
+<!-- 使用AdviseModel装载结果集 -->
+<resultMap id="AdviseinitModel" class="AdviseinitModel">
+    <result column="CMPL_ADVS_ID" property="CMPL_ADVS_ID" />
+</resultMap>
+<select id="AREA_MANAGE" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+		select 
+			yh.XTYHID,
+			yh.YHM 
+		from 
+			T_SYS_XTYH yh,
+			BASE_AREA_CHRG ach,
+			BASE_AREA area 
+		where 
+			yh.xtyhid = ach.chrg_no 
+			and ach.area_id = area.area_id 
+			and area.area_id = #AREA_ID# 
+			and ach.JOB = '区域经理' 
+	]]>
+</select>
+<select id="AREA_CHIEF" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+		select 
+			yh.XTYHID,
+			yh.YHM 
+		from 
+			T_SYS_XTYH yh,
+			BASE_AREA_CHRG ach,
+			BASE_AREA area 
+		where 
+			yh.xtyhid = ach.chrg_no 
+			and ach.area_id = area.area_id 
+			and area.area_id = #AREA_ID# 
+			and ach.JOB = '区域总监'
+	]]>
+</select>
+<insert id="insertProCmpl" parameterClass="map">
+	<![CDATA[
+		insert into DRP_CMPL_ADVS(
+			CMPL_ADVS_ID,
+			CMPL_ADVS_NO,
+			CMPL_ADVS_TITLE,
+			CMPL_ADVS_TYPE,
+			CHANN_ID,
+			CHANN_NO,
+			CHANN_NAME,
+			AREA_NO,
+			AREA_NAME,
+			RAISE_PSON_NAME,
+			TEL,
+			STATE,
+			CRE_NAME,
+         	CREATOR,
+         	CRE_TIME,
+         	UPD_NAME,
+         	UPDATOR,
+         	UPD_TIME,
+         	DEPT_ID,
+         	DEPT_NAME,
+         	ORG_ID,
+         	ORG_NAME,
+         	LEDGER_ID,
+         	LEDGER_NAME,
+         	DEL_FLAG,
+         	AREA_MANAGE_ID,
+         	AREA_MANAGE_NAME,
+         	AREA_CHIEF_ID,
+         	AREA_CHIEF_NAME,
+         	RAISE_TIME,
+         	APPOINT_PSON_ID,
+         	EMG_LVL,
+			PROV,
+			ADVS_SOURCE,
+			CUSTOMER_TEL,
+			CUSTOMER_NAME
+         )values(
+         	#CMPL_ADVS_ID#,
+			#CMPL_ADVS_NO#,
+			#CMPL_ADVS_TITLE#,
+			#CMPL_ADVS_TYPE#,
+			#CHANN_ID#,
+			#CHANN_NO#,
+			#CHANN_NAME#,
+			#AREA_NO#,
+			#AREA_NAME#,
+			#RAISE_PSON_NAME#,
+			#TEL#,
+			#STATE#,
+			#CRE_NAME#,
+        	#CREATOR#,
+	    	sysdate, 
+        	#UPD_NAME#,
+        	#UPDATOR#,
+			sysdate, 
+        	#DEPT_ID#,
+        	#DEPT_NAME#,
+        	#ORG_ID#,
+        	#ORG_NAME#,
+        	#LEDGER_ID#,
+        	#LEDGER_NAME#,
+        	#DEL_FLAG#,
+        	#AREA_MANAGE_ID#,
+         	#AREA_MANAGE_NAME#,
+         	#AREA_CHIEF_ID#,
+         	#AREA_CHIEF_NAME#,
+         	sysdate,
+         	#APPOINT_PSON_ID#,
+         	#EMG_LVL#,
+			#PROV#,
+			#ADVS_SOURCE#,
+			#CUSTOMER_TEL#,
+			#CUSTOMER_NAME#
+        	)
+	]]>
+</insert>
+<insert id="insertProCmplChild" parameterClass="map">
+	<![CDATA[
+		insert into DRP_CMPL_PRD_DTL(
+			CMPL_PRD_DTL_ID,
+			CMPL_ADVS_ID,
+			PRD_ID,
+			PRD_NO,
+			PRD_NAME,
+			PRD_SPEC,
+			PRD_PROBLEM_TYPE,
+			REMARK,
+			PRD_ATT,
+			DEL_FLAG,
+			USE_TIME,
+			SHIP_POINT_NO,
+			SHIP_POINT_ID,
+			SHIP_POINT_NAME,
+			PRDC_DATE,
+			BUY_DATE,
+			PRD_TYPE,
+			PRD_NUM
+		)values(
+			#CMPL_PRD_DTL_ID#,
+			#CMPL_ADVS_ID#,
+			#PRD_ID#,
+			#PRD_NO#,
+			#PRD_NAME#,
+			#PRD_SPEC#,
+			#PRD_PROBLEM_TYPE#,
+			#REMARK#,
+			#PRD_ATT#,
+			#DEL_FLAG#,
+			#USE_TIME#,
+			#SHIP_POINT_NO#,
+			#SHIP_POINT_ID#,
+			#SHIP_POINT_NAME#,
+			to_date(#PRDC_DATE#,'yyyy-mm-dd'),
+			to_date(#BUY_DATE#,'yyyy-mm-dd'),
+			#PRD_TYPE#,
+			#PRD_NUM#
+			)
+	]]>
+</insert>
+<insert id="insertSerCmpl" parameterClass="map">
+	<![CDATA[
+		insert into DRP_CMPL_ADVS(
+			CMPL_ADVS_ID,
+			CMPL_ADVS_NO,
+			CMPL_ADVS_TITLE,
+			CMPL_ADVS_TYPE,
+			CHANN_ID,
+			CHANN_NO,
+			CHANN_NAME,
+			AREA_NO,
+			AREA_NAME,
+			RAISE_PSON_NAME,
+			TEL,
+			CMPL_OBJ,
+			CMPL_TO_PSON,
+			CMPL_ADVS_CONTENT,
+			STATE,
+			CRE_NAME,
+         	CREATOR,
+         	CRE_TIME,
+         	UPD_NAME,
+         	UPDATOR,
+         	UPD_TIME,
+         	DEPT_ID,
+         	DEPT_NAME,
+         	ORG_ID,
+         	ORG_NAME,
+         	LEDGER_ID,
+         	LEDGER_NAME,
+         	DEL_FLAG,
+         	AREA_MANAGE_ID,
+         	AREA_MANAGE_NAME,
+         	AREA_CHIEF_ID,
+         	AREA_CHIEF_NAME,
+         	RAISE_TIME,
+         	APPOINT_PSON_ID,
+         	EMG_LVL
+         )values(
+         	#CMPL_ADVS_ID#,
+			#CMPL_ADVS_NO#,
+			#CMPL_ADVS_TITLE#,
+			#CMPL_ADVS_TYPE#,
+			#CHANN_ID#,
+			#CHANN_NO#,
+			#CHANN_NAME#,
+			#AREA_NO#,
+			#AREA_NAME#,
+			#RAISE_PSON_NAME#,
+			#TEL#,
+			#CMPL_OBJ#,
+			#CMPL_TO_PSON#,
+			#CMPL_ADVS_CONTENT#,
+			#STATE#,
+			#CRE_NAME#,
+        	#CREATOR#,
+	    	sysdate, 
+        	#UPD_NAME#,
+        	#UPDATOR#,
+			sysdate, 
+        	#DEPT_ID#,
+        	#DEPT_NAME#,
+        	#ORG_ID#,
+        	#ORG_NAME#,
+        	#LEDGER_ID#,
+        	#LEDGER_NAME#,
+        	#DEL_FLAG#,
+        	#AREA_MANAGE_ID#,
+         	#AREA_MANAGE_NAME#,
+         	#AREA_CHIEF_ID#,
+         	#AREA_CHIEF_NAME#,
+         	sysdate,
+         	#APPOINT_PSON_ID#,
+         	#EMG_LVL#
+        	)
+	]]>
+</insert>
+<insert id="insertAdvs" parameterClass="map">
+	<![CDATA[
+		insert into DRP_CMPL_ADVS(
+			CMPL_ADVS_ID,
+			CMPL_ADVS_NO,
+			CMPL_ADVS_TITLE,
+			CMPL_ADVS_TYPE,
+			CHANN_ID,
+			CHANN_NO,
+			CHANN_NAME,
+			AREA_NO,
+			AREA_NAME,
+			RAISE_PSON_NAME,
+			TEL,
+			ADVS_TYPE,
+			ADVS_SMMRY,
+			CMPL_ADVS_CONTENT,
+			STATE,
+			CRE_NAME,
+         	CREATOR,
+         	CRE_TIME,
+         	UPD_NAME,
+         	UPDATOR,
+         	UPD_TIME,
+         	DEPT_ID,
+         	DEPT_NAME,
+         	ORG_ID,
+         	ORG_NAME,
+         	LEDGER_ID,
+         	LEDGER_NAME,
+         	DEL_FLAG,
+         	AREA_MANAGE_ID,
+         	AREA_MANAGE_NAME,
+         	AREA_CHIEF_ID,
+         	AREA_CHIEF_NAME,
+         	RAISE_TIME,
+         	APPOINT_PSON_ID
+         )values(
+         	#CMPL_ADVS_ID#,
+			#CMPL_ADVS_NO#,
+			#CMPL_ADVS_TITLE#,
+			#CMPL_ADVS_TYPE#,
+			#CHANN_ID#,
+			#CHANN_NO#,
+			#CHANN_NAME#,
+			#AREA_NO#,
+			#AREA_NAME#,
+			#RAISE_PSON_NAME#,
+			#TEL#,
+			#ADVS_TYPE#,
+			#ADVS_SMMRY#,
+			#CMPL_ADVS_CONTENT#,
+			#STATE#,
+			#CRE_NAME#,
+        	#CREATOR#,
+	    	sysdate, 
+        	#UPD_NAME#,
+        	#UPDATOR#,
+			sysdate, 
+        	#DEPT_ID#,
+        	#DEPT_NAME#,
+        	#ORG_ID#,
+        	#ORG_NAME#,
+        	#LEDGER_ID#,
+        	#LEDGER_NAME#,
+        	#DEL_FLAG#,
+        	#AREA_MANAGE_ID#,
+         	#AREA_MANAGE_NAME#,
+         	#AREA_CHIEF_ID#,
+         	#AREA_CHIEF_NAME#,
+         	sysdate,
+         	#APPOINT_PSON_ID#
+        	)
+	]]>
+</insert>
+
+
+ 	<insert id="insertADVSTRACE" parameterClass="map">
+	<![CDATA[
+		insert into DRP_CMPL_ADVS_TRACE(
+			DRP_CMPL_ADVS_TRACE_ID,
+			CMPL_ADVS_ID,
+			DEAL_PSON_ID,
+			DEAL_PSON_NAME,
+         	DEAL_TIME,
+         	FEEDBACK_INFO,
+         	STATE
+         )values(
+         	#DRP_CMPL_ADVS_TRACE_ID#,
+         	#CMPL_ADVS_ID#,
+			#DEAL_PSON_ID#,
+        	#DEAL_PSON_NAME#,
+        	sysdate,
+        	#FEEDBACK_INFO#,
+			#STATE#
+        	)
+	]]>
+</insert>
+
+
+</sqlMap>

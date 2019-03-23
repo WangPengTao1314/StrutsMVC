@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Numformat">
+	<!-- 
+		*@module 系统管理
+		*@func 小数位设置
+		*@version 1.1
+		*@author 唐赟
+		*  -->
+	<typeAlias type="com.hoperun.sys.model.NumformatModel" alias="NumformatModel" />
+
+	<!-- 使用BMXX装载结果集 -->
+	<resultMap id="NumformatModel" class="NumformatModel">
+		<result column="NUMFORMATID" property="NUMFORMATID" />
+	</resultMap>
+
+    <sql id="queryDynSql">
+        <isNotEmpty prepend="and" property="NUMFORMATMC">
+			NUMFORMATMC like '%'+#NUMFORMATMC#+'%'
+		</isNotEmpty>
+    </sql>
+    
+    <sql id="orderSql">
+        <isNotEmpty prepend=" " property="orderField">
+			$orderField$,
+		</isNotEmpty>
+    </sql>
+    
+    <sql id="coreSql">
+        <![CDATA[  select NUMFORMATID,NUMFORMATMC,NUMTYPE,DECIMALS,ROUNDTYPE,CREATER,CRENAME, CRETIME,UPDATER, UPDTIME,
+  STATE,DELFLAG　from ${SYSSCHEMA}.T_SYS_NUMFORMAT   ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql" />
+		</dynamic>
+    </sql>
+    <!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(*) cnt FROM ${SYSSCHEMA}.T_SYS_NUMFORMAT ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+	
+	<select id="getOneRecord" parameterClass="String" resultClass="java.util.HashMap">
+	    select NUMFORMATID,NUMFORMATMC,NUMTYPE,DECIMALS,ROUNDTYPE,CREATER,CRENAME,CRETIME,UPDATER, UPDTIME,
+  STATE,DELFLAG from ${SYSSCHEMA}.T_SYS_NUMFORMAT
+	    where NUMFORMATID=#numid#
+	</select>
+	
+	<insert id="insertOneRecord" parameterClass="map">
+	    insert into ${SYSSCHEMA}.T_SYS_NUMFORMAT(NUMFORMATID,NUMFORMATMC,NUMTYPE,DECIMALS,ROUNDTYPE,CREATER,CRENAME,CRETIME,UPDATER,UPDTIME,
+  STATE,DELFLAG)
+	    values(#NUMFORMATID#,#NUMFORMATMC#,#NUMTYPE#,#DECIMALS#,#ROUNDTYPE#,#CREATER#,#CRENAME#,convert(varchar, getdate(), 20),#CREATER#,convert(varchar, getdate(), 20),
+  #STATE#,0)
+	</insert>
+
+<update id="updateOneRecord" parameterClass="map">
+    update ${SYSSCHEMA}.T_SYS_NUMFORMAT
+    <dynamic prepend="set">
+        <isNotNull  prepend="," property="NUMFORMATMC"><![CDATA[NUMFORMATMC = #NUMFORMATMC#]]></isNotNull>
+        <isNotNull  prepend="," property="NUMTYPE"><![CDATA[NUMTYPE = #NUMTYPE#]]></isNotNull>
+        <isNotNull  prepend="," property="DECIMALS"><![CDATA[DECIMALS = #DECIMALS#]]></isNotNull>
+        <isNotNull  prepend="," property="ROUNDTYPE"><![CDATA[ROUNDTYPE = #ROUNDTYPE#]]></isNotNull>
+        <isNotNull  prepend="," property="STATE"><![CDATA[STATE = #STATE#]]></isNotNull>
+    </dynamic>
+    where NUMFORMATID=#NUMFORMATID#
+</update>
+	
+	<delete id="deleteOneRecord" parameterClass="String">
+	   delete from ${SYSSCHEMA}.T_SYS_NUMFORMAT where NUMFORMATID=#NUMFORMATID#
+	</delete>
+	
+	<update id="updatestate" parameterClass="map">
+	    update ${SYSSCHEMA}.T_SYS_NUMFORMAT
+	    set state=#STATE#
+	    where NUMFORMATID=#NUMFORMATID#
+	</update>
+</sqlMap>
+

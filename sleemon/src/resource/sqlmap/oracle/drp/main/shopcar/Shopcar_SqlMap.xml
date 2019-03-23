@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ *@module 基础资料
+ *@func 货品信息
+ *@version 1.1
+ *@author 刘曰刚
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Shopcar">
+
+	<typeAlias type="com.hoperun.drp.main.shopcar.model.ShopcarModel"
+		alias="ShopcarModel" />
+
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="ShopcarModel" class="ShopcarModel">
+		<result column="SHOP_CART_ID" property="SHOP_CART_ID" />
+	</resultMap>
+	<!-- 动态查询 and 列表排序 -->
+	<sql id="queryDynSql"> 
+		<isNotEmpty prepend="and " property="LEDGER_ID">u.LEDGER_ID =#LEDGER_ID#</isNotEmpty>
+		<isNotEmpty prepend="and " property="DEL_FLAG">u.DEL_FLAG =#DEL_FLAG#</isNotEmpty>
+		<isNotEmpty prepend="and " property="DEAL_FLAG">u.DEAL_FLAG =#DEAL_FLAG#</isNotEmpty>
+		<isNotEmpty prepend="and " property="sql"> $sql$ </isNotEmpty>
+		<isNotEmpty prepend="and " property="SHOP_CART_TYPE">u.SHOP_CART_TYPE=#SHOP_CART_TYPE#</isNotEmpty>
+		<isNotEmpty prepend="and " property="PRDNOS">$PRDNOS$</isNotEmpty>
+	</sql>
+    <sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField"> $orderField$</isNotEmpty>
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[
+				select 
+					u.SHOP_CART_ID,
+					u.PRD_ID,
+					u.PRD_NO,
+					u.PRD_NAME,
+					u.PRD_SPEC,
+					u.PRD_COLOR,
+					u.BRAND,
+					u.SESSION_ID,
+					u.STD_UNIT,
+					u.SPCL_TECH_ID,
+					c.SPCL_TECH_FLAG,
+					c.SPCL_SPEC_REMARK,
+					u.PRICE,
+					u.DECT_RATE,
+	      			u.DECT_PRICE,
+					u.ORDER_NUM,
+					u.ORDER_AMOUNT,
+					b.PIC_PATH,
+					NVL(b.VOLUME,1) VOLUME,
+					u.SHOP_CART_TYPE,
+					b.FACT_PRICE,
+					NVL(b.PRD_SUIT_FLAG,0)PRD_SUIT_FLAG,
+					to_char(u.ORDER_RECV_DATE,'yyyy-MM-DD') ORDER_RECV_DATE,
+					c.TECH_MULT,
+					c.TECH_AMOUNT
+				from DRP_SHOP_CART u 
+					left join BASE_PRODUCT b on u.PRD_ID=b.PRD_ID
+					left join DRP_SPCL_TECH c on u.SPCL_TECH_ID = c.SPCL_TECH_ID and c.USE_FLAG = 1
+				]]>
+		<dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	<!-- 主表分页查询 -->
+	<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+			<include refid="public.pageBegin" />
+			<include refid="coreSql" />
+			<include refid="public.pageEnd" />
+		</select>
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+	      <![CDATA[
+	      	select 
+					count(0)
+				from DRP_SHOP_CART u 
+					left join BASE_PRODUCT b on u.PRD_ID=b.PRD_ID
+					left join DRP_SPCL_TECH c on u.SPCL_TECH_ID = c.SPCL_TECH_ID and c.USE_FLAG = 1
+	    ]]>
+		<dynamic prepend="where">
+				<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+	<!-- 更新购物车 -->
+	<update id="update" parameterClass="map">
+		<![CDATA[ update DRP_SHOP_CART ]]>
+		<dynamic prepend="set">
+			<isNotNull property="SPCL_TECH_ID" prepend=","><![CDATA[SPCL_TECH_ID = #SPCL_TECH_ID# ]]></isNotNull>
+		    <isNotNull property="ORDER_NUM" prepend=","><![CDATA[ORDER_NUM = #ORDER_NUM# ]]></isNotNull>
+		    <isNotNull property="ORDER_AMOUNT" prepend=","><![CDATA[ORDER_AMOUNT = #ORDER_AMOUNT# ]]></isNotNull>
+		    <isNotNull property="DEAL_FLAG" prepend=","><![CDATA[DEAL_FLAG = #DEAL_FLAG# ]]></isNotNull>
+		    <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+		    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+		    <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+		    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+		    <isNotNull property="ORDER_RECV_DATE" prepend=","><![CDATA[ORDER_RECV_DATE = to_date(#ORDER_RECV_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+		    
+	    </dynamic>
+		<![CDATA[ where SHOP_CART_ID = #SHOP_CART_ID#]]>
+	</update>
+	
+	<!-- 购物车临时工艺表转购物车工艺表 -->
+	<insert id="insertSpcl" parameterClass="map">
+		<![CDATA[
+			insert into DRP_CART_SPCL_TECH(
+				CART_SPCL_TECH_ID,
+				SHOP_CART_ID,
+				TECH_TYPE,
+				REMARK
+			)values(
+				#CART_SPCL_TECH_ID#,
+				#SHOP_CART_ID#,
+				#TECH_TYPE#,
+				#REMARK#
+			)
+		]]>
+	</insert>
+	<!-- 新增 订货订单 -->
+	<insert id="insert" parameterClass="map">
+		insert into DRP_GOODS_ORDER(
+			GOODS_ORDER_ID,
+			GOODS_ORDER_NO,
+			ORDER_CHANN_ID,
+			ORDER_CHANN_NO,
+			ORDER_CHANN_NAME,
+			SEND_CHANN_ID,
+			SEND_CHANN_NO,
+			SEND_CHANN_NAME,
+			BILL_TYPE,
+			IS_USE_REBATE,
+			RECV_CHANN_ID,
+			RECV_CHANN_NO,
+			RECV_CHANN_NAME,
+			PERSON_CON,
+			TEL,
+			RECV_ADDR,
+			STATE,
+			CREATOR,
+			CRE_NAME,
+			CRE_TIME,
+			DEPT_ID,
+			DEPT_NAME,
+			ORG_ID,
+			ORG_NAME,
+			LEDGER_ID,
+			LEDGER_NAME,
+			DEL_FLAG,
+			AREA_ID,
+			AREA_NO,
+			AREA_NAME,
+			STORE_ID,
+			STORE_NO,
+			STORE_NAME,
+			RECV_ADDR_NO,
+			ORDER_RECV_DATE,
+			SHIP_POINT_ID,
+			SHIP_POINT_NAME,
+			IS_AREA_SER_ORDER,
+			WAREA_ID,
+			WAREA_NO,
+			WAREA_NAME
+		)values(
+			#GOODS_ORDER_ID#,
+			#GOODS_ORDER_NO#,
+			#ORDER_CHANN_ID#,
+			#ORDER_CHANN_NO#,
+			#ORDER_CHANN_NAME#,
+			#SEND_CHANN_ID#,
+			#SEND_CHANN_NO#,
+			#SEND_CHANN_NAME#,
+			#BILL_TYPE#,
+			#IS_USE_REBATE#,
+			#RECV_CHANN_ID#,
+			#RECV_CHANN_NO#,
+			#RECV_CHANN_NAME#,
+			#PERSON_CON#,
+			#TEL#,
+			#RECV_ADDR#,
+			#STATE#,
+			#CREATOR#,
+			#CRE_NAME#,
+			sysdate,
+			#DEPT_ID#,
+			#DEPT_NAME#,
+			#ORG_ID#,
+			#ORG_NAME#,
+			#LEDGER_ID#,
+			#LEDGER_NAME#,
+			#DEL_FLAG#,
+			#AREA_ID#,
+			#AREA_NO#,
+			#AREA_NAME#,
+			#STORE_ID#,
+			#STORE_NO#,
+			#STORE_NAME#,
+			#RECV_ADDR_NO#,
+			to_date(#ORDER_RECV_DATE#,'yyyy-MM-DD'),
+			#SHIP_POINT_ID#,
+			#SHIP_POINT_NAME#,
+			#IS_AREA_SER_ORDER#,
+			#WAREA_ID#,
+			#WAREA_NO#,
+			#WAREA_NAME#
+		)
+	</insert>
+	<insert id="insertDtl" parameterClass="map" >
+		insert into DRP_GOODS_ORDER_DTL(
+			GOODS_ORDER_DTL_ID,
+			GOODS_ORDER_ID,
+			PRD_ID,
+			PRD_NO,
+			PRD_NAME,
+			PRD_SPEC,
+			PRD_COLOR,
+			BRAND,
+			STD_UNIT,
+			PRICE,
+			DECT_RATE,
+			DECT_PRICE,
+			ORDER_NUM,
+			ORDER_AMOUNT,
+			DEL_FLAG,
+			VOLUME,
+			TOTAL_VOLUME,
+			SPCL_TECH_ID,
+			IS_NO_STAND_FLAG,
+			ORDER_RECV_DATE,
+			REBATE_PRICE,
+			REMARK,
+			OLD_PRICE,
+			REBATE_AMOUNT,
+			ROW_NO
+		)values(
+			#GOODS_ORDER_DTL_ID#,
+			#GOODS_ORDER_ID#,
+			#PRD_ID#,
+			#PRD_NO#,
+			#PRD_NAME#,
+			#PRD_SPEC#,
+			#PRD_COLOR#,
+			#BRAND#,
+			#STD_UNIT#,
+			#PRICE#,
+			#DECT_RATE#,
+			#DECT_PRICE#,
+			#ORDER_NUM#,
+			#ORDER_AMOUNT#,
+			#DEL_FLAG#,
+			#VOLUME#,
+			#TOTAL_VOLUME#,
+			#SPCL_TECH_ID#,
+			#IS_NO_STAND_FLAG#,
+			to_date(#ORDER_RECV_DATE#,'yyyy-MM-DD'),
+			#REBATE_PRICE#,
+			#REMARK#,
+			#PRICE#,
+			#REBATE_AMOUNT#,
+			#ROW_NO#
+		)
+	</insert>
+	<!-- //0156403 Start 刘曰刚 2013-06-17//-->
+	<!-- 修改渠道信息信用获取方式 -->
+	<select id="getChannInfo" parameterClass="string" resultClass="java.util.HashMap">
+		<![CDATA[
+			select 
+				a.CHANN_ID,
+				a.CHANN_NO,
+				a.CHANN_NAME,
+				a.AREA_ID,
+				a.AREA_NO,
+				a.AREA_NAME,
+				(NVL(a.REBATE_CURRT,0)-NVL(a.REBATE_FREEZE,0)) REBATE_CURRT,
+				a.PERSON_CON,
+				a.TEL,
+				a.ADDRESS,
+				NVL(a.CREDIT_CURRT,0) CREDIT_CURRT,
+        		(sum(NVL(b.TEMP_CREDIT_REQ,0))+NVL(a.PAYMENT_CREDIT,0))  TEMP_CREDIT,
+        		NVL(a.REBATE_TOTAL,0) REBATE_TOTAL
+			from BASE_CHANN a 
+			left join ERP_TEMP_CREDIT_REQ b on a.CHANN_ID=b.CHANN_ID and b.STATE='审核通过' and b.DEL_FLAG=0 and b.TEMP_CREDIT_VALDT>=sysdate
+			where a.CHANN_ID=#CHANN_ID#
+		      group by
+		        a.CHANN_ID,
+				a.CHANN_NO,
+				a.CHANN_NAME,
+				a.AREA_ID,
+				a.AREA_NO,
+				a.AREA_NAME,
+				a.CREDIT_CURRT,
+				a.TEMP_CREDIT,
+				a.REBATE_CURRT,
+				a.PERSON_CON,
+				a.TEL,
+				a.ADDRESS,
+				a.PAYMENT_CREDIT,
+				a.REBATE_TOTAL,
+				a.REBATE_FREEZE
+		]]>
+	</select>
+
+
+<!-- 渠道信息信用获取方式  by zzb(cj) 2014-7-02-->
+<select id="getChannCreDit" parameterClass="map" resultClass="java.util.HashMap">
+	  select 
+	   a.CHANN_ID,
+       a.CHANN_NO,
+       a.CHANN_NAME,
+       a.AREA_ID,
+       a.AREA_NO,
+       a.AREA_NAME,
+       (NVL(a.REBATE_CURRT, 0) - NVL(a.REBATE_FREEZE, 0)) REBATE_CURRT,
+       a.PERSON_CON,
+       a.TEL,
+       a.ADDRESS,
+       NVL(a.INI_CREDIT,0)INI_CREDIT,
+       NVL(a.FREEZE_CREDIT,0) FREEZE_CREDIT,
+       NVL(a.CREDIT_CURRT, 0) CREDIT_CURRT,
+       NVL(a.PAYMENT_CREDIT, 0) PAYMENT_CREDIT ,
+       NVL(a.REBATE_TOTAL, 0) REBATE_TOTAL,
+       (select NVL(sum(b.TEMP_CREDIT_REQ),0)TEMP_CREDIT_REQ from ERP_TEMP_CREDIT_REQ b where 1=1 
+        and b.STATE = '审核通过' and b.DEL_FLAG = 0 and b.TEMP_CREDIT_VALDT >= sysdate 
+        and b.CHANN_ID=#CHANN_ID#
+       )TEMP_CREDIT_REQ
+      from BASE_CHANN a  where a.CHANN_ID = #CHANN_ID#
+	
+</select>
+	 
+	  
+	 
+	 
+	 
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update DRP_SHOP_CART 
+	               set DEL_FLAG = #DEL_FLAG# ,UPD_NAME=#UPD_NAME#  ,UPDATOR=#UPDATOR# ,UPD_TIME=sysdate
+ 	  where 
+	     SHOP_CART_ID in ($SHOP_CART_IDS$)
+    ]]>
+</delete>
+
+
+
+<!-- 根据货品id获取货品体积 -->
+<select id="getPrdVOLUME" resultClass="int" parameterClass="string">
+	select VOLUME from BASE_PRODUCT where PRD_ID=#PRD_ID#
+</select>
+<update id="upShopCar" parameterClass="map">
+	update DRP_SHOP_CART set GOODS_ORDER_ID=#GOODS_ORDER_ID#
+	where SHOP_CART_ID in ($SHOP_CART_IDS$)
+</update>
+<update id="upPrice" parameterClass="map">
+	update DRP_SHOP_CART set 
+		PRICE=#PRICE#,
+		DECT_RATE=#DECT_RATE#,
+		DECT_PRICE=#DECT_PRICE#,
+		ORDER_NUM=#ORDER_NUM#,
+		ORDER_AMOUNT=#ORDER_AMOUNT#
+	where SHOP_CART_ID =#SHOP_CART_ID#
+</update>
+<!-- 根据传进来的工艺单id查询合并后的数据 -->
+<select id="getPrdInfo" parameterClass="string" resultClass="java.util.HashMap">
+	<![CDATA[
+		select 
+			a.PRD_ID,
+			a.PRD_NO,
+			a.PRD_NAME,
+			a.PRD_SPEC,
+			a.PRD_COLOR,
+			a.BRAND,
+			a.STD_UNIT,
+			a.PRICE,
+			a.DECT_RATE,
+			a.DECT_PRICE,
+			a.SHOP_CART_TYPE,
+			sum(a.ORDER_NUM) ORDER_NUM,
+			sum(a.ORDER_AMOUNT) ORDER_AMOUNT,
+			a.SPCL_TECH_ID,
+			a.VOLUME,
+			sum((a.ORDER_NUM*a.VOLUME)) TOTAL_VOLUME,
+			b.SPCL_TECH_FLAG,
+			to_char(a.ORDER_RECV_DATE,'yyyy-MM-DD')ORDER_RECV_DATE,
+			sum(NVL(b.TECH_MULT,0)) TECH_MULT,
+			sum(NVL(b.TECH_AMOUNT,0)) TECH_AMOUNT,
+			a.REMARK
+		from DRP_SHOP_CART a
+		left join DRP_SPCL_TECH b on a.SPCL_TECH_ID=b.SPCL_TECH_ID and b.USE_FLAG=1
+		where  a.SHOP_CART_ID in ($SHOP_CART_IDS$)
+		group by
+			a.PRD_ID,
+			a.PRD_NO,
+			a.PRD_NAME,
+			a.PRD_SPEC,
+			a.PRD_COLOR,
+			a.BRAND,
+			a.STD_UNIT,
+			a.PRICE,
+			a.DECT_RATE,
+			a.DECT_PRICE,
+			a.VOLUME,
+			a.SPCL_TECH_ID,
+			b.SPCL_TECH_FLAG,
+			a.ORDER_RECV_DATE,
+			a.SHOP_CART_TYPE,
+			a.REMARK,
+			decode(a.REMARK,'','NULL',a.REMARK||rownum)
+	]]>
+</select>
+<!-- 更新处理标记 -->
+<update id="upDeal" parameterClass="map">
+	<![CDATA[
+		update DRP_SHOP_CART set DEAL_FLAG=#DEAL_FLAG# where SHOP_CART_ID in ($SHOP_CART_IDS$)
+	]]>
+</update>
+<select id="getDate" resultClass="string">
+	select to_char(sysdate,'yyyy-mm-dd') from dual
+</select>
+<select id="getCHANN_TYPE" parameterClass="string" resultClass="java.util.HashMap">
+	select CHANN_TYPE,AREA_SER_ID from BASE_CHANN where CHANN_ID=#CHANN_ID#
+</select>
+<select id="getShipPointInfo" parameterClass="string" resultClass="java.util.HashMap">
+	select SHIP_POINT_NO,SHIP_POINT_ID,SHIP_POINT_NAME from BASE_CHANN where CHANN_ID=#CHANN_ID#
+</select>
+<select id="getLargessDect" parameterClass="map" resultClass="string">
+	select NVL(DECT_RATE,0)DECT_RATE  from BASE_CHANN_DSCT where CHANN_ID=#CHANN_ID# and DECT_TYPE=#DECT_TYPE#
+</select>
+<select id="getWareaInfo" parameterClass="string" resultClass="java.util.HashMap">
+	select b.AREA_ID_P WAREA_ID, b.AREA_NO_P WAREA_NO, b.AREA_NAME_P WAREA_NAME
+	  from BASE_CHANN a
+	  left join BASE_AREA b
+	    on a.AREA_ID = b.AREA_ID
+	 where a.CHANN_ID = #CHANN_ID#
+
+</select>
+
+<!-- 查询订货订单号是否重复了 -->
+<select id="judgeGoodNo" parameterClass="string" resultClass="int">
+  select count(1) from DRP_GOODS_ORDER t where t.GOODS_ORDER_NO=#GOODS_ORDER_NO#
+</select>
+<select id="checkAdvcReturn" parameterClass="map" resultClass="int">
+	select count(1) from DRP_SHOP_CART a where a.SHOP_CART_ID in ($SHOP_CART_IDS$) and a.DEL_FLAG=#DEL_FLAG#
+</select>
+</sqlMap>

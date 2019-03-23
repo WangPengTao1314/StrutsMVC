@@ -1,0 +1,83 @@
+
+
+.dis {
+	display: block;
+}
+
+.undis {
+	display: none;
+}
+
+/*- Menu Tabs F--------------------------- */
+#tabsF {
+	line-height: normal;
+	height:24px;
+	background-color:#cde0fa; 
+	FILTER: progid:DXImageTransform.Microsoft.Gradient(gradientType=0,startColorStr=#cde0fa,endColorStr=#EEF4FF);
+}
+
+#tabsF ul {
+	margin: 0;
+	padding: 10px 10px 0 6px;
+	list-style: none;
+}
+
+#tabsF li {
+	display: inline;
+	margin: 0;
+	padding: 0;
+}
+
+#tabsF a {
+	float: left;
+	background: url("../images/tabs/tableft.gif") no-repeat left top;
+	margin: 0;
+	padding: 0 0 0 4px;
+	text-decoration: none;
+	
+}
+
+#tabsF a span {
+	float: left;
+	display: block;
+	background: url("../images/tabs/tabright.gif") no-repeat right top;
+	padding: 5px 15px 4px 6px;
+	color: #666;
+}
+
+/* Commented Backslash Hack hides rule from IE5-Mac \*/
+#tabsF a span {
+	float: none;
+}
+
+/* End IE5-Mac hack */
+#tabsF a:hover span {
+	
+}
+
+#tabsF a:hover {
+	background-position: 0% -42px;
+}
+
+#tabsF a:hover span {
+	background-position: 100% -42px;
+}
+
+#tabsF a.hovertab {
+	background-position: 0% -42px;
+	border-bottom-color:#FFFFFF;
+}
+
+#tabsF a.hovertab span {
+	background-position: 100% -42px;
+	font-weight: bold;
+	color: #14418b;
+}
+
+#tabsF a.normaltab {
+	
+}
+
+#tabsF a.normaltab span {
+	
+}

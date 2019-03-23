@@ -1,0 +1,546 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd"
+	default-autowire="byName">
+
+
+	<!-- 分发指令接收-->
+	<bean name="/dstrorder" class="com.hoperun.drp.sale.dstrorder.action.DstrorderAction"
+		scope="singleton">
+		<property name="dstrorderService" ref="dstrorderService"></property>
+	</bean>
+
+	<!-- 预订单录入 lyg -->
+	<bean name="/advcorder" class="com.hoperun.drp.sale.advcorder.action.AdvcorderAction"
+		scope="singleton">
+		<property name="advcorderService" ref="advcorderService"></property>
+	</bean>
+
+	<!-- 库房库位信息wdb -->
+	<bean name="/store" class="com.hoperun.drp.base.store.action.StoreAction"
+		scope="singleton">
+		<property name="storeService" ref="storeService"></property>
+	</bean>
+	<!-- 退货申请单维护 add by  wzg -->
+	<bean name="/prdreturnreq" class="com.hoperun.drp.sale.prdreturnreq.action.PrdreturnreqAction" scope="singleton">
+	    <property name="prdreturnreqService" ref="prdreturnreqService"></property>
+	</bean>
+	<!-- 我的退货单 add by  wzg -->
+	<bean name="/myretrun" class="com.hoperun.drp.sale.myretrun.action.MyretrunAction" scope="singleton">
+	    <property name="myretrunService" ref="myretrunService"></property>
+	</bean>
+	
+	<!--喜临门营销平台-->
+	<bean name="/storediff" class="com.hoperun.drp.store.storediff.action.StorediffAction" scope="singleton">
+		    <property name="storediffService" ref="storediffService"></property>
+	</bean>
+	
+
+	<!-- 投诉与建议查询  -->
+	<bean name="/advise" class="com.hoperun.drp.sale.advise.action.AdviseAction" scope="singleton">
+	    <property name="adviseService" ref="adviseService"></property>
+	</bean>
+	
+	<!--入库通知单维护-->
+	<bean name="/storeinnotice" class="com.hoperun.drp.store.storeinnotice.action.StoreinnoticeAction" scope="singleton">
+	    <property name="storeinnoticeService" ref="storeinnoticeService"></property>
+	</bean>
+	<!--终端退货录入-->
+	<bean name="/termreturn" class="com.hoperun.drp.sale.termreturn.action.TermreturnAction" scope="singleton">
+	    <property name="termreturnService" ref="termreturnService"></property>
+	</bean>
+	<!-- 投诉与建议  -->
+	<bean name="/adviseinit" class="com.hoperun.drp.sale.adviseinit.action.AdviseinitAction" scope="singleton">
+	    <property name="adviseinitService" ref="adviseinitService"></property>
+	</bean>
+	<!-- 付款凭证上传 -->
+	<bean name="/paymentup" class="com.hoperun.drp.sale.paymentup.action.PaymentupAction" scope="singleton">
+	    <property name="paymentupService" ref="paymentupService"></property>
+	</bean>
+	<!-- 分销业务一》人员信息 -->
+	<bean name="/employee" class="com.hoperun.drp.base.employee.action.EmployeeAction" scope="singleton">
+	    <property name="employeeService" ref="employeeService"></property>
+	</bean>
+	<!--入库单处理-->
+	<bean name="/storein" class="com.hoperun.drp.store.storein.action.StoreinAction" scope="singleton">
+		    <property name="storeinService" ref="storeinService"></property>
+	</bean>
+	<!-- 预订单转订货 lyg -->
+	<bean name="/advctoorder" class="com.hoperun.drp.sale.advctoorder.action.AdvctoorderAction"
+		scope="singleton">
+		<property name="advctoorderService" ref="advctoorderService"></property>
+	</bean>
+	
+	<!--转储-->
+	<bean name="/dump" class="com.hoperun.drp.store.dump.action.DumpAction" scope="singleton">
+		 <property name="dumpService" ref="dumpService"></property>
+	</bean>
+	
+	<!--调拨申请维护/审核  -->
+	<bean name="/allocate" class="com.hoperun.drp.store.allocate.action.AllocateAction" scope="singleton">
+	    <property name="allocateService" ref="allocateService"></property>
+	</bean>
+	<!--盘点单维护/审核  -->
+	<bean name="/inventory" class="com.hoperun.drp.store.inventory.action.InventoryAction" scope="singleton">
+	    <property name="inventoryService" ref="inventoryService"></property>
+	</bean>
+	
+	<!--库存储备-->
+	<bean name="/resvstore" class="com.hoperun.drp.base.resvstore.action.ResvstoreAction" scope="singleton">
+		    <property name="resvstoreService" ref="resvstoreService"></property>
+	</bean>
+	
+	<!--分销首页-->
+	<bean name="/drpFirpage" class="com.hoperun.drp.main.firpage.action.DrpFirpageAction" scope="singleton">
+		    <property name="drpFirpageService" ref="drpFirpageService"></property>
+	</bean>
+	<!--我要订货-->
+	<bean name="/myorder" class="com.hoperun.drp.main.myorder.action.MyorderAction" scope="singleton">
+		    <property name="myorderService" ref="myorderService"></property>
+	</bean>
+	<!--销售出库处理-->
+	<bean name="/storeout" class="com.hoperun.drp.store.storeout.action.StoreoutAction" scope="singleton">
+		    <property name="storeoutService" ref="storeoutService"></property>
+	</bean>
+	
+	<!--退货出库处理-->
+	<bean name="/rtstoreout" class="com.hoperun.drp.store.storeout.action.StoreoutAction" scope="singleton">
+		    <property name="storeoutService" ref="storeoutService"></property>
+	</bean>
+	
+    <!--调拨出库处理-->
+	<bean name="/dbstoreout" class="com.hoperun.drp.store.storeout.action.StoreoutAction" scope="singleton">
+		    <property name="storeoutService" ref="storeoutService"></property>
+	</bean>
+	
+	<!--分发出库处理-->
+	<bean name="/dstrstoreout" class="com.hoperun.drp.store.storeout.action.StoreoutAction" scope="singleton">
+		    <property name="storeoutService" ref="storeoutService"></property>
+	</bean>
+	
+	    <!--返修出库处理-->
+	<bean name="/repairstoreout" class="com.hoperun.drp.store.storeout.action.StoreoutAction" scope="singleton">
+		    <property name="storeoutService" ref="storeoutService"></property>
+	</bean>
+	
+	<!--订货订单-->
+	<bean name="/goodsorderhd" class="com.hoperun.drp.sale.goodsorderhd.action.GoodsorderhdAction" scope="singleton">
+		    <property name="goodsorderhdService" ref="goodsorderhdService"></property>
+	</bean>
+	<!--购物车-->
+	<bean name="/shopcar" class="com.hoperun.drp.main.shopcar.action.ShopcarAction" scope="singleton">
+		    <property name="shopcarService" ref="shopcarService"></property>
+	</bean>
+	
+	<!--整车计算-->
+	<bean name="/carcalculate" class="com.hoperun.drp.main.carcalculate.action.CarcalculateAction" 
+	          scope="singleton">
+		    <property name="carcalculateService" ref="carcalculateService"></property>
+	</bean>
+	
+	<!-- 客户收款单 -->
+	<bean name="/advpayment" class="com.hoperun.drp.finance.advpayment.action.AdvpaymentAction" scope="singleton">
+	    <property name="advpaymentService" ref="advpaymentService"></property>
+	</bean>
+	
+	<!-- 客户退款单 -->
+	<bean name="/custrefundments" class="com.hoperun.drp.finance.custrefundments.action.CustRefundmentAction" scope="singleton">
+	    <property name="custRefundmentService" ref="custRefundmentService"></property>
+	</bean>
+	
+	<!-- 预定单结算 -->
+	<bean name="/preorderpayment" class="com.hoperun.drp.finance.preorderpayment.action.PreorderpaymentAction" scope="singleton">
+	    <property name="preorderpaymentService" ref="preorderpaymentService"></property>
+	</bean>
+	<!-- 预订单发货 lyg -->
+	<bean name="/advctoout" class="com.hoperun.drp.sale.advctoout.action.AdvctooutAction"
+		scope="singleton">
+		<property name="advctooutService" ref="advctooutService"></property>
+	</bean>
+	<!--预订单退货-->
+	<bean name="/advcreturn" class="com.hoperun.drp.sale.advcreturn.action.AdvcreturnAction" scope="singleton">
+	    <property name="advcreturnService" ref="advcreturnService"></property>
+	</bean>
+	<!-- 客户退货结算 -->
+	<bean name="/restatements" class="com.hoperun.drp.finance.restatements.action.RestatementsAction" scope="singleton">
+	    <property name="restatementsService" ref="restatementsService"></property>
+	</bean>
+	
+	<!-- 预订单核销 -->
+	<bean name="/advcverify" class="com.hoperun.drp.finance.advcverify.action.AdvcverifyAction" scope="singleton">
+	    <property name="advcverifyService" ref="advcverifyService"></property>
+	</bean>
+	<!-- 返修单申请审核 -->
+	<bean name="/repairapp" class="com.hoperun.drp.sale.repairapp.action.RepairappAction" scope="singleton">
+	    <property name="repairappService" ref="repairappService"></property>
+	</bean>
+	
+	 <!--返修出库-->
+	<bean name="/repairout" class="com.hoperun.drp.sale.repairstoreout.action.RepairStoreoutAction" scope="singleton">
+		    <property name="repairStoreoutService" ref="repairStoreoutService"></property>
+	</bean>
+	
+	<!--返修收货确认-->
+	<bean name="/repairrecv" class="com.hoperun.drp.sale.repairrecv.action.RepairrecvAction" scope="singleton">
+		    <property name="repairrecvService" ref="repairrecvService"></property>
+	</bean>
+	<!--返修发货-->
+	<bean name="/repairsend" class="com.hoperun.drp.sale.repairsend.action.RepairsendAction" scope="singleton">
+		    <property name="repairsendService" ref="repairsendService"></property>
+	</bean>
+	<!-- 预订单核价 lyg -->
+	<bean name="/advccheckprice" class="com.hoperun.drp.sale.advccheckprice.action.AdvccheckpriceAction"
+		scope="singleton">
+		<property name="advccheckpriceService" ref="advccheckpriceService"></property>
+	</bean>
+	<!--预订单发货申请-->
+	<bean name="/advcgoodsapp" class="com.hoperun.drp.sale.advcgoodsapp.action.AdvcgoodsappAction" scope="singleton">
+		    <property name="advcgoodsappService" ref="advcgoodsappService"></property>
+	</bean>
+	
+	<!--销售收货确认-->
+	<bean name="/storeoutconfirm" class="com.hoperun.drp.store.storeoutconfirm.action.StoreoutconfirmAction" scope="singleton">
+		    <property name="storeoutconfirmService" ref="storeoutconfirmService"></property>
+	</bean>
+	
+	<!--订单特殊工艺 lyg-->
+	<bean name="/techorderManager" class="com.hoperun.commons.techorder.action.TechorderManagerAction" scope="singleton">
+		    <property name="techorderManagerService" ref="techorderManagerService"></property>
+	</bean>
+	
+	<!-- 应收余额查询 -->
+	<bean name="/querypaymentrep" class="com.hoperun.drp.report.querypaymentrep.action.QuerypaymentrepAction" scope="singleton">
+	        <property name="queryPayMentRepService" ref="queryPayMentRepService"></property>
+	</bean>
+	
+	<!-- 库存查询 -->
+	<bean name="/querystock" class="com.hoperun.drp.report.querystock.action.QuerystockAction" scope="singleton">
+	        <property name="querystockService" ref="querystockService"></property>
+	</bean>
+	
+	<!--报表[退货查询 ]-->
+	<bean name="/drp/report/queryReutrnRep" class="com.hoperun.drp.report.queryReutrnRep.action.QueryReutrnRepAction" scope="singleton">
+		    <property name="queryReutrnRepService" ref="queryReutrnRepService"></property>
+	</bean>
+	<!--报表[生产情况查询]-->
+	<bean name="/drp/report/queryProStatus" class="com.hoperun.drp.report.queryProStatus.action.QueryProStatusAction" scope="singleton">
+		    <property name="queryProStatusService" ref="queryProStatusService"></property>
+	</bean>
+	<!-- 渠道参数设置 -->
+	<bean name="/paramset" class="com.hoperun.drp.base.paramset.action.ParamsetAction" scope="singleton">
+	        <property name="paramsetService" ref="paramsetService"></property>
+	</bean>
+	
+	<!--预订单变更-->
+	<bean name="/changeadvcorder" class="com.hoperun.drp.sale.changeadvcorder.action.ChangeadvcorderAction"
+		scope="singleton">
+		<property name="changeadvcorderService" ref="changeadvcorderService"></property>
+	</bean>
+	<!--预订单发货取消-->
+	<bean name="/advccancelsapp" class="com.hoperun.drp.sale.advccancelsapp.action.AdvccancelsappAction" scope="singleton">
+		    <property name="advccancelsappService" ref="advccancelsappService"></property>
+	</bean>
+	<!--分销-区域服务中心-订货订单处理-->
+	<bean name="/sergoodsorder" class="com.hoperun.drp.sale.sergoodsorder.action.SergoodsorderAction" scope="singleton">
+		    <property name="sergoodsorderService" ref="sergoodsorderService"></property>
+	</bean>
+
+	<!-- 装修申请单维护 -->
+	<bean name="/decorationapp" class="com.hoperun.drp.oamg.decorationapp.action.DecorationSQAction" scope="singleton">
+		    <property name="decorationSQService" ref="decorationSQService"></property>
+	</bean>
+    
+    <!-- 装修补贴标准维护 -->
+    <bean name="/decorationallo" class="com.hoperun.drp.oamg.decorationallo.action.DecorationalloAction" scope="singleton">
+            <property name="decorationalloService" ref="decorationalloService"></property>
+    </bean>
+    
+    <!-- 装修验收单维护 -->
+    <bean name="/rnvtncheck" class="com.hoperun.drp.oamg.rnvtncheck.action.RnvtncheckAction" scope="singleton">
+           <property name="rnvtncheckService" ref="rnvtncheckService"></property>
+    </bean>
+    <!-- 装修整改单维护 -->
+    <bean name="/rnvtnreform" class="com.hoperun.drp.oamg.rnvtnreform.action.RnvtnreformAction" scope="singleton">
+           <property name="rnvtnreformService" ref="rnvtnreformService"></property>
+    </bean>
+    <!-- 装修整改验收单维护 -->
+    <bean name="/rnvtnreformcheck" class="com.hoperun.drp.oamg.rnvtnreformcheck.action.RnvtnreformcheckAction" scope="singleton">
+           <property name="rnvtnreformcheckService" ref="rnvtnreformcheckService"></property>
+    </bean>
+    
+    <!-- 总部-入库通知单 -->
+    <bean name="/tstoreIn" class="com.hoperun.drp.oamg.tstoreIn.action.StoreInAction" scope="singleton">
+           <property name="storeInService" ref="storeInService"></property>
+    </bean>
+	<!--分销-区域服务中心-销售订单处理-->
+	<bean name="/sersaleorder" class="com.hoperun.drp.sale.sersaleorder.action.SersaleorderAction" scope="singleton">
+		    <property name="sersaleorderService" ref="sersaleorderService"></property>
+	</bean>
+	<!--分销-区域服务中心-销售订单转订货-->
+	<bean name="/sotoadvorder" class="com.hoperun.drp.areaser.sotoadvorder.action.SotoadvorderAction" scope="singleton">
+		    <property name="sotoAdvorderService" ref="sotoAdvorderService"></property>
+	</bean>
+	<!--专卖店转分销店申请单维护-->
+	<bean name="/storetoretail" class="com.hoperun.drp.oamg.storetoretail.action.StoretoretailAction" scope="singleton">
+		    <property name="storetoretailService" ref="storetoretailService"></property>
+	</bean>
+
+	<!--分销-区域服务中心-出库通知管理-销售出库通知单维护-->
+	<bean name="/storeoutnotice" class="com.hoperun.drp.areaser.storeoutnotice.action.StoreoutnoticeAction" scope="singleton">
+		    <property name="storeoutnoticeService" ref="storeoutnoticeService"></property>
+	</bean>
+
+	<!--分销-区域服务中心-退货单审核-->
+	<bean name="/returnpdtrls" class="com.hoperun.drp.areaser.returnpdtrls.action.ReturnpdtrlsAction" scope="singleton">
+		    <property name="returnpdtrlsService" ref="returnpdtrlsService"></property>
+	</bean>
+	
+<!-- 	分销-区域服务中心-销售出库处理-->
+	<bean name="/serstoreouthd" class="com.hoperun.drp.store.storeout.action.StoreoutAction" scope="singleton">
+		    <property name="storeoutService" ref="storeoutService"></property>
+	</bean>
+
+    <!-- 渠道管理-装修管理-装修报销申请单维护 -->
+	<bean name="/decorationreit" class="com.hoperun.drp.oamg.decorationreit.action.DecorationreitAction" scope="singleton">
+		    <property name="decorationreitService" ref="decorationreitService"></property>
+	</bean>
+	
+	<!-- 推广费用申请单维护 -->
+	<bean name="/promoexpen" class="com.hoperun.drp.oamg.promoexpen.action.PromoexpenAction" scope="singleton">
+	    <property name="promoexpenService" ref="promoexpenService"></property>
+	</bean>
+	<!-- 推广费用报销单维护 -->
+	<bean name="/promoreim" class="com.hoperun.drp.oamg.promoreim.action.PromoreimAction" scope="singleton">
+	    <property name="promoreimService" ref="promoreimService"></property>
+	</bean>
+	
+	<!-- 开业大礼包申请单维护 -->
+	<bean name="/openbusspkg" class="com.hoperun.drp.oamg.openbusspkg.action.OpenbusspkgAction" scope="singleton">
+	    <property name="openbusspkgService" ref="openbusspkgService"></property>
+	</bean>
+	<!--门店精致化检查结果-->
+	<bean name="/termrefinecheck" class="com.hoperun.drp.oamg.termrefinecheck.action.TermrefinecheckAction" scope="singleton">
+		    <property name="termrefinecheckService" ref="termrefinecheckService"></property>
+	</bean>
+	
+	<!-- 检查方案 -->
+	<bean name="/plancheck" class="com.hoperun.drp.oamg.plancheck.action.ChanncheckplanAction" scope="singleton">
+            <property name="plancheckService" ref="plancheckService"></property>
+    </bean>
+	<!--总部直发通知单-->
+	<bean name="/senddirectnotice" class="com.hoperun.drp.areaser.senddirectnotice.action.SenddirectnoticeAction" scope="singleton">
+		    <property name="senddirectnoticeService" ref="senddirectnoticeService"></property>
+	</bean>
+
+	<!-- 拓展拜访表维护 -->
+	<bean name="/expandvisit" class="com.hoperun.drp.visit.expandvisit.action.ExpandVisitAction" scope="singleton">
+		    <property name="expandvisitService" ref="expandvisitService"></property>
+	</bean>
+	
+	<!-- 加盟商拜访表维护 -->
+	<bean name="/channvisit" class="com.hoperun.drp.visit.channvisit.action.ChannVisitAction" scope="singleton">
+		    <property name="channvisitService" ref="channvisitService"></property>
+	</bean>
+	
+	<!-- 门店拜访表维护 -->
+    <bean name="/storevisit" class="com.hoperun.drp.visit.storevisit.action.StoreVisitAction" scope="singleton">
+		    <property name="storevisitService" ref="storevisitService"></property>
+	</bean>
+	<!--我的销售订单-->
+	<bean name="/saleorderview" class="com.hoperun.drp.sale.saleorderview.action.SaleorderviewAction" scope="singleton">
+		    <property name="saleorderviewService" ref="saleorderviewService"></property>
+	</bean>
+	
+	<!--报表[销售订单生产状态查询]-->
+	<bean name="/drp/report/saleProStatus" class="com.hoperun.drp.report.saleProStatus.action.SaleProStatusAction" scope="singleton">
+		    <property name="saleProStatusService" ref="saleProStatusService"></property>
+	</bean>
+	<!--培训申请单-->
+	<bean name="/trainreq" class="com.hoperun.drp.oamg.trainreq.action.TrainreqAction" scope="singleton">
+		    <property name="trainreqService" ref="trainreqService"></property>
+	</bean>
+	<!-- 广告投放报销申请单维护 -->
+	<bean name="/advreit" class="com.hoperun.drp.oamg.advreit.action.AdvreitAction" scope="singleton">
+		    <property name="advreitService" ref="advreitService"></property>
+	</bean>
+	
+	<!--广告投放申请单-->
+	<bean name="/advreq" class="com.hoperun.drp.adv.advreq.action.AdvreqAction" scope="singleton">
+		    <property name="advreqService" ref="advreqService"></property>
+	</bean>
+	
+	<!--待发货预订单-->
+	<bean name="/advcgoodslook" class="com.hoperun.drp.sale.advcgoodslook.action.AdvcgoodslookAction" scope="singleton">
+		   <property name="advcgoodslookService" ref="advcgoodslookService"></property>
+	</bean>
+	
+	<!--待确认预订单-->
+	<bean name="/uncomm" class="com.hoperun.drp.sale.uncomm.action.UncommAction" scope="singleton">
+		   <property name="uncommService" ref="uncommService"></property>
+	</bean>
+	
+	<!--活动-->
+	<bean name="/promote" class="com.hoperun.drp.base.promote.action.PromoteAction" scope="singleton">
+		   <property name="promoteService" ref="promoteService"></property>
+	</bean>
+	
+	<!--销售报表 -->
+	<bean name="/storereport" class="com.hoperun.erp.report.storereport.action.StoreReportAction" scope="singleton">
+	    <property name="storeReportService" ref="storeReportService"></property>
+	</bean>
+	<!--总部相关报表 -->
+	<bean name="/headreport" class="com.hoperun.erp.report.storereport.action.StoreReportAction" scope="singleton">
+	    <property name="storeReportService" ref="storeReportService"></property>
+	</bean>
+	<!-- 分销查看发运单-->
+	<bean name="/delivershow" class="com.hoperun.drp.sale.delivershow.action.DelivershowAction"
+		scope="singleton">
+		<property name="delivershowService" ref="delivershowService"></property>
+	</bean>
+	<bean name="/cw/act" class="com.hoperun.drp.finance.account.action.ActAction" scope="singleton">
+		<property name="actService" ref="actService"></property>
+	</bean>
+	<bean name="/retalprice" class="com.hoperun.drp.base.retalprice.action.RetalpriceAction" scope="singleton">
+		<property name="retalpriceService" ref="retalpriceService"></property>
+	</bean>
+	
+	<!-- 客户退款单-退货退款 -->
+	<bean name="/custrefundorder" class="com.hoperun.drp.finance.custrefundorder.action.CustRefundorderAction" scope="singleton">
+	    <property name="custRefundorderService" ref="custRefundorderService"></property>
+	</bean>
+	
+	<!-- 客户退款单-退货退款 -->
+	<bean name="/statechange" class="com.hoperun.drp.store.statechange.action.StateChangeAction" scope="singleton">
+	    <property name="stateChangeService" ref="stateChangeService"></property>
+	</bean>
+	
+	<!-- 新开门店申请单 -->
+	<bean name="/openterminal" class="com.hoperun.drp.oamg.openterminal.action.OpenTerminalAction" scope="singleton">
+	    <property name="openterminalService" ref="openterminalService"></property>
+	</bean>
+
+	
+	<!-- 成本调整单 -->
+	<bean name="/costadjust" class="com.hoperun.drp.sale.costadjust.action.CostAdjustAction" scope="singleton">
+	    <property name="costAdjustService" ref="costAdjustService"></property>
+	</bean>
+
+	<!-- 门店变更申请单 -->
+	<bean name="/terminalchange" class="com.hoperun.drp.oamg.terminalchange.action.TerminalChangeAction" scope="singleton">
+	    <property name="terminalchangeService" ref="terminalchangeService"></property>
+	</bean>
+	
+	<!-- 销售数据上报 -->
+	<bean name="/saledateup" class="com.hoperun.drp.oamg.saledateup.action.SaledateUpAction" scope="singleton">
+	    <property name="saledateUpService" ref="saledateUpService"></property>
+	</bean>
+	<!--工作计划维护-->
+	<bean name="/workplanmage" class="com.hoperun.drp.oamg.workplanmage.action.WorkplanmageAction" scope="singleton">
+		    <property name="workplanmageService" ref="workplanmageService"></property>
+	</bean>
+	<!-- 预订单开票维护 -->
+	<bean name="/advcinvoice" class="com.hoperun.drp.finance.advcInvoice.action.AdvcInvoiceAction" scope="singleton">
+	    <property name="advcInvoiceService" ref="advcInvoiceService"></property>
+	</bean>
+	<!-- 盈亏单查询 -->
+	<bean name="/profiiloss" class="com.hoperun.drp.finance.profiiloss.action.ProfiiLossAction" scope="singleton">
+	    <property name="profiiLossService" ref="profiiLossService"></property>
+	</bean>
+	<!-- 零星出库通知单 -->
+	<bean name="/storeoutfewnotice" class="com.hoperun.drp.store.storeoutfewnotice.action.StoreoutfewnoticeAction" scope="singleton">
+	    <property name="storeoutfewnoticeService" ref="storeoutfewnoticeService"></property>
+	</bean>
+    <!--零星出库处理-->
+	<bean name="/sporadicstoreout" class="com.hoperun.drp.store.storeout.action.StoreoutAction" scope="singleton">
+		    <property name="storeoutService" ref="storeoutService"></property>
+	</bean>
+    <!--活动价格设置-->
+	<bean name="/drppromoteprice" class="com.hoperun.drp.base.drppromoteprice.action.DrppromotepriceAction" scope="singleton">
+		    <property name="drppromotepriceService" ref="drppromotepriceService"></property>
+	</bean>
+	<!--加盟商门店指标-->
+	<bean name="/channTermianl" class="com.hoperun.drp.oamg.channTermianl.action.ChannTerminalQuota" scope="singleton">
+		    <property name="channTerminalQuotaService" ref="channTerminalQuotaService"></property>
+	</bean>
+	<!--二套帐-->
+	<bean name="/cw/acctengi" class="com.hoperun.drp.finance.acctengi.action.AcctEngiAction" scope="singleton">
+		<property name="acctengiService" ref="acctengiService"></property>
+	</bean>
+	<!--渠道销售价格设置-->
+	<bean name="/drpsaleprice" class="com.hoperun.drp.base.drpsaleprice.action.DrpsalepriceAction" scope="singleton">
+		    <property name="drpsalepriceService" ref="drpsalepriceService"></property>
+	</bean>
+	<!--直营办-销售订单-->
+	<bean name="/saleordera" class="com.hoperun.drp.sale.saleordera.action.SaleorderaAction" scope="singleton">
+		    <property name="saleorderaService" ref="saleorderaService"></property>
+	</bean>
+	<!--直营办-下级销售出库单-->
+	<bean name="/storeouta" class="com.hoperun.drp.store.storeouta.action.StoreoutaAction" scope="singleton">
+		    <property name="storeoutaService" ref="storeoutaService"></property>
+	</bean>
+	<!--门店－销售出库单-->
+	<bean name="/termstoreouta" class="com.hoperun.drp.sale.termstoreouta.action.TermstoreoutaAction" scope="singleton">
+		    <property name="termstoreoutaService" ref="termstoreoutaService"></property>
+	</bean>
+	<!--直营办-下级退货单-->
+	<bean name="/drpreturna" class="com.hoperun.drp.sale.drpreturna.action.DrpreturnaAction" scope="singleton">
+		    <property name="drpreturnaService" ref="drpreturnaService"></property>
+	</bean>
+	<!--直营办-下级退货入库单-->
+	<bean name="/drpreturnstorein" class="com.hoperun.drp.sale.drpreturnstorein.action.DrpreturnstoreinAction" scope="singleton">
+		    <property name="drpreturnstoreinService" ref="drpreturnstoreinService"></property>
+	</bean>
+	<!--门店-退货入库单-->
+	<bean name="/termreturnstorein" class="com.hoperun.drp.sale.termreturnstorein.action.TermreturnstoreinAction" scope="singleton">
+		    <property name="termreturnstoreinService" ref="termreturnstoreinService"></property>
+	</bean>
+	<!--门店-退货出库单-->
+	<bean name="/termreturnstoreout" class="com.hoperun.drp.sale.termreturnstoreout.action.TermreturnstoreoutAction" scope="singleton">
+		    <property name="termreturnstoreoutService" ref="termreturnstoreoutService"></property>
+	</bean>
+	<!--直营办报表-->
+	<bean name="/saleareport" class="com.hoperun.erp.report.storereport.action.StoreReportAction" scope="singleton">
+		    <property name="storeReportService" ref="storeReportService"></property>
+	</bean>
+
+	<!--预计量上报-->
+	<bean name="/forecasttaskup" class="com.hoperun.drp.sale.forecasttaskup.action.ForecastTaskupAction" scope="singleton">
+		    <property name="forecastTaskupService" ref="forecastTaskupService"></property>
+	</bean>
+	
+	<!-- 营销经理日报 -->
+	<bean name="/mkmdayreport" class="com.hoperun.drp.oamg.mkmdayreport.action.MkmDayReportAction" scope="singleton">
+	    <property name="mkmDayReportService" ref="mkmDayReportService"></property>
+	</bean>
+	<!-- 加盟商营销经理评价表 -->
+	<bean name="/channscoremkm" class="com.hoperun.drp.oamg.channscoremkm.action.ChannScoreMkmAction" scope="singleton">
+	    <property name="channScoreMkmService" ref="channScoreMkmService"></property>
+	</bean>
+	
+	<!--分销渠道信息登记-->
+	<bean name="/distributerReq" class="com.hoperun.drp.distributer.distributerreq.action.DistributerReqAction" scope="singleton">
+		    <property name="distributerReqService" ref="distributerReqService"></property>
+	</bean>
+	
+    <bean name="/distributerReqT" class="com.hoperun.drp.distributer.distributerreq.action.DistributerReqTAction" scope="singleton">
+		    <property name="distributerReqService" ref="distributerReqService"></property>
+	</bean>
+	
+	<!--分销商购货月报-->
+	<bean name="/distributerSalerpt" class="com.hoperun.drp.distributer.distributersalerpt.action.DistributerSalerptAction" scope="singleton">
+		    <property name="distributerSalerptService" ref="distributerSalerptService"></property>
+	</bean>
+	<!--加盟商终止合作申请-->
+	<bean name="/distributerEndReq" class="com.hoperun.drp.distributer.distributerendreq.action.DistributerEndReqAction" scope="singleton">
+		    <property name="distributerEndReqService" ref="distributerEndReqService"></property>
+	</bean>	
+	<!-- 预订单出库维护 -->
+	<bean name="/dststoreout" class="com.hoperun.drp.store.dststoreout.action.DststoreoutAction" scope="singleton">
+	    <property name="dststoreoutService" ref="dststoreoutService"></property>
+	</bean>
+	
+</beans>

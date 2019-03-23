@@ -1,0 +1,251 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author chenj
+@function 
+@version 2014-01-30 10:18:20
+-->
+<sqlMap  namespace="Xmsjzdwh">
+<!-- 定义SjzdwhModel,SjzdwhModelChld -->
+<typeAlias type="com.hoperun.sys.model.XMSJZDWHModel" alias="SjzdwhModel"/>
+<typeAlias type="com.hoperun.sys.model.XMSJZDWHModelChld" alias="SjzdwhModelChld" />
+<!-- 使用SjzdwhModel装载结果集 -->
+<resultMap id="SjzdwhModel" class="SjzdwhModel">
+    <result column="DATA_ID" property="DATA_ID" />
+</resultMap>
+<!-- 使用SjzdwhModelChld装载结果集 -->
+<resultMap id="SjzdwhModelChld" class="SjzdwhModelChld">
+    <result column="DATA_DTL_ID" property="DATA_DTL_ID" />
+</resultMap>
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="DATA_CODE">
+    u.DATA_CODE like '%'||#DATA_CODE#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="DATA_NAME">
+    u.DATA_NAME like '%'||#DATA_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE like '%'||#STATE#||'%'
+  </isNotEmpty>
+    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	</isNotEmpty>
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.DATA_ID,
+		u.DATA_CODE,
+		u.DATA_NAME,
+		u.DELFLAG,
+		u.DATA_REMARK,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD') CRE_TIME,
+		u.STATE
+      from PROJECT_DATA_DICTIONARY u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM PROJECT_DATA_DICTIONARY u ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into PROJECT_DATA_DICTIONARY(
+		 DATA_ID,
+         DATA_CODE,
+         DATA_NAME,
+         DATA_REMARK,
+         CRE_NAME,
+         CREATOR,
+         CRE_TIME,
+         STATE
+	   )values(
+		#DATA_ID#,
+        #DATA_CODE#,
+        #DATA_NAME#,
+        #DATA_REMARK#,
+        #CRE_NAME#,
+        #CREATOR#,
+	    sysdate, 
+        #STATE#
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update PROJECT_DATA_DICTIONARY ]]>
+	<dynamic prepend="set">
+    <isNotNull property="DATA_CODE" prepend=","><![CDATA[DATA_CODE = #DATA_CODE# ]]></isNotNull>
+    <isNotNull property="DATA_NAME" prepend=","><![CDATA[DATA_NAME = #DATA_NAME# ]]></isNotNull>
+    <isNotNull property="DATA_REMARK" prepend=","><![CDATA[DATA_REMARK = #DATA_REMARK# ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where DATA_ID = #DATA_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update PROJECT_DATA_DICTIONARY 
+	               set DEL_FLAG = #DEL_FLAG#
+ 	  where 
+	     DATA_ID = #DATA_ID:VARCHAR# 
+    ]]>
+</delete>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.DATA_ID,
+		u.DATA_CODE,
+		u.DATA_NAME,
+		u.DELFLAG,
+		u.DATA_REMARK,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD') CRE_TIME,
+		u.STATE
+	  from
+       PROJECT_DATA_DICTIONARY u 
+	  where 
+		u.DATA_ID = #DATA_ID#
+	]]>
+</select>
+<!-- 明细操作开始-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+     select 
+		u.DATA_DTL_ID,
+		u.DATA_ID,
+		u.DATA_DTL_CODE,
+		u.DATA_DTL_NAME,
+		u.PAR_DATA_DTL_ID,
+		u.PAR_DATA_DTL_CODE,
+		u.PAR_DATA_DTL_NAME,
+		u.DATA_DTL_DES_1,
+		u.DATA_DTL_DES_2,
+		u.REMARK,
+		u.DELFLAG
+       from PROJECT_DATA_DICTIONARY_DTL u  
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.DATA_ID=#DATA_ID# and DELFLAG=0
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+	        u.DATA_DTL_ID in ($DATA_DTL_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+<!--明细表插入 -->
+<insert id="insertChld" parameterClass="map">
+  <![CDATA[
+	  insert into PROJECT_DATA_DICTIONARY_DTL(
+		 DATA_DTL_ID,
+		 DATA_ID,
+		 PAR_DATA_DTL_ID,
+         PAR_DATA_DTL_NAME,
+         DATA_DTL_NAME,
+         DATA_DTL_CODE,
+         PAR_DATA_DTL_CODE,
+         DATA_DTL_DES_1,
+         DATA_DTL_DES_2,
+         REMARK,
+         DELFLAG
+	   )values(
+		#DATA_DTL_ID#,
+		#DATA_ID#,
+		#PAR_DATA_DTL_ID#,
+        #PAR_DATA_DTL_NAME#,
+        #DATA_DTL_NAME#,
+        #DATA_DTL_CODE#,
+        #PAR_DATA_DTL_CODE#,
+        #DATA_DTL_DES_1#,
+        #DATA_DTL_DES_2#,
+        #REMARK#,
+        0
+		)
+   ]]>
+</insert>
+<!--明细表更新 -->
+<update id="updateChldById" parameterClass="map">
+	<![CDATA[ update PROJECT_DATA_DICTIONARY_DTL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="PAR_DATA_DTL_NAME" prepend=","><![CDATA[PAR_DATA_DTL_NAME = #PAR_DATA_DTL_NAME# ]]></isNotNull>
+    <isNotNull property="DATA_DTL_NAME" prepend=","><![CDATA[DATA_DTL_NAME = #DATA_DTL_NAME# ]]></isNotNull>
+    <isNotNull property="DATA_DTL_CODE" prepend=","><![CDATA[DATA_DTL_CODE = #DATA_DTL_CODE# ]]></isNotNull>
+    <isNotNull property="PAR_DATA_DTL_ID" prepend=","><![CDATA[PAR_DATA_DTL_ID = #PAR_DATA_DTL_ID# ]]></isNotNull>
+    <isNotNull property="PAR_DATA_DTL_CODE" prepend=","><![CDATA[PAR_DATA_DTL_CODE = #PAR_DATA_DTL_CODE# ]]></isNotNull>
+    <isNotNull property="DATA_DTL_DES_1" prepend=","><![CDATA[DATA_DTL_DES_1 = #DATA_DTL_DES_1# ]]></isNotNull>
+    <isNotNull property="DATA_DTL_DES_2" prepend=","><![CDATA[DATA_DTL_DES_2 = #DATA_DTL_DES_2# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where DATA_DTL_ID = #DATA_DTL_ID#]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteChldByIds" parameterClass="map">
+	<![CDATA[ update PROJECT_DATA_DICTIONARY_DTL 
+	               set DELFLAG = #DEL_FLAG#	 
+ 	  where 
+	      DATA_DTL_ID in ($DATA_DTL_IDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细 -->
+<delete id="delChldByFkId" parameterClass="map">
+	<![CDATA[ update PROJECT_DATA_DICTIONARY_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      DATA_ID = #DATA_ID:VARCHAR#
+    ]]>
+</delete>
+</sqlMap>

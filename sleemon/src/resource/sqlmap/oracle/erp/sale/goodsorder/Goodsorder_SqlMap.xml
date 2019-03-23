@@ -1,0 +1,1547 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zzb
+@function 
+@version 2013-08-30 15:55:09
+-->
+<sqlMap  namespace="Goodsorder">
+<!-- 定义GoodsorderModel,GoodsorderModelChld -->
+<typeAlias type="com.hoperun.erp.sale.goodsorder.model.GoodsorderModel" alias="GoodsorderModel"/>
+<typeAlias type="com.hoperun.erp.sale.goodsorder.model.GoodsorderModelChld" alias="GoodsorderModelChld" />
+<typeAlias type="com.hoperun.base.factory.model.FactoryModel" alias="FactoryModel" />
+	
+<!-- 使用GoodsorderModel装载结果集 -->
+<resultMap id="GoodsorderModel" class="GoodsorderModel">
+    <result column="GOODS_ORDER_ID" property="GOODS_ORDER_ID" />
+</resultMap>
+<!-- 使用GoodsorderModelChld装载结果集 -->
+<resultMap id="GoodsorderModelChld" class="GoodsorderModelChld">
+    <result column="GOODS_ORDER_DTL_ID" property="GOODS_ORDER_DTL_ID" />
+</resultMap>
+
+<resultMap id="FactoryModel" class="FactoryModel">
+    <result column="FACTORY_ID" property="FACTORY_ID" />
+</resultMap>
+
+
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <!-- 渠道分管 -->
+  <isNotEmpty prepend="and" property="CHANNS_CHARG">
+     b.CHANN_ID in $CHANNS_CHARG$
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and" property="ORDER_CHANN_NO">
+    u.ORDER_CHANN_NO like '%'||#ORDER_CHANN_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="ORDER_CHANN_NAME">
+    u.ORDER_CHANN_NAME like '%'||#ORDER_CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="GOODS_ORDER_NO">
+   upper(u.GOODS_ORDER_NO) like upper('%'||#GOODS_ORDER_NO#||'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="AREA_NO">
+   upper(u.AREA_NO) like upper('%'||#AREA_NO#||'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="AREA_NAME">
+    u.AREA_NAME like '%'||#AREA_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_BEGIN">
+	  <![CDATA[  u.CRE_TIME >= to_date(#CRE_TIME_BEGIN#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+	  <![CDATA[  u.CRE_TIME <= to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="ORDER_DATE_BEGIN">
+	  <![CDATA[  u.ORDER_DATE >= to_date(#ORDER_DATE_BEGIN#,'yyyy-MM-DD')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="ORDER_DATE_END">
+	  <![CDATA[  u.ORDER_DATE <= to_date(#ORDER_DATE_END#,'yyyy-MM-DD')]]>
+  </isNotEmpty> 
+  
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="BILL_TYPE">
+    u.BILL_TYPE = #BILL_TYPE#
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and " property="DEL_FLAG">
+	 u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="PRD_NO">
+	 u.GOODS_ORDER_ID in (select d.GOODS_ORDER_ID from DRP_GOODS_ORDER_DTL d where upper(d.PRD_NO) like upper('%'||#PRD_NO#||'%'))
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="PRD_NAME">
+	 u.GOODS_ORDER_ID in (select d.GOODS_ORDER_ID from DRP_GOODS_ORDER_DTL d where upper(d.PRD_NAME) like upper('%'||#PRD_NAME#||'%'))
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="PRD_SPEC">
+	 u.GOODS_ORDER_ID in (select d.GOODS_ORDER_ID from DRP_GOODS_ORDER_DTL d where upper(d.PRD_SPEC) like upper('%'||#PRD_SPEC#||'%'))
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and " property="QXJBCON">
+	$QXJBCON$
+  </isNotEmpty>
+	 
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.GOODS_ORDER_ID,
+		u.GOODS_ORDER_NO,
+		u.ORDER_CHANN_ID,
+		u.ORDER_CHANN_NO,
+		u.ORDER_CHANN_NAME,
+		u.SEND_CHANN_ID,
+		u.SEND_CHANN_NO,
+		u.SEND_CHANN_NAME,
+		u.BILL_TYPE,
+		u.IS_USE_REBATE,
+		u.RECV_CHANN_ID,
+		u.RECV_CHANN_NO,
+		u.RECV_CHANN_NAME,
+		u.PERSON_CON,
+		u.TEL,
+		u.RECV_ADDR,
+		u.REMARK,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG,
+		u.AREA_ID,
+		u.AREA_NO,
+		u.AREA_NAME,
+		u.RECV_ADDR_NO,
+		u.SHIP_POINT_ID,
+		u.SHIP_POINT_NAME,
+		u.WAREA_NAME,
+		to_char(u.ORDER_DATE,'yyyy-MM-DD')ORDER_DATE,
+		to_char(u.ORDER_RECV_DATE,'yyyy-MM-DD')ORDER_RECV_DATE,
+		floor(CAST(u.CRE_TIME as date)-to_date(#BILL_DIFF_DATE_FLAG#,'yyyy-MM-DD'))DATE_DIFF,
+		temp.TOTAL_AMOUNT
+      from DRP_GOODS_ORDER u
+      left join BASE_CHANN b on u.ORDER_CHANN_ID = b.CHANN_ID
+      left join (
+      		select sum(d.ORDER_AMOUNT)TOTAL_AMOUNT,d.GOODS_ORDER_ID 
+      		from DRP_GOODS_ORDER_DTL d 
+      		where d.DEL_FLAG=0 
+      		group by GOODS_ORDER_ID 
+      		) temp on temp.GOODS_ORDER_ID=u.GOODS_ORDER_ID 
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM DRP_GOODS_ORDER u 
+      left join BASE_CHANN b on u.ORDER_CHANN_ID = b.CHANN_ID
+      ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_GOODS_ORDER(
+		 GOODS_ORDER_ID,
+         CRE_NAME,
+         CREATOR,
+         CRE_TIME,
+         UPD_NAME,
+         UPDATOR,
+         UPD_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         STATE,
+         DEL_FLAG
+	   )values(
+		#GOODS_ORDER_ID#,
+        #CRE_NAME#,
+        #CREATOR#,
+	    sysdate, 
+        #UPD_NAME#,
+        #UPDATOR#,
+		sysdate, 
+        #DEPT_ID#,
+        #DEPT_NAME#,
+        #ORG_ID#,
+        #ORG_NAME#,
+        #LEDGER_ID#,
+        #LEDGER_NAME#,
+        #STATE#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update DRP_GOODS_ORDER ]]>
+	<dynamic prepend="set">
+	<isNotNull property="SHIP_POINT_ID" prepend=","><![CDATA[SHIP_POINT_ID = #SHIP_POINT_ID# ]]></isNotNull>
+	<isNotNull property="SHIP_POINT_NAME" prepend=","><![CDATA[SHIP_POINT_NAME = #SHIP_POINT_NAME# ]]></isNotNull>
+    <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+    <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    <isNotNull property="RETURN_RSON" prepend=","><![CDATA[RETURN_RSON = #RETURN_RSON# ]]></isNotNull>
+    <isNotNull property="AUDIT_ID" prepend=","><![CDATA[AUDIT_ID = #AUDIT_ID# ]]></isNotNull>
+    <isNotNull property="AUDIT_NAME" prepend=","><![CDATA[AUDIT_NAME = #AUDIT_NAME# ]]></isNotNull>
+    <isNotNull property="AUDIT_TIME" prepend=","><![CDATA[AUDIT_TIME = sysdate ]]></isNotNull>
+    
+    <isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG# ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where GOODS_ORDER_ID = #GOODS_ORDER_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update DRP_GOODS_ORDER 
+	               set DEL_FLAG = #DEL_FLAG#
+                      ,UPD_NAME=#UPD_NAME#
+                     ,UPDATOR=#UPDATOR#
+                      ,UPD_TIME=sysdate
+ 	  where 
+	     GOODS_ORDER_ID = #GOODS_ORDER_ID:VARCHAR# 
+    ]]>
+</delete>
+
+<!-- 以实体 类 封装数据-->
+<select id="loadByIdModel" parameterClass="String" resultClass="GoodsorderModel">
+	<![CDATA[ 
+	  select 
+		u.GOODS_ORDER_ID,
+		u.GOODS_ORDER_NO,
+		u.ORDER_CHANN_ID,
+		u.ORDER_CHANN_NO,
+		u.ORDER_CHANN_NAME,
+		u.AREA_ID,
+		u.AREA_NO,
+		u.AREA_NAME,
+		u.SEND_CHANN_ID,
+		u.SEND_CHANN_NO,
+		u.SEND_CHANN_NAME,
+		u.BILL_TYPE,
+		u.IS_USE_REBATE,
+		u.RECV_CHANN_ID,
+		u.RECV_CHANN_NO,
+		u.RECV_CHANN_NAME,
+		u.PERSON_CON,
+		u.TEL,
+		u.RECV_ADDR,
+		u.REMARK,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.RETURN_RSON,
+		u.DEL_FLAG,
+		u.RECV_ADDR_NO,
+		b.SHIP_POINT_ID,
+		b.SHIP_POINT_NAME,
+		to_char(u.ORDER_DATE,'yyyy-MM-DD')ORDER_DATE,
+		to_char(u.ORDER_RECV_DATE,'yyyy-MM-DD')ORDER_RECV_DATE,
+		(select sum(d.ORDER_AMOUNT)TOTAL_AMOUNT from DRP_GOODS_ORDER_DTL d where d.DEL_FLAG=0 and d.GOODS_ORDER_ID=u.GOODS_ORDER_ID)TOTAL_AMOUNT
+	  from
+       DRP_GOODS_ORDER u 
+     left join BASE_CHANN b on u.ORDER_CHANN_ID = b.CHANN_ID
+	  where 
+		u.GOODS_ORDER_ID = #GOODS_ORDER_ID#
+	]]>
+</select>
+
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.GOODS_ORDER_ID,
+		u.GOODS_ORDER_NO,
+		u.ORDER_CHANN_ID,
+		u.ORDER_CHANN_NO,
+		u.ORDER_CHANN_NAME,
+		u.AREA_ID,
+		u.AREA_NO,
+		u.AREA_NAME,
+		u.SEND_CHANN_ID,
+		u.SEND_CHANN_NO,
+		u.SEND_CHANN_NAME,
+		u.BILL_TYPE,
+		u.IS_USE_REBATE,
+		u.RECV_CHANN_ID,
+		u.RECV_CHANN_NO,
+		u.RECV_CHANN_NAME,
+		u.PERSON_CON,
+		u.TEL,
+		u.RECV_ADDR,
+		u.REMARK,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG,
+		u.RECV_ADDR_NO,
+		b.SHIP_POINT_ID,
+		b.SHIP_POINT_NAME,
+		u.WAREA_NAME,
+		u.WAREA_NO,
+		to_char(u.ORDER_DATE,'yyyy-MM-DD')ORDER_DATE,
+		to_char(u.ORDER_RECV_DATE,'yyyy-MM-DD')ORDER_RECV_DATE,
+		(select sum(d.ORDER_AMOUNT)TOTAL_AMOUNT from DRP_GOODS_ORDER_DTL d where d.DEL_FLAG=0 and d.GOODS_ORDER_ID=u.GOODS_ORDER_ID)TOTAL_AMOUNT
+	  from
+       DRP_GOODS_ORDER u 
+     left join BASE_CHANN b on u.ORDER_CHANN_ID = b.CHANN_ID
+	  where 
+		u.GOODS_ORDER_ID = #GOODS_ORDER_ID#
+	]]>
+</select>
+
+<!-- 明细操作开始-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CANCEL_FLAG">
+     NVL(u.CANCEL_FLAG,0)=#CANCEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+    select u.GOODS_ORDER_DTL_ID,
+       u.GOODS_ORDER_ID,
+       u.PRD_ID,
+       u.PRD_NO,
+       u.PRD_NAME,
+       u.PRD_SPEC,
+       u.PRD_COLOR,
+       u.BRAND,
+       u.STD_UNIT,
+       u.SPCL_TECH_ID,
+       u.PRICE,
+       u.DECT_RATE,
+       u.DECT_PRICE,
+       u.ORDER_NUM,
+       u.ORDER_AMOUNT,
+       u.REMARK,
+       u.SESSION_ID,
+       u.TECH_PRICE_MULT,
+       u.DEL_FLAG,
+       u.OLD_PRICE,
+       u.VOLUME,
+       u.CREDIT_FREEZE_PRICE,
+       a.SPCL_TECH_FLAG,
+       a.SPCL_SPEC_REMARK,
+       t.STATE,
+       t.BILL_TYPE,
+       NVL(t.IS_USE_REBATE,0)IS_USE_REBATE,
+       u.IS_NO_STAND_FLAG,
+       u.CANCEL_FLAG,
+       u.REBATE_PRICE,
+       u.OLD_ORDER_NUM,
+       NVL(u.IS_BACKUP_FLAG, 0) IS_BACKUP_FLAG,
+       u.TOTAL_VOLUME,
+       to_char(u.ORDER_RECV_DATE, 'yyyy-MM-DD') ORDER_RECV_DATE,
+       to_char(u.ADVC_SEND_DATE,'yyyy-mm-dd')ADVC_SEND_DATE,
+       NVL(p.PRD_SUIT_FLAG, 0) PRD_SUIT_FLAG,
+       a.SPCL_TECH_NO,
+       a.DM_SPCL_TECH_NO,
+       p.PAR_PRD_NAME,
+       p.AUTO_BACKUP_FLG,
+       u.ROW_NO,
+       u.NEW_SPEC,
+       u.NEW_COLOR,
+       u.PRODUCT_REMARK
+  from DRP_GOODS_ORDER_DTL u
+  left join DRP_SPCL_TECH a
+    on u.SPCL_TECH_ID = a.SPCL_TECH_ID
+   and a.USE_FLAG = 1
+  left join DRP_GOODS_ORDER t
+    on u.GOODS_ORDER_ID = t.GOODS_ORDER_ID
+  left join BASE_PRODUCT p
+    on u.PRD_ID = p.PRD_ID
+  left join BASE_PRODUCT prdType
+    on p.PAR_PRD_ID = prdType.PRD_ID
+
+
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.GOODS_ORDER_ID=#GOODS_ORDER_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+  
+   <!-- 根据主表ID查询明细 返回实体类list -->
+  <select id="queryChldModelByFkId" parameterClass="map" resultClass="GoodsorderModelChld">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.GOODS_ORDER_ID=#GOODS_ORDER_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+  
+  
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+	        u.GOODS_ORDER_DTL_ID in ($GOODS_ORDER_DTL_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+	   order by u.ORDER_RECV_DATE
+  </select>
+<!--明细表插入 -->
+<insert id="insertChld" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_GOODS_ORDER_DTL(
+		 GOODS_ORDER_DTL_ID,
+		 GOODS_ORDER_ID,
+		 PRD_ID,
+		 PRD_NO,
+		 PRD_NAME,
+		 PRD_SPEC,
+		 PRD_COLOR,
+		 BRAND,
+		 STD_UNIT,
+		 SPCL_TECH_FLAG,
+		 PRICE,
+		 DECT_RATE,
+		 DECT_PRICE,
+		 ORDER_NUM,
+		 ORDER_AMOUNT,
+		 REMARK,
+         DEL_FLAG,
+         ORDER_RECV_DATE
+	   )values(
+		#GOODS_ORDER_DTL_ID#,
+		#GOODS_ORDER_ID#,
+		#PRD_ID#,
+		#PRD_NO#,
+		#PRD_NAME#,
+		#PRD_SPEC#,
+		#PRD_COLOR#,
+		#BRAND#,
+		#STD_UNIT#,
+		#SPCL_TECH_FLAG#,
+		#PRICE#,
+		#DECT_RATE#,
+		#DECT_PRICE#,
+		#ORDER_NUM#,
+		#ORDER_AMOUNT#,
+		#REMARK#,
+		#DEL_FLAG#,
+		to_date(#ORDER_RECV_DATE#,'yyyy-MM-DD')
+		)
+   ]]>
+</insert>
+
+<!--明细表更新 -->
+<update id="updateChldById" parameterClass="map">
+	<![CDATA[ update DRP_GOODS_ORDER_DTL ]]>
+	<dynamic prepend="set">
+	    <isNotNull property="SPCL_TECH_ID" prepend=","><![CDATA[SPCL_TECH_ID = #SPCL_TECH_ID# ]]></isNotNull>
+	    <isNotNull property="PRICE" prepend=","><![CDATA[PRICE = #PRICE# ]]></isNotNull>
+	    <isNotNull property="DECT_RATE" prepend=","><![CDATA[DECT_RATE = #DECT_RATE# ]]></isNotNull>
+	    <isNotNull property="DECT_PRICE" prepend=","><![CDATA[DECT_PRICE = #DECT_PRICE# ]]></isNotNull>
+	    <isNotNull property="ORDER_NUM" prepend=","><![CDATA[ORDER_NUM = #ORDER_NUM# ]]></isNotNull>
+	    <isNotNull property="ORDER_AMOUNT" prepend=","><![CDATA[ORDER_AMOUNT = #ORDER_AMOUNT# ]]></isNotNull>
+	    <isNotNull property="VOLUME" prepend=","><![CDATA[VOLUME = #VOLUME# ]]></isNotNull>
+	    <isNotNull property="OLD_PRICE" prepend=","><![CDATA[OLD_PRICE = #OLD_PRICE# ]]></isNotNull>
+	    <isNotNull property="IS_NO_STAND_FLAG" prepend=","><![CDATA[IS_NO_STAND_FLAG = #IS_NO_STAND_FLAG# ]]></isNotNull>
+	    <isNotNull property="IS_BACKUP_FLAG" prepend=","><![CDATA[IS_BACKUP_FLAG = #IS_BACKUP_FLAG# ]]></isNotNull>
+	    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+	    <isNotNull property="REBATE_PRICE" prepend=","><![CDATA[REBATE_PRICE = #REBATE_PRICE# ]]></isNotNull>
+	    <isNotNull property="REBATE_AMOUNT" prepend=","><![CDATA[REBATE_AMOUNT = #REBATE_AMOUNT# ]]></isNotNull>
+	    <isNotNull property="PRICE_EDIT_NAME" prepend=","><![CDATA[PRICE_EDIT_NAME = #PRICE_EDIT_NAME# ]]></isNotNull>
+	    <isNotNull property="EDIT_PRICE" prepend=","><![CDATA[EDIT_PRICE = #EDIT_PRICE# ]]></isNotNull>
+	    <isNotNull property="PRICE_EDIT_TIME" prepend=","><![CDATA[PRICE_EDIT_TIME = sysdate ]]></isNotNull>
+        <isNotNull property="ADVC_SEND_DATE" prepend=","><![CDATA[ADVC_SEND_DATE = to_date(#ADVC_SEND_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+	    <isNotNull property="PRODUCT_REMARK" prepend=","><![CDATA[PRODUCT_REMARK = #PRODUCT_REMARK# ]]></isNotNull>
+	    <isNotNull property="NEW_SPEC" prepend=","><![CDATA[NEW_SPEC = #NEW_SPEC# ]]></isNotNull>
+	    <isNotNull property="NEW_COLOR" prepend=","><![CDATA[NEW_COLOR = #NEW_COLOR# ]]></isNotNull>
+	    
+    </dynamic>
+	<![CDATA[ where GOODS_ORDER_DTL_ID = #GOODS_ORDER_DTL_ID#]]>
+</update>
+
+<!--根据明细IDs删除明细 -->
+<delete id="deleteChldByIds" parameterClass="map">
+   <![CDATA[ update DRP_GOODS_ORDER_DTL ]]>
+	<dynamic prepend="set">
+	<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG# ]]></isNotNull>
+	<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where GOODS_ORDER_DTL_ID in ($GOODS_ORDER_DTL_IDS$)]]>
+</delete>
+<!--根据主键ID删除明细 -->
+<delete id="delChldByFkId" parameterClass="map">
+	<![CDATA[ update DRP_GOODS_ORDER_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      GOODS_ORDER_ID = #GOODS_ORDER_ID:VARCHAR#
+    ]]>
+</delete>
+
+
+<!-- 更新订货订单明细的  CANCEL_FLAG -->
+<update id="updateGoodDtlByIdS" parameterClass="map">
+	<![CDATA[ update DRP_GOODS_ORDER_DTL ]]>
+	<dynamic prepend="set">
+	  <isNotNull property="CANCEL_FLAG" prepend=","><![CDATA[CANCEL_FLAG = #CANCEL_FLAG# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where GOODS_ORDER_DTL_ID in($GOODS_ORDER_DTL_IDS$) ]]>
+</update>
+
+
+<!-- 查询明细的默认工厂 -->
+<select id="queryDefaultFactory" parameterClass="map" resultClass="FactoryModel">
+	  select f.FACTORY_ID,f.FACTORY_NAME 
+	  from base_factory_ship p 
+	  left join base_factory f 
+	  on p.FACTORY_ID = f.FACTORY_ID 
+	  where p.SHIP_POINT_ID = (select t.SHIP_POINT_ID from DRP_GOODS_ORDER t where t.GOODS_ORDER_ID=#GOODS_ORDER_ID# )
+	  and f.STATE=#STATE# and p.DEL_FLAG =#DEL_FLAG#
+ </select>
+
+ <!-- ==================================================销售订单 -===================================================== -->
+<!-- 销售订单 -->
+<insert id="insertSaleOrder" parameterClass="map">
+  <![CDATA[
+  insert into ERP_SALE_ORDER (
+	   SALE_ORDER_ID,
+	   SALE_ORDER_NO,
+	   BILL_TYPE,
+	   FROM_BILL_ID,
+	   FROM_BILL_NO,
+	   ORDER_CHANN_ID,
+	   ORDER_CHANN_NO,
+	   ORDER_CHANN_NAME,
+	   SEND_CHANN_ID,
+	   SEND_CHANN_NO,
+	   SEND_CHANN_NAME,
+	   IS_USE_REBATE,
+	   RECV_CHANN_ID,
+	   RECV_CHANN_NO,
+	   RECV_CHANN_NAME,
+	   PERSON_CON,
+	   TEL,
+	   RECV_ADDR ,
+	   SHIP_POINT_ID,
+	   SHIP_POINT_NAME ,
+	   STATE,
+	   REMARK,
+	   CREATOR,
+	   CRE_NAME,
+	   CRE_TIME ,
+	   DEPT_ID,
+	   DEPT_NAME,
+	   ORG_ID,
+	   ORG_NAME,
+	   LEDGER_ID,
+	   LEDGER_NAME,
+	   DEL_FLAG,
+	   ORDER_DATE,
+	   AREA_ID,
+	   AREA_NO,
+	   AREA_NAME,
+	   RECV_ADDR_NO,
+	   WAREA_ID,
+	   WAREA_NO,
+       WAREA_NAME
+	   )values(
+	   #SALE_ORDER_ID#,
+	   #SALE_ORDER_NO#,
+	   #BILL_TYPE#,
+	   #FROM_BILL_ID#,
+	   #FROM_BILL_NO#,
+	   #ORDER_CHANN_ID#,
+	   #ORDER_CHANN_NO#,
+	   #ORDER_CHANN_NAME#,
+	   #SEND_CHANN_ID#,
+	   #SEND_CHANN_NO#,
+	   #SEND_CHANN_NAME#,
+	   #IS_USE_REBATE#,
+	   #RECV_CHANN_ID#,
+	   #RECV_CHANN_NO#,
+	   #RECV_CHANN_NAME#,
+	   #PERSON_CON#,
+	   #TEL#,
+	   #RECV_ADDR#,
+	   #SHIP_POINT_ID#,
+	   #SHIP_POINT_NAME#,
+	   #STATE#,
+	   #REMARK#,
+	   #CREATOR#,
+	   #CRE_NAME#,
+	   to_date((case when to_char(sysdate, 'hh24') < '18' then to_char(sysdate, 'yyyy-mm-dd hh24:MI:SS') else to_char(sysdate - 1 / 24, 'yyyy-mm-dd hh24:MI:SS') end),'yyyy-mm-dd hh24:MI:SS'),
+	   #DEPT_ID#,
+	   #DEPT_NAME#,
+	   #ORG_ID#,
+	   #ORG_NAME#,
+	   #LEDGER_ID#,
+	   #LEDGER_NAME#,
+	   #DEL_FLAG#,
+	   to_date(#ORDER_DATE#,'yyyy-MM-DD'),
+	   #AREA_ID#,
+	   #AREA_NO#,
+	   #AREA_NAME#,
+	   #RECV_ADDR_NO#,
+	   #WAREA_ID#,
+	   #WAREA_NO#,
+       #WAREA_NAME#
+	   )
+   ]]>
+</insert>
+
+
+<!-- 销售订单 明细 --> <!-- OLD_ORDER_NUM 初始值为订货数量 ORDER_NUM-->
+<insert id="insertSaleOrderDtl" parameterClass="map">
+ <![CDATA[
+   insert into ERP_SALE_ORDER_DTL(
+   SALE_ORDER_DTL_ID,
+   SALE_ORDER_ID,
+   PRD_ID,
+   PRD_NO,
+   PRD_NAME,
+   PRD_SPEC,
+   PRD_COLOR,
+   BRAND,
+   STD_UNIT,
+   IS_BACKUP_FLAG,
+   IS_NO_STAND_FLAG,
+   SPCL_TECH_FLAG,
+   PRICE,
+   DECT_RATE,
+   DECT_PRICE,
+   ORDER_NUM,
+   ORDER_AMOUNT,
+   REMARK,
+   DEL_FLAG,
+   SESSION_ID,
+   TECH_PRICE_MULT,
+   FROM_BILL_DTL_ID,
+   CANCEL_FLAG,
+   VOLUME,
+   SPCL_TECH_ID,
+   GOODS_ORDER_NO,
+   CREDIT_FREEZE_PRICE,
+   REBATE_PRICE,
+   OLD_ORDER_NUM,
+   IS_FREE_FLAG,
+   IS_CAN_PRD_FLAG,
+   U_CODE,
+   ADVC_SEND_DATE,
+   IS_TOSS_FLAG,
+   PRDC_POINT_ID,
+   PRDC_POINT_NAME,
+   ROW_NO,
+   PRODUCT_REMARK,
+   NEW_COLOR,
+   NEW_SPEC
+   )values(
+       #SALE_ORDER_DTL_ID#,
+	   #SALE_ORDER_ID#,
+	   #PRD_ID#,
+	   #PRD_NO#,
+	   #PRD_NAME#,
+	   #PRD_SPEC#,
+	   #PRD_COLOR#,
+	   #BRAND#,
+	   #STD_UNIT#,
+	   #IS_BACKUP_FLAG#,
+	   #IS_NO_STAND_FLAG#,
+	   #SPCL_TECH_FLAG#,
+	   #PRICE#,
+	   #DECT_RATE#,
+	   #DECT_PRICE#,
+	   #ORDER_NUM#,
+	   #ORDER_AMOUNT#,
+	   #REMARK#,
+	   #DEL_FLAG#,
+	   #SESSION_ID#,
+	   #TECH_PRICE_MULT#,
+	   #FROM_BILL_DTL_ID#,
+	   #CANCEL_FLAG#,
+	   #VOLUME#,
+	   #SPCL_TECH_ID#,
+	   #GOODS_ORDER_NO#,
+	   #CREDIT_FREEZE_PRICE#,
+	   #REBATE_PRICE#,
+	   #ORDER_NUM#,
+	   #IS_FREE_FLAG#,
+	   #IS_CAN_PRD_FLAG#,
+	   #SALE_ORDER_DTL_ID#,
+	   to_date(#ADVC_SEND_DATE#,'yyyy-MM-DD'),
+	   #IS_TOSS_FLAG#,
+       #SHIP_POINT_ID#,
+       #SHIP_POINT_NAME#,
+       #ROW_NO#,
+	   #PRODUCT_REMARK#,
+	   #NEW_COLOR#,
+	   #NEW_SPEC#
+   )
+   
+ ]]>
+</insert>
+
+<insert id="insertSaleSpacTech" parameterClass="map">
+ <![CDATA[
+  insert into ERP_SALE_SPCL_TECH(SALE_ORDER_DTL_ID,SALE_ORDER_ID)values(#SALE_ORDER_DTL_ID#,#SALE_ORDER_ID#)
+ ]]>
+</insert>
+
+
+<!--回退 -->
+<update id="updateAdvcById" parameterClass="map">
+	<![CDATA[ update DRP_ADVC_ORDER ]]>
+	<dynamic prepend="set">
+	<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+	<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+	<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+	<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+	<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where GOODS_ORDER_ID = #GOODS_ORDER_ID#]]>
+</update>
+
+
+
+ <!-- 插入生命周期表 -->
+<insert id="insertOrderTrack" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_GOODS_ORDER_TRACE(
+	     GOODS_ORDER_TRACE_ID,
+	     GOODS_ORDER_ID,
+	     SALE_ORDER_ID,
+		 BILL_NO,
+		 BILL_TYPE,
+		 ACTION_NAME,
+		 TRACE_URL,
+		 DEAL_PSON_NAME,
+		 DEAL_TIME,
+		 STATE
+	   )values(
+	     #GOODS_ORDER_TRACE_ID#,
+		 #GOODS_ORDER_ID#,
+		 #SALE_ORDER_ID#,
+		 #BILL_NO#,
+		 #BILL_TYPE#,
+		 #ACTION_NAME#,
+		 #TRACE_URL#,
+		 #DEAL_PSON_NAME#,
+		 sysdate,
+		 #STATE#
+		 
+		)
+   ]]>
+</insert>
+
+
+ <!-- 查询 -->
+<sql id="coreSqlTrace">
+	<![CDATA[ 
+     select 
+		u.GOODS_ORDER_TRACE_ID,
+		u.GOODS_ORDER_ID,
+		u.SALE_ORDER_ID,
+		u.BILL_NO,
+		u.BILL_TYPE,
+		u.ACTION_NAME,
+		u.TRACE_URL,
+		u.DEAL_PSON_NAME,
+		to_char(u.DEAL_TIME,'yyyy-MM-DD HH24:MI:SS') DEAL_TIME,
+		u.STATE
+       from DRP_GOODS_ORDER_TRACE u 
+   ]]>
+</sql>
+ <!-- 根据主表ID查询生命周期 -->
+  <select id="queryTraceByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlTrace"/>
+	  <dynamic prepend="where">
+			u.GOODS_ORDER_ID=#GOODS_ORDER_ID#
+	  </dynamic>
+	   order by u.DEAL_TIME
+  </select>
+ <!-- =====================================工艺单=============================================== -->
+ 
+ <!-- 插入 特殊工艺订单 -->
+<insert id="insertTechOrder" parameterClass="map">
+  <![CDATA[
+  insert into ERP_TECH_ORDER (
+	   TECH_ORDER_ID,
+	   TECH_ORDER_NO,
+	   FROM_BILL_ID,
+	   FROM_BILL_NO,
+	   ORDER_CHANN_ID,
+	   ORDER_CHANN_NO,
+	   ORDER_CHANN_NAME,
+	   STATE,
+	   REMARK,
+	   CREATOR,
+	   CRE_NAME,
+	   CRE_TIME ,
+	   DEPT_ID,
+	   DEPT_NAME,
+	   ORG_ID,
+	   ORG_NAME,
+	   LEDGER_ID,
+	   LEDGER_NAME,
+	   DEL_FLAG,
+	   ORDER_DATE
+	   )values(
+	   #TECH_ORDER_ID#,
+	   #TECH_ORDER_NO#,
+	   #SALE_ORDER_ID#,
+	   #SALE_ORDER_NO#,
+	   #ORDER_CHANN_ID#,
+	   #ORDER_CHANN_NO#,
+	   #ORDER_CHANN_NAME#,
+	   #STATE#,
+	   #REMARK#,
+	   #CREATOR#,
+	   #CRE_NAME#,
+	   sysdate,
+	   #DEPT_ID#,
+	   #DEPT_NAME#,
+	   #ORG_ID#,
+	   #ORG_NAME#,
+	   #LEDGER_ID#,
+	   #LEDGER_NAME#,
+	   #DEL_FLAG#,
+	   to_date(#ORDER_DATE#,'yyyy-MM-DD')
+	   )
+   ]]>
+</insert>
+
+
+<!-- 工艺单 明细 -->
+<insert id="insertTechOrderDtl" parameterClass="map">
+ <![CDATA[
+   insert into ERP_TECH_ORDER_DTL(
+   TECH_ORDER_DTL_ID,
+   TECH_ORDER_ID,
+   PRD_ID,
+   PRD_NO,
+   PRD_NAME,
+   PRD_SPEC,
+   PRD_COLOR,
+   BRAND,
+   STD_UNIT,
+   PRICE,
+   DECT_RATE,
+   DECT_PRICE,
+   ORDER_NUM,
+   REMARK,
+   DEL_FLAG,
+   IS_CAN_PRD_FLAG,
+   PRICE_DECIDE,
+   NEW_PRD_ID,
+   NEW_PRD_NO,
+   NEW_PRD_NAME,
+   NEW_PRD_SPEC,
+   FROM_BILL_DTL_ID,
+   SPCL_TECH_ID
+   )values(
+       #TECH_ORDER_DTL_ID#,
+	   #TECH_ORDER_ID#,
+	   #PRD_ID#,
+	   #PRD_NO#,
+	   #PRD_NAME#,
+	   #PRD_SPEC#,
+	   #PRD_COLOR#,
+	   #BRAND#,
+	   #STD_UNIT#,
+	   #PRICE#,
+	   #DECT_RATE#,
+	   #DECT_PRICE#,
+	   #ORDER_NUM#,
+	   #REMARK#,
+	   #DEL_FLAG#,
+	   #IS_CAN_PRD_FLAG#,
+       #PRICE_DECIDE#,
+       #NEW_PRD_ID#,
+       #NEW_PRD_NO#,
+       #NEW_PRD_NAME#,
+       #NEW_PRD_SPEC#,
+       #SALE_ORDER_DTL_ID#,
+       #SPCL_TECH_ID#
+   )
+   
+ ]]>
+</insert>
+ <update id="updateCREDIT_FREEZE_PRICE" parameterClass="string">
+	<![CDATA[ 
+		update DRP_GOODS_ORDER_DTL set CREDIT_FREEZE_PRICE=0 where GOODS_ORDER_ID=#GOODS_ORDER_ID#
+	]]>	
+</update>
+<!-- 入库差异生成销售订单 -->
+<insert id="addSaleOrder" parameterClass="map">
+  <![CDATA[
+  insert into ERP_SALE_ORDER (
+	   SALE_ORDER_ID,
+	   SALE_ORDER_NO,
+	   BILL_TYPE,
+	   FROM_BILL_ID,
+	   FROM_BILL_NO,
+	   ORDER_CHANN_ID,
+	   ORDER_CHANN_NO,
+	   ORDER_CHANN_NAME,
+	   SEND_CHANN_ID,
+	   SEND_CHANN_NO,
+	   SEND_CHANN_NAME,
+	   IS_USE_REBATE,
+	   RECV_CHANN_ID,
+	   RECV_CHANN_NO,
+	   RECV_CHANN_NAME,
+	   PERSON_CON,
+	   TEL,
+	   RECV_ADDR ,
+	   SHIP_POINT_ID,
+	   SHIP_POINT_NAME ,
+	   STATE,
+	   REMARK,
+	   CREATOR,
+	   CRE_NAME,
+	   CRE_TIME ,
+	   DEPT_ID,
+	   DEPT_NAME,
+	   ORG_ID,
+	   ORG_NAME,
+	   LEDGER_ID,
+	   LEDGER_NAME,
+	   DEL_FLAG,
+	   ORDER_DATE,
+	   AREA_ID,
+	   AREA_NO,
+	   AREA_NAME
+	   )
+	select
+	   #SALE_ORDER_ID#,
+	   #SALE_ORDER_NO#,
+	   #BILL_TYPE#,
+	   #FROM_BILL_ID#,
+	   #FROM_BILL_NO#,
+	   a.CHANN_ID,
+	   a.CHANN_NO,
+	   a.CHANN_NAME,
+	   #SEND_CHANN_ID#,
+	   #SEND_CHANN_NO#,
+	   #SEND_CHANN_NAME#,
+	   #IS_USE_REBATE#,
+	   #RECV_CHANN_ID#,
+	   #RECV_CHANN_NO#,
+	   #RECV_CHANN_NAME#,
+	   a.PERSON_CON,
+	   a.TEL,
+	   a.ADDRESS,
+	   a.SHIP_POINT_ID,
+	   a.SHIP_POINT_NAME,
+	   #STATE#,
+	   #REMARK#,
+	   #CREATOR#,
+	   #CRE_NAME#,
+	   sysdate,
+	   #DEPT_ID#,
+	   #DEPT_NAME#,
+	   #ORG_ID#,
+	   #ORG_NAME#,
+	   #LEDGER_ID#,
+	   #LEDGER_NAME#,
+	   #DEL_FLAG#,
+	   sysdate,
+	   a.AREA_ID,
+	   a.AREA_NO,
+	   a.AREA_NAME
+	   from BASE_CHANN a where a.CHANN_ID=#ORDER_CHANN_ID# 
+   ]]>
+</insert>
+
+
+
+
+
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryMergeDynSql">
+ <!-- <![CDATA[
+  
+        u.BILL_TYPE = t.BILL_TYPE   
+		and u.ORDER_CHANN_ID = t.ORDER_CHANN_ID
+		and u.RECV_CHANN_ID = t.RECV_CHANN_ID
+		and u.AREA_ID = t.AREA_ID
+		and u.SHIP_POINT_ID = t.SHIP_POINT_ID
+		and t.GOODS_ORDER_ID = #GOODS_ORDER_ID# ]]> -->
+  		
+  <!-- 渠道分管 -->
+  <isNotEmpty prepend=" " property="CHANNS_CHARG">
+       u.ORDER_CHANN_ID in $CHANNS_CHARG$
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and" property="ORDER_CHANN_ID">
+    u.ORDER_CHANN_ID = #ORDER_CHANN_ID#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="RECV_CHANN_ID">
+    u.RECV_CHANN_ID = #RECV_CHANN_ID#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="AREA_ID">
+    u.AREA_ID = #AREA_ID#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="BILL_TYPE">
+    u.BILL_TYPE = #BILL_TYPE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="SHIP_POINT_ID">
+    u.SHIP_POINT_ID = #SHIP_POINT_ID#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="ORDER_CHANN_NO">
+    u.ORDER_CHANN_NO = #ORDER_CHANN_NO#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="ORDER_CHANN_NAME">
+    u.ORDER_CHANN_NAME = #ORDER_CHANN_NAME#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="AREA_NO">
+    u.AREA_NO = #AREA_NO#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="AREA_NAME">
+    u.AREA_NAME = #AREA_NAME#
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="STATE">
+	 u.STATE=#STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="DEL_FLAG">
+	 u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="and" property="CRE_TIME_BEGIN">
+	  <![CDATA[  u.CRE_TIME >= to_date(#CRE_TIME_BEGIN#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+	  <![CDATA[  u.CRE_TIME <= to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty> 
+  
+  <isNotEmpty prepend="and " property="QXJBCON">
+	$QXJBCON$
+  </isNotEmpty>
+	 
+</sql>
+<sql id="orderMergeSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreMergeSql">
+  <![CDATA[ 
+	select 
+		u.GOODS_ORDER_ID,
+		u.GOODS_ORDER_NO,
+		u.ORDER_CHANN_ID,
+		u.ORDER_CHANN_NO,
+		u.ORDER_CHANN_NAME,
+		u.SEND_CHANN_ID,
+		u.SEND_CHANN_NO,
+		u.SEND_CHANN_NAME,
+		u.BILL_TYPE,
+		u.IS_USE_REBATE,
+		u.RECV_CHANN_ID,
+		u.RECV_CHANN_NO,
+		u.RECV_CHANN_NAME,
+		u.PERSON_CON,
+		u.TEL,
+		u.RECV_ADDR,
+		u.REMARK,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG,
+		u.AREA_ID,
+		u.AREA_NO,
+		u.AREA_NAME,
+		u.RECV_ADDR_NO,
+		u.SHIP_POINT_ID,
+		u.SHIP_POINT_NAME,
+		to_char(u.CRE_TIME,'yyyy-MM-DD')ORDER_DATE,
+		to_char(u.ORDER_RECV_DATE,'yyyy-MM-DD')ORDER_RECV_DATE,
+		(select sum(d.ORDER_AMOUNT)TOTAL_AMOUNT from DRP_GOODS_ORDER_DTL d where d.DEL_FLAG=0 and  d.GOODS_ORDER_ID=u.GOODS_ORDER_ID)TOTAL_AMOUNT
+      from DRP_GOODS_ORDER u
+       
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryMergeDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderMergeSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageMergeQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreMergeSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageMergeCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM DRP_GOODS_ORDER u
+       ]]>
+	<dynamic prepend="where">
+			<include refid="queryMergeDynSql"/>
+	</dynamic>
+</select>
+
+
+<select id="queryMergeChild" parameterClass="map" resultClass="GoodsorderModelChld">
+  <![CDATA[
+         select 
+		u.GOODS_ORDER_DTL_ID,
+		u.GOODS_ORDER_ID,
+		u.PRD_ID,
+		u.PRD_NO,
+		u.PRD_NAME,
+		u.PRD_SPEC,
+		u.PRD_COLOR,
+		u.BRAND,
+		u.STD_UNIT,
+		u.SPCL_TECH_ID,
+		u.PRICE,
+		u.DECT_RATE,
+		u.DECT_PRICE,
+		u.ORDER_NUM,
+		u.ORDER_AMOUNT,
+		u.REMARK,
+		u.SESSION_ID,
+		u.TECH_PRICE_MULT,
+		u.DEL_FLAG,
+		u.OLD_PRICE,
+		u.VOLUME,
+		u.CREDIT_FREEZE_PRICE,
+		u.IS_NO_STAND_FLAG,
+		u.CANCEL_FLAG,
+		u.REBATE_PRICE,
+		to_char(u.ORDER_RECV_DATE,'yyyy-MM-DD') ORDER_RECV_DATE,
+		to_char(u.ADVC_SEND_DATE,'yyyy-MM-DD') ADVC_SEND_DATE,
+		NVL(p.PRD_SUIT_FLAG,0)PRD_SUIT_FLAG
+       from DRP_GOODS_ORDER_DTL u 
+        left join BASE_PRODUCT p on u.PRD_ID = p.PRD_ID
+       where u.GOODS_ORDER_ID in($GOODS_ORDER_IDS$)
+       
+      ]]>
+</select>
+
+<!-- 合并可以合并的货品 -->
+<select id="mergeChild" parameterClass="map" resultClass="java.util.HashMap">
+  <![CDATA[
+       select d.PRD_ID,d.SPCL_TECH_ID,d.DECT_PRICE, sum(d.ORDER_NUM)ORDER_NUM,(sum(d.ORDER_NUM)*d.DECT_PRICE)ORDER_AMOUNT,
+        d.DECT_RATE,d.PRICE,d.PRD_NO,d.PRD_NAME,d.PRD_SPEC,d.PRD_COLOR,d.BRAND,d.IS_BACKUP_FLAG,d.REMARK,
+        d.CREDIT_FREEZE_PRICE,d.REBATE_PRICE,d.VOLUME,d.STD_UNIT,p.AUTO_BACKUP_FLG  from DRP_GOODS_ORDER_DTL d left join BASE_PRODUCT p
+        on d.PRD_ID = p.PRD_ID and p.DEL_FALG=0
+		where d.GOODS_ORDER_DTL_ID in
+		($GOODS_ORDER_DTL_IDS$)
+		group by d.PRD_ID,d.SPCL_TECH_ID,d.DECT_PRICE,
+		d.DECT_RATE,d.IS_BACKUP_FLAG,d.PRICE,d.PRD_NO,d.PRD_NAME, d.PRD_SPEC,d.PRD_COLOR,d.BRAND, d.CREDIT_FREEZE_PRICE,
+		d.REBATE_PRICE,d.VOLUME,d.STD_UNIT,d.REMARK,decode(d.REMARK,'','NULL',d.REMARK||rownum)
+       
+       
+      ]]>
+</select>
+
+
+
+<!-- 产品套 合并可以合并的货品 -->
+<select id="mergeChildBySuitFlag" parameterClass="map" resultClass="java.util.HashMap">
+  <![CDATA[
+    select s.PRD_ID,
+       s.PRD_NO,
+       s.PRD_NAME,
+       s.PRD_SPEC,
+       s.PRD_COLOR,
+       s.BRAND,
+       s.STD_UNIT,
+       s.MAIN_BOM_FLAG,
+       s.PRVD_PRICE PRICE,
+       d.DECT_RATE,
+       1 PRD_SUIT_FLAG,
+       s.PRVD_PRICE DECT_PRICE,
+       s.PRVD_PRICE* #PAY_RATE#
+        CREDIT_FREEZE_PRICE,
+       sp.VOLUME,
+       sum(s.COMP_NUM *d.ORDER_NUM) ORDER_NUM,
+       NVL(s.PRVD_PRICE, 0) *  (sum(s.COMP_NUM *d.ORDER_NUM))  ORDER_AMOUNT,
+       d.IS_BACKUP_FLAG,
+       sp.AUTO_BACKUP_FLG,
+       d.REMARK
+  from DRP_GOODS_ORDER_DTL d
+  left join BASE_PRODUCT p
+    on d.PRD_ID = p.PRD_ID
+ right join BASE_PRD_SUIT s
+    on p.PRD_ID = s.MAIN_PRD_ID
+    left join BASE_PRODUCT sp on s.PRD_ID=sp.PRD_ID
+ where p.PRD_SUIT_FLAG = 1
+   and d.GOODS_ORDER_DTL_ID in ($PRD_SUIT_FLAG_IDS$)
+   group by 
+       s.PRD_ID,
+       s.PRD_NO,
+       s.PRD_NAME,
+       s.PRD_SPEC,
+       s.PRD_COLOR,
+       s.BRAND,
+       s.STD_UNIT,
+       d.DECT_RATE,
+       s.MAIN_BOM_FLAG,
+       s.PRVD_PRICE,
+       sp.VOLUME,
+       d.IS_BACKUP_FLAG,
+       sp.AUTO_BACKUP_FLG,
+       d.REMARK,
+       decode(d.REMARK,'','NULL',d.REMARK||rownum)
+
+
+       
+      ]]>
+</select>
+
+
+
+<!-- 产品套的货品 -->
+<select id="queryChildBySuitFlag" parameterClass="map" resultClass="java.util.HashMap">
+  <![CDATA[
+    select s.PRD_ID,
+       s.PRD_NO,
+       s.PRD_NAME,
+       s.PRD_SPEC,
+       s.PRD_COLOR,
+       s.BRAND,
+       s.STD_UNIT,
+       s.MAIN_BOM_FLAG,
+       s.PRVD_PRICE PRICE,
+       d.DECT_RATE,
+       1 PRD_SUIT_FLAG,
+       s.PRVD_PRICE*$DECT_RATE$ DECT_PRICE,
+       s.PRVD_PRICE-NVL(s.PRVD_PRICE*$DECT_RATE$,0) REBATE_PRICE,
+       (s.PRVD_PRICE*$DECT_RATE$*#PAY_RATE#)CREDIT_FREEZE_PRICE,
+       sp.VOLUME,
+       sum(s.COMP_NUM *d.ORDER_NUM) ORDER_NUM,
+       NVL(s.PRVD_PRICE, 0)*$DECT_RATE$ *  (sum(s.COMP_NUM *d.ORDER_NUM))  ORDER_AMOUNT,
+       d.IS_BACKUP_FLAG,
+       d.REMARK,
+       d.GOODS_ORDER_DTL_ID,
+       d.ADVC_SEND_DATE,
+       sp.AUTO_BACKUP_FLG
+  from DRP_GOODS_ORDER_DTL d
+  left join BASE_PRODUCT p
+    on d.PRD_ID = p.PRD_ID
+ right join BASE_PRD_SUIT s
+    on p.PRD_ID = s.MAIN_PRD_ID
+    left join BASE_PRODUCT sp on s.PRD_ID=sp.PRD_ID
+ where p.PRD_SUIT_FLAG = 1
+   and NVL(s.DEL_FLAG,0)=0
+   and d.GOODS_ORDER_DTL_ID =#PRD_SUIT_FLAG_ID#
+   group by 
+       s.PRD_ID,
+       s.PRD_NO,
+       s.PRD_NAME,
+       s.PRD_SPEC,
+       s.PRD_COLOR,
+       s.BRAND,
+       s.STD_UNIT,
+       d.DECT_RATE,
+       s.MAIN_BOM_FLAG,
+       s.PRVD_PRICE,
+       sp.VOLUME,
+       d.IS_BACKUP_FLAG,
+       d.REMARK,
+       decode(d.REMARK,'','NULL',d.REMARK||rownum),
+       d.GOODS_ORDER_DTL_ID,
+       d.ADVC_SEND_DATE,
+       sp.AUTO_BACKUP_FLG
+      ]]>
+</select>
+
+
+
+
+<!-- 合并提交的时候 反填销售订单Id到订货订单明细 -->
+ <update id="updateGoodorderDtl_" parameterClass="map">
+	<![CDATA[ 
+		update DRP_GOODS_ORDER_DTL set SALE_ORDER_ID=#SALE_ORDER_ID# 
+		where GOODS_ORDER_DTL_ID in($GOODS_ORDER_DTL_IDS$)
+	]]>	
+</update>
+
+<!-- 单条记录提交的时候 反填销售订单Id到订货订单明细 -->
+ <update id="updateGoodorderDtlByone_" parameterClass="map">
+	<![CDATA[ 
+		update DRP_GOODS_ORDER_DTL set SALE_ORDER_ID=#SALE_ORDER_ID# 
+		where GOODS_ORDER_DTL_ID =#FROM_BILL_DTL_ID#
+	]]>	
+</update>
+
+
+<update id="updateByIdS" parameterClass="map">
+	<![CDATA[ update DRP_GOODS_ORDER ]]>
+	<dynamic prepend="set">
+    <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+    <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    <isNotNull property="AUDIT_ID" prepend=","><![CDATA[AUDIT_ID = #AUDIT_ID# ]]></isNotNull>
+    <isNotNull property="AUDIT_NAME" prepend=","><![CDATA[AUDIT_NAME = #AUDIT_NAME# ]]></isNotNull>
+    <isNotNull property="AUDIT_TIME" prepend=","><![CDATA[AUDIT_TIME = sysdate ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[  where GOODS_ORDER_ID in ($GOODS_ORDER_IDS$) ]]>
+</update>
+
+
+
+ <!--合并提交   插入生命周期表 -->
+<insert id="mergeInsertOrderTrack" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_GOODS_ORDER_TRACE(
+	     GOODS_ORDER_TRACE_ID,
+	     GOODS_ORDER_ID,
+	     SALE_ORDER_ID,
+		 BILL_NO,
+		 BILL_TYPE,
+		 ACTION_NAME,
+		 TRACE_URL,
+		 DEAL_PSON_NAME,
+		 DEAL_TIME,
+		 STATE
+	   )values(
+	     #GOODS_ORDER_TRACE_ID#,
+		 #GOODS_ORDER_ID#,
+		 #SALE_ORDER_ID#,
+		 (select t.GOODS_ORDER_NO  from DRP_GOODS_ORDER t where t.GOODS_ORDER_ID=#GOODS_ORDER_ID#),
+		 (select t.BILL_TYPE  from DRP_GOODS_ORDER t where t.GOODS_ORDER_ID=#GOODS_ORDER_ID#),
+		 #ACTION_NAME#,
+		 #TRACE_URL#,
+		 #DEAL_PSON_NAME#,
+		 sysdate,
+		 #STATE#
+		 
+		)
+   ]]>
+</insert>
+
+
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkMore" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.GOODS_ORDER_ID in ($GOODS_ORDER_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+	   order by u.ORDER_RECV_DATE
+  </select>
+
+
+
+  <select id="queryStore" parameterClass="map" resultClass="java.util.HashMap">
+	   select sum(NVL(b.ORDER_NUM, 0) - NVL(b.SENDED_NUM, 0)) TOTAL_STORE
+		  from ERP_SALE_ORDER a, ERP_SALE_ORDER_DTL b
+		 where a.SALE_ORDER_ID = b.SALE_ORDER_ID
+		   and b.IS_BACKUP_FLAG = 1
+		   and a.DEL_FLAG=0 
+		   and b.DEL_FLAG=0
+		   and b.PRD_NO = #PRD_NO#
+	       <isNotEmpty prepend="and" property="SPCL_TECH_ID">
+		     b.SPCL_TECH_ID =  #SPCL_TECH_ID#
+		  </isNotEmpty>
+	  
+  </select>
+ 
+ <!-- 查询工艺单审核。核价权限的人员 -->
+ <select id="queryReceiver" parameterClass="map" resultClass="java.util.HashMap">
+	   select c.XTYHID,c.ZTXXID,c.YHM
+               from T_SYS_JSQX a, T_SYS_XTYHJS b, T_SYS_XTYH c
+               where a.XTJSID = b.XTJSID
+               and b.XTYHID = c.XTYHID
+               and (a.XTMKID='BS0011201' or a.XTMKID='BS0011301')
+               and c.YHZT = '启用' 
+               and c.DELFLAG =0 
+               and c.ZTXXID is not null
+               group by c.XTYHID, c.ZTXXID,c.YHM 
+	  
+ </select>
+  
+  <select id="downGetById" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+		select 
+	       u.GOODS_ORDER_NO,
+	       to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME, 
+	       to_char(u.ORDER_DATE,'yyyy-MM-DD')ORDER_DATE,
+	       (select sum(NVL(d.ORDER_AMOUNT,0))TOTAL_AMOUNT from DRP_GOODS_ORDER_DTL d where d.DEL_FLAG=0 and  d.GOODS_ORDER_ID=u.GOODS_ORDER_ID) TOTAL_AMOUNT,
+	       u.SHIP_POINT_NAME,
+	       u.BILL_TYPE,
+	       (case when u.IS_USE_REBATE =1 then '是' else '否' end) IS_USE_REBATE,
+	       u.AREA_NO,
+	       u.AREA_NAME,
+	       u.ORDER_CHANN_NO,
+	       u.ORDER_CHANN_NAME,
+	       u.SEND_CHANN_NO,
+	       u.SEND_CHANN_NAME,
+	       u.RECV_CHANN_NO,
+	       u.RECV_CHANN_NAME,
+	       u.PERSON_CON,
+	       u.TEL,
+	       u.STATE,
+	       u.RECV_ADDR,
+	       u.REMARK PRIMARYREMARK,
+	       d.PRD_NO,
+	       d.PRD_NAME,
+	       d.PRD_SPEC,
+	       d.BRAND,
+	       d.STD_UNIT,
+	       (case when d.IS_NO_STAND_FLAG =1 then '是' else '否' end) IS_NO_STAND_FLAG,
+	       c.SPCL_DTL_REMARK SPCL_SPEC_REMARK,
+	       (case when d.IS_BACKUP_FLAG =1 then '是' else '否' end) IS_BACKUP_FLAG,
+	       d.DECT_PRICE,
+	       d.ORDER_NUM,
+	       d.ORDER_AMOUNT,
+	       d.VOLUME,
+	       (case when d.CANCEL_FLAG =1 then '总部取消' else '正常' end) CANCEL_FLAG,
+	       d.REMARK 
+	from DRP_GOODS_ORDER u
+	left join DRP_GOODS_ORDER_DTL d on u.GOODS_ORDER_ID=d.GOODS_ORDER_ID and d.DEL_FLAG=0
+	left join DRP_SPCL_TECH c on d.SPCL_TECH_ID=c.SPCL_TECH_ID and c.USE_FLAG=1
+	left join  BASE_CHANN b on u.ORDER_CHANN_ID = b.CHANN_ID
+	]]>
+	<dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+</select>
+<update id="txUpSpclEditFlag" parameterClass="map">
+	update DRP_SPCL_TECH set TECH_NO_EDIT_FLAG=#TECH_NO_EDIT_FLAG# 
+	where SPCL_TECH_ID in ($SPCL_TECH_IDS$)
+</update>
+<select id="getChldIdAndSpclId" parameterClass="map" resultClass="java.util.HashMap">
+	select GOODS_ORDER_DTL_ID,SPCL_TECH_ID from DRP_GOODS_ORDER_DTL where SPCL_TECH_ID is not null and GOODS_ORDER_ID=#GOODS_ORDER_ID# and DEL_FLAG=#DEL_FLAG#
+</select>
+<update id="updateSpclFlagById" parameterClass="map">
+	update DRP_SPCL_TECH set TECH_NO_EDIT_FLAG=#TECH_NO_EDIT_FLAG# where SPCL_TECH_ID in ($SPCL_TECH_IDS$) and USE_FLAG=#USE_FLAG# 
+</update>
+<select id="checkSpclId" parameterClass="map" resultClass="int">
+	select count(1) cnt
+	 from 
+	   DRP_GOODS_ORDER a ,DRP_GOODS_ORDER_DTL b 
+	 where
+	   a.GOODS_ORDER_ID=b.GOODS_ORDER_ID
+	  and b.SPCL_TECH_ID=#SPCL_TECH_ID#
+	  and a.STATE='已处理'
+	  and b.GOODS_ORDER_DTL_ID !=#GOODS_ORDER_DTL_ID#
+</select>
+<update id="updateStateById" parameterClass="map">
+	<![CDATA[ update DRP_GOODS_ORDER ]]>
+	<dynamic prepend="set">
+    <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+    <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = to_date((case when to_char(sysdate, 'hh24') < '18' then to_char(sysdate, 'yyyy-mm-dd hh24:MI:SS') else to_char(sysdate - 1 / 24, 'yyyy-mm-dd hh24:MI:SS') end),'yyyy-mm-dd hh24:MI:SS') ]]></isNotNull>
+    <isNotNull property="AUDIT_ID" prepend=","><![CDATA[AUDIT_ID = #AUDIT_ID# ]]></isNotNull>
+    <isNotNull property="AUDIT_NAME" prepend=","><![CDATA[AUDIT_NAME = #AUDIT_NAME# ]]></isNotNull>
+    <isNotNull property="AUDIT_TIME" prepend=","><![CDATA[AUDIT_TIME = to_date((case when to_char(sysdate, 'hh24') < '18' then to_char(sysdate, 'yyyy-mm-dd hh24:MI:SS') else to_char(sysdate - 1 / 24, 'yyyy-mm-dd hh24:MI:SS') end),'yyyy-mm-dd hh24:MI:SS') ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where GOODS_ORDER_ID = #GOODS_ORDER_ID#]]>
+</update>
+<select id="getAdvcSpclId" resultClass="string" parameterClass="string">
+	select c.SPCL_TECH_ID
+  	from DRP_GOODS_ORDER a
+  	left join DRP_SHOP_CART b on a.GOODS_ORDER_ID = b.GOODS_ORDER_ID
+  	left join DRP_ADVC_ORDER_DTL c on c.ADVC_ORDER_DTL_ID = b.ADVC_ORDER_DTL_ID
+ 	where a.GOODS_ORDER_ID = #GOODS_ORDER_ID#
+   	and c.SPCL_TECH_ID is not null
+</select>
+</sqlMap>

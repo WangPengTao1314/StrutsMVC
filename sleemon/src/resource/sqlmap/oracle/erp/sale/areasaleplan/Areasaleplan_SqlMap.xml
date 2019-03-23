@@ -1,0 +1,521 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zcx
+@function 区域销售指标设定
+@version 2014-11-12 15:42:19
+-->
+<sqlMap  namespace="Areasaleplan">
+<!-- 定义SaleorderModel,SaleorderModelChld -->
+<typeAlias type="com.hoperun.erp.sale.areasaleplan.model.AreasaleplanModel"    alias="AreasaleplanModel"/>
+<typeAlias type="com.hoperun.erp.sale.areasaleplan.model.AreasaleplandtlModel" alias="AreasaleplandtlModel" />
+<!-- 使用SaleorderspModel装载结果集 -->
+<resultMap id="AreasaleplanModel" class="AreasaleplanModel">
+    <result column="AREA_SALE_PLAN_ID" property="AREA_SALE_PLAN_ID" />
+</resultMap>
+<!-- 使用SaleorderspModelChld装载结果集 -->
+<resultMap id="AreasaleplandtlModel" class="AreasaleplandtlModel">
+    <result column="AREA_SALE_PLAN_DTL_ID" property="AREA_SALE_PLAN_DTL_ID" />
+</resultMap>
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <!-- 渠道分管 -->
+    u.DEL_FLAG = 0
+  <isNotEmpty prepend="" property="AREA_MANAGE_NAME">
+	  <![CDATA[ and u.AREA_MANAGE_NAME = #AREA_MANAGE_NAME# ]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="" property="PLAN_YEAR">
+      <![CDATA[ and u.PLAN_YEAR = #PLAN_YEAR#]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="STATE">
+      <![CDATA[ and u.STATE = #STATE#]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="AREA_NO">
+      <![CDATA[ and u.AREA_NO = #AREA_NO#]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="AREA_NAME">
+      <![CDATA[ and u.AREA_NAME  like '%'||#AREA_NAME#||'%']]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="WAREA_NAME">
+      <![CDATA[ and u.WAREA_NAME  like '%'||#WAREA_NAME#||'%']]>
+  </isNotEmpty>
+
+  <isNotEmpty prepend="" property="QXJBCON">
+	 and  $QXJBCON$
+  </isNotEmpty>
+</sql>
+
+<sql id="queryBatchSql">
+  <!-- 渠道分管 -->
+    u.DEL_FLAG=0 and u.STATE='审核通过' 
+  <isNotEmpty prepend="" property="PLAN_YEAR">
+	  <![CDATA[ and u.PLAN_YEAR = #PLAN_YEAR# ]]>
+  </isNotEmpty> 
+    <isNotEmpty prepend="" property="AREA_NOQuery">
+	  <![CDATA[ $AREA_NOQuery$ ]]>
+  </isNotEmpty> 
+    <isNotEmpty prepend="" property="AREA_NAMEQuery">
+	  <![CDATA[ $AREA_NAMEQuery$ ]]>
+  </isNotEmpty> 
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+		  select  
+	        u.AREA_SALE_PLAN_ID,
+	        u.AREA_ID,
+	        u.AREA_NO,
+	        u.AREA_NAME,
+	        u.WAREA_ID,
+	        u.WAREA_NO,
+	        u.WAREA_NAME,
+	        u.AREA_MANAGE_ID,
+	        u.AREA_MANAGE_NAME,
+	        u.PLAN_SALE_AMOUNT_TOTAL,
+	        u.CHANN_SALE_AMOUNT_TOTAL,
+	        u.PLAN_YEAR,
+	        u.YEAR_PLAN_AMOUNT,
+			u.FIRST_QUARTER_AMOUNT,
+			u.SECOND_QUARTER_AMOUNT,
+			u.THIRD_QUARTER_AMOUNT,
+			u.FOURTH_QUARTER_AMOUNT,
+			u.JAN_AMOUNT,
+		    u.FEB_AMOUNT,
+			u.MAR_AMOUNT,
+			u.APR_AMOUNT,
+			u.MAY_AMOUNT,
+			u.JUN_AMOUNT,
+			u.JUL_AMOUNT,
+			u.AUG_AMOUNT,
+			u.SEP_AMOUNT,
+			u.OCT_AMOUNT,
+			u.NOV_AMOUNT,
+			u.DEC_AMOUNT,
+			u.STATE
+			from  ERP_AREA_SALE_PLAN  u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+<sql id="batchSql">
+  <![CDATA[ 
+		  select  
+	        u.AREA_SALE_PLAN_ID,
+	        u.AREA_ID,
+	        u.AREA_NO,
+	        u.AREA_NAME,
+	        u.WAREA_ID,
+	        u.WAREA_NO,
+	        u.WAREA_NAME,
+	        u.AREA_MANAGE_ID,
+	        u.AREA_MANAGE_NAME,
+	        u.PLAN_SALE_AMOUNT_TOTAL,
+	        u.CHANN_SALE_AMOUNT_TOTAL,
+	        u.PLAN_YEAR,
+	        u.YEAR_PLAN_AMOUNT,
+			u.FIRST_QUARTER_AMOUNT,
+			u.SECOND_QUARTER_AMOUNT,
+			u.THIRD_QUARTER_AMOUNT,
+			u.FOURTH_QUARTER_AMOUNT,
+			u.JAN_AMOUNT,
+			u.FEB_AMOUNT,
+			u.MAR_AMOUNT,
+			u.APR_AMOUNT,
+			u.MAY_AMOUNT,
+			u.JUN_AMOUNT,
+			u.JUL_AMOUNT,
+			u.AUG_AMOUNT,
+			u.SEP_AMOUNT,
+			u.OCT_AMOUNT,
+			u.NOV_AMOUNT,
+			u.DEC_AMOUNT,
+			u.STATE
+			from  ERP_AREA_SALE_PLAN  u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryBatchSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt from ERP_AREA_SALE_PLAN u 
+      ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+
+<select id="pageBatchCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt from ERP_AREA_SALE_PLAN u 
+      ]]>
+	<dynamic prepend="where">
+			<include refid="queryBatchSql"/>
+	</dynamic>
+</select>
+
+<select id="pageBatch" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="batchSql" />
+		<include refid="public.pageEnd" />
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_AREA_SALE_PLAN(
+		 AREA_SALE_PLAN_ID,
+         AREA_ID,
+         AREA_NO,
+         AREA_NAME,
+         WAREA_ID,
+         WAREA_NO,
+         WAREA_NAME,
+         AREA_MANAGE_ID,
+         AREA_MANAGE_NAME,
+         PLAN_YEAR,
+         PLAN_SALE_AMOUNT_TOTAL,
+         CHANN_SALE_AMOUNT_TOTAL,
+         STATE,
+         REMARK,
+         CREATOR,
+         CRE_NAME,
+         CRE_TIME,
+         UPD_NAME,
+         UPDATOR,
+         UPD_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         DEL_FLAG,
+         YEAR_PLAN_AMOUNT,
+         FIRST_QUARTER_AMOUNT,
+         SECOND_QUARTER_AMOUNT,
+         THIRD_QUARTER_AMOUNT,
+         FOURTH_QUARTER_AMOUNT,
+         JAN_AMOUNT,
+         FEB_AMOUNT,
+         MAR_AMOUNT,
+         APR_AMOUNT,
+         MAY_AMOUNT,
+         JUN_AMOUNT,
+         JUL_AMOUNT,
+         AUG_AMOUNT,
+         SEP_AMOUNT,
+         OCT_AMOUNT,
+         NOV_AMOUNT,
+         DEC_AMOUNT
+	   )values(
+		 #AREA_SALE_PLAN_ID#,
+         #AREA_ID#,
+         #AREA_NO#,
+         #AREA_NAME#,
+         #WAREA_ID#,
+         #WAREA_NO#,
+         #WAREA_NAME#,
+         #AREA_MANAGE_ID#,
+         #AREA_MANAGE_NAME#,
+         #PLAN_YEAR#,
+         #PLAN_SALE_AMOUNT_TOTAL#,
+         #CHANN_SALE_AMOUNT_TOTAL#,
+         #STATE#,
+         #REMARK#,
+		 #CREATOR#,
+         #CRE_NAME#,
+	     sysdate, 
+         #UPD_NAME#,
+         #UPDATOR#,
+		 sysdate, 
+         #DEPT_ID#,
+         #DEPT_NAME#,
+         #ORG_ID#,
+         #ORG_NAME#,
+         #LEDGER_ID#,
+         #LEDGER_NAME#,
+		 #DEL_FLAG#,
+		 #YEAR_PLAN_AMOUNT#,
+         #FIRST_QUARTER_AMOUNT#,
+         #SECOND_QUARTER_AMOUNT#,
+         #THIRD_QUARTER_AMOUNT#,
+         #FOURTH_QUARTER_AMOUNT#,
+         #JAN_AMOUNT#,
+         #FEB_AMOUNT#,
+         #MAR_AMOUNT#,
+         #APR_AMOUNT#,
+         #MAY_AMOUNT#,
+         #JUN_AMOUNT#,
+         #JUL_AMOUNT#,
+         #AUG_AMOUNT#,
+         #SEP_AMOUNT#,
+         #OCT_AMOUNT#,
+         #NOV_AMOUNT#,
+         #DEC_AMOUNT#
+		)
+   ]]>
+</insert>
+
+<insert id="insertChild" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_AREA_SALE_PLAN_DTL(
+	     AREA_SALE_PLAN_DTL_ID,
+		 AREA_SALE_PLAN_ID,
+		 PLAN_YEAR,
+		 PLAN_MONTH,
+		 PLAN_SALE_AMOUNT,
+		 CHANN_SALE_AMOUNT,
+		 DEL_FLAG,
+		 PLAN_QUARTER
+	   )values(
+	     #AREA_SALE_PLAN_DTL_ID#,
+		 #AREA_SALE_PLAN_ID#,
+		 #PLAN_YEAR#,
+		 #PLAN_MONTH#,
+		 #PLAN_SALE_AMOUNT#,
+		 #CHANN_SALE_AMOUNT#,
+		 #DEL_FLAG#,
+		 #PLAN_QUARTER#
+		)
+   ]]>
+</insert>
+
+
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update ERP_AREA_SALE_PLAN ]]>
+	<dynamic prepend="set">
+    <isNotNull property="AREA_ID" prepend=","><![CDATA[AREA_ID = #AREA_ID# ]]></isNotNull>
+    <isNotNull property="AREA_NO" prepend=","><![CDATA[AREA_NO = #AREA_NO# ]]></isNotNull>
+    <isNotNull property="AREA_NAME" prepend=","><![CDATA[AREA_NAME = #AREA_NAME# ]]></isNotNull>
+    <isNotNull property="WAREA_ID" prepend=","><![CDATA[WAREA_ID = #WAREA_ID# ]]></isNotNull>
+    <isNotNull property="WAREA_NO" prepend=","><![CDATA[WAREA_NO = #WAREA_NO# ]]></isNotNull>
+    <isNotNull property="WAREA_NAME" prepend=","><![CDATA[WAREA_NAME = #WAREA_NAME# ]]></isNotNull>
+    <isNotNull property="AREA_MANAGE_ID"   prepend=","><![CDATA[AREA_MANAGE_ID   =#AREA_MANAGE_ID# ]]></isNotNull>
+    <isNotNull property="AREA_MANAGE_NAME" prepend=","><![CDATA[AREA_MANAGE_NAME =#AREA_MANAGE_NAME# ]]></isNotNull>
+    <isNotNull property="PLAN_YEAR" prepend=","><![CDATA[PLAN_YEAR = #PLAN_YEAR# ]]></isNotNull>
+    <isNotNull property="PLAN_SALE_AMOUNT_TOTAL" prepend=","><![CDATA[PLAN_SALE_AMOUNT_TOTAL = #PLAN_SALE_AMOUNT_TOTAL# ]]></isNotNull>
+    <isNotNull property="CHANN_SALE_AMOUNT_TOTAL" prepend=","><![CDATA[CHANN_SALE_AMOUNT_TOTAL = #CHANN_SALE_AMOUNT_TOTAL# ]]></isNotNull>
+    <isNotNull property="UPD_NAME"        prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPDATOR"   prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+    <isNotNull property="UPD_TIME"  prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    <isNotNull property="REMARK"    prepend=","><![CDATA[REMARK   = #REMARK# ]]></isNotNull>
+    
+    <isNotNull property="YEAR_PLAN_AMOUNT"      prepend=","><![CDATA[YEAR_PLAN_AMOUNT = #YEAR_PLAN_AMOUNT# ]]></isNotNull>
+    <isNotNull property="FIRST_QUARTER_AMOUNT"  prepend=","><![CDATA[FIRST_QUARTER_AMOUNT = #FIRST_QUARTER_AMOUNT# ]]></isNotNull>
+    <isNotNull property="SECOND_QUARTER_AMOUNT"    prepend=","><![CDATA[SECOND_QUARTER_AMOUNT   = #SECOND_QUARTER_AMOUNT# ]]></isNotNull>
+    <isNotNull property="THIRD_QUARTER_AMOUNT"   prepend=","><![CDATA[THIRD_QUARTER_AMOUNT = #THIRD_QUARTER_AMOUNT# ]]></isNotNull>
+    <isNotNull property="FOURTH_QUARTER_AMOUNT"  prepend=","><![CDATA[FOURTH_QUARTER_AMOUNT = #FOURTH_QUARTER_AMOUNT# ]]></isNotNull>
+    <isNotNull property="JAN_AMOUNT"    prepend=","><![CDATA[JAN_AMOUNT   = #JAN_AMOUNT# ]]></isNotNull>
+    <isNotNull property="FEB_AMOUNT"   prepend=","><![CDATA[FEB_AMOUNT = #FEB_AMOUNT# ]]></isNotNull>
+    <isNotNull property="MAR_AMOUNT"  prepend=","><![CDATA[MAR_AMOUNT = #MAR_AMOUNT# ]]></isNotNull>
+    <isNotNull property="APR_AMOUNT"    prepend=","><![CDATA[APR_AMOUNT   = #APR_AMOUNT# ]]></isNotNull>
+    
+    <isNotNull property="MAY_AMOUNT"    prepend=","><![CDATA[MAY_AMOUNT   = #MAY_AMOUNT# ]]></isNotNull>
+    <isNotNull property="JUN_AMOUNT"   prepend=","><![CDATA[JUN_AMOUNT = #JUN_AMOUNT# ]]></isNotNull>
+    <isNotNull property="JUL_AMOUNT"  prepend=","><![CDATA[JUL_AMOUNT = #JUL_AMOUNT# ]]></isNotNull>
+    <isNotNull property="AUG_AMOUNT"    prepend=","><![CDATA[AUG_AMOUNT   = #AUG_AMOUNT# ]]></isNotNull>
+    
+    <isNotNull property="SEP_AMOUNT"    prepend=","><![CDATA[SEP_AMOUNT   = #SEP_AMOUNT# ]]></isNotNull>
+    <isNotNull property="OCT_AMOUNT"    prepend=","><![CDATA[OCT_AMOUNT = #OCT_AMOUNT# ]]></isNotNull>
+    <isNotNull property="NOV_AMOUNT"    prepend=","><![CDATA[NOV_AMOUNT  = #NOV_AMOUNT# ]]></isNotNull>
+    <isNotNull property="DEC_AMOUNT"    prepend=","><![CDATA[DEC_AMOUNT   = #DEC_AMOUNT# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where AREA_SALE_PLAN_ID = #AREA_SALE_PLAN_ID#]]>
+</update>
+
+
+<update id="updateChild" parameterClass="map">
+	<![CDATA[ update ERP_AREA_SALE_PLAN_DTL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="AREA_SALE_PLAN_ID" prepend=","><![CDATA[AREA_SALE_PLAN_ID = #AREA_SALE_PLAN_ID# ]]></isNotNull>
+    <isNotNull property="PLAN_YEAR" prepend=","><![CDATA[PLAN_YEAR = #PLAN_YEAR# ]]></isNotNull>
+    <isNotNull property="PLAN_MONTH" prepend=","><![CDATA[PLAN_MONTH = #PLAN_MONTH# ]]></isNotNull>
+    <isNotNull property="PLAN_SALE_AMOUNT" prepend=","><![CDATA[PLAN_SALE_AMOUNT = #PLAN_SALE_AMOUNT# ]]></isNotNull>
+    <isNotNull property="CHANN_SALE_AMOUNT" prepend=","><![CDATA[CHANN_SALE_AMOUNT = #CHANN_SALE_AMOUNT# ]]></isNotNull>
+    <isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where AREA_SALE_PLAN_DTL_ID = #AREA_SALE_PLAN_DTL_ID#]]>
+</update>
+
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  SELECT
+	     u.AREA_SALE_PLAN_ID,
+	     to_char(u.CRE_TIME,'yyyy-MM-DD') CRE_TIME,
+	     u.CRE_NAME,
+	     u.AREA_ID,
+	     u.AREA_NO,
+	     u.AREA_NAME,
+	     u.WAREA_ID,
+	     u.WAREA_NO,
+	     u.WAREA_NAME,
+	     u.AREA_MANAGE_ID,
+	     u.AREA_MANAGE_NAME,
+	     u.PLAN_YEAR,
+	     u.PLAN_SALE_AMOUNT_TOTAL,
+	     u.CHANN_SALE_AMOUNT_TOTAL,
+	     u.STATE,
+	     u.YEAR_PLAN_AMOUNT,
+			  u.FIRST_QUARTER_AMOUNT,
+			  u.SECOND_QUARTER_AMOUNT,
+			  u.THIRD_QUARTER_AMOUNT,
+			  u.FOURTH_QUARTER_AMOUNT,
+			  u.JAN_AMOUNT,
+			  u.FEB_AMOUNT,
+			  u.MAR_AMOUNT,
+			  u.APR_AMOUNT,
+			  u.MAY_AMOUNT,
+			  u.JUN_AMOUNT,
+			  u.JUL_AMOUNT,
+			  u.AUG_AMOUNT,
+			  u.SEP_AMOUNT,
+			  u.OCT_AMOUNT,
+			  u.NOV_AMOUNT,
+			  u.DEC_AMOUNT,
+	     u.REMARK
+	     FROM ERP_AREA_SALE_PLAN u
+	     where 
+	     u.AREA_SALE_PLAN_ID = #AREA_SALE_PLAN_ID#
+	]]>
+</select>
+
+<!--根据明细IDs删除明细 -->
+<delete id="deleteChldByIds" parameterClass="map">
+	<![CDATA[ update ERP_AREA_SALE_PLAN_DTL 
+	          set DEL_FLAG = #DEL_FLAG#	 
+ 	          where 
+	          AREA_SALE_PLAN_DTL_ID = #AREA_SALE_PLAN_DTL_ID#
+    ]]>
+</delete>
+
+ <!-- 根据主表ID查询明细  left join ERP_SALE_ORDER t on u.SALE_ORDER_ID = t.SALE_ORDER_ID  -->
+ <select id="childQuery" parameterClass="map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+       select 
+       t.AREA_SALE_PLAN_DTL_ID,
+       t.AREA_SALE_PLAN_ID,
+       t.PLAN_YEAR,
+       t.PLAN_MONTH,
+       t.PLAN_SALE_AMOUNT,
+       t.CHANN_SALE_AMOUNT,
+       t.DEL_FLAG
+       from ERP_AREA_SALE_PLAN_DTL t where t.AREA_SALE_PLAN_ID=#AREA_SALE_PLAN_ID# and t.DEL_FLAG=0
+      ]]>
+  </select>
+  
+  
+ <select id="childQueryT" parameterClass="map" resultClass="AreasaleplandtlModel">
+	  <![CDATA[ 
+       select 
+       t.AREA_SALE_PLAN_DTL_ID,
+       t.AREA_SALE_PLAN_ID,
+       t.PLAN_YEAR,
+       t.PLAN_MONTH,
+       t.PLAN_SALE_AMOUNT,
+       t.CHANN_SALE_AMOUNT
+       from ERP_AREA_SALE_PLAN_DTL t where t.AREA_SALE_PLAN_ID=#AREA_SALE_PLAN_ID# and t.DEL_FLAG=0
+      ]]>
+ </select>
+
+<!-- 查询SQL -->
+<select id="selectBrothers" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[  
+	select d.SJXZ,d.SJGL from t_sys_sjzd t left join t_sys_sjzdmx  d on t.sjzdid = d.sjzdid  where t.SJZDBH LIKE
+	'%'||#SJZDBH#||'%' 
+	]]>
+</select>
+
+<select id="loadByIds" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[  
+	 	select 
+	     u.AREA_SALE_PLAN_DTL_ID,
+	     u.AREA_SALE_PLAN_ID,
+         u.PLAN_YEAR,
+         u.PLAN_MONTH,
+         u.PLAN_SALE_AMOUNT,
+         u.CHANN_SALE_AMOUNT
+         from ERP_AREA_SALE_PLAN_DTL u  left join  ERP_AREA_SALE_PLAN d on u.AREA_SALE_PLAN_ID = d.AREA_SALE_PLAN_ID
+	     where u.DEL_FLAG=0 AND  u.AREA_SALE_PLAN_DTL_ID in ($AREA_SALE_PLAN_DTL_IDS$)]]>
+</select>
+
+<select id="queryAreaAndYear" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[  
+	  SELECT * FROM ERP_AREA_SALE_PLAN e where e.PLAN_YEAR=#PLAN_YEAR#  AND e.AREA_ID=#AREA_ID#
+	  AND e.DEL_FLAG=0
+	]]>
+</select>
+
+<select id="queryRYXXID" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[      
+	      SELECT r.RYXXID  FROM T_SYS_RYXX r where r.Delflag=0 AND r.XM = #XM#
+    ]]>
+</select>
+
+<select id="queryJudgeModelT" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[      
+       SELECT r.RYXXID  FROM T_SYS_RYXX r where r.Delflag=0 AND r.XM = #XM#
+    ]]>
+</select>
+
+
+<!-- 删除子表信息 -->
+<delete id="deleteByIds" parameterClass="map">
+	<![CDATA[ update ERP_AREA_SALE_PLAN_DTL ]]>
+	<dynamic prepend="set">
+		<isNotNull property="DEL_FLAG"><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+	</dynamic>
+	<![CDATA[ where AREA_SALE_PLAN_DTL_ID in ($AREA_SALE_PLAN_DTL_IDs$) ]]>
+</delete>
+
+<delete id="deleteByIdsT" parameterClass="map">
+	<![CDATA[ update ERP_AREA_SALE_PLAN_DTL ]]>
+	<dynamic prepend="set">
+		<isNotNull property="DEL_FLAG"><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+	</dynamic>
+	<![CDATA[ where AREA_SALE_PLAN_DTL_ID = #AREA_SALE_PLAN_DTL_ID# ]]>
+</delete>
+  
+<!-- 删除 -->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update ERP_AREA_SALE_PLAN ]]>
+	<dynamic prepend="set">
+		<isNotNull property="DEL_FLAG"><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+	</dynamic>
+	<![CDATA[ where AREA_SALE_PLAN_ID = #AREA_SALE_PLAN_ID# ]]>
+</delete>
+
+
+<update id="updateStateById" parameterClass="map">
+	<![CDATA[ update ERP_AREA_SALE_PLAN ]]>
+	<dynamic prepend="set">
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    <isNotNull property="UPD_NAME"        prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPDATOR"   prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+    <isNotNull property="UPD_TIME"  prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+ </dynamic>
+	<![CDATA[ where AREA_SALE_PLAN_ID = #AREA_SALE_PLAN_ID#]]>
+</update>
+
+
+</sqlMap>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="public">
+    <!-- edit by zhuxw 2012-9-29 -->
+    <!-- 分页前面包装部分 -->
+	<sql id="pageBegin">
+		<dynamic>
+			<![CDATA[ select row_.* from ( ]]>
+		</dynamic>
+	</sql>
+    <!-- 分页后面包装部分 -->
+	<sql id="pageEnd">
+		<dynamic>
+		    <![CDATA[ ) row_  where 1=1 ]]>
+			<isNotEmpty property="startRow">
+			     <![CDATA[ and  rownum_ > #startRow# ]]>
+			</isNotEmpty>
+			<isNotEmpty property="endRow">
+				 <![CDATA[ and  rownum_ <= #endRow# ]]>	
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	<select id="query" parameterClass="String" resultClass="java.util.HashMap"> 
+		<![CDATA[ $sql$ ]]>
+	</select>
+	<insert id="insert" parameterClass="String">
+		<![CDATA[ $sql$ ]]>
+	</insert>
+	<update id="update" parameterClass="String">
+		<![CDATA[ $sql$ ]]>
+	</update>
+	<delete id="delete" parameterClass="String">
+		<![CDATA[ $sql$ ]]>
+	</delete>
+
+</sqlMap>
+

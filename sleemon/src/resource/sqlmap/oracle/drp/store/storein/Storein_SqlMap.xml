@@ -1,0 +1,868 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author glw
+@function 
+@version 2013-08-19 16:55:43
+-->
+<sqlMap  namespace="Storein">
+<!-- 定义StoreinModel,StoreinModelChld -->
+<typeAlias type="com.hoperun.drp.store.storein.model.StoreinModel" alias="StoreinModel"/>
+<typeAlias type="com.hoperun.drp.store.storein.model.StoreinModelChld" alias="StoreinModelChld" />
+<typeAlias type="com.hoperun.drp.store.storein.model.StoreinModelGrandChld" alias="StoreinModelGrandChld" />
+<!-- 使用StoreinModel装载结果集 -->
+<resultMap id="StoreinModel" class="StoreinModel">
+    <result column="STOREIN_ID" property="STOREIN_ID" />
+</resultMap>
+<!-- 使用StoreinModelChld装载结果集 -->
+<resultMap id="StoreinModelChld" class="StoreinModelChld">
+    <result column="STOREIN_DTL_ID" property="STOREIN_DTL_ID" />
+</resultMap>
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="BILL_TYPE">
+    u.BILL_TYPE like '%'||#BILL_TYPE#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STOREIN_NO">
+    u.STOREIN_NO like '%'||#STOREIN_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="FROM_BILL_NO">
+    u.FROM_BILL_NO like '%'||#FROM_BILL_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="SEND_CHANN_NO">
+    u.SEND_CHANN_NO like '%'||#SEND_CHANN_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STORAGE_FLAG">
+    u.STORAGE_FLAG like '%'||#STORAGE_FLAG#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="SEND_CHANN_NAME">
+    u.SEND_CHANN_NAME like '%'||#SEND_CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="RECV_CHANN_NO">
+    u.RECV_CHANN_NO like '%'||#RECV_CHANN_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="RECV_CHANN_NAME">
+    u.RECV_CHANN_NAME like '%'||#RECV_CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STOREIN_STORE_NO">
+    u.STOREIN_STORE_NO like '%'||#STOREIN_STORE_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STOREIN_STORE_NAME">
+    u.STOREIN_STORE_NAME like '%'||#STOREIN_STORE_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_BEG">
+     <![CDATA[u.CRE_TIME >=to_date(#CRE_TIME_BEG#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+     <![CDATA[u.CRE_TIME <=  to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="LEDGER_ID">
+    u.LEDGER_ID = #LEDGER_ID#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STOREIN_STORE_ID">
+    u.STOREIN_STORE_ID in #STOREIN_STORE_ID#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CONTRACT_NO">
+  	u.FROM_BILL_ID in (select a.ADVC_ORDER_ID from DRP_ADVC_ORDER a left join DRP_ADVC_ORDER b on a.FROM_BILL_ID=b.ADVC_ORDER_ID where b.CONTRACT_NO like '%'||#CONTRACT_NO#||'%' and b.DEL_FLAG=#DEL_FLAG#)
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="DEL_FLAG">
+    u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="QXJBCON">
+    $QXJBCON$
+  </isNotEmpty>
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.STOREIN_ID,
+		u.STOREIN_NO,
+		u.BILL_TYPE,
+		u.FROM_BILL_ID,
+		u.FROM_BILL_NO,
+		u.SEND_CHANN_ID,
+		u.SEND_CHANN_NO,
+		u.SEND_CHANN_NAME,
+		u.RECV_CHANN_ID,
+		u.RECV_CHANN_NO,
+		u.RECV_CHANN_NAME,
+		u.STOREIN_STORE_ID,
+		u.STOREIN_STORE_NO,
+		u.STOREIN_STORE_NAME,
+		u.STORAGE_FLAG,
+		u.REMARK,
+		u.DEAL_FLAG,
+		to_char(u.DEAL_TIME,'yyyy-MM-DD HH24:MI:SS') DEAL_TIME,
+		u.DEAL_PSON_ID,
+		u.DEAL_PSON_NAME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG
+      from DRP_STOREIN u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM DRP_STOREIN u ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<update id="updateById" parameterClass="map">
+
+	<![CDATA[ update DRP_STOREIN ]]>
+	<dynamic prepend="set">
+	<isNotNull property="DEAL_FLAG" prepend=","><![CDATA[DEAL_FLAG = #DEAL_FLAG# ]]></isNotNull>
+	<isNotNull property="DEAL_TIME" prepend=","><![CDATA[DEAL_TIME = sysdate ]]></isNotNull>
+	<isNotNull property="DEAL_PSON_ID" prepend=","><![CDATA[DEAL_PSON_ID = #DEAL_PSON_ID# ]]></isNotNull>
+	<isNotNull property="DEAL_PSON_NAME" prepend=","><![CDATA[DEAL_PSON_NAME = #DEAL_PSON_NAME# ]]></isNotNull>
+	<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+	<isNotNull property="SALE_PSON_ID" prepend=","><![CDATA[SALE_PSON_ID = #SALE_PSON_ID# ]]></isNotNull>
+	<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+	<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+	<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+	</dynamic>
+	<![CDATA[  where STOREIN_ID = #STOREIN_ID#]]>
+</update>
+
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.STOREIN_ID,
+		u.STOREIN_NO,
+		u.BILL_TYPE,
+		u.FROM_BILL_ID,
+		u.FROM_BILL_NO,
+		u.SEND_CHANN_ID,
+		u.SEND_CHANN_NO,
+		u.SEND_CHANN_NAME,
+		u.RECV_CHANN_ID,
+		u.RECV_CHANN_NO,
+		u.RECV_CHANN_NAME,
+		u.STOREIN_STORE_ID,
+		u.STOREIN_STORE_NO,
+		u.STOREIN_STORE_NAME,
+		u.STORAGE_FLAG,
+		u.REMARK,
+		u.DEAL_FLAG,
+		to_char(u.DEAL_TIME,'yyyy-MM-DD HH24:MI:SS') DEAL_TIME,
+		u.DEAL_PSON_ID,
+		u.DEAL_PSON_NAME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG,
+		u.ORDER_CHANN_ID,
+		u.ORDER_CHANN_NO,
+		u.ORDER_CHANN_NAME,
+		to_char(u.STATEMENUT_DATE,'yyyy-MM-DD HH24:MI:SS') STATEMENUT_DATE
+	  from
+       DRP_STOREIN u 
+	  where 
+		u.STOREIN_ID = #STOREIN_ID#
+	]]>
+</select>
+<!-- 明细操作开始-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+     select 
+		u.STOREIN_DTL_ID,
+		u.STOREIN_ID,
+		u.PRD_ID,
+		u.PRD_NO,
+		u.PRD_NAME,
+		u.PRD_SPEC,
+		u.PRD_COLOR,
+		u.BRAND,
+		u.STD_UNIT,
+		u.NOTICE_NUM,
+		u.REAL_NUM,
+		u.REMARK,
+		u.PRICE,
+		u.DECT_RATE,
+		u.DECT_PRICE,
+		u.DECT_AMOUNT,
+		u.DEL_FLAG,
+		u.INS_FLAG,
+		(select STOREIN_STORE_ID from DRP_STOREIN where STOREIN_ID = u.STOREIN_ID) STOREIN_STORE_ID,
+    	a.SPCL_TECH_FLAG,
+	    u.SPCL_TECH_ID,
+	    u.SALE_ORDER_ID,
+	    u.SALE_ORDER_NO,
+	    u.SALE_ORDER_DTL_ID,
+	    u.GOODS_ORDER_NO,
+	    a.SPCL_SPEC_REMARK,
+		a.DM_SPCL_TECH_NO
+       from DRP_STOREIN_DTL u 
+       		left join DRP_SPCL_TECH a on u.SPCL_TECH_ID = a.SPCL_TECH_ID
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.STOREIN_ID=#STOREIN_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+	        u.STOREIN_DTL_ID in ($STOREIN_DTL_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+<!--明细表插入 -->
+<insert id="insertChld" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_STOREIN_DTL(
+		 STOREIN_DTL_ID,
+		 STOREIN_ID,
+         PRD_ID,
+	 	 PRD_NO,
+	 	 PRD_NAME,
+	 	 PRD_SPEC,
+	 	 PRD_COLOR,
+	 	 BRAND,
+		 STD_UNIT,
+		 NOTICE_NUM,
+		 REAL_NUM,
+		 PRICE,
+		 DECT_RATE,
+		 DECT_PRICE,
+		 DECT_AMOUNT,
+		 DEL_FLAG,
+		 YEAR_MONTH,
+		 INS_FLAG,
+		 FROM_BILL_DTL_ID,
+		 SPCL_TECH_ID,
+		 SALE_ORDER_ID,
+		 SALE_ORDER_NO,
+		 SALE_ORDER_DTL_ID,
+		 GOODS_ORDER_NO
+	   )values(
+		#STOREIN_DTL_ID#,
+		#STOREIN_ID#,
+        #PRD_ID#,
+	 	#PRD_NO#,
+	 	#PRD_NAME#,
+	 	#PRD_SPEC#,
+	 	#PRD_COLOR#,
+	 	#BRAND#,
+		#STD_UNIT#,
+		#NOTICE_NUM#,
+		#REAL_NUM#,
+		#PRICE#,
+		#DECT_RATE#,
+		#DECT_PRICE#,
+		#DECT_AMOUNT#,
+		#DEL_FLAG#,
+		to_char(sysdate,'yyyy-MM'),
+		#INS_FLAG#,
+		#FROM_BILL_DTL_ID#,
+		#SPCL_TECH_ID#,
+		#SALE_ORDER_ID#,
+		#SALE_ORDER_NO#,
+		#SALE_ORDER_DTL_ID#,
+		#GOODS_ORDER_NO#
+		
+		)
+   ]]>
+</insert>
+<!--明细表更新 -->
+<update id="updateChldById" parameterClass="map">
+	<![CDATA[ update 
+				DRP_STOREIN_DTL 
+			  set
+			  	REAL_NUM = #REAL_NUM#
+			  where 
+				STOREIN_DTL_ID = #STOREIN_DTL_ID# 
+	]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteChldByIds" parameterClass="map">
+	<![CDATA[ update DRP_STOREIN_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      STOREIN_DTL_ID in ($STOREIN_DTL_IDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细 -->
+<delete id="delChldByFkId" parameterClass="map">
+	<![CDATA[ update DRP_STOREIN_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      STOREIN_ID = #STOREIN_ID:VARCHAR#
+    ]]>
+</delete>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update DRP_STOREIN
+	               set DEL_FLAG = #DEL_FLAG#
+                      ,UPD_NAME=#UPD_NAME#
+                     ,UPDATOR=#UPDATOR#
+                      ,UPD_TIME=sysdate
+ 	  where 
+	     STOREIN_ID = #STOREIN_ID:VARCHAR# 
+    ]]>
+</delete>
+
+<!-- 孙表操作开始 -->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlGrandChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlGrandChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlGrandChld">
+	<![CDATA[ 
+     select 
+		u.STOREIN_STORG_DTL_ID,
+		u.STOREIN_DTL_ID,
+		u.STOREIN_ID,
+		u.PRD_ID,
+		u.PRD_NO,
+		u.PRD_NAME,
+		u.PRD_SPEC,
+		u.PRD_COLOR,
+		u.BRAND,
+		u.STD_UNIT,
+		u.STORG_ID,
+		u.STORG_NO,
+		u.STORG_NAME,
+		u.REAL_NUM,
+		u.DEL_FLAG
+       from DRP_STOREIN_STORG_DTL u 
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryGrandChld" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlGrandChld"/>
+	  <dynamic prepend="where">
+	    STOREIN_ID = #STOREIN_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlGrandChld" />
+	  </dynamic>
+	  <isNotEmpty  prepend=" and " property="STOREIN_DTL_ID">
+	  		 u.STOREIN_DTL_ID in ($STOREIN_DTL_ID$)
+	  </isNotEmpty>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlGrandChld"/>
+	  </isNotNull>
+  </select>
+  
+   <!-- 根据主表ID查询明细 -->
+  <select id="queryGrandChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlGrandChld"/>
+	  <dynamic prepend="where">
+	    u.STOREIN_DTL_ID = #STOREIN_DTL_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlGrandChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlGrandChld"/>
+	  </isNotNull>
+  </select>
+  
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadGrandChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlGrandChld"/>
+	  <dynamic prepend="where">
+	        u.STOREIN_STORG_DTL_ID in ($STOREIN_STORG_DTL_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlGrandChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlGrandChld"/>
+	  </isNotNull>
+  </select>
+<!--明细表插入 -->
+<insert id="insertGrandChld" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_STOREIN_STORG_DTL(
+			STOREIN_STORG_DTL_ID,
+			STOREIN_DTL_ID,
+			STOREIN_ID,
+	       	PRD_ID,
+			PRD_NO,
+			PRD_NAME,
+			PRD_SPEC,
+			PRD_COLOR,
+			BRAND,
+			STD_UNIT,
+			STORG_ID,
+			STORG_NO,
+			STORG_NAME,
+			REAL_NUM,
+			DEL_FLAG,
+			YEAR_MONTH
+	   )values(
+	   		#STOREIN_STORG_DTL_ID#,
+			#STOREIN_DTL_ID#,
+			#STOREIN_ID#,
+			#PRD_ID#,
+			#PRD_NO#,
+			#PRD_NAME#,
+			#PRD_SPEC#,
+			#PRD_COLOR#,
+			#BRAND#,
+			#STD_UNIT#,
+			#STORG_ID#,
+			#STORG_NO#,
+			#STORG_NAME#,
+			#REAL_NUM#,
+			#DEL_FLAG#,
+			to_char(sysdate,'yyyyMM')
+		)
+   ]]>
+</insert>
+<!--明细表更新 -->
+<update id="updateGrandChldById" parameterClass="map">
+	<![CDATA[ update DRP_STOREIN_STORG_DTL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="STORG_ID" prepend=","><![CDATA[STORG_ID = #STORG_ID# ]]></isNotNull>
+    <isNotNull property="STORG_NO" prepend=","><![CDATA[STORG_NO = #STORG_NO# ]]></isNotNull>
+    <isNotNull property="STORG_NAME" prepend=","><![CDATA[STORG_NAME = #STORG_NAME# ]]></isNotNull>
+    <isNotNull property="REAL_NUM" prepend=","><![CDATA[REAL_NUM = #REAL_NUM# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where STOREIN_STORG_DTL_ID = #STOREIN_STORG_DTL_ID#]]>
+</update>
+<update id="updateGrandChld" parameterClass="map">
+	<![CDATA[
+		 update DRP_STOREIN_DTL set     
+		 	REAL_NUM =(
+		 		select sum(REAL_NUM) from DRP_STOREIN_STORG_DTL 
+		 		where 
+		 			STOREIN_DTL_ID=#STOREIN_DTL_ID# and DEL_FLAG=#DEL_FLAG#
+		 		)
+		  where STOREIN_DTL_ID=#STOREIN_DTL_ID#
+	]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteGrandChldByIds" parameterClass="map">
+	<![CDATA[ update DRP_STOREIN_STORG_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      STOREIN_STORG_DTL_ID in ($STOREIN_STORG_DTL_IDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细 -->
+<delete id="delGrandChldByFkId" parameterClass="map">
+	<![CDATA[ update DRP_STOREIN_STORG_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      STOREIN_DTL_ID = #STOREIN_DTL_ID:VARCHAR#
+    ]]>
+</delete>
+<!--根据主表ID查询库位明细是否存在 -->
+<select id="DSSDCount" parameterClass="map" resultClass="java.util.HashMap">
+   <![CDATA[select
+   				u.STORAGE_FLAG,
+   				nvl((select  sum(REAL_NUM) from DRP_STOREIN_DTL where STOREIN_ID = u.STOREIN_ID and DEL_FLAG = #DEL_FLAG#), 0) STOREIN_DTL_SUM,
+    			(select count(0) from DRP_STOREIN_STORG_DTL where STOREIN_ID = u.STOREIN_ID and DEL_FLAG = #DEL_FLAG#) STOREIN_NOTICE_DTL_CON,
+    			STOREIN_STORE_ID
+			from
+				DRP_STOREIN u
+			where
+				u.STOREIN_ID = #STOREIN_ID#
+			and
+				u.DEL_FLAG = #DEL_FLAG#
+	]]>
+</select>
+
+<!--根据主表ID查询折扣率 -->
+<select id="selectDect" parameterClass="map" resultClass="java.util.HashMap">
+   <![CDATA[
+   		select BASE_PRICE PRICE,DECT_RATE ,DECT_PRICE 
+   		from BASE_AREA_DSCT_FLAT a
+		left join BASE_CHANN b on a.AREA_ID=b.AREA_ID
+		 where PRD_ID=#PRD_ID# and b.CHANN_ID=#CHANN_ID#
+	]]>
+</select>
+<!--根据明细ID查询库位ID -->
+<select id="selectIDs" parameterClass="map" resultClass="java.util.HashMap">
+   <![CDATA[select
+	  			STOREIN_STORG_DTL_ID
+			from
+			  DRP_STOREIN_STORG_DTL
+			where
+			  	STOREIN_DTL_ID in ($STOREIN_DTL_IDS$);
+	]]>
+</select>
+<!--插入 入库差异单(DRP_STOREIN_DIFF) -->
+<insert id="insertDRP_STOREIN_DIFF" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_STOREIN_DIFF(
+			STOREIN_DIFF_ID,
+			STOREIN_DIFF_NO,
+			BILL_TYPE,
+			FROM_BILL_ID,
+			FROM_BILL_NO,
+			SEND_CHANN_ID,
+			SEND_CHANN_NO,
+			SEND_CHANN_NAME,
+			RECV_CHANN_ID,
+			RECV_CHANN_NO,
+			RECV_CHANN_NAME,
+			STOREIN_STORE_ID,
+			STOREIN_STORE_NO,
+			STOREIN_STORE_NAME,
+			STATE,
+			REMARK,
+			CREATOR,
+			CRE_NAME,
+			CRE_TIME,
+			DEPT_ID,
+			DEPT_NAME,
+			ORG_ID,
+			ORG_NAME,
+			LEDGER_ID,
+			LEDGER_NAME,
+			DEL_FLAG,
+			ORDER_CHANN_ID,
+			ORDER_CHANN_NO,
+			ORDER_CHANN_NAME
+	   )values(
+	   		#STOREIN_DIFF_ID#,
+			#STOREIN_DIFF_NO#,
+			#BILL_TYPE#,
+			#FROM_BILL_ID#,
+			#FROM_BILL_NO#,
+			#SEND_CHANN_ID#,
+			#SEND_CHANN_NO#,
+			#SEND_CHANN_NAME#,
+			#RECV_CHANN_ID#,
+			#RECV_CHANN_NO#,
+			#RECV_CHANN_NAME#,
+			#STOREIN_STORE_ID#,
+			#STOREIN_STORE_NO#,
+			#STOREIN_STORE_NAME#,
+			#STATE#,
+			#REMARK#,
+			#CREATOR#,
+			#CRE_NAME#,
+			sysdate,
+			#DEPT_ID#,
+			#DEPT_NAME#,
+			#ORG_ID#,
+			#ORG_NAME#,
+			#LEDGER_ID#,
+			#LEDGER_NAME#,
+			#DEL_FLAG#,
+			#ORDER_CHANN_ID#,
+			#ORDER_CHANN_NO#,
+			#ORDER_CHANN_NAME#
+		)
+   ]]>
+</insert>
+<!-- 插入 入库差异单明细(DRP_STOREIN_DIFF_DTL) -->
+<insert id="insertDRP_STOREIN_DIFF_DTL" parameterClass="map">
+	<![CDATA[
+		insert into DRP_STOREIN_DIFF_DTL(
+			STOREIN_DIFF_DTL_ID,	
+			STOREIN_DIFF_ID,
+			PRD_ID,
+			PRD_NO,
+			PRD_NAME,
+			PRD_SPEC,
+			PRD_COLOR,
+			BRAND,
+			STD_UNIT,
+			NOTICE_NUM,
+			REAL_NUM,
+			PRICE,
+			DECT_RATE,
+			DECT_PRICE,
+			DIFF_NUM,
+			DIFF_AMOUNT,
+			DEL_FLAG,
+			FROM_BILL_DTL_ID,
+	    	SPCL_TECH_ID,
+	    	SALE_ORDER_ID,
+	    	SALE_ORDER_NO,
+	    	SALE_ORDER_DTL_ID,
+	    	GOODS_ORDER_NO
+		)values(
+			#STOREIN_DIFF_DTL_ID#,	
+			#STOREIN_DIFF_ID#,
+			#PRD_ID#,
+			#PRD_NO#,
+			#PRD_NAME#,
+			#PRD_SPEC#,
+			#PRD_COLOR#,
+			#BRAND#,
+			#STD_UNIT#,
+			#NOTICE_NUM#,
+			#REAL_NUM#,
+			#PRICE#,
+			#DECT_RATE#,
+			#DECT_PRICE#,
+			#DIFF_NUM#,
+			#DIFF_AMOUNT#,
+			#DEL_FLAG#,
+			#FROM_BILL_DTL_ID#,
+	    	#SPCL_TECH_ID#,
+	    	#SALE_ORDER_ID#,
+	    	#SALE_ORDER_NO#,
+	    	#SALE_ORDER_DTL_ID#,
+	    	#GOODS_ORDER_NO#
+		)
+	 ]]>
+</insert>
+<insert id="insert" parameterClass="map">
+	insert into DRP_STOREIN(
+		STOREIN_ID,
+		STOREIN_NO,
+		BILL_TYPE,
+		FROM_BILL_ID,
+		FROM_BILL_NO,
+		SEND_CHANN_ID,
+		SEND_CHANN_NO,
+		SEND_CHANN_NAME,
+		RECV_CHANN_ID,
+		RECV_CHANN_NO,
+		RECV_CHANN_NAME,
+		ORDER_CHANN_ID,
+		ORDER_CHANN_NO,
+		ORDER_CHANN_NAME,
+		STOREIN_STORE_ID,
+		STOREIN_STORE_NO,
+		STOREIN_STORE_NAME,
+		STORAGE_FLAG,
+		STATE,
+		REMARK,
+		CREATOR,
+		CRE_NAME,
+		CRE_TIME,
+		DEPT_ID,
+		DEPT_NAME,
+		ORG_ID,
+		ORG_NAME,
+		LEDGER_ID,
+		LEDGER_NAME,
+		DEL_FLAG,
+		YEAR_MONTH,
+		STATEMENUT_DATE
+	)values(
+		#STOREIN_ID#,
+		#STOREIN_NO#,
+		#BILL_TYPE#,
+		#FROM_BILL_ID#,
+		#FROM_BILL_NO#,
+		#SEND_CHANN_ID#,
+		#SEND_CHANN_NO#,
+		#SEND_CHANN_NAME#,
+		#RECV_CHANN_ID#,
+		#RECV_CHANN_NO#,
+		#RECV_CHANN_NAME#,
+		#ORDER_CHANN_ID#,
+		#ORDER_CHANN_NO#,
+		#ORDER_CHANN_NAME#,
+		#STOREIN_STORE_ID#,
+		#STOREIN_STORE_NO#,
+		#STOREIN_STORE_NAME#,
+		#STORAGE_FLAG#,
+		#STATE#,
+		#REMARK#,
+		#CREATOR#,
+		#CRE_NAME#,
+		sysdate,
+		#DEPT_ID#,
+		#DEPT_NAME#,
+		#ORG_ID#,
+		#ORG_NAME#,
+		#LEDGER_ID#,
+		#LEDGER_NAME#,
+		#DEL_FLAG#,
+		sysdate,
+		to_date(#STATEMENUT_DATE#,'yyyy-mm-dd')
+	)
+</insert>
+<!--明细扫码序列号更新 -->
+	<update id="updateScanChldById" parameterClass="map">
+	<![CDATA[ update DRP_STOREIN_DTL ]]>
+		<dynamic prepend="set">
+			<isNotNull property="REAL_NUM" prepend=","><![CDATA[REAL_NUM = #REAL_NUM# ]]></isNotNull>
+		</dynamic>
+	<![CDATA[ where STOREIN_DTL_ID = #STOREIN_DTL_ID#
+			        and STOREIN_ID = #STOREIN_ID#
+	]]>
+	</update>
+	<!-- 跟据序列号查货品ID-->
+	<select id="queryErpStoreInDtl" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		SN,
+		PRD_ID
+	  from
+       ERP_STOREOUT_DTL 
+	  where 
+		SN = #SN#
+	]]>
+	</select>
+	<select id="queryDrpStoreInDtl" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		PRD_ID
+	  from
+       DRP_STOREIN_DTL 
+	  where 
+		PRD_ID = #PRD_ID#
+	]]>
+	</select>
+	<update id="txUpSpclEditFlag" parameterClass="map">
+	update DRP_SPCL_TECH set TECH_NO_EDIT_FLAG=#TECH_NO_EDIT_FLAG# 
+	where SPCL_TECH_ID in (select SPCL_TECH_ID from DRP_STOREIN_DTL where DEL_FLAG=#DEL_FLAG# and STOREIN_ID=#STOREIN_ID# and SPCL_TECH_ID is not null)
+	and USE_FLAG=#USE_FLAG#
+</update>
+<update id="updateReturnAdvcState" parameterClass="map">
+	update DRP_ADVC_ORDER set STATE=#STATE# where ADVC_ORDER_ID=#FROM_BILL_ID#
+</update>
+<update id="updateReturnStoreState" parameterClass="map">
+	update DRP_STOREIN_NOTICE set STATE=#STATE# where STOREIN_NOTICE_ID=#FROM_BILL_ID#
+</update>
+
+
+<!-- 导出 -->
+<select id="downGet" parameterClass="map" resultClass="java.util.HashMap" remapResults="true">
+<![CDATA[
+     
+     select 
+		u.STOREIN_ID,
+		u.STOREIN_NO,
+		u.BILL_TYPE,
+		u.FROM_BILL_ID,
+		u.FROM_BILL_NO,
+		u.SEND_CHANN_ID,
+		u.SEND_CHANN_NO,
+		u.SEND_CHANN_NAME,
+		u.RECV_CHANN_ID,
+		u.RECV_CHANN_NO,
+		u.RECV_CHANN_NAME,
+		u.STOREIN_STORE_ID,
+		u.STOREIN_STORE_NO,
+		u.STOREIN_STORE_NAME,
+		u.STORAGE_FLAG,
+		u.REMARK,
+		u.DEAL_FLAG,
+		to_char(u.DEAL_TIME,'yyyy-MM-DD HH24:MI:SS') DEAL_TIME,
+		u.DEAL_PSON_ID,
+		u.DEAL_PSON_NAME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.REMARK,
+	 	d.PRD_NO,
+	 	d.PRD_NAME,
+	 	d.PRD_SPEC,
+	 	d.PRD_COLOR,
+	 	d.BRAND,
+		d.STD_UNIT,
+		d.NOTICE_NUM,
+		d.REAL_NUM,
+		d.PRICE,
+		d.DECT_RATE,
+		d.DECT_PRICE,
+		d.DECT_AMOUNT,
+		c.SPCL_DTL_REMARK
+     from DRP_STOREIN u
+  left join DRP_STOREIN_DTL d
+    on u.STOREIN_ID = d.STOREIN_ID
+  left join DRP_SPCL_TECH c
+    on c.SPCL_TECH_ID = d.SPCL_TECH_ID
+   and c.USE_FLAG = 1
+  where u.DEL_FLAG=0 and d.DEL_FLAG = 0 and 1=1
+      
+]]>
+<dynamic prepend=" and ">
+	<include refid="queryDynSql" />
+</dynamic>
+</select>
+
+<update id="upDtlNumById" parameterClass="string">
+	update DRP_STOREIN_DTL a set REAL_NUM=0 where a.STOREIN_ID=#STOREIN_ID# and a.DEL_FLAG=0
+</update>
+
+</sqlMap>

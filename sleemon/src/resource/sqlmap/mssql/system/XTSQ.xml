@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="XTSQ">
+	<!-- 
+		*@module 系统管理
+		*@func 系统授权
+		*@version 1.1
+		*@author 吴亚林
+		*  -->
+	<typeAlias type="com.hoperun.sys.model.XTSQModel" alias="XTSQModel" />
+
+	
+	<!-- 新增 -->
+	<insert id="insert" parameterClass="map">
+		<![CDATA[ INSERT INTO T_SYS_XTSQ (XTSQID, XTYHID, XTMKID) VALUES (#XTSQID#, #XTYHID#, #XTMKID#) ]]>
+	</insert>
+	
+	<!-- 删除部门 -->
+	<delete id="delete" parameterClass="String">
+		<![CDATA[ DELETE FROM T_SYS_XTSQ  WHERE XTYHID = #XTYHID# ]]>
+	</delete>
+	
+	<!-- 加载 -->
+	<select id="loadById" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[ SELECT A.XTSQID, A.XTMKID, B.MKBH, B.MKMC, C.YHM
+				  FROM T_SYS_XTSQ A
+				  LEFT JOIN T_SYS_XTMK B
+				    ON A.XTMKID = B.XTMKID
+				  LEFT JOIN T_SYS_XTYH C
+				    ON A.XTYHID = C.XTYHID 
+				  WHERE A.XTYHID=#XTYHID# ORDER BY MKBH ]]>
+	</select>
+</sqlMap>
+

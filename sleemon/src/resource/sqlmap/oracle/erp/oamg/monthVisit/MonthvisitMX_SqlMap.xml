@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+	@author zcx
+	@function 月度拜访计划维护
+	@version 2014-05-20 11:13:12
+-->
+<sqlMap namespace="monthvisitMX">
+	<typeAlias
+		type="com.hoperun.erp.oamg.monthVisit.model.MonthvisitdtlModel"
+		alias="MonthvisitdtlModel" />
+	<!-- 使用Resvstore装载结果集 -->
+	<resultMap id="MonthvisitdtlModel" class="MonthvisitdtlModel">
+		<result column="MONTH_VISIT_PLAN_DTL_ID" property="MONTH_VISIT_PLAN_DTL_ID" />
+	</resultMap>
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		u.DEL_FLAG = 0
+		<isNotEmpty property="MONTH_VISIT_PLAN_NO">
+			and u.MONTH_VISIT_PLAN_NO like '%'||#MONTH_VISIT_PLAN_NO#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="RYBH">
+			and u.RYBH like '%'||#RYBH#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="RYMC">
+			and u.RYMC like '%'||#RYMC#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="PLAN_YEAR">
+			and u.PLAN_YEAR like '%'||#PLAN_YEAR#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="PLAN_MONTH">
+			and u.PLAN_MONTH like '%'||#PLAN_MONTH#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="STATE">
+			and u.STATE like '%'||#STATE#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="LEDGER_ID">
+			and u.LEDGER_ID = #LEDGER_ID#
+		</isNotEmpty>
+		<isNotEmpty property="QXJBCON">and $QXJBCON$</isNotEmpty>
+
+	</sql>
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField">
+			$orderField$
+		</isNotEmpty>
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[ 
+		select
+		   u.MONTH_VISIT_PLAN_DTL_ID,
+	       u.MONTH_VISIT_PLAN_ID,
+	       u.VISIT_OBJ_TYPE,
+	       u.VISIT_OBJ_ID,
+	       u.VISIT_OBJ_NO,
+	       u.VISIT_OBJ_NAME,
+	       u.PLAN_VISIT_NUM
+	       from ERP_MONTH_VISIT_PLAN_DTL u
+   ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql" />
+		</dynamic>
+	</sql>
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[
+	   select count(0) cnt 
+            from ERP_MONTH_VISIT_PLAN_DTL u 
+		   ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+	<!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		  insert into ERP_MONTH_VISIT_PLAN_DTL(
+			 MONTH_VISIT_PLAN_DTL_ID,
+			 MONTH_VISIT_PLAN_ID,
+			 VISIT_OBJ_TYPE,
+			 VISIT_OBJ_ID,
+			 VISIT_OBJ_NO,
+			 VISIT_OBJ_NAME,
+			 PLAN_VISIT_NUM,
+			 DEL_FLAG,
+			 VISIT_TYPE
+		   )values(
+			 #MONTH_VISIT_PLAN_DTL_ID#,
+			 #MONTH_VISIT_PLAN_ID#,
+			 #VISIT_OBJ_TYPE#,
+			 #VISIT_OBJ_ID#,
+			 #VISIT_OBJ_NO#,
+			 #VISIT_OBJ_NAME#,
+			 #PLAN_VISIT_NUM#,
+			 #DEL_FLAG#,
+			 #VISIT_TYPE#
+			)
+	   ]]>
+	</insert>
+
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ERP_MONTH_VISIT_PLAN_DTL ]]>
+		<dynamic prepend="set">
+			<isNotNull property="MONTH_VISIT_PLAN_ID" prepend=","><![CDATA[MONTH_VISIT_PLAN_ID = #MONTH_VISIT_PLAN_ID# ]]></isNotNull>
+			<isNotNull property="VISIT_OBJ_TYPE" prepend=","><![CDATA[VISIT_OBJ_TYPE = #VISIT_OBJ_TYPE# ]]></isNotNull>
+			<isNotNull property="VISIT_OBJ_ID" prepend=","><![CDATA[VISIT_OBJ_ID = #VISIT_OBJ_ID# ]]></isNotNull>
+			<isNotNull property="VISIT_OBJ_NO" prepend=","><![CDATA[VISIT_OBJ_NO = #VISIT_OBJ_NO# ]]></isNotNull>
+		    <isNotNull property="VISIT_OBJ_NAME" prepend=","><![CDATA[VISIT_OBJ_NAME = #VISIT_OBJ_NAME# ]]></isNotNull>
+			<isNotNull property="PLAN_VISIT_NUM" prepend=","><![CDATA[PLAN_VISIT_NUM = #PLAN_VISIT_NUM# ]]></isNotNull>
+			<isNotNull property="VISIT_TYPE" prepend=","><![CDATA[VISIT_TYPE = #VISIT_TYPE# ]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where MONTH_VISIT_PLAN_DTL_ID = #MONTH_VISIT_PLAN_DTL_ID#]]>
+	</update>
+
+	<select id="queryChildById" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<![CDATA[ 
+	         select 
+	            t.WORK_PLAN_DTL_ID,
+	            t.WORK_PLAN_ID ,
+	            t.RYXXID,
+	            t.RYBH,
+	            t.XM
+	            from DRP_WORK_PLAN_DTL t  
+	            where 
+		        t.DEL_FLAG='0' AND t.ORK_PLAN_ID = #ORK_PLAN_ID#
+	]]>
+	</select>
+	
+	<select id="loadById" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[ 
+	  select 
+		   t.WORK_PLAN_DTL_ID,
+           t.WORK_PLAN_ID ,
+           t.RYXXID,
+           t.RYBH,
+           t.XM
+           from DRP_WORK_PLAN_DTL t  
+	       where 
+		   t.WORK_PLAN_ID = #WORK_PLAN_ID#
+	]]>
+	</select>
+	
+	<update id="deleteByIds" parameterClass="map">
+		<![CDATA[ 
+	      update DRP_WORK_PLAN_DTL
+	         set DEL_FLAG = #DEL_FLAG#
+ 	         where 
+	         WORK_PLAN_DTL_ID in ($WORK_PLAN_DTL_ID$)
+    ]]>
+	</update>
+
+	<insert id="insertMX" parameterClass="map">
+	   insert into ${SYSSCHEMA}.t_sys_datarecycle(DATARECYCLEID,DELETOR,DELTIME,BUSINESSTYPE,DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10,DF11,DF12,DF13,DF14)
+	                                      select #DATARECYCLEID#||rownum,#DELETOR#,sysdate,'装修验收单维护',RNVTN_CHECK_DTL_ID,RNVTN_CHECK_ID,PRJ_TYPE,PRJ_NAME,PRJ_SCORE,CHECK_SCORE,CHECK_REMARK,DEL_FLAG,IS_REFORM_FLAG,CREATER,CRETIME,UPDATER,UPDTIME,STATE
+        from DRP_RNVTN_CHECK_DTL  where  RNVTN_CHECK_DTL_ID in ($RNVTN_CHECK_DTL_ID$)
+	</insert>
+	
+	<delete id="deleteCheck" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.DRP_RNVTN_CHECK ]]>
+		<dynamic prepend="set">
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where RNVTN_CHECK_ID = #RNVTN_CHECK_ID# ]]>
+	</delete>
+     
+    <delete id="delete" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.ERP_MONTH_VISIT_PLAN_DTL  ]]>
+		<dynamic prepend="set">
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = 1]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where MONTH_VISIT_PLAN_DTL_ID = #MONTH_VISIT_PLAN_DTL_ID#]]>
+	</delete> 
+    
+    
+	<select id="queryReformTtl" parameterClass="map"
+		resultClass="RnvtncheckChildModel">
+		<![CDATA[  
+	 	 select d.RNVTN_CHECK_DTL_ID,d.prj_type,d.prj_name,d.prj_score, d.RNVTN_CHECK_ID,d.CHECK_SCORE,d.check_remark,d.IS_REFORM_FLAG from DRP_RNVTN_CHECK_DTL d where d.DEL_FLAG=0 and d.RNVTN_CHECK_ID  =  #RNVTN_CHECK_ID#
+	 	]]>
+	</select>
+	
+	<select id="queryTypeAndName" parameterClass="map"
+		resultClass="RnvtncheckChildModel">
+		<![CDATA[  
+              select d.rnvtn_check_dtl_id,d.rnvtn_check_id  from DRP_RNVTN_CHECK_DTL d where d.PRJ_TYPE =#PRJ_TYPE# and d.PRJ_NAME=#PRJ_NAME# and d.del_flag=0
+              and d.RNVTN_CHECK_ID = #RNVTN_CHECK_ID#
+        ]]>
+	</select>
+
+	
+	<select id="queryTtl" parameterClass="map"
+		resultClass="RnvtncheckChildModel">
+		<![CDATA[  
+              select d.rnvtn_check_dtl_id,d.rnvtn_check_id from  DRP_RNVTN_CHECK_DTL d where d.rnvtn_check_id =  #RNVTN_CHECK_ID#	 	]]>
+	</select>
+ 
+	<!-- 查询SQL -->
+	<select id="selectBrothers" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[  
+	 	 select a.AREA_ID,a.AREA_ID_P,a.AREA_NO_P,a.AREA_NAME_P,c.RYXXID,c.RYBH,c.XM
+				from base_area a
+				left join base_chann b on a.area_id=b.area_id
+				left join t_sys_ryxx c on b.chann_id=c.jgxxid
+	            where a.AREA_ID_P = #WAREA_ID# and c.delflag = 0]]>
+	</select>
+
+	<!-- 查询重复 -->
+	<select id="queryBhForInt" parameterClass="map" resultClass="int">
+		select count(u.CHANN_RNVTN_ID) from DRP_CHANN_RNVTN u where
+		u.CHANN_RNVTN_ID=#CHANN_RNVTN_ID#
+		<isNotEmpty prepend="and" property="CHANN_NAME">
+			u.CHANN_NAME != #CHANN_NAME#
+		</isNotEmpty>
+
+	</select>
+	
+	<select id="loadByIdsT" parameterClass="String" resultClass="WorkplanmagedtlModel">
+		<![CDATA[  
+	 	 select 
+		  u.WORK_PLAN_DTL_ID,
+		  u.RYXXID,
+		  u.RYBH,
+		  u.RYMC,
+		  u.UP_REPORT_NUM
+		  from ERP_WORK_PLAN_DTL u
+	      where u.WORK_PLAN_DTL_ID in ($WORK_PLAN_DTL_IDs$)]]>
+	</select>
+	
+	<select id="childQueryT" parameterClass="map" resultClass="MonthvisitdtlModel">
+	  <![CDATA[ 
+       select 
+       t.MONTH_VISIT_PLAN_DTL_ID,
+       t.MONTH_VISIT_PLAN_ID,
+       t.VISIT_OBJ_TYPE,
+       t.VISIT_OBJ_ID,
+       t.VISIT_OBJ_NO,
+       t.VISIT_OBJ_NAME,
+       t.PLAN_VISIT_NUM,
+       t.VISIT_TYPE
+       from ERP_MONTH_VISIT_PLAN_DTL t where t.MONTH_VISIT_PLAN_ID=#MONTH_VISIT_PLAN_ID# and t.DEL_FLAG=0
+      ]]>
+    </select>
+    
+    <select id="queryChildbyNumT" parameterClass="String" resultClass="MonthvisitdtlModel">
+	<![CDATA[  
+	   select 
+			 u.PLAN_VISIT_NUM,
+			 u.MONTH_VISIT_PLAN_ID
+             from ERP_MONTH_VISIT_PLAN_DTL u 
+             where u.MONTH_VISIT_PLAN_ID = #MONTH_VISIT_PLAN_ID#  and u.DEL_FLAG=0
+	]]>
+    </select>
+    <select id="getDtlAllCount" resultClass="int" parameterClass="string">
+    	select count(1) ALLCOUNT from ERP_MONTH_VISIT_PLAN_DTL a where a.MONTH_VISIT_PLAN_ID=#MONTH_VISIT_PLAN_ID# and a.DEL_FLAG=0
+    </select>
+    <select id="getDtlCount" resultClass="int" parameterClass="string">
+    	select count(1) COUNT
+		  from (select a.MONTH_VISIT_PLAN_ID
+		          from ERP_MONTH_VISIT_PLAN_dtl a
+		         where a.MONTH_VISIT_PLAN_ID = #MONTH_VISIT_PLAN_ID#
+		           and a.DEL_FLAG = 0
+		         group by a.VISIT_OBJ_TYPE, a.VISIT_TYPE, a.MONTH_VISIT_PLAN_ID
+		        )
+
+    </select>
+    <select id="getMainCount" resultClass="java.util.HashMap" parameterClass="string">
+    	select (a.PLAN_YEAR || '年' || a.PLAN_MONTH || '月') DATA, a.RYMC
+		  from ERP_MONTH_VISIT_PLAN a,
+		       (select PLAN_YEAR, PLAN_MONTH, RYXXID
+		          from ERP_MONTH_VISIT_PLAN
+		         where MONTH_VISIT_PLAN_ID = #MONTH_VISIT_PLAN_ID#) b
+		 where a.PLAN_YEAR = b.PLAN_YEAR
+		   and a.PLAN_MONTH = b.PLAN_MONTH
+		   and a.RYXXID = b.RYXXID
+		   and a.MONTH_VISIT_PLAN_ID != #MONTH_VISIT_PLAN_ID#
+		   and a.DEL_FLAG = 0
+    </select>
+</sqlMap>

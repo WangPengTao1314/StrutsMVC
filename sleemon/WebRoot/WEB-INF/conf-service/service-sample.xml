@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd"
+	default-autowire="byName">
+	<!-- 通用组件 仅做示例用，版本正式发布时删除 -->
+	<bean id = "sampleService" parent="IBaseService" class = "com.hoperun.commons.sample.service.impl.SampleServiceImpl"/>
+	<bean id = "singleTableService" parent="IBaseService" class = "com.hoperun.sample.singletable.service.impl.SingleTableServiceImpl"/>
+	<!-- 1.1版本新单表 add by zhuxw -->
+	<bean id = "newsingleTableService" parent="IBaseService" class = "com.hoperun.sample.newsingletable.service.impl.NewSingleTableServiceImpl"/>
+	<!-- 1.1版本新主从表 add by zhuxw -->
+	<bean id = "newMasterSlaveService" parent="IBaseService" class = "com.hoperun.sample.newmasterslave.service.impl.NewMasterSlaveServiceImpl"/>
+	<bean id = "grantService" parent="IBaseService" class = "com.hoperun.sample.grant.service.impl.GrantServiceImpl"/>
+</beans>

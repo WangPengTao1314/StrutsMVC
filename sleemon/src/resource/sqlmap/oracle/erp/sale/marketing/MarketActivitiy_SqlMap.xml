@@ -1,0 +1,544 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zzb
+@function 
+@version 2013-09-15 10:35:10
+-->
+<sqlMap  namespace="MarketActivity">
+<!-- 定义  -->
+<typeAlias type="com.hoperun.erp.sale.marketing.model.MarketActivitiyModel" alias="MarketActivitiyModel"/>
+<typeAlias type="com.hoperun.erp.sale.marketing.model.MarketCardModel" alias="MarketCardModel" />
+<typeAlias type="com.hoperun.erp.sale.marketing.model.MarketChannModel" alias="MarketChannModel" />
+
+<!-- 使用MarketActivitiyModel装载结果集 -->
+<resultMap id="MarketActivitiyModel" class="MarketActivitiyModel">
+    <result column="MARKETING_ACT_ID" property="MARKETING_ACT_ID" />
+</resultMap>
+<!-- 使用MarketCardModel装载结果集 -->
+<resultMap id="MarketCardModel" class="MarketCardModel">
+    <result column="MARKETING_CARD_ID" property="MARKETING_CARD_ID" />
+</resultMap>
+<!-- 使用MarketChannModel装载结果集 -->
+<resultMap id="MarketChannModel" class="MarketChannModel">
+    <result column="MARKETING_CHANN_ID" property="MARKETING_CHANN_ID" />
+</resultMap>
+
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="MARKETING_ACT_NO">
+    u.MARKETING_ACT_NO like '%'||#MARKETING_ACT_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="MARKETING_ACT_NAME">
+    u.MARKETING_ACT_NAME like '%'||#MARKETING_ACT_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="SPONSOR_NAME">
+    u.SPONSOR_NAME like '%'||#SPONSOR_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="RECV_CHANN_NAME">
+    u.RECV_CHANN_NAME like '%'||#RECV_CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="START_DATE">
+	  <![CDATA[  u.START_DATE >= to_date(#START_DATE#,'yyyy-MM-DD')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="END_DATE">
+	  <![CDATA[  u.END_DATE <= to_date(#END_DATE#,'yyyy-MM-DD')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="CRE_TIME_BEGIN">
+	  <![CDATA[  u.CRE_TIME >= to_date(#CRE_TIME_BEGIN#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty> 
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+	  <![CDATA[  u.CRE_TIME <= to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>  
+  
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="DEL_FLAG">
+    u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="QXJBCON">
+        $QXJBCON$
+  </isNotEmpty>
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.MARKETING_ACT_ID,
+		u.MARKETING_ACT_NO,
+		u.MARKETING_ACT_NAME,
+		to_char(u.START_DATE,'yyyy-MM-DD')START_DATE,
+		to_char(u.END_DATE,'yyyy-MM-DD')END_DATE,
+		u.REMARK,
+		u.SPONSOR_NAME,
+		u.COMMISSION_PERCENTAGE,
+		to_char(round(u.COMMISSION_PERCENTAGE*100,4),'9999990.99') || '%' COMMISSION_PERCENTAGE_P,
+		u.STATE,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.DEL_FLAG
+      from ERP_MARKETING_ACT u
+      
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM ERP_MARKETING_ACT u ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+
+ 
+	
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_MARKETING_ACT(
+		 MARKETING_ACT_ID,
+		 MARKETING_ACT_NO,
+		 MARKETING_ACT_NAME,
+		 START_DATE,
+		 END_DATE,
+		 REMARK,
+		 SPONSOR_NAME,
+		 COMMISSION_PERCENTAGE,
+		 STATE,
+         CRE_NAME,
+         CREATOR,
+         CRE_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         DEL_FLAG
+	   )values(
+		#MARKETING_ACT_ID#,
+		#MARKETING_ACT_NO#,
+		#MARKETING_ACT_NAME#,
+		to_date(#START_DATE#,'yyyy-MM-DD'),
+		to_date(#END_DATE#,'yyyy-MM-DD'),
+		#REMARK#,
+		#SPONSOR_NAME#,
+		#COMMISSION_PERCENTAGE#,
+		#STATE#,
+        #CRE_NAME#,
+        #CREATOR#,
+	    sysdate, 
+        #DEPT_ID#,
+        #DEPT_NAME#,
+        #ORG_ID#,
+        #ORG_NAME#,
+        #LEDGER_ID#,
+        #LEDGER_NAME#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update ERP_MARKETING_ACT ]]>
+	<dynamic prepend="set">
+	<isNotNull property="START_DATE" prepend=","><![CDATA[START_DATE = to_date(#START_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+	<isNotNull property="END_DATE" prepend=","><![CDATA[END_DATE = to_date(#END_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+	<isNotNull property="SPONSOR_NAME" prepend=","><![CDATA[SPONSOR_NAME = #SPONSOR_NAME# ]]></isNotNull>
+    <isNotNull property="COMMISSION_PERCENTAGE" prepend=","><![CDATA[COMMISSION_PERCENTAGE = #COMMISSION_PERCENTAGE# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    <isNotNull property="MARKETING_ACT_NAME" prepend=","><![CDATA[MARKETING_ACT_NAME = #MARKETING_ACT_NAME# ]]></isNotNull>
+    <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+    <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where MARKETING_ACT_ID = #MARKETING_ACT_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update ERP_MARKETING_ACT 
+	               set DEL_FLAG = #DEL_FLAG#
+                      ,UPD_NAME=#UPD_NAME#
+                     ,UPDATOR=#UPDATOR#
+                      ,UPD_TIME=sysdate
+ 	  where 
+	     MARKETING_ACT_ID = #MARKETING_ACT_ID# 
+    ]]>
+</delete>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	 select 
+		u.MARKETING_ACT_ID,
+		u.MARKETING_ACT_NO,
+		u.MARKETING_ACT_NAME,
+		to_char(u.START_DATE,'yyyy-MM-DD')START_DATE,
+		to_char(u.END_DATE,'yyyy-MM-DD')END_DATE,
+		u.REMARK,
+		u.SPONSOR_NAME,
+		u.COMMISSION_PERCENTAGE,
+		to_char(round(u.COMMISSION_PERCENTAGE*100,4),'9999990.99') || '%' COMMISSION_PERCENTAGE_P,
+		u.STATE,
+		u.AUDIT_ID,
+		u.AUDIT_NAME,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.DEL_FLAG
+      from ERP_MARKETING_ACT u
+	  where 
+		u.MARKETING_ACT_ID = #MARKETING_ACT_ID#
+	]]>
+</select>
+
+
+<!-- ==========================================================MarketChann明细操作开始================-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlMarketChann">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlMarketChann">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlMarketChann">
+	<![CDATA[ 
+     select 
+		u.MARKETING_CHANN_ID,
+		u.CHANN_ID,
+		u.CHANN_NO,
+		u.CHANN_NAME,
+		u.CHANN_TYPE,
+		u.WAREA_ID,
+		u.WAREA_NO,
+		u.WAREA_NAME,
+		u.AREA_MANAGE_ID,
+		u.AREA_MANAGE_NAME,
+		u.DEL_FLAG,
+		u.MARKETING_ACT_ID
+       from ERP_MARKETING_CHANN u
+       	 
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryMarketChannByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlMarketChann"/>
+	  <dynamic prepend="where">
+			u.MARKETING_ACT_ID=#MARKETING_ACT_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlMarketChann" />
+	  </dynamic>
+  </select>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadMarketChannByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlMarketChann"/>
+	  <dynamic prepend="where">
+	        u.MARKETING_CHANN_ID in ($MARKETING_CHANN_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlMarketChann" />
+	  </dynamic>
+  </select>
+<!--明细表插入 -->
+<insert id="insertMarketChann" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_MARKETING_CHANN(
+		 MARKETING_CHANN_ID,
+		 CHANN_ID,
+		 CHANN_NO,
+		 CHANN_NAME,
+		 CHANN_TYPE,
+		 WAREA_ID,
+		 WAREA_NO,
+		 WAREA_NAME,
+		 AREA_MANAGE_ID,
+		 AREA_MANAGE_NAME,
+		 DEL_FLAG,
+		 MARKETING_ACT_ID
+	   )values(
+		 #MARKETING_CHANN_ID#,
+		 #CHANN_ID#,
+		 #CHANN_NO#,
+		 #CHANN_NAME#,
+		 #CHANN_TYPE#,
+		 #WAREA_ID#,
+		 #WAREA_NO#,
+		 #WAREA_NAME#,
+		 #AREA_MANAGE_ID#,
+		 #AREA_MANAGE_NAME#,
+		 #DEL_FLAG#,
+		 #MARKETING_ACT_ID#
+		)
+   ]]>
+</insert>
+<!--明细表更新 -->
+<update id="updateMarketChannById" parameterClass="map">
+	<![CDATA[ update ERP_MARKETING_CHANN ]]>
+	<dynamic prepend="set">
+    <isNotNull property="CHANN_ID" prepend=","><![CDATA[CHANN_ID = #CHANN_ID# ]]></isNotNull>
+    <isNotNull property="CHANN_NO" prepend=","><![CDATA[CHANN_NO = #CHANN_NO# ]]></isNotNull>
+    <isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME# ]]></isNotNull>
+    <isNotNull property="CHANN_TYPE" prepend=","><![CDATA[CHANN_TYPE = #CHANN_TYPE# ]]></isNotNull>
+    <isNotNull property="WAREA_ID" prepend=","><![CDATA[WAREA_ID = #WAREA_ID# ]]></isNotNull>
+    <isNotNull property="WAREA_NO" prepend=","><![CDATA[WAREA_NO = #WAREA_NO# ]]></isNotNull>
+    <isNotNull property="WAREA_NAME" prepend=","><![CDATA[WAREA_NAME = #WAREA_NAME#]]></isNotNull>
+    <isNotNull property="AREA_MANAGE_ID" prepend=","><![CDATA[AREA_MANAGE_ID = #AREA_MANAGE_ID#]]></isNotNull>
+    <isNotNull property="AREA_MANAGE_NAME" prepend=","><![CDATA[AREA_MANAGE_NAME = #AREA_MANAGE_NAME#]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where MARKETING_CHANN_ID = #MARKETING_CHANN_ID#]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteMarketChannByIds" parameterClass="map">
+	<![CDATA[ update ERP_MARKETING_CHANN 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      MARKETING_CHANN_ID in ($MARKETING_CHANN_IDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细 -->
+<delete id="delMarketChannByFkId" parameterClass="map">
+	<![CDATA[ update ERP_MARKETING_CHANN 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      MARKETING_ACT_ID = #MARKETING_ACT_ID#
+    ]]>
+</delete>
+
+  <!-- 查询已加入的加盟商的ID -->
+ <select id="queryChannIdsByFkId" parameterClass="map" resultClass="java.util.HashMap" >
+     select to_char(wmsys.wm_concat( '''' || a.CHANN_ID || '''' )) CHANN_IDS 
+    from ERP_MARKETING_CHANN a  where a.MARKETING_ACT_ID = #MARKETING_ACT_ID#
+    and a.DEL_FlAG=0
+ </select>
+ 
+
+<!-- ==========================================================MarketCard明细操作开始================-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlMarketCard">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlMarketCard">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlMarketCard">
+	<![CDATA[ 
+     select 
+		u.MARKETING_CARD_ID,
+		u.MARKETING_CARD_NO,
+		u.CARD_TYPE,
+		u.CARD_VALUE,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.CARD_SEQ_NO,
+		u.STATE,
+		u.DEL_FLAG,
+		u.MARKETING_ACT_ID
+       from ERP_MARKETING_CARD u
+       	 
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryMarketCardByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlMarketCard"/>
+	  <dynamic prepend="where">
+			u.MARKETING_ACT_ID=#MARKETING_ACT_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlMarketCard" />
+	  </dynamic>
+	  <dynamic prepend="order by ">
+	   <include refid="orderSqlMarketCard"/>
+	</dynamic>
+  </select>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadMarketCardByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlMarketCard"/>
+	  <dynamic prepend="where">
+	        u.MARKETING_CARD_ID in ($MARKETING_CARD_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlMarketCard" />
+	  </dynamic>
+  </select>
+<!--明细表插入 -->
+<insert id="insertMarketCard" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_MARKETING_CARD(
+		MARKETING_CARD_ID,
+		MARKETING_CARD_NO,
+		CARD_TYPE,
+		CARD_VALUE,
+		CRE_TIME,
+		CARD_SEQ_NO,
+		STATE,
+		DEL_FLAG,
+		MARKETING_ACT_ID
+	   )values(
+		#MARKETING_CARD_ID#,
+		#MARKETING_CARD_NO#,
+		#CARD_TYPE#,
+		#CARD_VALUE#,
+		sysdate,
+		#CARD_SEQ_NO#,
+		#STATE#,
+		#DEL_FLAG#,
+		#MARKETING_ACT_ID#
+		)
+   ]]>
+</insert>
+<!--明细表更新 -->
+<update id="updateMarketCardById" parameterClass="map">
+	<![CDATA[ update ERP_MARKETING_CARD ]]>
+	<dynamic prepend="set">
+    <isNotNull property="CARD_TYPE" prepend=","><![CDATA[CARD_TYPE = #CARD_TYPE# ]]></isNotNull>
+    <isNotNull property="CARD_VALUE" prepend=","><![CDATA[CARD_VALUE = #CARD_VALUE# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where MARKETING_CARD_ID = #MARKETING_CARD_ID#]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteMarketCardByIds" parameterClass="map">
+	<![CDATA[ update ERP_MARKETING_CARD 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      MARKETING_CARD_ID in ($MARKETING_CARD_IDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细 -->
+<delete id="delMarketCardByFkId" parameterClass="map">
+	<![CDATA[ update ERP_MARKETING_CARD 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      MARKETING_ACT_ID = #MARKETING_ACT_ID#
+    ]]>
+</delete>  
+
+
+<update id="updateCardState" parameterClass="map">
+	<![CDATA[ update ERP_MARKETING_CARD ]]>
+	<dynamic prepend="set">
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where MARKETING_CARD_ID in ($MARKETING_CARD_IDS$)]]>
+</update>
+
+
+    
+<!-- 查询当前最大单位的编码  (remapResults="true"  解决动态字段名情况下，由ibatis缓存select字段而引起的 缓存)-->
+<select id="queryMaxBillNo" parameterClass="map" resultClass="java.util.HashMap"  remapResults="true" >
+  select row_.*
+ from ( 
+   select CARD_SEQ_NO from  ERP_MARKETING_CARD
+     where DEL_FLAG=0 
+     and MARKETING_ACT_ID = #MARKETING_ACT_ID#
+     and CARD_TYPE = #CARD_TYPE#
+     order by CARD_SEQ_NO desc) row_
+ where rownum = 1
+ </select>
+ 
+<!--=========================================================== 卡券分页===================================================== -->
+
+<sql id="coreCardSql">
+  <![CDATA[ 
+	select 
+		u.MARKETING_CARD_ID,
+		u.MARKETING_CARD_NO,
+		u.CARD_TYPE,
+		u.CARD_VALUE,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.CARD_SEQ_NO,
+		u.STATE,
+		u.DEL_FLAG,
+		u.MARKETING_ACT_ID
+       from ERP_MARKETING_CARD u
+       where u.MARKETING_ACT_ID = #MARKETING_ACT_ID#
+       and  DEL_FLAG = 0
+   ]]>
+    <dynamic prepend="order by ">
+	   <include refid="orderSqlMarketCard"/>
+	</dynamic>
+   
+</sql>
+
+<!-- 主表分页查询 -->
+<select id="pageCardQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreCardSql" />
+		<include refid="public.pageEnd" />
+</select>
+<!-- 分页计数 -->
+<select id="pageCardCount" parameterClass="map" resultClass="int">
+     <![CDATA[
+     select count(0) cnt FROM ERP_MARKETING_CARD u 
+     where u.MARKETING_ACT_ID = #MARKETING_ACT_ID#
+     and  DEL_FLAG = 0
+     ]]>
+</select>  
+
+<select id="exportExcel" parameterClass="map" resultClass="java.util.HashMap">
+     <![CDATA[
+         select 
+		u.MARKETING_CARD_ID,
+		u.MARKETING_CARD_NO,
+		u.CARD_TYPE,
+		u.CARD_VALUE,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.CARD_SEQ_NO,
+		u.STATE,
+		u.DEL_FLAG,
+		u.MARKETING_ACT_ID
+       from ERP_MARKETING_CARD u
+       where u.MARKETING_ACT_ID = #MARKETING_ACT_ID#
+       and  DEL_FLAG = 0
+     ]]>
+</select>  
+
+
+
+ 
+</sqlMap>

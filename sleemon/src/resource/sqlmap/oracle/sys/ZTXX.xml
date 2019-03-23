@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+  *@module 财务管理
+  *@fuc 帐套信息维护
+  *@version 1.1
+  *@author 唐赟
+ -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="CWZT">  
+
+	<typeAlias type="com.hoperun.sys.model.ZTWHModel"
+		alias="ztwhModel" />
+
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="ztwhModel" class="ztwhModel">
+		<result column="ZTXXID" property="ZTXXID" />
+	</resultMap>
+ 
+    <sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField">
+			 $orderField$,
+		</isNotEmpty>cretime desc
+	</sql>	
+    <!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+	   <isNotEmpty prepend="and" property="ZTXXID"> 
+	   (ZTXXID = #ZTXXID# OR SJZT = #ZTXXID#)
+	   </isNotEmpty>
+	   <isNotEmpty prepend="and" property="ZTBH"> ztbh like '%'||#ZTBH#||'%'</isNotEmpty>
+	   <isNotEmpty prepend="and" property="ZTMC"> ZTMC like '%'||#ZTMC#||'%'</isNotEmpty>
+	   <isNotEmpty prepend="and" property="ZTLB"> ZTLB like '%'||#ZTLB#||'%'</isNotEmpty>
+	   <isNotEmpty prepend="and" property="ZZSH"> ZZSH like '%'||#ZZSH#||'%'</isNotEmpty>
+	   <isNotEmpty prepend="and" property="SJZT"> sjztmc like '%'||#SJZT#||'%'</isNotEmpty>
+	   <isNotEmpty prepend="and" property="ZT"> STATE like '%'||#ZT#||'%'</isNotEmpty>
+	   <isNotEmpty prepend="and" property="DELFLAG"> DELFLAG=#DELFLAG#</isNotEmpty>
+	   <isNotEmpty prepend="and " property="QXJBCON">$QXJBCON$</isNotEmpty>
+	   <isNotEmpty prepend="and " property="conditionString">$conditionString$</isNotEmpty>
+	</sql>
+	
+	<sql id="coreSqll">
+	   <![CDATA[
+	       select ZTXXID,ZTBH,ZTMC,YJZBJ,SJZT,sjztmc,ZZSH,YYZZH,ZTLB,STATE,CREATER,CRENAME,to_char(CRETIME,'yyyy-MM-DD HH24:MI:SS')CRETIME
+	       from (select a.*,b.ztmc sjztmc from ${SYSSCHEMA}.T_SYS_ZTXX a left join ${SYSSCHEMA}.T_SYS_ZTXX b on a.sjzt = b.ztxxid)   
+	   ]]>
+	   <dynamic prepend="where">
+	      <include refid="queryDynSql"/>
+	   </dynamic>
+	   <dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+		
+	</sql>
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSqll" />
+		<include refid="public.pageEnd" />
+	</select>
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(1) cnt FROM (select a.*,b.ztmc sjztmc from ${SYSSCHEMA}.T_SYS_ZTXX a left join ${SYSSCHEMA}.T_SYS_ZTXX b on a.sjzt = b.ztxxid)  ]]>
+	   <dynamic prepend="where">
+	      <include refid="queryDynSql"/>
+	   </dynamic>
+	</select>
+	
+<!-- 树查询 -->	
+	<!-- 分页查询 -->
+	<!-- 查询 下级帐套 及 自身 SQL -->
+	<select id="pageQuery1" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<![CDATA[ select * from (select a.delflag,a.ZTXXID, a.ZTBH, a.ZTMC,
+		               a.YJZBJ,a.SJZT,b.ztmc sjztmc, a.ZZSH,a.YYZZH, a.ZTLB, a.STATE,a.CREATER,a.crename,
+		               to_char(a.CRETIME, 'yyyy-MM-dd') CRETIME
+		          from ${SYSSCHEMA}.T_SYS_ZTXX a left join ${SYSSCHEMA}.T_SYS_ZTXX b  on a.sjzt = b.ztxxid
+		          where 1=1 AND a.delflag=0) u
+		           start with 
+		           u.DELFLAG = 0
+		           and u.ztxxid = #ZTXXID#
+		                  connect by prior u.ztxxid = u.sjzt]]>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+		<include refid="public.pageEnd" />
+	</select>
+	<!-- 下级帐套 及 自身 分页计数 -->
+	<select id="pageCount1" parameterClass="map" resultClass="int">
+		<![CDATA[ select count(1) cnt from (select a.delflag,a.ZTXXID, a.ZTBH, a.ZTMC,
+		               a.YJZBJ,a.SJZT,b.ztmc sjztmc, a.ZZSH,a.YYZZH, a.ZTLB, a.STATE,a.CREATER,a.crename,
+		               to_char(a.CRETIME, 'yyyy-MM-dd') CRETIME
+		          from ${SYSSCHEMA}.T_SYS_ZTXX a 
+		          left join ${SYSSCHEMA}.T_SYS_ZTXX b
+		          on a.sjzt = b.ztxxid
+		          where 1=1 AND a.delflag=0) u
+		           start with 
+		           u.DELFLAG = 0
+		           and u.ztxxid = #ZTXXID#
+		                  connect by prior u.ztxxid = u.sjzt]]>
+	</select>
+	
+	<select id="getOne" parameterClass="String" resultClass="java.util.HashMap">
+	  select ZTXXID,ZTBH,ZTMC,YJZBJ,SJZT,ZZSH,YYZZH,ZTLB,STATE,CREATER,CRENAME,to_char(CRETIME,'yyyy-MM-DD') CRETIME
+	       from ${SYSSCHEMA}.T_SYS_ZTXX where ztxxid=#ztxxid#
+	</select>
+	
+<!-- 结束 -->
+	<select id="getOneRecord" parameterClass="String" resultClass="java.util.HashMap">
+	   select sjztmc,ZTXXID,ZTMC,YJZBJ,ZZSH,JZRQ,ZGKJ,ZSXX,STATE ,ZTLB,SJZT,BZXXID,DIRTYFLAG,JJLX,ZTBH,YYZZH,CREATER,CRENAME,to_char(CRETIME,'yyyy-MM-dd HH24:MI:SS') CRETIME
+	   from (select a.*,b.ztmc sjztmc from ${SYSSCHEMA}.T_SYS_ZTXX a left join ${SYSSCHEMA}.T_SYS_ZTXX b on a.sjzt = b.ztxxid)
+	   where ztxxid=#ztxxID#
+	   
+	</select>
+	
+	<!-- 更新 -->
+	<update id="updateById" parameterClass="map">
+	    <![CDATA[ update ${SYSSCHEMA}.T_SYS_ZTXX ]]>
+	    set UPDATER=#UPDATER#,
+	    UPDTIME=sysdate
+		
+			<isNotNull property="ZTMC" prepend=","><![CDATA[ZTMC = #ZTMC#]]></isNotNull>
+			<isNotNull property="YJZBJ" prepend=","><![CDATA[YJZBJ = TO_NUMBER(#YJZBJ#)]]></isNotNull>
+			<isNotNull property="SJZT" prepend=","><![CDATA[SJZT = #SJZT#]]></isNotNull>
+			<isNotNull property="ZZSH" prepend=","><![CDATA[ZZSH = #ZZSH#]]></isNotNull>
+			<isNotNull property="YYZZH" prepend=","><![CDATA[YYZZH = #YYZZH#]]></isNotNull>
+			<isNotNull property="ZTLB" prepend=","><![CDATA[ZTLB = #ZTLB#]]></isNotNull>
+		 
+		<![CDATA[ where ZTXXID = #ZTXXID# ]]>
+	</update>
+	
+	<!-- 插入 -->
+	<insert id="insertRecord" parameterClass="map">
+	   insert into ${SYSSCHEMA}.T_SYS_ZTXX(ZTXXID,ZTBH,ZTMC,YJZBJ,SJZT,ZZSH,YYZZH,ZTLB,STATE,CREATER, CRETIME,DELFLAG,CRENAME,UPDTIME,UPDATER)
+	   values(#ZTXXID#,#ZTBH#,#ZTMC#,to_number(#YJZBJ#),#SJZT:VARCHAR:NULL#,#ZZSH#,#YYZZH#,#ZTLB#,#STATE#,#CREATER#, sysdate,#DELFLAG#,#CRENAME#,sysdate,#CRENAME#) 
+	</insert>
+	
+	<!-- 得到编号列表 -->
+	<select id="getAllBH" resultClass="ztwhModel" >
+	   select ztbh,ztmc from ${SYSSCHEMA}.T_SYS_ZTXX where delflag=0
+	</select>
+	
+	<update id="updateZTStatus" parameterClass="map">
+	   update ${SYSSCHEMA}.T_SYS_ZTXX
+	   set STATE=#STATE#
+	   where ZTXXID=#ztxxid#
+	</update>
+	
+	<update id="deleteById" parameterClass="map">
+	   update ${SYSSCHEMA}.T_SYS_ZTXX 
+	   set delflag=1,
+	       UPDATER=#UPDATER#,
+	       UPDTIME=sysdate
+	   where ZTXXID=#ztxxid# 
+	</update>
+	
+	<delete id="delete" parameterClass="map">
+	   delete from  ${SYSSCHEMA}.T_SYS_ZTXX 
+	   where ZTXXID=#ztxxid# 
+	</delete>
+	
+	<select id="queryTree"  resultClass="com.hoperun.sys.model.ZTWHTree">
+  		<![CDATA[
+			select ztxxid id,ztbh||'('||ztmc||')' name,sjzt pid from ${SYSSCHEMA}.T_SYS_ZTXX where DELFLAG = 0
+			]]>
+	</select>
+	
+	<select id="getCountRecord" parameterClass="String" resultClass="int">
+	   select count(ztbh) from ${SYSSCHEMA}.T_SYS_ZTXX where sjzt = #ztxxid#
+	</select>
+	
+	<select id="querySjForInt" parameterClass="map" resultClass="int">
+			<![CDATA[select COUNT(*) from( select ZTXXID,state from  ${SYSSCHEMA}.T_SYS_ZTXX
+                           start with ZTXXID = #ztxxid#
+                          connect by prior SJZT=ZTXXID ) temp 
+                          where  trim(state)!=#STATE# and ZTXXID! = #ztxxid#]]>
+	</select>
+	
+	<select id="loadZTZT" parameterClass="String" resultClass="String">
+		<![CDATA[ select trim(STATE) STATE from ${SYSSCHEMA}.T_SYS_ZTXX WHERE ZTXXID = #SJZT#]]>
+	</select>
+</sqlMap>
+

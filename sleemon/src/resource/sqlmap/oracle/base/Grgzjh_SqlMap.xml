@@ -1,0 +1,423 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author wujun
+@function 
+@version 2014-12-11 09:42:25
+-->
+<sqlMap  namespace="Grgzjh">
+<!-- 定义GrgzjhModel GrgzjhModelChld-->
+<typeAlias type="com.hoperun.base.grgzjh.model.GrgzjhModel" alias="GrgzjhModel"/>
+<typeAlias type="com.hoperun.base.grgzjh.model.GrgzjhModelChld" alias="GrgzjhModelChld"/>
+<!-- 使用GrgzjhModel装载结果集 -->
+<resultMap id="GrgzjhModel" class="GrgzjhModel">
+    <result column="PER_WORK_PLAN_ID" property="PER_WORK_PLAN_ID" />
+</resultMap>
+<!-- 使用GrgzjhModelChld装载结果集 -->
+<resultMap id="GrgzjhModelChld" class="GrgzjhModelChld">
+    <result column="PER_WORK_PLAN_DTL_ID" property="PER_WORK_PLAN_DTL_ID" />
+</resultMap>
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="XM">
+    u.CRE_NAME like '%'||#XM#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRETIME_BEG">
+     <![CDATA[u.CRE_TIME >=to_date(#CRE_TIME_BEG#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+     <![CDATA[u.CRE_TIME <=  to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="DEPT_NAME">
+    u.DEPT_NAME like '%'||#DEPT_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="ORG_NAME">
+    u.ORG_NAME like '%'||#ORG_NAME#||'%'
+  </isNotEmpty>
+	<isNotEmpty prepend="and " property="DEL_FLAG">
+	        u.DEL_FLAG=#DEL_FLAG#
+	</isNotEmpty>
+    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	</isNotEmpty>
+	<isNotEmpty prepend="and " property="PLAN_PSON_NAME">
+	        u.PLAN_PSON_NAME like '%'||#PLAN_PSON_NAME#||'%'
+	</isNotEmpty>
+	<isNotEmpty prepend="and " property="PER_WORK_PLAN_NO">
+	        u.PER_WORK_PLAN_NO like '%'||#PER_WORK_PLAN_NO#||'%'
+	</isNotEmpty>
+	<isNotEmpty prepend="and " property="PLAN_YEAR">
+	        u.PLAN_YEAR = #PLAN_YEAR#
+	</isNotEmpty>
+    <isNotEmpty prepend="and " property="PLAN_PSON_ID">
+        <![CDATA[  U.PLAN_PSON_ID <= #PLAN_PSON_ID#      ]]>
+    </isNotEmpty>
+     <isNotEmpty prepend="and " property="STATE">
+        <![CDATA[  U.STATE = #STATE#      ]]>
+    </isNotEmpty>
+    
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+
+SELECT U.PER_WORK_PLAN_ID,
+	   U.PER_WORK_PLAN_NO,
+       U.PLAN_PSON_ID,
+       U.PLAN_PSON_NAME,
+       U.PLAN_YEAR,
+       U.PLAN_MONTH,
+       U.PLAN_DAY,
+       U.DEPT_ID,
+       U.DEPT_NAME,
+       U.ORG_ID,
+       U.ORG_NAME,
+       U.DEL_FLAG,
+       U.REMARK,
+       U.STATE,
+       to_char(U.CRE_TIME,'yyyy-MM-DD') CRE_TIME
+  FROM ERP_PER_WORK_PLAN U
+ INNER JOIN (SELECT PER_WORK_PLAN_ID, COUNT(0) AS CNT
+               FROM ERP_PER_WORK_PLAN_DTL
+              WHERE DEL_FLAG = 0
+	        <isNotEmpty prepend="and " property="XFSJ_BEG">
+	        	TO_DATE(PLAN_YEAR || '-' || PLAN_MONTH || '-' || PLAN_DAY, 'YYYY-MM-DD')>=  TO_DATE(#XFSJ_BEG#, 'YYYY-MM-DD')
+	        </isNotEmpty>
+		    <isNotEmpty prepend="and " property="XFSJ_END">
+		        <![CDATA[    TO_DATE(PLAN_YEAR || '-' || PLAN_MONTH || '-' || PLAN_DAY, 'YYYY-MM-DD')<=  TO_DATE(#XFSJ_END#, 'YYYY-MM-DD')        ]]>
+		    </isNotEmpty>		    
+              GROUP BY PER_WORK_PLAN_ID) T ON U.PER_WORK_PLAN_ID = T.PER_WORK_PLAN_ID
+
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	 	order by U.PLAN_YEAR,U.PLAN_MONTH ASC
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+    <include refid="public.pageEnd" />
+</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      SELECT COUNT(0) CNT
+   FROM ERP_PER_WORK_PLAN U
+ INNER JOIN (SELECT PER_WORK_PLAN_ID, COUNT(0) AS CNT
+               FROM ERP_PER_WORK_PLAN_DTL
+              WHERE DEL_FLAG = 0
+               <isNotEmpty prepend="and " property="XFSJ_BEG">
+               TO_DATE(PLAN_YEAR || '-' || PLAN_MONTH || '-' || PLAN_DAY, 'YYYY-MM-DD')>=  TO_DATE(#XFSJ_BEG#, 'YYYY-MM-DD')
+               </isNotEmpty>
+    <isNotEmpty prepend="and " property="XFSJ_END">
+        <![CDATA[    TO_DATE(PLAN_YEAR || '-' || PLAN_MONTH || '-' || PLAN_DAY, 'YYYY-MM-DD')<=  TO_DATE(#XFSJ_END#, 'YYYY-MM-DD')        ]]>
+    </isNotEmpty>
+    GROUP BY PER_WORK_PLAN_ID) T ON U.PER_WORK_PLAN_ID = T.PER_WORK_PLAN_ID
+
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+
+
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_PER_WORK_PLAN(
+		 PER_WORK_PLAN_ID,
+		 PER_WORK_PLAN_NO,
+         PLAN_PSON_ID,
+         PLAN_PSON_NO,
+         PLAN_DAY,
+         PLAN_MONTH,
+         PLAN_YEAR,
+         PLAN_PSON_NAME,
+         CRE_NAME,
+         CREATOR,
+         CRE_TIME,
+         UPDATOR,
+         UPD_NAME,
+         UPD_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         DEL_FLAG,
+         REMARK,
+         STATE
+	   )values(
+		#PER_WORK_PLAN_ID#,
+		#PER_WORK_PLAN_NO#,
+        #PLAN_PSON_ID#,
+        #PLAN_PSON_NO#,
+        #PLAN_DAY#,
+        #PLAN_MONTH#,
+        #PLAN_YEAR#,
+        #PLAN_PSON_NAME#,
+        #CRE_NAME#,
+        #CREATOR#,
+	    sysdate, 
+        #UPDATOR#,
+        #UPD_NAME#,
+		sysdate, 
+        #DEPT_ID#,
+        #DEPT_NAME#,
+        #ORG_ID#,
+        #ORG_NAME#,
+		#DEL_FLAG#,
+		#REMARK#,
+		#STATE#
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update ERP_PER_WORK_PLAN ]]>
+	<dynamic prepend="set">
+    <isNotNull property="PLAN_PSON_ID" prepend=","><![CDATA[PLAN_PSON_ID = #PLAN_PSON_ID# ]]></isNotNull>
+    <isNotNull property="PLAN_DAY" prepend=","><![CDATA[PLAN_DAY = #PLAN_DAY# ]]></isNotNull>
+    <isNotNull property="PLAN_MONTH" prepend=","><![CDATA[PLAN_MONTH = #PLAN_MONTH# ]]></isNotNull>
+    <isNotNull property="PLAN_YEAR" prepend=","><![CDATA[PLAN_YEAR = #PLAN_YEAR# ]]></isNotNull>
+    <isNotNull property="PLAN_PSON_NAME" prepend=","><![CDATA[PLAN_PSON_NAME = #PLAN_PSON_NAME# ]]></isNotNull>
+    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+    <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where PER_WORK_PLAN_ID = #PER_WORK_PLAN_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update ERP_PER_WORK_PLAN 
+	               set DEL_FLAG = #DEL_FLAG#
+                      ,UPDATOR=#UPDATOR#
+                     ,UPD_NAME=#UPD_NAME#
+                      ,UPD_TIME=sysdate
+ 	  where 
+	     PER_WORK_PLAN_ID = #PER_WORK_PLAN_ID:VARCHAR# 
+    ]]>
+</delete>
+
+
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.PER_WORK_PLAN_ID,
+		u.PLAN_PSON_ID,
+		u.PLAN_PSON_NAME,
+		u.PLAN_YEAR,
+		u.PLAN_MONTH,
+		u.PLAN_DAY,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPDATOR,
+		u.UPD_NAME,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.DEL_FLAG,
+		u.REMARK,
+		u.STATE
+	  from
+       ERP_PER_WORK_PLAN u 
+	  where 
+		u.PER_WORK_PLAN_ID = #PER_WORK_PLAN_ID#
+	]]>
+</select>
+<!-- 明细操作开始-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+     SELECT U.PER_WORK_PLAN_DTL_ID,
+       U.PER_WORK_PLAN_ID,
+       U.PLAN_PSON_ID,
+       U.PLAN_YEAR,
+       U.PLAN_MONTH,
+       U.PLAN_DAY,
+       U.DEL_FLAG,
+       CASE
+         WHEN U.IS_IMPT_FLAG =0 THEN
+          '【重要】' || U.PLAN_CONTENT
+         ELSE
+          U.PLAN_CONTENT
+       END AS PLAN_CONTENT,
+       U.PLAN_YEAR || '-' || CASE
+         WHEN U.PLAN_MONTH < 10 THEN
+          '0' || U.PLAN_MONTH
+         ELSE
+          TO_CHAR(U.PLAN_MONTH)
+       END || '-' || CASE
+         WHEN U.PLAN_DAY < 10 THEN
+          '0' || U.PLAN_DAY
+         ELSE
+          TO_CHAR(U.PLAN_DAY)
+       END AS ESTART
+  FROM ERP_PER_WORK_PLAN_DTL U
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.PER_WORK_PLAN_ID=#PER_WORK_PLAN_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+	        u.PER_WORK_PLAN_DTL_ID in ($PER_WORK_PLAN_DTL_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+<!--明细表插入 -->
+<insert id="insertChld" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_PER_WORK_PLAN_DTL(
+		 PER_WORK_PLAN_DTL_ID,
+		 PER_WORK_PLAN_ID,
+         PLAN_YEAR,
+         PLAN_MONTH,
+         IS_IMPT_FLAG,
+         PLAN_DAY,
+         PLAN_PSON_ID,
+         PLAN_CONTENT,
+         DEL_FLAG
+	   )values(
+		#PER_WORK_PLAN_DTL_ID#,
+		#PER_WORK_PLAN_ID#,
+        #PLAN_YEAR#,
+        #PLAN_MONTH#,
+        #IS_IMPT_FLAG#,
+        #PLAN_DAY#,
+        #PLAN_PSON_ID#,
+        #PLAN_CONTENT#,
+		#DEL_FLAG#
+		)
+   ]]>
+</insert>
+<!--明细表更新 -->
+<update id="updateChldById" parameterClass="map">
+	<![CDATA[ update ERP_PER_WORK_PLAN_DTL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="PER_WORK_PLAN_ID" prepend=","><![CDATA[PER_WORK_PLAN_ID = #PER_WORK_PLAN_ID# ]]></isNotNull>
+    <isNotNull property="PLAN_YEAR" prepend=","><![CDATA[PLAN_YEAR = #PLAN_YEAR# ]]></isNotNull>
+    <isNotNull property="PLAN_MONTH" prepend=","><![CDATA[PLAN_MONTH = #PLAN_MONTH# ]]></isNotNull>
+    <isNotNull property="PLAN_PSON_NAME" prepend=","><![CDATA[PLAN_PSON_NAME = #PLAN_PSON_NAME# ]]></isNotNull>
+    <isNotNull property="PLAN_DAY" prepend=","><![CDATA[PLAN_DAY = #PLAN_DAY# ]]></isNotNull>
+    <isNotNull property="PLAN_PSON_ID" prepend=","><![CDATA[PLAN_PSON_ID = #PLAN_PSON_ID# ]]></isNotNull>
+    <isNotNull property="PLAN_CONTENT" prepend=","><![CDATA[PLAN_CONTENT = #PLAN_CONTENT# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where PER_WORK_PLAN_DTL_ID = #PER_WORK_PLAN_DTL_ID#]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteChldByIds" parameterClass="map">
+	<![CDATA[ update ERP_PER_WORK_PLAN_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      PER_WORK_PLAN_DTL_ID in ($PER_WORK_PLAN_DTL_IDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细 -->
+<delete id="delChldByFkId" parameterClass="map">
+	<![CDATA[ update ERP_PER_WORK_PLAN_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      PER_WORK_PLAN_ID = #PER_WORK_PLAN_ID:VARCHAR#
+    ]]>
+</delete>
+<!-- 查询个人明细工作计划 -->
+<select id="loadEventsForCurrentUser" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <![CDATA[
+        SELECT PLAN_YEAR || '-' || PLAN_MONTH || '-' || PLAN_DAY AS ESTART,
+       PLAN_CONTENT,
+       PER_WORK_PLAN_DTL_ID,
+       PER_WORK_PLAN_ID
+  FROM (SELECT A.PLAN_YEAR,
+               A.PER_WORK_PLAN_ID,
+               CASE
+                 WHEN A.PLAN_MONTH < 10 THEN
+                  '0' || A.PLAN_MONTH
+                 ELSE
+                  TO_CHAR(A.PLAN_MONTH)
+               END AS PLAN_MONTH,
+               CASE
+                 WHEN A.PLAN_DAY < 10 THEN
+                  '0' || A.PLAN_DAY
+                 ELSE
+                  TO_CHAR(A.PLAN_DAY)
+               END AS PLAN_DAY,
+               A.PER_WORK_PLAN_DTL_ID,
+               CASE
+                 WHEN A.IS_IMPT_FLAG =0 THEN
+                  '【重要】' || A.PLAN_CONTENT
+                 ELSE
+                  A.PLAN_CONTENT
+               END AS PLAN_CONTENT
+          FROM ERP_PER_WORK_PLAN_DTL A
+        WHERE A.DEL_FLAG = 0
+        AND A.PLAN_PSON_ID = #PLAN_PSON_ID#
+        AND A.PLAN_YEAR = #PLAN_YEAR#
+        AND A.PLAN_MONTH =#PLAN_MONTH#)
+         ]]>
+</select>
+
+
+<!--明细表更新 -->
+<update id="updateMx" parameterClass="map">
+	<![CDATA[ update ERP_PER_WORK_PLAN_DTL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="PER_WORK_PLAN_ID" prepend=","><![CDATA[PER_WORK_PLAN_ID = #PER_WORK_PLAN_ID# ]]></isNotNull>
+    <isNotNull property="PLAN_YEAR" prepend=","><![CDATA[PLAN_YEAR = #PLAN_YEAR# ]]></isNotNull>
+    <isNotNull property="PLAN_MONTH" prepend=","><![CDATA[PLAN_MONTH = #PLAN_MONTH# ]]></isNotNull>
+    <isNotNull property="PLAN_PSON_NAME" prepend=","><![CDATA[PLAN_PSON_NAME = #PLAN_PSON_NAME# ]]></isNotNull>
+    <isNotNull property="PLAN_DAY" prepend=","><![CDATA[PLAN_DAY = #PLAN_DAY# ]]></isNotNull>
+    <isNotNull property="PLAN_PSON_ID" prepend=","><![CDATA[PLAN_PSON_ID = #PLAN_PSON_ID# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where PER_WORK_PLAN_DTL_ID = #PER_WORK_PLAN_DTL_ID#]]>
+</update>
+
+
+<!-- 根据年、月、人员ID查询个人工作计划 -->
+<select id="loadUserPlanId" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+	<![CDATA[
+	 select distinct PER_WORK_PLAN_ID
+	  from ERP_PER_WORK_PLAN
+	 where PLAN_PSON_ID = #PLAN_PSON_ID#
+	   and PLAN_YEAR = #PLAN_YEAR#
+	   and PLAN_MONTH = #PLAN_MONTH#
+	   and DEL_FLAG=0
+	]]>
+</select>
+
+<delete id="deleteChild" parameterClass="java.util.HashMap">
+          UPDATE ERP_PER_WORK_PLAN_DTL SET DEL_FLAG = '1' WHERE PER_WORK_PLAN_DTL_ID=#PER_WORK_PLAN_DTL_ID#
+    </delete>
+</sqlMap>

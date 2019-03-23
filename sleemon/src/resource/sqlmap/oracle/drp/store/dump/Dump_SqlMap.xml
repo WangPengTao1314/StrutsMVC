@@ -1,0 +1,544 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zzb
+@function 
+@version 2013-09-05 14:00:34
+-->
+<sqlMap  namespace="Dump">
+<!-- 定义DumpModel,DumpModelChld -->
+<typeAlias type="com.hoperun.drp.store.dump.model.DumpModel" alias="DumpModel"/>
+<typeAlias type="com.hoperun.drp.store.dump.model.DumpModelChld" alias="DumpModelChld" />
+<!-- 使用DumpModel装载结果集 -->
+<resultMap id="DumpModel" class="DumpModel">
+    <result column="DUMP_ID" property="DUMP_ID" />
+</resultMap>
+<!-- 使用DumpModelChld装载结果集 -->
+<resultMap id="DumpModelChld" class="DumpModelChld">
+    <result column="DUMP_DTL_ID" property="DUMP_DTL_ID" />
+</resultMap>
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="DUMP_NO">
+    (u.DUMP_NO like '%'||#DUMP_NO#||'%' or u.RELT_BILL_NO like '%'||#DUMP_NO#||'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="BILL_TYPE">
+    u.BILL_TYPE = #BILL_TYPE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="DUMP_OUT_STORE_NO">
+    u.DUMP_OUT_STORE_NO like '%'||#DUMP_OUT_STORE_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="DUMP_OUT_STORE_NAME">
+    u.DUMP_OUT_STORE_NAME like '%'||#DUMP_OUT_STORE_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="DUMP_IN_STORE_NO">
+    u.DUMP_IN_STORE_NO like '%'||#DUMP_IN_STORE_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="DUMP_IN_STORE_NAME">
+    u.DUMP_IN_STORE_NAME like '%'||#DUMP_IN_STORE_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_BEG">
+     <![CDATA[u.CRE_TIME >=to_date(#CRE_TIME_BEG#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+     <![CDATA[u.CRE_TIME <=  to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="DUMP_DATE_BEG">
+     <![CDATA[u.DUMP_DATE >=to_date(#DUMP_DATE_BEG#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="DUMP_DATE_END">
+     <![CDATA[u.DUMP_DATE <=  to_date(#DUMP_DATE_END#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="LEDGER_ID">
+    u.LEDGER_ID = #LEDGER_ID#
+  </isNotEmpty>
+	<isNotEmpty prepend="and " property="DEL_FLAG">
+	        u.DEL_FLAG=#DEL_FLAG#
+	</isNotEmpty>
+    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	</isNotEmpty>
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.DUMP_ID,
+		u.DUMP_NO,
+		u.BILL_TYPE,
+		u.DUMP_OUT_STORE_ID,
+		u.DUMP_OUT_STORE_NO,
+		u.DUMP_OUT_STORE_NAME,
+		u.DUMP_OUT_STORAGE_FLAG,
+		u.DUMP_IN_STORE_ID,
+		u.DUMP_IN_STORE_NO,
+		u.DUMP_IN_STORE_NAME,
+		u.STORAGE_FLAG2,
+		u.REMARK,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.AUDIT_NAME,
+		u.AUDIT_ID,
+		NVL(u.PRINT_NUM,0)PRINT_NUM
+      from DRP_DUMP u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM DRP_DUMP u ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_DUMP(
+		 DUMP_ID,
+         STORAGE_FLAG2,
+         DUMP_OUT_STORE_NAME,
+         DUMP_OUT_STORE_NO,
+         REMARK,
+         DUMP_IN_STORE_ID,
+         DUMP_NO,
+         BILL_TYPE,
+         DUMP_OUT_STORE_ID,
+         DUMP_OUT_STORAGE_FLAG,
+         DUMP_IN_STORE_NO,
+         DUMP_IN_STORE_NAME,
+         STATE,
+         CREATOR,
+         CRE_NAME,
+         CRE_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         DEL_FLAG,
+         DUMP_DATE,
+         RELT_BILL_NO
+	   )values(
+		#DUMP_ID#,
+        #STORAGE_FLAG2#,
+        #DUMP_OUT_STORE_NAME#,
+        #DUMP_OUT_STORE_NO#,
+        #REMARK#,
+        #DUMP_IN_STORE_ID#,
+        #DUMP_NO#,
+        #BILL_TYPE#,
+        #DUMP_OUT_STORE_ID#,
+        #DUMP_OUT_STORAGE_FLAG#,
+        #DUMP_IN_STORE_NO#,
+        #DUMP_IN_STORE_NAME#,
+        #STATE#,
+        #CREATOR#,
+        #CRE_NAME#,
+        sysdate,
+        #DEPT_ID#,
+        #DEPT_NAME#,
+        #ORG_ID#,
+        #ORG_NAME#,
+        #LEDGER_ID#,
+        #LEDGER_NAME#,
+        #DEL_FLAG#,
+        to_date(#DUMP_DATE#,'yyyy-MM-DD'),
+        #RELT_BILL_NO#
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update DRP_DUMP ]]>
+	<dynamic prepend="set">
+    <isNotNull property="STORAGE_FLAG2" prepend=","><![CDATA[STORAGE_FLAG2 = #STORAGE_FLAG2# ]]></isNotNull>
+    <isNotNull property="DUMP_OUT_STORE_NAME" prepend=","><![CDATA[DUMP_OUT_STORE_NAME = #DUMP_OUT_STORE_NAME# ]]></isNotNull>
+    <isNotNull property="DUMP_OUT_STORE_NO" prepend=","><![CDATA[DUMP_OUT_STORE_NO = #DUMP_OUT_STORE_NO# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    <isNotNull property="DUMP_IN_STORE_ID" prepend=","><![CDATA[DUMP_IN_STORE_ID = #DUMP_IN_STORE_ID# ]]></isNotNull>
+    <isNotNull property="DUMP_NO" prepend=","><![CDATA[DUMP_NO = #DUMP_NO# ]]></isNotNull>
+    <isNotNull property="BILL_TYPE" prepend=","><![CDATA[BILL_TYPE = #BILL_TYPE# ]]></isNotNull>
+    <isNotNull property="DUMP_OUT_STORE_ID" prepend=","><![CDATA[DUMP_OUT_STORE_ID = #DUMP_OUT_STORE_ID# ]]></isNotNull>
+    <isNotNull property="DUMP_OUT_STORAGE_FLAG" prepend=","><![CDATA[DUMP_OUT_STORAGE_FLAG = #DUMP_OUT_STORAGE_FLAG# ]]></isNotNull>
+    <isNotNull property="DUMP_IN_STORE_NO" prepend=","><![CDATA[DUMP_IN_STORE_NO = #DUMP_IN_STORE_NO# ]]></isNotNull>
+    <isNotNull property="DUMP_IN_STORE_NAME" prepend=","><![CDATA[DUMP_IN_STORE_NAME = #DUMP_IN_STORE_NAME# ]]></isNotNull>
+    <isNotNull property="AUDIT_ID" prepend=","><![CDATA[AUDIT_ID = #AUDIT_ID#]]></isNotNull>
+    <isNotNull property="AUDIT_NAME" prepend=","><![CDATA[AUDIT_NAME = #AUDIT_NAME#]]></isNotNull>
+    <isNotNull property="AUDIT_TIME" prepend=","><![CDATA[AUDIT_TIME = sysdate]]></isNotNull>
+	<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+	<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+	<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+	<isNotNull property="DUMP_DATE" prepend=","><![CDATA[DUMP_DATE = to_date(#DUMP_DATE#,'yyyy-MM-DD')]]></isNotNull>
+	<isNotNull property="RELT_BILL_NO" prepend=","><![CDATA[RELT_BILL_NO = #RELT_BILL_NO#]]></isNotNull>
+	
+    </dynamic>
+	<![CDATA[ where DUMP_ID = #DUMP_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update DRP_DUMP 
+	          set 
+	          UPD_NAME=#UPD_NAME#,UPDATOR=#UPDATOR#,UPD_TIME=sysdate,
+              DEL_FLAG = #DEL_FLAG#
+	               
+ 	  where 
+	     DUMP_ID = #DUMP_ID:VARCHAR# 
+    ]]>
+</delete>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.DUMP_ID,
+		u.DUMP_NO,
+		u.BILL_TYPE,
+		u.DUMP_OUT_STORE_ID,
+		u.DUMP_OUT_STORE_NO,
+		u.DUMP_OUT_STORE_NAME,
+		u.DUMP_OUT_STORAGE_FLAG,
+		u.DUMP_IN_STORE_ID,
+		u.DUMP_IN_STORE_NO,
+		u.DUMP_IN_STORE_NAME,
+		u.STORAGE_FLAG2,
+		u.REMARK,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.AUDIT_NAME,
+		u.AUDIT_ID,
+		u.RELT_BILL_NO,
+		to_char(u.DUMP_DATE,'yyyy-MM-DD') DUMP_DATE
+	  from
+       DRP_DUMP u 
+	  where 
+		u.DUMP_ID = #DUMP_ID#
+	]]>
+</select>
+<!-- 明细操作开始-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+     select 
+		u.DUMP_DTL_ID,
+		u.DUMP_ID,
+		u.PRD_ID,
+		u.PRD_NO,
+		u.PRD_NAME,
+		u.PRD_SPEC,
+		u.PRD_COLOR,
+		u.BRAND,
+		u.STD_UNIT,
+		u.DUMP_OUT_STORG_ID,
+		u.DUMP_OUT_STORG_NO,
+		u.DUMP_OUT_STORG_NAME,
+		u.DUMP_IN_STORG_ID,
+		u.DUMP_IN_STORG_NO,
+		u.DUMP_IN_STORG_NAME,
+		u.DUMP_NUM,
+		u.REMARK,
+		u.DEL_FLAG,
+		u.RELT_BILL_DTL_ID,
+		b.SPCL_TECH_FLAG,
+    	u.SPCL_TECH_ID,
+    	b.SPCL_SPEC_REMARK,
+		b.DM_SPCL_TECH_NO,
+    	temp.SAFE_NUM
+       from DRP_DUMP_DTL u 
+       	left join DRP_SPCL_TECH b on u.SPCL_TECH_ID = b.SPCL_TECH_ID
+       	left join DRP_DUMP t on u.DUMP_ID = t.DUMP_ID
+       	left join (select a.PRD_ID,b.STORE_NO,b.STORE_NAME,b.STORE_TYPE,
+       	      sum(NVL(STORE_NUM,0)-NVL(FREEZE_NUM,0)) SAFE_NUM,a.LEDGER_ID,a.STORE_ID     
+		    from  DRP_STORE_ACCT a,DRP_STORE b where  a.STORE_ID=b.STORE_ID
+		    group by  a.PRD_ID,b.STORE_NO,b.STORE_NAME,b.STORE_TYPE,a.ledger_id,a.store_id) temp  
+        on u.PRD_ID = temp.PRD_ID 
+        and temp.STORE_ID = t.DUMP_OUT_STORE_ID
+       	
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.DUMP_ID=#DUMP_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+	        u.DUMP_DTL_ID in ($DUMP_DTL_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+<!--明细表插入 -->
+<insert id="insertChld" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_DUMP_DTL(
+		 DUMP_DTL_ID,
+		 DUMP_ID,
+         PRD_ID,
+         PRD_NO,
+         PRD_NAME,
+         PRD_SPEC,
+         PRD_COLOR,
+         BRAND,
+         STD_UNIT,
+         DUMP_OUT_STORG_ID,
+         DUMP_OUT_STORG_NO,
+         DUMP_OUT_STORG_NAME,
+         DUMP_IN_STORG_ID,
+         DUMP_IN_STORG_NO,
+         DUMP_IN_STORG_NAME,
+         DUMP_NUM,
+         REMARK,
+         DEL_FLAG,
+         SPCL_TECH_ID,
+         RELT_BILL_DTL_ID
+	   )values(
+		#DUMP_DTL_ID#,
+		#DUMP_ID#,
+        #PRD_ID#,
+        #PRD_NO#,
+        #PRD_NAME#,
+        #PRD_SPEC#,
+        #PRD_COLOR#,
+        #BRAND#,
+        #STD_UNIT#,
+        #DUMP_OUT_STORG_ID#,
+        #DUMP_OUT_STORG_NO#,
+        #DUMP_OUT_STORG_NAME#,
+        #DUMP_IN_STORG_ID#,
+        #DUMP_IN_STORG_NO#,
+        #DUMP_IN_STORG_NAME#,
+        #DUMP_NUM#,
+        #REMARK#,
+        #DEL_FLAG#,
+        #SPCL_TECH_ID#,
+        #RELT_BILL_DTL_ID#
+		)
+   ]]>
+</insert>
+<!--明细表更新 -->
+<update id="updateChldById" parameterClass="map">
+	<![CDATA[ update DRP_DUMP_DTL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="DUMP_DTL_ID" prepend=","><![CDATA[DUMP_DTL_ID = #DUMP_DTL_ID# ]]></isNotNull>
+    <isNotNull property="PRD_ID" prepend=","><![CDATA[PRD_ID = #PRD_ID# ]]></isNotNull>
+    <isNotNull property="PRD_NO" prepend=","><![CDATA[PRD_NO = #PRD_NO# ]]></isNotNull>
+    <isNotNull property="PRD_NAME" prepend=","><![CDATA[PRD_NAME = #PRD_NAME# ]]></isNotNull>
+    <isNotNull property="PRD_SPEC" prepend=","><![CDATA[PRD_SPEC = #PRD_SPEC# ]]></isNotNull>
+    <isNotNull property="PRD_COLOR" prepend=","><![CDATA[PRD_COLOR = #PRD_COLOR# ]]></isNotNull>
+    <isNotNull property="BRAND" prepend=","><![CDATA[BRAND = #BRAND# ]]></isNotNull>
+    <isNotNull property="STD_UNIT" prepend=","><![CDATA[STD_UNIT = #STD_UNIT# ]]></isNotNull>
+    <isNotNull property="SPCL_TECH_ID" prepend=","><![CDATA[SPCL_TECH_ID = #SPCL_TECH_ID# ]]></isNotNull>
+    <isNotNull property="DUMP_OUT_STORG_ID" prepend=","><![CDATA[DUMP_OUT_STORG_ID = #DUMP_OUT_STORG_ID# ]]></isNotNull>
+    <isNotNull property="DUMP_OUT_STORG_NO" prepend=","><![CDATA[DUMP_OUT_STORG_NO = #DUMP_OUT_STORG_NO# ]]></isNotNull>
+    <isNotNull property="DUMP_OUT_STORG_NAME" prepend=","><![CDATA[DUMP_OUT_STORG_NAME = #DUMP_OUT_STORG_NAME# ]]></isNotNull>
+    <isNotNull property="DUMP_IN_STORG_ID" prepend=","><![CDATA[DUMP_IN_STORG_ID = #DUMP_IN_STORG_ID# ]]></isNotNull>
+    <isNotNull property="DUMP_IN_STORG_NO" prepend=","><![CDATA[DUMP_IN_STORG_NO = #DUMP_IN_STORG_NO# ]]></isNotNull>
+    <isNotNull property="DUMP_IN_STORG_NAME" prepend=","><![CDATA[DUMP_IN_STORG_NAME = #DUMP_IN_STORG_NAME# ]]></isNotNull>
+    <isNotNull property="DUMP_NUM" prepend=","><![CDATA[DUMP_NUM = #DUMP_NUM# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where DUMP_DTL_ID = #DUMP_DTL_ID#]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteChldByIds" parameterClass="map">
+	<![CDATA[ update DRP_DUMP_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      DUMP_DTL_ID in ($DUMP_DTL_IDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细 -->
+<delete id="delChldByFkId" parameterClass="map">
+	<![CDATA[ update DRP_DUMP_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      DUMP_ID = #DUMP_ID:VARCHAR#
+    ]]>
+</delete>
+
+
+<select id="expertExcel" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+   select u.DUMP_ID,
+		u.DUMP_NO,
+		u.BILL_TYPE,
+		u.DUMP_OUT_STORE_ID,
+		u.DUMP_OUT_STORE_NO,
+		u.DUMP_OUT_STORE_NAME,
+		u.DUMP_OUT_STORAGE_FLAG,
+		u.DUMP_IN_STORE_ID,
+		u.DUMP_IN_STORE_NO,
+		u.DUMP_IN_STORE_NAME,
+		u.STORAGE_FLAG2,
+		u.REMARK,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG,
+		to_char(u.AUDIT_TIME,'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+		u.AUDIT_NAME,
+		u.AUDIT_ID,
+		u.RELT_BILL_NO,
+		to_char(u.DUMP_DATE,'yyyy-MM-DD') DUMP_DATE,
+       d.PRD_NO,
+       d.PRD_NAME,
+       d.PRD_SPEC,
+       d.BRAND,
+       d.STD_UNIT,
+       sp.DM_SPCL_TECH_NO,
+       sp.SPCL_DTL_REMARK,
+       NVL(d.DUMP_NUM,0)DUMP_NUM,
+       d.REMARK ROW_REMARK
+  from DRP_DUMP u
+  left join DRP_DUMP_DTL d on u.DUMP_ID = d.DUMP_ID
+  left join  DRP_SPCL_TECH  sp on sp.SPCL_TECH_ID = d.SPCL_TECH_ID
+	]]>
+	<dynamic prepend="where">
+	u.DEL_FLAG=0 and d.DEL_FLAG=0  and 
+	   <include refid="queryDynSql" />
+	</dynamic>
+</select>
+<select id="getDumpStoreId" resultClass="java.util.HashMap" parameterClass="string">
+	select DUMP_OUT_STORE_ID,DUMP_IN_STORE_ID from DRP_DUMP where DUMP_ID=#DUMP_ID#
+</select>
+<select id="getDtlCount" parameterClass="string" resultClass="int">
+	select count(1) from DRP_DUMP_DTL where DUMP_ID=#DUMP_ID# and DEL_FLAG=0
+</select>
+
+
+
+<select id="queryChldByReltBillNo" parameterClass="map" resultClass="java.util.HashMap">
+  <![CDATA[ 
+     select 
+		u.DUMP_DTL_ID RELT_BILL_DTL_ID,
+		u.DUMP_ID,
+		u.PRD_ID,
+		u.PRD_NO,
+		u.PRD_NAME,
+		NVL(u.PRD_SPEC,'')PRD_SPEC,
+		NVL(u.PRD_COLOR,'')PRD_COLOR,
+		NVL(u.BRAND,'')BRAND,
+		NVL(u.STD_UNIT,'')STD_UNIT,
+		u.DUMP_OUT_STORG_ID,
+		u.DUMP_OUT_STORG_NO,
+		u.DUMP_OUT_STORG_NAME,
+		u.DUMP_IN_STORG_ID,
+		u.DUMP_IN_STORG_NO,
+		u.DUMP_IN_STORG_NAME,
+		NVL(u.DUMP_NUM,0)DUMP_NUM,
+		NVL(u.REMARK,'')REMARK,
+		u.DEL_FLAG,
+		b.SPCL_TECH_FLAG,
+    	NVL(u.SPCL_TECH_ID,'')SPCL_TECH_ID,
+    	NVL(b.SPCL_SPEC_REMARK,'')SPCL_SPEC_REMARK,
+		NVL(b.DM_SPCL_TECH_NO,'')DM_SPCL_TECH_NO,
+    	NVL(temp.SAFE_NUM,0)SAFE_NUM
+       from DRP_DUMP_DTL u 
+       	left join DRP_SPCL_TECH b on u.SPCL_TECH_ID = b.SPCL_TECH_ID
+       	left join DRP_DUMP t on u.DUMP_ID = t.DUMP_ID
+       	left join (select a.PRD_ID,b.STORE_NO,b.STORE_NAME,b.STORE_TYPE,
+       	      sum(NVL(STORE_NUM,0)-NVL(FREEZE_NUM,0)) SAFE_NUM,a.LEDGER_ID,a.STORE_ID     
+		    from  DRP_STORE_ACCT a,DRP_STORE b where  a.STORE_ID=b.STORE_ID
+		    group by  a.PRD_ID,b.STORE_NO,b.STORE_NAME,b.STORE_TYPE,a.ledger_id,a.store_id) temp  
+        on u.PRD_ID = temp.PRD_ID 
+        and temp.STORE_ID = t.DUMP_IN_STORE_ID
+        where t.DUMP_NO = #RELT_BILL_NO#
+        and t.DEL_FLAG=0 and  u.DEL_FLAG=0
+       	
+   ]]>
+</select>
+
+
+<!-- 查找关联的明细ID-->
+<select id="queryReltDtls" parameterClass="map" resultClass="String">
+	<![CDATA[ 
+   select
+    to_char(wmsys.wm_concat(NVL(u.RELT_BILL_DTL_ID, ''))) RELT_BILL_DTL_IDS
+ from DRP_DUMP_DTL u
+ where u.RELT_BILL_DTL_ID is not null
+     and u.DUMP_ID = #DUMP_ID#
+     and u.DEL_FLAG=0
+	]]>
+</select>
+
+  
+  
+</sqlMap>

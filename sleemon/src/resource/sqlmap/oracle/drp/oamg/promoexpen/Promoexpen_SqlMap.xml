@@ -1,0 +1,772 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author chenj
+@function 
+@version 2014-01-24 10:59:55
+-->
+<sqlMap  namespace="Promoexpen">
+<typeAlias type="com.hoperun.drp.oamg.promoexpen.model.PromoexpenModel" alias="PromoexpenModel"/>
+<!-- 使用Promoexpen装载结果集 -->
+<resultMap id="PromoexpenModel" class="PromoexpenModel">
+    <result column="PRMT_COST_REQ_ID" property="PRMT_COST_REQ_ID" />
+</resultMap>
+<!-- 动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+   u.DEL_FLAG = 0
+  <isNotEmpty prepend="" property="RELATE_ORDER_NOS">
+     and u.PRMT_COST_REQ_NO in ($RELATE_ORDER_NOS$)
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="REQ_NAME">
+     and u.REQ_NAME  like '%'||#REQ_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="REQ_DATE">
+     and u.REQ_DATE = to_date(#REQ_DATE#,'yyyy-MM-DD')
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="AREA_NAME">
+     and u.AREA_NAME  like '%'||#AREA_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CHANN_NAME">
+     and u.CHANN_NAME  like '%'||#CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CHANN_NO">
+     and u.CHANN_NO = #CHANN_NO#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CHANNS_CHARG">
+     and u.CHANN_ID in $CHANNS_CHARG$
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="PRMT_COST_REQ_NO">
+     and u.PRMT_COST_REQ_NO like '%'||#PRMT_COST_REQ_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="STATE">
+     and u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="searchSTATE">
+     and u.STATE in ($searchSTATE$)
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="STATES">
+     and u.STATE in ($STATES$)
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="DEL_FLAG">
+     and u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="LEDGER_ID">
+     and u.LEDGER_ID =  #LEDGER_ID#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="QXJBCON">
+     and $QXJBCON$
+  </isNotEmpty>
+</sql>
+
+<sql id="qDynSql">
+      and   temp.CORRELATIONID = u.PRMT_COST_REQ_ID
+     <isNotEmpty prepend="and" property="RELATE_ORDER_NOS">
+     u.PRMT_COST_REQ_NO in ($RELATE_ORDER_NOS$)
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="REQ_NAME">
+     u.REQ_NAME  like '%'||#REQ_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="REQ_DATE">
+     u.REQ_DATE = to_date(#REQ_DATE#,'yyyy-MM-DD')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="AREA_NAME">
+     u.AREA_NAME  like '%'||#AREA_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CHANN_NAME">
+     u.CHANN_NAME  like '%'||#CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CHANN_NO">
+     u.CHANN_NO = #CHANN_NO#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CHANNS_CHARG">
+     u.CHANN_ID in $CHANNS_CHARG$
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="PRMT_COST_REQ_NO">
+    u.PRMT_COST_REQ_NO like '%'||#PRMT_COST_REQ_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="searchSTATE">
+    u.STATE in ($searchSTATE$)
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STATES">
+    u.STATE in ($STATES$)
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="DEL_FLAG">
+    u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="LEDGER_ID">
+    u.LEDGER_ID =  #LEDGER_ID#
+  </isNotEmpty>
+</sql>
+
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	  select u.PRMT_COST_REQ_ID,
+               u.PRMT_COST_REQ_NO,
+               u.REQ_ID,
+               u.REQ_NAME,
+               u.CHANN_ID,
+               u.CHANN_NO,
+               u.CHANN_NAME,
+               to_char(u.REQ_DATE, 'yyyy-MM-DD') REQ_DATE,
+               u.CHANN_TEL,
+               u.AREA_ID,
+               u.AREA_NO,
+               u.AREA_NAME,
+               u.AREA_MANAGE_ID,
+               u.AREA_MANAGE_NAME,
+               u.AREA_MANAGE_TEL,
+               u.REQ_REMARK,
+               u.TOTAL_AREA_SEND_AMOUNT,
+               u.TOTAL_AREA_BUDGET_AMOUNT,
+               u.TOTAL_AREA_SEND_COST_AMOUNT,
+               u.TOTAL_AREA_SEND_BUDGET_AMOUNT,
+               u.AREA_REQ_COST_AMOUNT,
+               u.TOTAL_AREA_SEND_LEFT_AMOUNT,
+               u.TOTAL_AREA_BUDGET_LEFT_AMOUNT,
+               u.AREA_SEND_COST_RATE,
+               u.AREA_SEND_BUDGET_RATE,
+               u.REIT_REQ_AMOUNT,
+               u.COST_TYPE,
+               u.REMARK,
+               u.AUDIT_ID,
+               u.AUDIT_NAME,
+               to_char(u.AUDIT_TIME, 'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+               u.CRE_NAME,
+               u.CREATOR,
+               to_char(u.CRE_TIME, 'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+               u.UPD_NAME,
+               u.UPDATOR,
+               to_char(u.UPD_TIME, 'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+               u.DEPT_ID,
+               u.DEPT_NAME,
+               u.ORG_ID,
+               u.ORG_NAME,
+               u.LEDGER_ID,
+               u.LEDGER_NAME,
+               u.STATE,
+               u.DEL_FLAG,
+               u.ZONE_ADDR,
+               u.CHANN_PERSON_CON,
+               u.PRO_SCREEN
+               from ERP_PRMT_COST_REQ u 
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+<sql id="coreSqlSH">
+  <![CDATA[ 
+	  select DISTINCT u.PRMT_COST_REQ_ID,
+               u.PRMT_COST_REQ_NO,
+               u.REQ_ID,
+               u.REQ_NAME,
+               u.CHANN_ID,
+               u.CHANN_NO,
+               u.CHANN_NAME,
+               to_char(u.REQ_DATE, 'yyyy-MM-DD') REQ_DATE,
+               u.CHANN_TEL,
+               u.AREA_ID,
+               u.AREA_NO,
+               u.AREA_NAME,
+               u.AREA_MANAGE_ID,
+               u.AREA_MANAGE_NAME,
+               u.AREA_MANAGE_TEL,
+               u.REQ_REMARK,
+               u.TOTAL_AREA_SEND_AMOUNT,
+               u.TOTAL_AREA_BUDGET_AMOUNT,
+               u.TOTAL_AREA_SEND_COST_AMOUNT,
+               u.TOTAL_AREA_SEND_BUDGET_AMOUNT,
+               u.AREA_REQ_COST_AMOUNT,
+               u.TOTAL_AREA_SEND_LEFT_AMOUNT,
+               u.TOTAL_AREA_BUDGET_LEFT_AMOUNT,
+               u.AREA_SEND_COST_RATE,
+               u.AREA_SEND_BUDGET_RATE,
+               u.REIT_REQ_AMOUNT,
+               u.COST_TYPE,
+               u.REMARK,
+               u.AUDIT_ID,
+               u.AUDIT_NAME,
+               to_char(u.AUDIT_TIME, 'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+               u.CRE_NAME,
+               u.CREATOR,
+               to_char(u.CRE_TIME, 'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+               u.UPD_NAME,
+               u.UPDATOR,
+               to_char(u.UPD_TIME, 'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+               u.DEPT_ID,
+               u.DEPT_NAME,
+               u.ORG_ID,
+               u.ORG_NAME,
+               u.LEDGER_ID,
+               u.LEDGER_NAME,
+               u.STATE,
+               u.DEL_FLAG,
+               u.ZONE_ADDR,
+               u.CHANN_PERSON_CON,
+               u.PRO_SCREEN
+               from ERP_PRMT_COST_REQ u ,
+   ]]>
+    <isNotEmpty prepend="" property="QXJBCON">
+	   $QXJBCON$  
+    </isNotEmpty>
+    <include refid="qDynSql" />
+</sql>
+
+<!-- 分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+</select>
+
+<select id="pageQuerySH" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSqlSH" />
+		<include refid="public.pageEnd" />
+</select>
+
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt 
+            from ERP_PRMT_COST_REQ u 
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+
+<select id="pageCountSH" parameterClass="map" resultClass="int">
+	<![CDATA[
+	     SELECT COUNT(*) FROM (select DISTINCT *
+            from ERP_PRMT_COST_REQ u,
+		   ]]>
+	<isNotEmpty prepend="" property="QXJBCON">
+       $QXJBCON$  
+    </isNotEmpty>
+	<include refid="qDynSql" />
+	<![CDATA[
+	   ) u
+	]]>
+</select>
+
+ <!-- 查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_PRMT_COST_REQ(
+		 PRMT_COST_REQ_ID,
+		 PRMT_COST_REQ_NO,
+		 REQ_ID,
+		 REQ_NAME,
+		 CHANN_ID,
+         CHANN_NO,
+         CHANN_NAME,
+         REQ_DATE,
+         CHANN_PERSON_CON,
+         CHANN_TEL,
+         AREA_ID,
+         AREA_NO,
+         AREA_NAME,
+         AREA_MANAGE_ID,
+         AREA_MANAGE_NAME,
+         AREA_MANAGE_TEL,
+         REQ_REMARK,
+         TOTAL_PRMT_COST,
+         REIT_REQ_AMOUNT,
+         COST_TYPE,
+         TOTAL_REAL_AMOUNT,
+         TOTAL_ADVC_AMOUNT,
+         TOTAL_RATE,
+         TOTAL_AREA_SEND_AMOUNT,
+         TOTAL_AREA_BUDGET_AMOUNT,
+         TOTAL_AREA_SEND_COST_AMOUNT,
+         TOTAL_AREA_SEND_BUDGET_AMOUNT,
+         AREA_REQ_COST_AMOUNT,
+         TOTAL_AREA_SEND_LEFT_AMOUNT,
+         TOTAL_AREA_BUDGET_LEFT_AMOUNT,
+         AREA_SEND_COST_RATE,
+         AREA_SEND_BUDGET_RATE,
+         PRMT_PLAN_ID,
+         PRMT_PLAN_NO,
+         PRMT_PLAN_NAME,
+         PRMT_TYPE,
+         BUDGET_ITEM_ID,
+         BUDGET_ITEM_NO,
+         BUDGET_ITEM_NAME,
+         BUDGET_ITEM_TYPE,
+         CITY_NAME,
+         CITY_LVL,
+         REQ_MAKE,
+         BUDGET_AMOUNT,
+         RETAIL_AMOUNT,
+         BILL_AMOUNT,
+         AREA_TOTAL_BUDGET_AMOUNT,
+         AREA_TOTAL_PRE_AMOUNT,
+         AREA_TOTAL_AVALIABLE_AMOUNT,
+         WARE_TOTAL_BUDGET_AMOUNT,
+         WARE_TOTAL_PRE_AMOUNT,
+         WARE_TOTAL_AVALIABLE_AMOUNT,
+         STATE,
+         REMARK,
+         CREATOR,
+         CRE_NAME,
+         CRE_TIME,
+         UPD_NAME,
+         UPDATOR,
+         UPD_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         ZONE_ID,
+         ZONE_ADDR,
+         DEL_FLAG,
+         BUDGET_QUOTA_ID,
+         PRO_SCREEN
+	   )values(
+		 #PRMT_COST_REQ_ID#,
+		 #PRMT_COST_REQ_NO#,
+		 #REQ_ID#,
+		 #REQ_NAME#,
+		 #CHANN_ID#,
+         #CHANN_NO#,
+         #CHANN_NAME#,
+         to_date(#REQ_DATE#,'yyyy-MM-DD'),
+         #CHANN_PERSON_CON#,
+         #CHANN_TEL#,
+         #AREA_ID#,
+         #AREA_NO#,
+         #AREA_NAME#,
+         #AREA_MANAGE_ID#,
+         #AREA_MANAGE_NAME#,
+         #AREA_MANAGE_TEL#,
+         #REQ_REMARK#,
+         #TOTAL_PRMT_COST#,
+         #REIT_REQ_AMOUNT#,
+         #COST_TYPE#,
+         #TOTAL_REAL_AMOUNT#,
+         #TOTAL_ADVC_AMOUNT#,
+         #TOTAL_RATE#,
+         #TOTAL_AREA_SEND_AMOUNT#,
+         #TOTAL_AREA_BUDGET_AMOUNT#,
+         #TOTAL_AREA_SEND_COST_AMOUNT#,
+         #TOTAL_AREA_SEND_BUDGET_AMOUNT#,
+         #AREA_REQ_COST_AMOUNT#,
+         #TOTAL_AREA_SEND_LEFT_AMOUNT#,
+         #TOTAL_AREA_BUDGET_LEFT_AMOUNT#,
+         #AREA_SEND_COST_RATE#,
+         #AREA_SEND_BUDGET_RATE#,
+         #PRMT_PLAN_ID#,
+         #PRMT_PLAN_NO#,
+         #PRMT_PLAN_NAME#,
+         #PRMT_TYPE#,
+         #BUDGET_ITEM_ID#,
+         #BUDGET_ITEM_NO#,
+         #BUDGET_ITEM_NAME#,
+         #BUDGET_ITEM_TYPE#,
+         #CITY_NAME#,
+         #CITY_LVL#,
+         #REQ_MAKE#,
+         #BUDGET_AMOUNT#,
+         #RETAIL_AMOUNT#,
+         #BILL_AMOUNT#,
+         #AREA_TOTAL_BUDGET_AMOUNT#,
+         #AREA_TOTAL_PRE_AMOUNT#,
+         #AREA_TOTAL_AVALIABLE_AMOUNT#,
+         #WARE_TOTAL_BUDGET_AMOUNT#,
+         #WARE_TOTAL_PRE_AMOUNT#,
+         #WARE_TOTAL_AVALIABLE_AMOUNT#,
+         #STATE#,
+         #REMARK#,
+         #CREATOR#,
+         #CRE_NAME#,
+	     sysdate, 
+         #UPD_NAME#,
+         #UPDATOR#,
+		 sysdate, 
+         #DEPT_ID#,
+         #DEPT_NAME#,
+         #ORG_ID#,
+         #ORG_NAME#,
+         #LEDGER_ID#,
+         #LEDGER_NAME#,
+         #ZONE_ID#,
+         #ZONE_ADDR#,
+         #DEL_FLAG#,
+         #BUDGET_QUOTA_ID#,
+         #PRO_SCREEN#
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update ERP_PRMT_COST_REQ ]]>
+	<dynamic prepend="set">
+	<isNotNull property="PRMT_COST_REQ_NO" prepend=","><![CDATA[PRMT_COST_REQ_NO = #PRMT_COST_REQ_NO# ]]></isNotNull>
+	<isNotNull property="REQ_ID" prepend=","><![CDATA[REQ_ID = #REQ_ID# ]]></isNotNull>
+	<isNotNull property="REQ_NAME" prepend=","><![CDATA[REQ_NAME = #REQ_NAME# ]]></isNotNull>
+	<isNotNull property="CHANN_ID" prepend=","><![CDATA[CHANN_ID = #CHANN_ID# ]]></isNotNull>
+    <isNotNull property="CHANN_NO" prepend=","><![CDATA[CHANN_NO = #CHANN_NO# ]]></isNotNull>
+	<isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME# ]]></isNotNull>
+	<isNotNull property="REQ_DATE" prepend=","><![CDATA[REQ_DATE = to_date(#REQ_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+	<isNotNull property="CHANN_PERSON_CON" prepend=","><![CDATA[CHANN_PERSON_CON = #CHANN_PERSON_CON# ]]></isNotNull>
+    <isNotNull property="CHANN_TEL" prepend=","><![CDATA[CHANN_TEL = #CHANN_TEL# ]]></isNotNull>
+    <isNotNull property="AREA_ID" prepend=","><![CDATA[AREA_ID = #AREA_ID# ]]></isNotNull>
+    <isNotNull property="AREA_NO" prepend=","><![CDATA[AREA_NO = #AREA_NO# ]]></isNotNull>
+    <isNotNull property="AREA_NAME" prepend=","><![CDATA[AREA_NAME = #AREA_NAME# ]]></isNotNull>
+    <isNotNull property="AREA_MANAGE_ID" prepend=","><![CDATA[AREA_MANAGE_ID = #AREA_MANAGE_ID# ]]></isNotNull>
+    <isNotNull property="AREA_MANAGE_NAME" prepend=","><![CDATA[AREA_MANAGE_NAME = #AREA_MANAGE_NAME# ]]></isNotNull>
+    <isNotNull property="AREA_MANAGE_TEL" prepend=","><![CDATA[AREA_MANAGE_TEL = #AREA_MANAGE_TEL# ]]></isNotNull>
+    <isNotNull property="REQ_REMARK" prepend=","><![CDATA[REQ_REMARK = #REQ_REMARK# ]]></isNotNull>
+    <isNotNull property="TOTAL_PRMT_COST" prepend=","><![CDATA[TOTAL_PRMT_COST = #TOTAL_PRMT_COST# ]]></isNotNull>
+    <isNotNull property="REIT_REQ_AMOUNT" prepend=","><![CDATA[REIT_REQ_AMOUNT = #REIT_REQ_AMOUNT# ]]></isNotNull>
+    
+    <isNotNull property="COST_TYPE" prepend=","><![CDATA[COST_TYPE = #COST_TYPE# ]]></isNotNull>
+    <isNotNull property="TOTAL_REAL_AMOUNT" prepend=","><![CDATA[TOTAL_REAL_AMOUNT = #TOTAL_REAL_AMOUNT# ]]></isNotNull>
+    <isNotNull property="TOTAL_ADVC_AMOUNT" prepend=","><![CDATA[TOTAL_ADVC_AMOUNT = #TOTAL_ADVC_AMOUNT# ]]></isNotNull>
+    <isNotNull property="TOTAL_RATE" prepend=","><![CDATA[TOTAL_RATE = #TOTAL_RATE# ]]></isNotNull>
+    <isNotNull property="TOTAL_AREA_SEND_AMOUNT" prepend=","><![CDATA[TOTAL_AREA_SEND_AMOUNT = #TOTAL_AREA_SEND_AMOUNT# ]]></isNotNull>
+    <isNotNull property="TOTAL_AREA_BUDGET_AMOUNT" prepend=","><![CDATA[TOTAL_AREA_BUDGET_AMOUNT = #TOTAL_AREA_BUDGET_AMOUNT# ]]></isNotNull>
+    <isNotNull property="TOTAL_AREA_SEND_COST_AMOUNT" prepend=","><![CDATA[TOTAL_AREA_SEND_COST_AMOUNT = #TOTAL_AREA_SEND_COST_AMOUNT# ]]></isNotNull>
+    <isNotNull property="TOTAL_AREA_SEND_BUDGET_AMOUNT" prepend=","><![CDATA[TOTAL_AREA_SEND_BUDGET_AMOUNT = #TOTAL_AREA_SEND_BUDGET_AMOUNT# ]]></isNotNull>
+    <isNotNull property="AREA_REQ_COST_AMOUNT" prepend=","><![CDATA[AREA_REQ_COST_AMOUNT = #AREA_REQ_COST_AMOUNT# ]]></isNotNull>
+    <isNotNull property="TOTAL_AREA_SEND_LEFT_AMOUNT" prepend=","><![CDATA[TOTAL_AREA_SEND_LEFT_AMOUNT = #TOTAL_AREA_SEND_LEFT_AMOUNT# ]]></isNotNull>
+    <isNotNull property="TOTAL_AREA_BUDGET_LEFT_AMOUNT" prepend=","><![CDATA[TOTAL_AREA_BUDGET_LEFT_AMOUNT = #TOTAL_AREA_BUDGET_LEFT_AMOUNT# ]]></isNotNull>
+    <isNotNull property="AREA_SEND_COST_RATE" prepend=","><![CDATA[AREA_SEND_COST_RATE = #AREA_SEND_COST_RATE# ]]></isNotNull>
+    <isNotNull property="AREA_SEND_BUDGET_RATE" prepend=","><![CDATA[AREA_SEND_BUDGET_RATE = #AREA_SEND_BUDGET_RATE# ]]></isNotNull>
+    <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+    <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    <isNotNull property="PRMT_PLAN_ID" prepend=","><![CDATA[PRMT_PLAN_ID = #PRMT_PLAN_ID# ]]></isNotNull>
+    <isNotNull property="PRMT_PLAN_NO" prepend=","><![CDATA[PRMT_PLAN_NO = #PRMT_PLAN_NO# ]]></isNotNull>
+    <isNotNull property="PRMT_PLAN_NAME" prepend=","><![CDATA[PRMT_PLAN_NAME = #PRMT_PLAN_NAME# ]]></isNotNull>
+    <isNotNull property="PRMT_TYPE" prepend=","><![CDATA[PRMT_TYPE = #PRMT_TYPE# ]]></isNotNull>
+    <isNotNull property="BUDGET_ITEM_ID" prepend=","><![CDATA[BUDGET_ITEM_ID = #BUDGET_ITEM_ID# ]]></isNotNull>
+    <isNotNull property="BUDGET_ITEM_NO" prepend=","><![CDATA[BUDGET_ITEM_NO = #BUDGET_ITEM_NO# ]]></isNotNull>
+    <isNotNull property="BUDGET_ITEM_NAME" prepend=","><![CDATA[BUDGET_ITEM_NAME = #BUDGET_ITEM_NAME# ]]></isNotNull>
+    <isNotNull property="BUDGET_ITEM_TYPE" prepend=","><![CDATA[BUDGET_ITEM_TYPE = #BUDGET_ITEM_TYPE# ]]></isNotNull>
+    <isNotNull property="CITY_NAME" prepend=","><![CDATA[CITY_NAME = #CITY_NAME# ]]></isNotNull>
+    <isNotNull property="CITY_LVL" prepend=","><![CDATA[CITY_LVL = #CITY_LVL# ]]></isNotNull>
+    
+    
+    <isNotNull property="REQ_MAKE" prepend=","><![CDATA[REQ_MAKE = #REQ_MAKE# ]]></isNotNull>
+    <isNotNull property="BUDGET_AMOUNT" prepend=","><![CDATA[BUDGET_AMOUNT = #BUDGET_AMOUNT# ]]></isNotNull>
+    <isNotNull property="RETAIL_AMOUNT" prepend=","><![CDATA[RETAIL_AMOUNT = #RETAIL_AMOUNT# ]]></isNotNull>
+    <isNotNull property="BILL_AMOUNT" prepend=","><![CDATA[BILL_AMOUNT = #BILL_AMOUNT# ]]></isNotNull>
+    <isNotNull property="AREA_TOTAL_BUDGET_AMOUNT" prepend=","><![CDATA[AREA_TOTAL_BUDGET_AMOUNT = #AREA_TOTAL_BUDGET_AMOUNT# ]]></isNotNull>
+    <isNotNull property="AREA_TOTAL_PRE_AMOUNT" prepend=","><![CDATA[AREA_TOTAL_PRE_AMOUNT = #AREA_TOTAL_PRE_AMOUNT# ]]></isNotNull>
+    <isNotNull property="AREA_TOTAL_AVALIABLE_AMOUNT" prepend=","><![CDATA[AREA_TOTAL_AVALIABLE_AMOUNT = #AREA_TOTAL_AVALIABLE_AMOUNT# ]]></isNotNull>
+    <isNotNull property="WARE_TOTAL_BUDGET_AMOUNT" prepend=","><![CDATA[WARE_TOTAL_BUDGET_AMOUNT = #WARE_TOTAL_BUDGET_AMOUNT# ]]></isNotNull>
+    <isNotNull property="WARE_TOTAL_PRE_AMOUNT" prepend=","><![CDATA[WARE_TOTAL_PRE_AMOUNT = #WARE_TOTAL_PRE_AMOUNT# ]]></isNotNull>
+    <isNotNull property="WARE_TOTAL_AVALIABLE_AMOUNT" prepend=","><![CDATA[WARE_TOTAL_AVALIABLE_AMOUNT = #WARE_TOTAL_AVALIABLE_AMOUNT# ]]></isNotNull>
+    <isNotNull property="BUDGET_QUOTA_ID" prepend=","><![CDATA[BUDGET_QUOTA_ID = #BUDGET_QUOTA_ID# ]]></isNotNull>
+    <isNotNull property="PRO_SCREEN" prepend=","><![CDATA[PRO_SCREEN = #PRO_SCREEN# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where PRMT_COST_REQ_ID = #PRMT_COST_REQ_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update ERP_PRMT_COST_REQ 
+	               set DEL_FLAG = #DEL_FLAG#
+                      ,UPD_NAME=#UPD_NAME#
+                     ,UPDATOR=#UPDATOR#
+                      ,UPD_TIME=sysdate
+ 	          where 
+	          PRMT_COST_REQ_ID = #PRMT_COST_REQ_ID:VARCHAR# 
+    ]]>
+</delete>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	    select u.PRMT_COST_REQ_ID,
+               u.PRMT_COST_REQ_NO,
+               u.REQ_ID,
+               u.REQ_NAME,
+               u.CHANN_ID,
+               u.CHANN_NO,
+               u.CHANN_NAME,
+               to_char(u.REQ_DATE, 'yyyy-MM-DD') REQ_DATE,
+               u.CHANN_TEL,
+               u.AREA_ID,
+               u.AREA_NO,
+               u.AREA_NAME,
+               u.AREA_MANAGE_ID,
+               u.AREA_MANAGE_NAME,
+               u.AREA_MANAGE_TEL,
+               u.REQ_REMARK,
+               u.BUDGET_AMOUNT,
+               u.TOTAL_PRMT_COST,
+               u.REIT_REQ_AMOUNT,
+               u.COST_TYPE,
+               u.TOTAL_AREA_SEND_AMOUNT,
+               u.TOTAL_AREA_BUDGET_AMOUNT,
+               u.TOTAL_AREA_SEND_COST_AMOUNT,
+               u.TOTAL_AREA_SEND_BUDGET_AMOUNT,
+               u.AREA_REQ_COST_AMOUNT,
+               u.TOTAL_AREA_SEND_LEFT_AMOUNT,
+               u.TOTAL_AREA_BUDGET_LEFT_AMOUNT,
+               u.AREA_SEND_COST_RATE,
+               u.AREA_SEND_BUDGET_RATE,
+               u.REMARK,
+               u.AUDIT_ID,
+               u.AUDIT_NAME,
+               to_char(u.AUDIT_TIME, 'yyyy-MM-DD HH24:MI:SS') AUDIT_TIME,
+               u.CRE_NAME,
+               u.CREATOR,
+               to_char(u.CRE_TIME, 'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+               u.UPD_NAME,
+               u.UPDATOR,
+               to_char(u.UPD_TIME, 'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+               u.DEPT_ID,
+               u.DEPT_NAME,
+               u.ORG_ID,
+               u.ORG_NAME,
+               u.LEDGER_ID,
+               u.LEDGER_NAME,
+               u.STATE,
+               u.DEL_FLAG,
+               u.ZONE_ADDR,
+               u.CHANN_PERSON_CON,
+               u.PRMT_PLAN_NAME,
+               u.BUDGET_ITEM_NAME,
+               u.REQ_MAKE,
+               b.ATT_PATH,
+               u.RETAIL_AMOUNT,
+               u.BILL_AMOUNT,
+               u.CITY_NAME,
+               u.CITY_LVL,
+               u.TOTAL_REAL_AMOUNT,
+               u.TOTAL_ADVC_AMOUNT,
+               u.TOTAL_RATE,
+               u.AREA_TOTAL_BUDGET_AMOUNT,
+               u.AREA_TOTAL_PRE_AMOUNT,
+               u.AREA_TOTAL_AVALIABLE_AMOUNT,
+               u.WARE_TOTAL_BUDGET_AMOUNT,
+               u.WARE_TOTAL_PRE_AMOUNT,
+               u.WARE_TOTAL_AVALIABLE_AMOUNT,
+               u.BUDGET_QUOTA_ID,
+               u.PRO_SCREEN
+               from ERP_PRMT_COST_REQ u left join BASE_ATT b on u.PRMT_COST_REQ_ID = b.FROM_BILL_ID 
+			   where 
+			   u.PRMT_COST_REQ_ID = #PRMT_COST_REQ_ID#
+			   and b.DEL_FLAG=0
+	]]>
+</select>
+<!--启用/停用-->
+<update id="updStusById" parameterClass="map">	
+     <![CDATA[ 
+	  update ERP_PRMT_COST_REQ 
+	       set STATE = #STATE#
+              ,UPD_NAME=#UPD_NAME#
+              ,UPDATOR=#UPDATOR#
+              ,UPD_TIME=sysdate
+ 	  where 
+	     PRMT_COST_REQ_ID = #PRMT_COST_REQ_ID:VARCHAR# 
+    ]]>
+</update>
+
+<insert id="saveFile" parameterClass="map">
+  <![CDATA[
+	  insert into BASE_ATT(
+		 ATT_ID,
+		 ATT_PATH,
+         FROM_BILL_ID,
+         CREATOR,
+         CRE_NAME,
+         CRE_TIME,
+         DEL_FLAG
+	   )values(
+		 #ATT_ID#,
+		 #ATT_PATH#,
+         #FROM_BILL_ID#,
+         #CREATOR#,
+         #CRE_NAME#,
+         sysdate,
+         #DEL_FLAG#
+		)
+   ]]>
+</insert>
+
+<delete id="deleteFile" parameterClass="map">
+	delete from BASE_ATT where FROM_BILL_ID= #FROM_BILL_ID# 
+</delete>
+
+<select id="queryFiles" parameterClass="String" resultClass="java.util.HashMap">
+	select * from BASE_ATT where FROM_BILL_ID=#FROM_BILL_ID#
+</select>
+
+<!-- 查询SQL -->
+<select id="selectBrothers" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[  
+   
+   select sum(NVL(d.dect_price, 0) * NVL(d.storeout_num, 0)) CHUHUO
+      from erp_storeout t, erp_storeout_prd_dtl d
+      where t.storeout_id = d.storeout_id
+      and t.del_flag = 0
+      and d.del_flag = 0
+      and t.order_chann_id =  #CHANN_ID#
+      and TO_CHAR(t.storeout_time, 'Q') = #QUARTER#
+      and to_char(t.storeout_time, 'yyyy') = #YEAR#
+      and exists (select 1
+          from erp_sale_order_dtl sd
+          where sd.sale_order_dtl_id = d.sale_order_dtl_id
+          and NVL(sd.is_free_flag, 0) = 0)
+   ]]>
+</select>
+
+<select id="selectBrothers1" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[  
+ 	    select sum(NVL(r.BUDGET_AMOUNT,0)) YUPI 
+ 	    from ERP_PRMT_COST_REQ r where r.state = '审核通过'
+		   and r.del_flag = 0 and r.chann_id = #CHANN_ID#  
+		    and TO_CHAR(r.audit_time, 'Q')= #QUARTER#
+		   and to_char(r.audit_time,'yyyy') = #YEAR#
+    ]]>
+</select>
+
+<select id="selectBrothers2" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[  
+ 	    select NVL(t.BUDGET_QUOTA,0) AYUSUAN
+				 from ERP_BUDGET_QUOTA t
+				 where t.del_flag = 0
+				   and t.year = #YEAR#
+				   and t.QUARTER = #QUARTER#
+				   and t.RELATE_AREA_ID = #RELATE_AREA_ID#
+    ]]>
+</select>
+
+<select id="selectBrothers3" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[  
+ 	   select NVL(t.FREEZE_BUDGET_QUOTA,0) AREAYUPI
+		  from ERP_BUDGET_QUOTA t
+		 where t.del_flag = 0
+		   and t.year = #YEAR#
+		   and t.QUARTER = #QUARTER#
+		   and t.RELATE_AREA_ID = #RELATE_AREA_ID#
+    ]]>
+</select>
+  
+<select id="selectBrothers4" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[  
+ 	  select sum(NVL(t.BUDGET_QUOTA, 0)) WAREYUSUAN
+	  from ERP_BUDGET_QUOTA t
+	  where t.del_flag = 0
+	   and t.year =  #YEAR#
+	   and t.QUARTER = #QUARTER#
+	   and t.RELATE_AREA_ID IN
+       (SELECT a.area_id FROM BASE_AREA a where a.area_id_p = #WAREA_ID#)
+
+    ]]>
+</select>
+ 
+<select id="selectBrothers5" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[  
+ 	    select SUM(NVL(t.FREEZE_BUDGET_QUOTA,0)) WAREYUPI
+		  from ERP_BUDGET_QUOTA t
+		  where t.del_flag = 0
+		   and t.year = #YEAR#
+		   and t.QUARTER = #QUARTER#
+		   and t.RELATE_AREA_ID IN ( SELECT a.area_id FROM BASE_AREA a where a.area_id_p =#WAREA_ID#)
+    ]]>
+</select>
+
+<select id="expertExcel" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+	    select u.PRMT_COST_REQ_NO,
+		       u.CHANN_NAME,
+		       u.CHANN_PERSON_CON,
+		       u.CHANN_TEL,
+		       u.AREA_NAME,
+		       u.AREA_MANAGE_NAME,
+		       u.REQ_NAME,
+		       to_char(u.REQ_DATE, 'yyyy-MM-DD HH24:MI:SS') REQ_DATE,
+		       u.CITY_NAME,
+		       u.CITY_LVL,
+		       u.REQ_REMARK,
+		       u.REQ_MAKE,
+		       u.BUDGET_ITEM_NAME,
+		       u.PRMT_PLAN_NAME,
+		       u.TOTAL_PRMT_COST,
+		       u.BUDGET_AMOUNT,
+		       u.COST_TYPE,
+		       u.RETAIL_AMOUNT,
+		       u.BILL_AMOUNT,
+		       u.TOTAL_REAL_AMOUNT,
+		       u.TOTAL_ADVC_AMOUNT,
+		       u.TOTAL_RATE,
+		       u.AREA_TOTAL_BUDGET_AMOUNT,
+		       u.AREA_TOTAL_PRE_AMOUNT,
+		       u.AREA_TOTAL_AVALIABLE_AMOUNT,
+		       u.WARE_TOTAL_BUDGET_AMOUNT,
+		       u.WARE_TOTAL_PRE_AMOUNT,
+		       u.WARE_TOTAL_AVALIABLE_AMOUNT
+			   from ERP_PRMT_COST_REQ u
+	]]>
+	<dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+</select>
+
+<select id="expertExcelSH" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+	    select DISTINCT u.PRMT_COST_REQ_NO,
+		       u.CHANN_NAME,
+		       u.CHANN_PERSON_CON,
+		       u.CHANN_TEL,
+		       u.AREA_NAME,
+		       u.AREA_MANAGE_NAME,
+		       u.REQ_NAME,
+		       to_char(u.REQ_DATE, 'yyyy-MM-DD HH24:MI:SS') REQ_DATE,
+		       u.CITY_NAME,
+		       u.CITY_LVL,
+		       u.REQ_REMARK,
+		       u.REQ_MAKE,
+		       u.BUDGET_ITEM_NAME,
+		       u.PRMT_PLAN_NAME,
+		       u.TOTAL_PRMT_COST,
+		       u.BUDGET_AMOUNT,
+		       u.COST_TYPE,
+		       u.RETAIL_AMOUNT,
+		       u.BILL_AMOUNT,
+		       u.TOTAL_REAL_AMOUNT,
+		       u.TOTAL_ADVC_AMOUNT,
+		       u.TOTAL_RATE,
+		       u.AREA_TOTAL_BUDGET_AMOUNT,
+		       u.AREA_TOTAL_PRE_AMOUNT,
+		       u.AREA_TOTAL_AVALIABLE_AMOUNT,
+		       u.WARE_TOTAL_BUDGET_AMOUNT,
+		       u.WARE_TOTAL_PRE_AMOUNT,
+		       u.WARE_TOTAL_AVALIABLE_AMOUNT
+			   from ERP_PRMT_COST_REQ u,
+	]]>
+	<isNotEmpty prepend="" property="QXJBCON">
+	   $QXJBCON$  
+    </isNotEmpty>
+    <include refid="qDynSql" />
+</select>
+
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryById" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSql"/>
+	  <dynamic prepend="and">
+			u.PRMT_COST_REQ_ID=#PRMT_COST_REQ_ID#
+	  </dynamic>
+  </select>
+
+</sqlMap>

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ *@module 基础数据
+ *@func  渠道分管
+ *@version 1.1
+ *@author  
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Channchrg">
+
+    <!-- 通过typeAlias使得我们在下面使用AreaModel实体类的时候不需要写包名 -->
+	<typeAlias type="com.hoperun.base.chann.model.ChannModel" alias="ChannModel" />
+
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="ChannModel" class="ChannModel">
+		<result column="CHANN_ID" property="CHANN_ID" />
+	</resultMap>
+ 
+
+<delete id="delete" parameterClass="map">
+	<![CDATA[
+	  delete from BASE_USER_CHANN_CHRG where USER_ID=#XTYHID#
+	]]>
+</delete>
+
+
+<delete id="deleteByIds" parameterClass="map">
+	<![CDATA[
+	  delete from BASE_USER_CHANN_CHRG where USER_ID=#XTYHID# and CHANN_ID in($CHANN_IDS$)
+	]]>
+</delete>
+	
+<insert id="insert" parameterClass="map">
+	<![CDATA[
+	 insert into BASE_USER_CHANN_CHRG(USER_CHANN_CHRG_ID,CHANN_ID,USER_ID)
+	 values(#USER_CHANN_CHRG_ID#,#CHANN_ID#,#XTYHID#)
+	]]>
+</insert>
+
+	
+<select id="queryChannByparams" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+	  SELECT 
+		c.CHANN_ID,
+		c.CHANN_NO,
+		c.CHANN_NAME,
+		c.CHANN_ABBR,
+		c.CHANN_TYPE,
+		c.CHAA_LVL,
+		c.CHANN_ID_P,
+		c.CHANN_NO_P,
+		c.CHANN_NAME_P,
+		c.PROV,
+		c.CITY,
+		c.AREA_ID,
+		c.AREA_NO,
+		c.AREA_NAME,
+		temp.USER_CHANN_CHRG_ID
+	    FROM ${SYSSCHEMA}.BASE_CHANN c
+	
+	]]> 
+	<isNotEmpty prepend="left join " property="XTYHID">
+		<![CDATA[ 
+		 (select t.USER_CHANN_CHRG_ID,t.CHANN_ID,t.USER_ID from BASE_USER_CHANN_CHRG t where 1=1 
+		 and t.USER_ID = #XTYHID#  ]]>
+	</isNotEmpty><!--
+	<isNotEmpty prepend="and" property="YHM">
+		<![CDATA[ t.USER_ID  in (select t.YHBH from T_SYS_XTYH t where t.YHM like '%' || #YHM# || '%' )  ]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="YHBH">
+		<![CDATA[ t.USER_ID  in (select t.YHBH from T_SYS_XTYH t where t.YHM like '%' || #YHBH# || '%' )  ]]>
+	</isNotEmpty>
+	
+	--><isNotEmpty prepend=" " property="XTYHID">
+    	<![CDATA[   ) temp  on c.CHANN_ID = temp.CHANN_ID ]]>
+	</isNotEmpty>
+		
+	<![CDATA[  where 1=1   ]]>
+	<isNotEmpty prepend="and" property="STATE_PARAMS">
+		<![CDATA[ $STATE_PARAMS$ ]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="DEL_FLAG">
+		<![CDATA[c.DEL_FLAG = #DEL_FLAG#]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="searchFlag">
+		<![CDATA[$searchFlag$]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="AREA_NO">
+		<![CDATA[c.AREA_NO like '%'|| #AREA_NO# ||'%']]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="AREA_NAME">
+		<![CDATA[c.AREA_NAME like '%'|| #AREA_NAME# ||'%']]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="CHANN_NO">
+		<![CDATA[c.CHANN_NO like '%'|| #CHANN_NO# ||'%' ]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="CHANN_NAME">
+		<![CDATA[c.CHANN_NAME like '%'|| #CHANN_NAME#||'%' ]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="CHANN_TYPE">
+		<![CDATA[c.CHANN_TYPE = #CHANN_TYPE#]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="CHAA_LVL">
+		<![CDATA[c.CHAA_LVL = #CHAA_LVL#]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="PROV">
+		<![CDATA[c.PROV  like '%'|| #PROV#||'%' ]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="CITY">
+		<![CDATA[c.CITY like '%'|| #CITY#||'%']]>
+	</isNotEmpty>
+	<!-- 显示未分管 -->
+	<isNotEmpty prepend="and" property="notcharg">
+	      USER_CHANN_CHRG_ID is  null 
+	</isNotEmpty>
+	<!-- 显示已分管 -->
+	<isNotEmpty prepend="and" property="havecharg">
+	      USER_CHANN_CHRG_ID is not  null 
+	</isNotEmpty>
+ </select>
+	
+ 
+ <select id="queryChann" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+	  SELECT 
+		c.CHANN_ID,
+		c.CHANN_NO,
+		c.CHANN_NAME,
+		c.CHANN_ABBR,
+		c.CHANN_TYPE,
+		c.CHAA_LVL,
+		c.CHANN_ID_P,
+		c.CHANN_NO_P,
+		c.CHANN_NAME_P,
+		c.PROV,
+		c.CITY,
+		c.AREA_ID,
+		c.AREA_NO,
+		c.AREA_NAME 
+	    FROM ${SYSSCHEMA}.BASE_CHANN c 
+	    where  1=1 
+	    
+	]]> 
+ 	
+	<isNotEmpty prepend="and" property="STATE">
+	      c.STATE = #STATE#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="DEL_FLAG">
+	      c.DEL_FLAG = #DEL_FLAG#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="searchFlag">
+		<![CDATA[$searchFlag$]]>
+	</isNotEmpty>
+ </select>
+
+
+
+<!-- =====================================================渠道维度========================================== -->	 
+	 
+ 
+ <select id="queryRyxxByparams" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+	  select temp.XTYHID, temp.YHBH,temp.YHM,temp.RYBH,temp.XM,temp.YHLB,temp.BMMC,temp.JGMC,
+	  u.USER_CHANN_CHRG_ID
+		from (select a.*, b.RYBH,b.XM, b.ZW, c.JGMC, d.BMMC
+		  from T_SYS_XTYH a
+		  left join T_SYS_RYXX b
+		    on a.RYXXID = b.RYXXID
+		   and RYZT = '启用'
+		  left join T_SYS_JGXX c
+		    on a.JGXXID = c.JGXXID
+		   and c.DELFLAG = 0
+		  LEFT JOIN T_SYS_BMXX d
+		    on a.BMXXID = d.BMXXID
+		   and d.BMZT = '启用'
+		   and d.DELFLAG = 0
+		 where a.YHZT = '启用'
+		    and a.JGXXID='00'
+		    and a.DELFLAG = 0
+		    )temp
+	
+	]]> 
+	<isNotEmpty prepend="left join " property="CHANN_ID">
+		<![CDATA[ 
+		 (select t.USER_CHANN_CHRG_ID,t.CHANN_ID,t.USER_ID from BASE_USER_CHANN_CHRG t where 1=1 
+		 and t.CHANN_ID = #CHANN_ID# )u ]]>
+	</isNotEmpty> 
+	<isNotEmpty prepend=" " property="CHANN_ID">
+    	<![CDATA[  on u.USER_ID = temp.XTYHID ]]>
+	</isNotEmpty> 
+	<![CDATA[  where 1=1   ]]>
+	<isNotEmpty prepend="and" property="searchFlag">
+		<![CDATA[$searchFlag$]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="YHBH">
+		<![CDATA[temp.YHBH like '%'|| #YHBH# ||'%' ]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="YHM">
+		<![CDATA[temp.YHM like '%'|| #YHM#||'%' ]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="BMMC">
+		<![CDATA[temp.BMMC like '%'|| #BMMC#||'%' ]]>
+	</isNotEmpty>
+	<!-- 显示未分管 -->
+	<isNotEmpty prepend="and" property="notcharg">
+	      USER_CHANN_CHRG_ID is  null 
+	</isNotEmpty>
+	<!-- 显示已分管 -->
+	<isNotEmpty prepend="and" property="havecharg">
+	      USER_CHANN_CHRG_ID is not  null 
+	</isNotEmpty>
+ </select>
+ 
+ 
+ 
+ <!-- 按渠道维度 删除 多个 -->
+ <delete id="deleteByYhxxIds" parameterClass="map">
+	<![CDATA[
+	  delete from BASE_USER_CHANN_CHRG where CHANN_ID=#CHANN_ID# and USER_ID in($XTYHIDS$)
+	]]>
+</delete>
+	
+</sqlMap>
+

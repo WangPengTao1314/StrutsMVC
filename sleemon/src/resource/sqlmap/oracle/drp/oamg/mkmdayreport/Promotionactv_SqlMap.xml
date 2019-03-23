@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zcx
+@function 
+@version 2014-11-06 10:49:05
+-->
+<sqlMap  namespace="Promotionactv">
+<typeAlias type="com.hoperun.drp.oamg.mkmdayreport.model.PromotionActvModel" alias="PromotionActvModel"/>
+<!-- 使用Promoreim装载结果集 -->
+<resultMap id="PromotionActvModel" class="PromotionActvModel">
+    <result column="PROMOTION_ACTV_ID" property="PROMOTION_ACTV_ID" />
+</resultMap>
+<!-- 动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  u.DEL_FLAG = 0 
+  <isNotEmpty prepend="" property="MKM_DAY_RPT_NO">
+       <![CDATA[ and u.MKM_DAY_RPT_NO = #MKM_DAY_RPT_NO#]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CRE_TIME_FROM">
+       <![CDATA[ and u.CRE_TIME >=to_date(#CRE_TIME_FROM#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CRE_TIME_TO">
+       <![CDATA[ and u.CRE_TIME <=to_date(#CRE_TIME_TO#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  
+  <isNotEmpty prepend="" property="LAST_DECOR_TIME_BEG">
+       <![CDATA[ and u.LAST_DECOR_TIME >=to_date(#LAST_DECOR_TIME_BEG#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="LAST_DECOR_TIME_END">
+       <![CDATA[ and u.LAST_DECOR_TIME <=to_date(#LAST_DECOR_TIME_END#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="QXJBCON">
+	  and   $QXJBCON$  
+  </isNotEmpty>
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+	   u.ACTV_STYLE,
+       u.ACTV_TITLE,
+       u.BEG_DATE,
+       u.AGREE_DATE,
+       u.AGREE_ADDR,
+       u.ACTV_PRMT_COST,
+       u.ADVC_DEAL_BILL_NUM,
+       u.ADVC_DEAL_BILL_AMOUNT,
+       u.FORWORD_DATE,
+       u.SALE_CARD_NUM,
+       u.OTHER_REMARK,
+       u.SALE_CARD_NUM_END,
+       u.CHECK_CARD_NUM,
+       u.ADVC_DEAL_AMOUNT,
+       u.COST_AMOUNT
+       from DRP_PROMOTION_ACTV u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+<!-- 分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+</select>
+ 
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt 
+              from DRP_PROMOTION_ACTV u
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+ 
+<!-- 查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_PROMOTION_ACTV(
+					 PROMOTION_ACTV_ID,
+					 MKM_DAY_RPT_ID,
+					 ACTV_STYLE,
+					 ACTV_TITLE,
+					 BEG_DATE,
+					 AGREE_DATE,
+					 AGREE_ADDR,
+					 ACTV_PRMT_COST,
+					 ADVC_DEAL_BILL_NUM,
+					 ADVC_DEAL_BILL_AMOUNT,
+					 FORWORD_DATE,
+					 SALE_CARD_NUM,
+					 OTHER_REMARK,
+					 SALE_CARD_NUM_END,
+					 CHECK_CARD_NUM,
+					 ADVC_DEAL_AMOUNT,
+					 COST_AMOUNT,
+					 DEAL_BILL_NUM,
+					 DEL_FLAG
+				   )values(
+				     #PROMOTION_ACTV_ID#,
+					 #MKM_DAY_RPT_ID#,
+					 #ACTV_STYLE#,
+					 #ACTV_TITLE#,
+					 to_date(#BEG_DATE#,'yyyy-MM-DD HH24:MI:SS'),
+					 to_date(#AGREE_DATE#,'yyyy-MM-DD HH24:MI:SS'),
+					 #AGREE_ADDR#,
+					 #ACTV_PRMT_COST#,
+					 #ADVC_DEAL_BILL_NUM#,
+					 #ADVC_DEAL_BILL_AMOUNT#,
+					 to_date(#FORWORD_DATE#,'yyyy-MM-DD'),
+					 #SALE_CARD_NUM#,
+					 #OTHER_REMARK#,
+					 #SALE_CARD_NUM_END#,
+					 #CHECK_CARD_NUM#,
+					 #ADVC_DEAL_AMOUNT#,
+					 #COST_AMOUNT#,
+					 #DEAL_BILL_NUM#,
+					 #DEL_FLAG#
+					)
+   ]]>
+</insert> 
+
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update DRP_PROMOTION_ACTV ]]>
+	<dynamic prepend="set">
+    <isNotNull property="ACTV_STYLE"       prepend=","><![CDATA[ACTV_STYLE = #ACTV_STYLE# ]]></isNotNull>
+    <isNotNull property="ACTV_TITLE"       prepend=","><![CDATA[ACTV_TITLE = #ACTV_TITLE# ]]></isNotNull>
+    <isNotNull property="BEG_DATE"         prepend=","><![CDATA[BEG_DATE = to_date(#BEG_DATE#,'yyyy-MM-DD HH24:MI:SS')]]></isNotNull>
+    <isNotNull property="AGREE_DATE"       prepend=","><![CDATA[AGREE_DATE = to_date(#AGREE_DATE#,'yyyy-MM-DD HH24:MI:SS')]]></isNotNull>
+    <isNotNull property="AGREE_ADDR"       prepend=","><![CDATA[AGREE_ADDR = #AGREE_ADDR# ]]></isNotNull>
+    <isNotNull property="ACTV_PRMT_COST"   prepend=","><![CDATA[ACTV_PRMT_COST = #ACTV_PRMT_COST# ]]></isNotNull>
+    <isNotNull property="ADVC_DEAL_BILL_NUM"        prepend=","><![CDATA[ADVC_DEAL_BILL_NUM    = #ADVC_DEAL_BILL_NUM# ]]></isNotNull>
+    <isNotNull property="ADVC_DEAL_BILL_AMOUNT"     prepend=","><![CDATA[ADVC_DEAL_BILL_AMOUNT = #ADVC_DEAL_BILL_AMOUNT# ]]></isNotNull>
+    <isNotNull property="FORWORD_DATE" prepend=","><![CDATA[FORWORD_DATE = to_date(#FORWORD_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+    <isNotNull property="SALE_CARD_NUM"    prepend=","><![CDATA[SALE_CARD_NUM = #SALE_CARD_NUM# ]]></isNotNull>
+    <isNotNull property="SALE_CARD_NUM_END"    prepend=","><![CDATA[SALE_CARD_NUM_END = #SALE_CARD_NUM_END# ]]></isNotNull>
+    <isNotNull property="CHECK_CARD_NUM"     prepend=","><![CDATA[CHECK_CARD_NUM = #CHECK_CARD_NUM# ]]></isNotNull>
+    <isNotNull property="ADVC_DEAL_AMOUNT"   prepend=","><![CDATA[ADVC_DEAL_AMOUNT = #ADVC_DEAL_AMOUNT# ]]></isNotNull>
+    <isNotNull property="COST_AMOUNT"        prepend=","><![CDATA[COST_AMOUNT = #COST_AMOUNT# ]]></isNotNull>
+    <isNotNull property="DEAL_BILL_NUM"      prepend=","><![CDATA[DEAL_BILL_NUM = #DEAL_BILL_NUM# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where PROMOTION_ACTV_ID = #PROMOTION_ACTV_ID#]]>
+</update>
+
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	    select
+	       u.PROMOTION_ACTV_ID,
+		   u.ACTV_STYLE,
+	       u.ACTV_TITLE,
+	       u.BEG_DATE,
+	       u.AGREE_DATE,
+	       u.AGREE_ADDR,
+	       u.ACTV_PRMT_COST,
+	       u.ADVC_DEAL_BILL_NUM,
+	       u.ADVC_DEAL_BILL_AMOUNT,
+	       u.FORWORD_DATE,
+	       u.SALE_CARD_NUM,
+	       u.OTHER_REMARK,
+	       u.SALE_CARD_NUM_END,
+	       u.CHECK_CARD_NUM,
+	       u.ADVC_DEAL_AMOUNT,
+	       u.COST_AMOUNT,
+	       u.DEAL_BILL_NUM,
+	       b.ATT_PATH ACTV_PRMT_ATT
+	       from DRP_PROMOTION_ACTV u
+	       left join BASE_ATT b on u.PROMOTION_ACTV_ID = b.from_bill_id
+	       where 
+		   u.MKM_DAY_RPT_ID = #MKM_DAY_RPT_ID#
+		   and u.DEL_FLAG = 0
+	]]>
+</select>
+
+<select id="queryActvId" parameterClass="map" resultClass="String">
+	<![CDATA[ 
+	    select u.PROMOTION_ACTV_ID
+	    from DRP_PROMOTION_ACTV u
+	    where u.MKM_DAY_RPT_ID = #MKM_DAY_RPT_ID#
+	]]>
+</select>
+
+<!-- 删除 -->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update DRP_PROMOTION_ACTV ]]>
+	<dynamic prepend="set">
+		<isNotNull property="DEL_FLAG"><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+	</dynamic>
+	<![CDATA[ where PROMOTION_ACTV_ID = #PROMOTION_ACTV_ID# ]]>
+</delete>
+
+</sqlMap>

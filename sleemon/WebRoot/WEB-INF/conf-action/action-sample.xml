@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd"
+	default-autowire="byName"> 
+	<!-- 通用组件 仅做示例用，版本正式发布时删除 -->
+	<bean name="/sample/sample" class="com.hoperun.commons.sample.action.SampleAction" scope="singleton">
+		<property name="sampleService" ref="sampleService"></property>
+	</bean>
+	<bean name="/sample/singletree" class="com.hoperun.sample.singletable.action.SingleTableAction" scope="singleton">
+		<property name="singleTableService" ref="singleTableService"></property>
+	</bean>
+	<!-- 1.1版本新单表 add by zhuxw -->
+	<bean name="/sample/newsingletable" class="com.hoperun.sample.newsingletable.action.NewSingleTableAction" scope="singleton">
+		<property name="newsingleTableService" ref="newsingleTableService"></property>
+	</bean>
+	<!-- 1.1版本新主从表 add by zhuxw -->
+	<bean name="/sample/newmasterslave" class="com.hoperun.sample.newmasterslave.action.NewMasterSlaveAction" scope="singleton">
+		<property name="newMasterSlaveService" ref="newMasterSlaveService"></property>
+	</bean>
+	<bean name="/grant" class="com.hoperun.sample.grant.action.GrantAction" scope="singleton">
+	    <property name="grantService" ref="grantService"></property>
+    </bean>
+</beans>

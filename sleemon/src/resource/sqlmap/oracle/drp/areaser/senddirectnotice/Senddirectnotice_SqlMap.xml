@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Senddirectnotice">
+	<typeAlias type="com.hoperun.drp.areaser.senddirectnotice.model.SenddirectnoticeModel" alias="SenddirectnoticeModel" />
+	<typeAlias type="com.hoperun.drp.areaser.senddirectnotice.model.SenddirectnoticeModelChld" alias="SenddirectnoticeModelChld" />
+	<!-- 使用SenddirectnoticeModel装载结果集 -->
+	<resultMap id="SenddirectnoticeModel" class="SenddirectnoticeModel">
+		<result column="BASE_DELIVER_NOTICE_ID" property="BASE_DELIVER_NOTICE_ID" />
+	</resultMap>
+	<!-- 使用SenddirectnoticeModelChld装载结果集 -->
+	<resultMap id="SenddirectnoticeModelChld" class="SenddirectnoticeModelChld">
+		<result column="BASE_DELIVER_NOTICE_DTL_ID" property="BASE_DELIVER_NOTICE_DTL_ID" />
+	</resultMap>
+
+	<!--主表动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+	  <isNotEmpty prepend="and" property="BASE_DELIVER_NOTICE_NO">
+	    u.BASE_DELIVER_NOTICE_NO like '%'||#BASE_DELIVER_NOTICE_NO#||'%'
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="FROM_BILL_NO">
+	    u.FROM_BILL_NO like '%'||#FROM_BILL_NO#||'%'
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="RECV_CHANN_NO">
+	    u.RECV_CHANN_NO like '%'||#RECV_CHANN_NO#||'%'
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="RECV_CHANN_NAME">
+	    u.RECV_CHANN_NAME like '%'||#RECV_CHANN_NAME#||'%'
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="ADVC_SEND_DATE_BEGIN">
+		  <![CDATA[  u.ADVC_SEND_DATE >= to_date(#ADVC_SEND_DATE_BEGIN#,'yyyy-MM-DD HH24:MI:SS')]]>
+	  </isNotEmpty> 
+	  <isNotEmpty prepend="and" property="ADVC_SEND_DATE_END">
+		  <![CDATA[  u.ADVC_SEND_DATE <= to_date(#ADVC_SEND_DATE_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+	  </isNotEmpty> 
+	  <isNotEmpty prepend="and" property="PRVD_NAME">
+	    u.PRVD_NAME like '%'||#PRVD_NAME#||'%'
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="TRUCK_TYPE">
+	    u.TRUCK_TYPE =#TRUCK_TYPE#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="STATE">
+	    u.STATE = #STATE#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="TRUCK_NO">
+	    u.TRUCK_NO = #TRUCK_NO#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and " property="DEL_FLAG">
+		 u.DEL_FLAG=#DEL_FLAG#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and " property="SQL">
+		 $SQL$
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and " property="QXJBCON">
+		$QXJBCON$
+	  </isNotEmpty>
+	</sql>
+	<sql id="orderSql">
+	   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+	</sql>
+	<!-- 主表查询SQL -->
+	<sql id="coreSql">
+	  <![CDATA[ 
+	  	select 
+		  	u.BASE_DELIVER_NOTICE_ID,
+			u.BASE_DELIVER_NOTICE_NO,
+			u.FROM_BILL_NO,
+			u.PRVD_NAME,
+			u.TRUCK_TYPE,
+			u.RECV_CHANN_ID,
+			u.RECV_CHANN_NO,
+			u.RECV_CHANN_NAME,
+			u.AREA_SER_ID,
+			u.AREA_SER_NO,
+			u.AREA_SER_NAME,
+			to_char(u.ADVC_SEND_DATE,'yyyy-mm-dd') ADVC_SEND_DATE,
+			u.TRUCK_NO,
+			u.STATE,
+			u.CRE_NAME,
+			to_char(u.CRE_TIME,'yyyy-mm-dd HH24:MI:SS') CRE_TIME,
+			u.DEPT_NAME,
+			u.ORG_NAME,
+			u.LEDGER_NAME
+		from ERP_BASE_DELIVER_NOTICE u
+	   ]]>
+	    <dynamic prepend="where">
+		   <include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+		   <include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	<!-- 主表分页查询 -->
+	<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+			<include refid="public.pageBegin" />
+			<include refid="coreSql" />
+			<include refid="public.pageEnd" />
+		</select>
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+	      <![CDATA[select count(0) cnt FROM ERP_BASE_DELIVER_NOTICE u ]]>
+		<dynamic prepend="where">
+				<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+	<!-- 主表查询 -->
+	<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[
+			select 
+				u.BASE_DELIVER_NOTICE_NO,
+				u.FROM_BILL_NO,
+				u.DELIVER_TYPE,
+				u.CHANN_TYPE,
+				u.PRVD_NO,
+				u.PRVD_NAME,
+				u.TRUCK_TYPE,
+				u.RECV_CHANN_ID,
+				u.RECV_CHANN_NO,
+				u.RECV_CHANN_NAME,
+				u.AREA_SER_NO,
+				u.AREA_SER_NAME,
+				to_char(u.ADVC_SEND_DATE,'yyyy-mm-dd') ADVC_SEND_DATE,
+				to_char(u.APPCH_TIME,'yyyy-mm-dd HH24:MI:SS') APPCH_TIME,
+				u.TOTAL_VOLUME,
+				u.TRUCK_NO,
+				u.STATE,
+				u.REMARK,
+				u.CRE_NAME,
+				to_char(u.CRE_TIME,'yyyy-mm-dd HH24:MI:SS') CRE_TIME,
+				u.UPDATOR,
+				u.UPD_NAME,
+				to_char(u.UPD_TIME,'yyyy-mm-dd HH24:MI:SS') UPD_TIME,
+				u.DEPT_NAME,
+				u.ORG_NAME,
+				u.LEDGER_NAME
+			from ERP_BASE_DELIVER_NOTICE u
+			where u.BASE_DELIVER_NOTICE_ID = #BASE_DELIVER_NOTICE_ID#
+		]]>
+	</select>
+	<!-- 明细操作开始-->
+	<!--明细查询条件定义 -->
+	<sql id="queryDynSqlChld">
+	  <isNotEmpty prepend="and" property="DEL_FLAG">
+	     u.DEL_FLAG=#DEL_FLAG#
+	  </isNotEmpty>
+	</sql>
+	<sql id="queryDynSqlChldGroup">
+				u.PRD_ID,
+				u.PRD_NO,
+				u.PRD_NAME,
+				u.PRD_SPEC,
+				u.BRAND,
+				u.IS_NO_STAND_FLAG,
+				u.SPCL_TECH_ID,
+				a.SPCL_TECH_FLAG,
+				b.PRICE
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="orderSqlChld">
+		 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+	</sql>
+	<sql id="coreSqlChld">
+		<![CDATA[ 
+			select 
+				u.PRD_ID,
+				u.PRD_NO,
+				u.PRD_NAME,
+				u.PRD_SPEC,
+				u.BRAND,
+				u.IS_NO_STAND_FLAG,
+				u.SPCL_TECH_ID,
+				sum(u.REAL_SEND_NUM) REAL_SEND_NUM,
+				a.SPCL_TECH_FLAG,
+				b.PRICE
+			from ERP_BASE_DELIVER_NOTICE_DTL u
+			left join DRP_SPCL_TECH a on a.SPCL_TECH_ID=u.SPCL_TECH_ID and a.USE_FLAG=1
+			left join ERP_SALE_ORDER_DTL b on u.SALE_ORDER_DTL_ID=b.SALE_ORDER_DTL_ID and b.DEL_FLAG=0
+			
+	   ]]>
+	</sql>
+	 <!-- 根据主表ID查询明细 -->
+	  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+		  <include refid="coreSqlChld"/>
+		  <dynamic prepend="where">
+			<isNotEmpty prepend="and" property="BASE_DELIVER_NOTICE_ID">
+			  	u.BASE_DELIVER_NOTICE_ID=#BASE_DELIVER_NOTICE_ID#
+			 </isNotEmpty>
+		  </dynamic>
+		  <dynamic prepend="and">
+		   <include refid="queryDynSqlChld" />
+		  </dynamic>
+		  <dynamic prepend=" group by ">
+		   <include refid="queryDynSqlChldGroup" />
+		  </dynamic>
+		  <isNotNull prepend=" order by " property="orderField">
+				<include refid="orderSqlChld"/>
+		  </isNotNull>
+	  </select>
+	  <!-- 操作销售订单 -->
+	  <!--主表动态查询 and 列表分页 -->
+	<sql id="querySaleSql">
+	  <isNotEmpty prepend="and" property="PRD_ID">
+	    c.PRD_ID=#PRD_ID#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="BASE_DELIVER_NOTICE_ID">
+	    c.BASE_DELIVER_NOTICE_ID=#BASE_DELIVER_NOTICE_ID#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="DEL_FLAG">
+	   c.DEL_FLAG=#DEL_FLAG# and NVL(c.SPCL_TECH_ID,'null')=NVL(#SPCL_TECH_ID#,'null') and NVL(u.ORDER_NUM,0)>NVL(u.SENDED_NUM,0)
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="SPCL_TECH_ID">
+		  
+	  </isNotEmpty> 
+	  <isNotEmpty prepend="and " property="SQL">
+		 $SQL$
+	  </isNotEmpty>
+	</sql>
+	  <select  id="querySaleOrder" parameterClass="map" resultClass="java.util.HashMap">
+	  <![CDATA[ 
+	  		select 
+	  			a.SALE_ORDER_ID,
+	  			a.SALE_ORDER_NO,
+	  			to_char(a.ORDER_DATE,'yyyy-mm-dd') ORDER_DATE,
+	  			c.ORDER_CHANN_ID,
+	  			c.ORDER_CHANN_NAME,
+	  			c.ORDER_CHANN_NO,
+	  			u.PRD_NO,
+	  			u.PRD_NAME,
+				u.PRD_SPEC,
+				u.BRAND,
+				u.SPCL_TECH_ID,
+				b.SPCL_TECH_FLAG,
+				u.ORDER_NUM,
+				u.SENDED_NUM,
+				u.SALE_ORDER_DTL_ID,
+				u.PRD_ID,
+				u.PRD_COLOR,
+				u.STD_UNIT,
+				c.BASE_DELIVER_NOTICE_DTL_ID,
+				c.BASE_DELIVER_NOTICE_ID,
+				c.RECV_CHANN_ID,
+				c.RECV_CHANN_NO,
+				c.RECV_CHANN_NAME,
+				c.RECV_ADDR_NO,
+				c.RECV_ADDR,
+				u.DECT_PRICE,
+				u.PRICE,
+				u.DECT_RATE
+	  		from DRP_SALE_ORDER_DTL u
+	  		left join DRP_SALE_ORDER a on a.SALE_ORDER_ID=u.SALE_ORDER_ID
+	  		left join DRP_SPCL_TECH b on u.SPCL_TECH_ID=b.SPCL_TECH_ID and USE_FLAG=1
+       		 left join ERP_BASE_DELIVER_NOTICE_DTL c on c.SALE_ORDER_DTL_ID=u.SALE_ORDER_DTL_ID
+	   ]]>
+	    <dynamic prepend="where">
+		   <include refid="querySaleSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+		   <include refid="orderSql"/>
+		</dynamic>
+	</select>
+
+<insert id="insertDeliverNotice" parameterClass="map">
+  <![CDATA[
+	  INSERT INTO ERP_BASE_DELIVER_NOTICE(
+       BASE_DELIVER_NOTICE_ID,
+       BASE_DELIVER_NOTICE_NO,
+       FROM_BILL_ID,
+       FROM_BILL_NO,
+       DELIVER_TYPE,
+       CHANN_TYPE,
+       PRVD_ID,
+       PRVD_NO,
+       PRVD_NAME,
+       TRUCK_TYPE,
+       RECV_CHANN_ID,
+       RECV_CHANN_NO,
+       RECV_CHANN_NAME,
+       AREA_SER_ID,
+       AREA_SER_NO,
+       AREA_SER_NAME,
+       ADVC_SEND_DATE,
+       APPCH_TIME,
+       TOTAL_VOLUME,
+       TRUCK_NO,
+       STATE,
+       REMARK,
+       CREATOR,
+       CRE_NAME,
+       CRE_TIME,
+       DEPT_ID,
+       DEPT_NAME,
+       ORG_ID,
+       ORG_NAME,
+       LEDGER_ID,
+       LEDGER_NAME,
+       DEL_FLAG
+       )values(
+		#BASE_DELIVER_NOTICE_ID#,
+       	#BASE_DELIVER_NOTICE_NO#,
+       	#FROM_BILL_ID#,
+       	#FROM_BILL_NO#,
+       	#DELIVER_TYPE#,
+       	#CHANN_TYPE#,
+       	#PRVD_ID#,
+       	#PRVD_NO#,
+       	#PRVD_NAME#,
+       	#TRUCK_TYPE#,
+       	#RECV_CHANN_ID#,
+       	#RECV_CHANN_NO#,
+       	#RECV_CHANN_NAME#,
+       	#AREA_SER_ID#,
+       	#AREA_SER_NO#,
+       	#AREA_SER_NAME#,
+       	#ADVC_SEND_DATE#,
+       	to_date(#APPCH_TIME#,'yyyy-MM-dd HH24:mi:ss'),
+       	#TOTAL_VOLUME#,
+       	#TRUCK_NO#,
+       	#STATE#,
+       	#REMARK#,
+       	#CREATOR#,
+       	#CRE_NAME#,
+       	sysdate,
+       	#DEPT_ID#,
+       	#DEPT_NAME#,
+       	#ORG_ID#,
+       	#ORG_NAME#,
+       	#LEDGER_ID#,
+       	#LEDGER_NAME#,
+       	#DEL_FLAG#
+	)
+   ]]>
+</insert>
+<insert id="insertDeliverNoticeDtl" parameterClass="map">
+  <![CDATA[
+	  INSERT INTO ERP_BASE_DELIVER_NOTICE_DTL(
+       BASE_DELIVER_NOTICE_DTL_ID,
+       BASE_DELIVER_NOTICE_ID,
+       FROM_BILL_DTL_ID,
+       SALE_ORDER_ID,
+       SALE_ORDER_DTL_ID,
+       SALE_ORDER_NO,
+       ORDER_CHANN_ID,
+       ORDER_CHANN_NO,
+       ORDER_CHANN_NAME,
+       RECV_CHANN_ID,
+       RECV_CHANN_NO,
+       RECV_CHANN_NAME,
+       PRD_ID,
+       PRD_NO,
+       PRD_NAME,
+       PRD_SPEC,
+       PRD_COLOR,
+       BRAND,
+       STD_UNIT,
+       VOLUME,
+       IS_NO_STAND_FLAG,
+       SPCL_TECH_ID,
+       RECV_ADDR,
+       REMARK,
+       REAL_SEND_NUM,
+       DEL_FLAG,
+       RECV_ADDR_NO
+       )values(
+		#BASE_DELIVER_NOTICE_DTL_ID#,
+       	#BASE_DELIVER_NOTICE_ID#,
+       	#FROM_BILL_DTL_ID#,
+       	#SALE_ORDER_ID#,
+       	#SALE_ORDER_DTL_ID#,
+       	#SALE_ORDER_NO#,
+       	#ORDER_CHANN_ID#,
+       	#ORDER_CHANN_NO#,
+       	#ORDER_CHANN_NAME#,
+       	#RECV_CHANN_ID#,
+       	#RECV_CHANN_NO#,
+       	#RECV_CHANN_NAME#,
+       	#PRD_ID#,
+       	#PRD_NO#,
+       	#PRD_NAME#,
+       	#PRD_SPEC#,
+       	#PRD_COLOR#,
+       	#BRAND#,
+       	#STD_UNIT#,
+       	#VOLUME#,
+       	#IS_NO_STAND_FLAG#,
+       	#SPCL_TECH_ID#,
+       	#RECV_ADDR#,
+       	#REMARK#,
+       	#REAL_SEND_NUM#,
+       	#DEL_FLAG#,
+       	#RECV_ADDR_NO#
+	)
+   ]]>
+</insert>
+<update id="updateAllotNum" parameterClass="map">
+	<![CDATA[ update DRP_SALE_ORDER_DTL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="SENDED_NUM" prepend=","><![CDATA[SENDED_NUM = NVL(SENDED_NUM,0)+#SENDED_NUM# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where SALE_ORDER_DTL_ID = #SALE_ORDER_DTL_ID#]]>
+</update>
+<select  id="querySaleOrderById" parameterClass="String" resultClass="java.util.HashMap">
+	  <![CDATA[
+		select u.SALE_ORDER_ID, u.SALE_ORDER_NO,to_char(u.CRE_TIME,'yyyy-mm-dd') SALE_DATE,d.goods_order_no
+     	from DRP_SALE_ORDER u 
+      	left join DRP_SALE_ORDER_DTL d
+      	on u.SALE_ORDER_ID = d.SALE_ORDER_ID
+      	where d.SALE_ORDER_DTL_ID =  #SALE_ORDER_DTL_ID#
+	   ]]>
+	</select>
+
+	<select id="getTotalNum" parameterClass="map" resultClass="int">
+		select sum(REAL_SEND_NUM) from ERP_BASE_DELIVER_NOTICE_DTL where BASE_DELIVER_NOTICE_ID=#BASE_DELIVER_NOTICE_ID# and DEL_FLAG=#DEL_FLAG#
+	</select>
+<update id="updateStats" parameterClass="map">
+	<![CDATA[ update ERP_BASE_DELIVER_NOTICE 
+	   set STATE = #STATE#,UPDATOR=#UPDATOR#,UPD_NAME=#UPD_NAME#,UPD_TIME=sysdate
+
+	   where BASE_DELIVER_NOTICE_ID = #BASE_DELIVER_NOTICE_ID#
+	]]>
+</update>
+<select  id="queryDrpSaleOrderById" parameterClass="map" resultClass="java.util.HashMap">
+	  <![CDATA[
+     select t.SALE_ORDER_ID,
+       t.SALE_ORDER_NO,
+       t.ORDER_CHANN_ID,
+       t.ORDER_CHANN_NO,
+       t.ORDER_CHANN_NAME,
+       t.ORDER_DATE,
+       t.SEND_CHANN_ID,
+       t.SEND_CHANN_NO,
+       t.SEND_CHANN_NAME,
+       t.RECV_CHANN_ID,
+       t.RECV_CHANN_NO,
+       t.RECV_CHANN_NAME,
+       t.RECV_ADDR_NO,
+       t.RECV_ADDR,
+       d.SALE_ORDER_DTL_ID,
+       d.PRD_ID,
+       d.PRD_NO,
+       d.PRD_NAME,
+       d.PRD_SPEC,
+       d.PRD_COLOR,
+       d.BRAND,
+       d.STD_UNIT,
+       d.SPCL_TECH_ID,
+       d.IS_NO_STAND_FLAG,
+       d.VOLUME
+  from DRP_SALE_ORDER t
+  left join DRP_SALE_ORDER_DTL d
+    on t.sale_order_id = d.sale_order_id
+ where d.PRD_ID = #PRD_ID#
+   and t.RECV_CHANN_ID = #RECV_CHANN_ID#
+   and t.STATE = #STATE#
+   and NVL(d.ORDER_NUM,0) > NVL(d.SENDED_NUM,0)
+   and NVL(d.SPCL_TECH_ID,'null')=NVL(#SPCL_TECH_ID#,'null')
+	   ]]>
+</select>
+
+</sqlMap>

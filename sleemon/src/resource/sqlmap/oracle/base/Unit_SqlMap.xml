@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+	<!--
+		*@module 系统管理 *@fuc 单位维护主表sql *@version 1.0 *@author 王栋斌
+	-->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="UNIT">
+
+	<typeAlias type="com.hoperun.base.unit.model.UnitModel"
+		alias="UnitModel" />
+
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="UnitModel" class="UnitModel">
+		<result column="MEAS_UNIT_ID" property="MEAS_UNIT_ID" />
+	</resultMap>
+
+	<!-- 动态查询 and 列表排序 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="MEAS_UNIT_ID">
+			u.MEAS_UNIT_ID like
+			'%'||#MEAS_UNIT_ID#||'%'
+		</isNotEmpty>
+
+		<isNotEmpty prepend="and" property="MEAS_UNIT_NAME">
+			u.MEAS_UNIT_NAME like
+			'%'||#MEAS_UNIT_NAME#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="MEAS_UNIT_NO">
+			u.MEAS_UNIT_NO like
+			'%'||#MEAS_UNIT_NO#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="UNIT_NAME_EN">
+			u.UNIT_NAME_EN like
+			'%'||#UNIT_NAME_EN#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="UNIT_TYPE">
+			u.UNIT_TYPE =
+			#UNIT_TYPE#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CRE_TIME_FROM">
+			<![CDATA[CRE_TIME >=
+			to_date(#CRE_TIME_FROM#,'yyyy-MM-DD HH24:MI:SS')]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CRE_TIME_TO">
+			<![CDATA[CRE_TIME <=
+			to_date(#CRE_TIME_TO#,'yyyy-MM-DD HH24:MI:SS')]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="STATE">
+			STATE = #STATE#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="DEL_FLAG">
+			u.DEL_FLAG = #DEL_FLAG#
+		</isNotEmpty>
+	</sql>
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField">
+			$orderField$,
+		</isNotEmpty>
+		u.CRE_TIME DESC
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[
+				select MEAS_UNIT_ID,MEAS_UNIT_NO,MEAS_UNIT_NAME,UNIT_NAME_EN,UNIT_TYPE,STATE,CREATOR,CRE_NAME,to_char(U.CRE_TIME,'yyyy-MM-DD HH24:MI:SS')CRE_TIME,UPDATOR,UPD_NAME,to_char(U.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,DEPT_ID,DEPT_NAME,ORG_ID,ORG_NAME
+				from ${SYSSCHEMA}.BASE_UNIT u 
+		]]>
+		<dynamic prepend="where ">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql" />
+		</dynamic>
+	</sql>
+
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[select count(u.MEAS_UNIT_ID) from BASE_UNIT u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+
+	<!-- 查询 -->
+	<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[  
+			 select  u.MEAS_UNIT_ID,u.MEAS_UNIT_NAME,u.MEAS_UNIT_NO,u.UNIT_NAME_EN,u.UNIT_TYPE,u.STATE,u.CREATOR,u.CRE_NAME,to_char(U.CRE_TIME,'yyyy-MM-DD HH24:MI:SS')CRE_TIME,u.UPDATOR,u.UPD_NAME,to_char(U.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,u.DEPT_ID,u.DEPT_NAME,u.ORG_ID,u.ORG_NAME 
+			 from ${SYSSCHEMA}.BASE_UNIT u where u.MEAS_UNIT_ID = #MEAS_UNIT_ID#]]>
+	</select>
+
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		  insert into ${SYSSCHEMA}.BASE_UNIT(MEAS_UNIT_ID,MEAS_UNIT_NAME,MEAS_UNIT_NO,UNIT_NAME_EN,UNIT_TYPE,STATE,CREATOR,CRE_NAME,CRE_TIME,DEPT_ID,DEPT_NAME,ORG_ID,ORG_NAME,DEL_FLAG)
+		 values(#MEAS_UNIT_ID#,#MEAS_UNIT_NAME#,#MEAS_UNIT_NO#,#UNIT_NAME_EN#,#UNIT_TYPE#,#STATE#,#CREATOR#,#CRE_NAME#,sysdate,#DEPT_ID#,#DEPT_NAME#,#ORG_ID#,#ORG_NAME#,0)
+		]]>
+	</insert>
+
+
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.BASE_UNIT ]]>
+		<!-- CHANAME, CHADES,CHADATE,CHASTU -->
+		<dynamic prepend="set">
+			<isNotNull property="MEAS_UNIT_NAME" prepend=","><![CDATA[MEAS_UNIT_NAME = #MEAS_UNIT_NAME#]]></isNotNull>
+			<isNotNull property="MEAS_UNIT_NO" prepend=","><![CDATA[MEAS_UNIT_NO = #MEAS_UNIT_NO#]]></isNotNull>
+			<isNotNull property="UNIT_NAME_EN" prepend=","><![CDATA[UNIT_NAME_EN = #UNIT_NAME_EN#]]></isNotNull>
+			<isNotNull property="UNIT_TYPE" prepend=","><![CDATA[UNIT_TYPE = #UNIT_TYPE#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[where MEAS_UNIT_ID = #MEAS_UNIT_ID# ]]>
+	</update>
+
+	<!-- 删除菜单 -->
+	<update id="delete" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.BASE_UNIT set DEL_FLAG=1 ]]>
+		<dynamic prepend="">
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[where MEAS_UNIT_ID = #MEAS_UNIT_ID# ]]>
+	</update>
+
+	<!-- 状态变更 -->
+	<update id="updateState" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.BASE_UNIT]]>
+		<dynamic prepend="set">
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where MEAS_UNIT_ID = #MEAS_UNIT_ID# ]]>
+	</update>
+</sqlMap>

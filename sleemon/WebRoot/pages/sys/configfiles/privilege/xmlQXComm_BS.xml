@@ -1,0 +1,1858 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MKList size="10">
+	<FMK MKNum="0" FMKName="销售管理" FMKCode="BS001" MKSM="BS">
+		<ZMK ZMKName="渠道惩罚设定" ZMKCode="BS00130">
+			<ZMKQX QXName="浏览" MKCode="BS0013001" />
+			<ZMKQX QXName="惩罚" MKCode="BS0013002" />
+			<ZMKQX QXName="取消惩罚" MKCode="BS0013003" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="路线信息" ZMKCode="BS00103">
+			<ZMKQX QXName="浏览" MKCode="BS0010301" />
+			<ZMKQX QXName="新增/维护" MKCode="BS0010302" />
+			<ZMKQX QXName="删除" MKCode="BS0010303" />
+			<ZMKQX QXName="停用/启用" MKCode="BS0010304" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="物流供应商信息" ZMKCode="BS00104">
+			<ZMKQX QXName="浏览" MKCode="BS0010401" />
+			<ZMKQX QXName="新增/维护" MKCode="BS0010402" />
+			<ZMKQX QXName="删除" MKCode="BS0010403" />
+			<ZMKQX QXName="停用/启用" MKCode="BS0010404" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="销售折扣设置" ZMKCode="BS00105">
+			<ZMKQX QXName="浏览" MKCode="BS0010501" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="订货订单处理" ZMKCode="BS00106">
+			<ZMKQX QXName="浏览" MKCode="BS0010601" />
+			<ZMKQX QXName="修改" MKCode="BS0010602" />
+			<ZMKQX QXName="提交" MKCode="BS0010603" />
+			<ZMKQX QXName="回退" MKCode="BS0010604" />
+			<ZMKQX QXName="取消订单明细" MKCode="BS0010605" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="标准订单维护" ZMKCode="BS00107">
+			<ZMKQX QXName="浏览" MKCode="BS0010701" />
+			<ZMKQX QXName="修改" MKCode="BS0010702" />
+			<ZMKQX QXName="提交" MKCode="BS0010703" />
+			<ZMKQX QXName="转非标订单" MKCode="BS0010704" />
+			<ZMKQX QXName="取消预订" MKCode="BS0010705" />
+			<ZMKQX QXName="恢复预订" MKCode="BS0010706" />
+			<ZMKQX QXName="删除" MKCode="BS0010707" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="非标订单维护" ZMKCode="BS00108">
+			<ZMKQX QXName="浏览" MKCode="BS0010801" />
+			<ZMKQX QXName="修改" MKCode="BS0010802" />
+			<ZMKQX QXName="提交" MKCode="BS0010803" />
+			<ZMKQX QXName="转标准订单" MKCode="BS0010804" />
+			<ZMKQX QXName="取消预订" MKCode="BS0010805" />
+			<ZMKQX QXName="恢复预订" MKCode="BS0010806" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="销售订单查询" ZMKCode="BS00109">
+			<ZMKQX QXName="浏览" MKCode="BS0010901" />
+			<ZMKQX QXName="审核" MKCode="BS0010902" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0010903" />
+			<ZMKQX QXName="取消预订" MKCode="BS0010904" />
+			<ZMKQX QXName="恢复预订" MKCode="BS0010905" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="付款凭证确认" ZMKCode="BS00110">
+			<ZMKQX QXName="浏览" MKCode="BS0011001" />
+			<ZMKQX QXName="打回" MKCode="BS0011002" />
+			<ZMKQX QXName="确认" MKCode="BS0011003" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="工艺单查询" ZMKCode="BS00111">
+			<ZMKQX QXName="浏览" MKCode="BS0011101" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="工艺单审核" ZMKCode="BS00112">
+			<ZMKQX QXName="浏览" MKCode="BS0011201" />
+			<ZMKQX QXName="编辑" MKCode="BS0011202" />
+			<ZMKQX QXName="审核完成" MKCode="BS0011203" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="工艺单核价" ZMKCode="BS00113">
+			<ZMKQX QXName="浏览" MKCode="BS0011301" />
+			<ZMKQX QXName="编辑" MKCode="BS0011302" />
+			<ZMKQX QXName="核价完成" MKCode="BS0011303" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="销售补单查询" ZMKCode="BS00114">
+			<ZMKQX QXName="浏览" MKCode="BS0011401" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="制定交付计划" ZMKCode="BS00115">
+		    <ZMKQX QXName="浏览" MKCode="BS0011501" />
+		    <ZMKQX QXName="生成交付计划" MKCode="BS0011502" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="交付计划维护" ZMKCode="BS00116">
+		    <ZMKQX QXName="浏览" MKCode="BS0011601" />
+		    <ZMKQX QXName="修改" MKCode="BS0011602" />
+		    <ZMKQX QXName="提交" MKCode="BS0011603" />
+		    <ZMKQX QXName="生产基地修改" MKCode="BS0011604" />
+		    <ZMKQX QXName="撤销生产" MKCode="BS0011605" />
+		     <ZMKQX QXName="行关闭" MKCode="BS0011606" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="货品发运" ZMKCode="BS00117">
+		    <ZMKQX QXName="浏览" MKCode="BS0011701" />
+		    <ZMKQX QXName="修改" MKCode="BS0011702" />
+		    <ZMKQX QXName="删除" MKCode="BS0011703" />
+		    <ZMKQX QXName="行关闭" MKCode="BS0011704" />
+		    <ZMKQX QXName="整单关闭" MKCode="BS0011705" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="发运单确认" ZMKCode="BS00118">
+		    <ZMKQX QXName="浏览" MKCode="BS0011801" />
+		    <ZMKQX QXName="发运确认" MKCode="BS0011802" />
+		    <ZMKQX QXName="编辑" MKCode="BS0011803" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="出库差异确认" ZMKCode="BS00119">
+			<ZMKQX QXName="浏览" MKCode="BS0011901" />
+		    <ZMKQX QXName="修改" MKCode="BS0011902" />
+		    <ZMKQX QXName="提交" MKCode="BS0011903" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="退货申请单初审" ZMKCode="BS00120">
+			<ZMKQX QXName="浏览" MKCode="BS0012001" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0012002" />
+			<ZMKQX QXName="审核" MKCode="BS0012003" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="退货申请单审核" ZMKCode="BS00121">
+			<ZMKQX QXName="浏览" MKCode="BS0012101" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0012102" />
+			<ZMKQX QXName="审核" MKCode="BS0012103" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="退货单维护" ZMKCode="BS00122">
+			<ZMKQX QXName="浏览" MKCode="BS0012201" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0012202" />
+			<ZMKQX QXName="删除" MKCode="BS0012203" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0012204" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="退货单审核" ZMKCode="BS00123">
+			<ZMKQX QXName="浏览" MKCode="BS0012301" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0012302" />
+			<ZMKQX QXName="审核" MKCode="BS0012303" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="退货单鉴定" ZMKCode="BS00124">
+			<ZMKQX QXName="浏览" MKCode="BS0012401" />
+			<ZMKQX QXName="提交" MKCode="BS0012402" />
+			<ZMKQX QXName="编辑" MKCode="BS0012403" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="信用额度设定" ZMKCode="BS00125">
+			<ZMKQX QXName="浏览" MKCode="BS0012501" />
+			<ZMKQX QXName="额度设定" MKCode="BS0012502" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="信用额度变更维护" ZMKCode="BS00126">
+			<ZMKQX QXName="浏览" MKCode="BS0012601" />
+			<ZMKQX QXName="新增/维护" MKCode="BS0012602" />
+			<ZMKQX QXName="删除" MKCode="BS0012603" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0012604" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="信用额度变更审核" ZMKCode="BS00127">
+			<ZMKQX QXName="浏览" MKCode="BS0012701" />
+			<ZMKQX QXName="审核" MKCode="BS0012702" />
+			<ZMKQX QXName="流程 跟踪" MKCode="BS0012703" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="客户付款单" ZMKCode="BS00128">
+			<ZMKQX QXName="浏览" MKCode="BS0012801" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="退货单财务核价" ZMKCode="BS00129">
+			<ZMKQX QXName="浏览" MKCode="BS0012901" />
+			<ZMKQX QXName="修改" MKCode="BS0012902" />
+			<ZMKQX QXName="提交厂家处理" MKCode="BS0012903" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="临时信用审核" ZMKCode="BS00131">
+			<ZMKQX QXName="浏览" MKCode="BS0013101" />
+			<ZMKQX QXName="审核" MKCode="BS0013102" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0013103" />
+			<ZMKQX QXName="关闭" MKCode="BS0013104" />
+			<ZMKQX QXName="修改临时信用有效期" MKCode="BS0013105" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="返修审核" ZMKCode="BS00132">
+			<ZMKQX QXName="浏览" MKCode="BS0013201" />
+			<ZMKQX QXName="审核" MKCode="BS0013202" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="返修收货确认" ZMKCode="BS00133">
+			<ZMKQX QXName="浏览" MKCode="BS0013301" />
+			<ZMKQX QXName="确认收货" MKCode="BS0013302" />
+			<ZMKQX QXName="退回" MKCode="BS0013303" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0013304" />
+			<ZMKQX QXName="删除" MKCode="BS0013305" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="返修发货" ZMKCode="BS00134">
+			<ZMKQX QXName="浏览" MKCode="BS0013401" />
+			<ZMKQX QXName="确认发货" MKCode="BS0013402" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>	
+		<ZMK ZMKName="付款凭证关闭" ZMKCode="BS00135">
+			<ZMKQX QXName="浏览" MKCode="BS0013501" />
+			<ZMKQX QXName="关闭" MKCode="BS0013502" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="总部出库单" ZMKCode="BS00136">
+			<ZMKQX QXName="浏览" MKCode="BS0013601" />
+			<ZMKQX QXName="整单关闭" MKCode="BS0013602" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="销售订单处理" ZMKCode="BS00137">
+			<ZMKQX QXName="浏览" MKCode="BS0013701" />
+			<ZMKQX QXName="编辑" MKCode="BS0013702" />
+			<ZMKQX QXName="反审核" MKCode="BS0013703" />
+			<ZMKQX QXName="提交生产" MKCode="BS0013704" />
+			<ZMKQX QXName="撤销生产" MKCode="BS0013705" />
+			<ZMKQX QXName="行关闭" MKCode="BS0013706" />
+			<ZMKQX QXName="强制关闭" MKCode="BS0013707" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+
+		
+		<ZMK ZMKName="出货计划维护" ZMKCode="BS00138">
+			<ZMKQX QXName="浏览" MKCode="BS0013801" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0013802" />
+			<ZMKQX QXName="删除" MKCode="BS0013803" />
+			<ZMKQX QXName="提交发货/整单撤销" MKCode="BS0013804" />
+			<ZMKQX QXName="关闭" MKCode="BS0013805" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="总部促销价格设置" ZMKCode="BS00139">
+			<ZMKQX QXName="浏览" MKCode="BS0013901" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="年度返利结算" ZMKCode="BS00140">
+			<ZMKQX QXName="浏览" MKCode="BS0014001" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		
+		<ZMK ZMKName="预计量上报-货品设置" ZMKCode="BS00141">
+			<ZMKQX QXName="浏览" MKCode="BS0014101" />
+			<ZMKQX QXName="保存" MKCode="BS0014102" />
+			<ZMKQX QXName="取消上报" MKCode="BS0014103" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="预计量上报-渠道设置" ZMKCode="BS00142">
+			<ZMKQX QXName="浏览" MKCode="BS0014201" />
+			<ZMKQX QXName="保存" MKCode="BS0014202" />
+			<ZMKQX QXName="取消上报" MKCode="BS0014203" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="预计量上报-上报任务发布" ZMKCode="BS00143">
+			<ZMKQX QXName="浏览" MKCode="BS0014301" />
+			<ZMKQX QXName="保存" MKCode="BS0014302" />
+			<ZMKQX QXName="删除" MKCode="BS0014303" />
+			<ZMKQX QXName="发布/取消" MKCode="BS0014304" />
+			<ZMKQX QXName="结束上报/打开上报" MKCode="BS0014305" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="预计量上报-上报货品审核" ZMKCode="BS00144">
+			<ZMKQX QXName="浏览" MKCode="BS0014401" />
+			<ZMKQX QXName="保存" MKCode="BS0014402" />
+			<ZMKQX QXName="审核" MKCode="BS0014403" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="入库通知单" ZMKCode="BS00145">
+			<ZMKQX QXName="浏览" MKCode="BS0014501" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0014502" />
+			<ZMKQX QXName="删除" MKCode="BS0014503" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0014504" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0014505" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		 </ZMK>
+		
+	</FMK>
+	
+	
+	
+	<FMK MKNum="1" FMKName="营销管理" FMKCode="BS002" MKSM="BS">
+		<ZMK ZMKName="返利规则维护" ZMKCode="BS00201">
+		</ZMK>
+		<ZMK ZMKName="返利登记" ZMKCode="BS00202">
+			<ZMKQX QXName="查询" MKCode="BS0020201" />
+			<ZMKQX QXName="保存返利" MKCode="BS0020202" />
+			<ZMKQX QXName="清空返利" MKCode="BS0020203" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="推广促销方案维护" ZMKCode="BS00203">
+			<ZMKQX QXName="浏览" MKCode="BS0020301" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0020302" />
+			<ZMKQX QXName="删除" MKCode="BS0020303" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0020304" />
+			<ZMKQX QXName="审核" MKCode="BS0020305" />
+			<ZMKQX QXName="发布" MKCode="BS0020306" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="投诉与建议处理" ZMKCode="BS00204">
+			<ZMKQX QXName="浏览" MKCode="BS0020401" />
+			<ZMKQX QXName="提交" MKCode="BS0020402" />
+			<ZMKQX QXName="指派处理人" MKCode="BS0020403" />
+			<ZMKQX QXName="退回" MKCode="BS0020404" />
+			<QXJB JBName="机构集中" JBValue="0">(u.APPOINT_PSON_ID='#XTYHID#' or u.APPOINT_PSON_ID="00")</QXJB>
+			<QXJB JBName="多机构" JBValue="1">(u.APPOINT_PSON_ID='#XTYHID#' or u.APPOINT_PSON_ID="00")</QXJB>
+			<QXJB JBName="本机构" JBValue="2">(u.APPOINT_PSON_ID='#XTYHID#' or u.APPOINT_PSON_ID="00")</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">(u.APPOINT_PSON_ID='#XTYHID#' or u.APPOINT_PSON_ID="00")</QXJB>
+			<QXJB JBName="多部门" JBValue="4">(u.APPOINT_PSON_ID='#XTYHID#' or u.APPOINT_PSON_ID="00")</QXJB>
+			<QXJB JBName="本部门" JBValue="5">(u.APPOINT_PSON_ID='#XTYHID#' or u.APPOINT_PSON_ID="00")</QXJB>
+			<QXJB JBName="本人员" JBValue="6">u.APPOINT_PSON_ID='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="促销品发放" ZMKCode="BS00205">
+			<ZMKQX QXName="浏览" MKCode="BS0020501" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0020502" />
+			<ZMKQX QXName="删除" MKCode="BS0020503" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0020504" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="加盟商推广费用申请单审核" ZMKCode="BS00206">
+			<ZMKQX QXName="浏览" MKCode="BS0020601" />
+			<ZMKQX QXName="审核" MKCode="BS0020602" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0020603" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0020604" />
+			<ZMKQX QXName="修改" MKCode="BS0020605" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="加盟商推广费用报销单审核" ZMKCode="BS00207">
+			<ZMKQX QXName="浏览" MKCode="BS0020701" />
+			<ZMKQX QXName="审核" MKCode="BS0020702" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0020703" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0020704" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		
+		<ZMK ZMKName="广告投放报销申请单审核" ZMKCode="BS00208">
+			<ZMKQX QXName="浏览" MKCode="BS0020801" />
+			<ZMKQX QXName="审核" MKCode="BS0020802" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0020803" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="广告投放申请单审核" ZMKCode="BS00604">
+			<ZMKQX QXName="浏览" MKCode="BS0060401" />
+			<ZMKQX QXName="审核" MKCode="BS0060402" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0060403" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+ 
+		<ZMK ZMKName="加盟商推广费用申请单维护" ZMKCode="BS00209">
+			<ZMKQX QXName="浏览" MKCode="BS0020901" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0020902" />
+			<ZMKQX QXName="删除" MKCode="BS0020903" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0020904" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0020905" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="加盟商推广费用报销单维护" ZMKCode="BS00210">
+			<ZMKQX QXName="浏览" MKCode="BS0021001" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0021002" />
+			<ZMKQX QXName="删除" MKCode="BS0021003" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0021004" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0021005" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="广告投放申请单维护" ZMKCode="BS00211">
+			<ZMKQX QXName="浏览" MKCode="BS0021101" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0021102" />
+			<ZMKQX QXName="删除" MKCode="BS0021103" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0021104" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0021105" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		
+	    <ZMK ZMKName="广告投放报销申请单维护" ZMKCode="BS00212">
+			<ZMKQX QXName="浏览" MKCode="BS0021201" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0021202" />
+			<ZMKQX QXName="删除" MKCode="BS0021203" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0021204" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0021205" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="渠道销售指标设定维护" ZMKCode="BS00213">
+			<ZMKQX QXName="浏览" MKCode="BS0021301" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0021302" />
+			<ZMKQX QXName="删除" MKCode="BS0021303" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0021304" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0021305" />
+			<ZMKQX QXName="批量编辑" MKCode="BS0021306" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="渠道销售指标设定审核" ZMKCode="BS00214">
+			<ZMKQX QXName="浏览" MKCode="BS0021401" />
+			<ZMKQX QXName="审核" MKCode="BS0021402" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0021403" />
+			<ZMKQX QXName="修改"    MKCode="BS0021404" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="销售数据上报审核" ZMKCode="BS00217">
+			<ZMKQX QXName="浏览" MKCode="BS0021701" />
+			<ZMKQX QXName="审核" MKCode="BS0021702" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0021703" />
+			<ZMKQX QXName="反审核"  MKCode="BS0021704" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="区域销售指标设定维护" ZMKCode="BS00218">
+			<ZMKQX QXName="浏览" MKCode="BS0021801" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0021802" />
+			<ZMKQX QXName="删除" MKCode="BS0021803" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0021804" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0021805" />
+			<ZMKQX QXName="批量编辑" MKCode="BS0021806" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="区域销售指标设定审核" ZMKCode="BS00219">
+			<ZMKQX QXName="浏览" MKCode="BS0021901" />
+			<ZMKQX QXName="审核" MKCode="BS0021902" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0021903" />
+			<ZMKQX QXName="修改"    MKCode="BS0021904" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="总部营销--营销活动维护" ZMKCode="BS00220">
+			<ZMKQX QXName="浏览" MKCode="BS0022001" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0022002" />
+			<ZMKQX QXName="删除" MKCode="BS0022003" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0022004" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0022005" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="总部营销--会员信息维护" ZMKCode="BS00221">
+			<ZMKQX QXName="浏览" MKCode="BS0022101" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0022102" />
+			<ZMKQX QXName="删除" MKCode="BS0022103" />
+			<ZMKQX QXName="启用/停用" MKCode="BS0022104" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="总部营销--营销活动审核" ZMKCode="BS00222">
+			<ZMKQX QXName="浏览" MKCode="BS0022201" />
+			<ZMKQX QXName="审核" MKCode="BS0022202" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0022203" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="总部营销--渠道卡券分配" ZMKCode="BS00223">
+			<ZMKQX QXName="浏览" MKCode="BS0022301" />
+			<ZMKQX QXName="分配" MKCode="BS0022302" />
+			<ZMKQX QXName="加盟商之间转卡" MKCode="BS0022304" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构"   JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构"   JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="预算科目设置" ZMKCode="BS00224">
+			<ZMKQX QXName="浏览" MKCode="BS0022401" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0022402" />
+			<ZMKQX QXName="删除" MKCode="BS0022403" />
+			<ZMKQX QXName="启用/停用" MKCode="BS0022404" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构"   JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构"   JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="预算额度设置" ZMKCode="BS00226">
+			<ZMKQX QXName="浏览" MKCode="BS0022601" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0022602" />
+			<ZMKQX QXName="删除" MKCode="BS0022603" />
+			<ZMKQX QXName="启用/停用" MKCode="BS0022604" />
+			<ZMKQX QXName="批量编辑" MKCode="BS0022605" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构"   JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构"   JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		
+		<ZMK ZMKName="销售数据上报" ZMKCode="BS00227">
+		   <ZMKQX QXName="浏览" MKCode="BS0022701" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0022702" />
+			<ZMKQX QXName="删除" MKCode="BS0022703" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0022704" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0022705" />
+			<ZMKQX QXName="导入/导出" MKCode="BS0022706" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">ORG_ID in (#DJGXXIDS#)</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		
+		<ZMK ZMKName="费用报销单维护" ZMKCode="BS00228">
+			<ZMKQX QXName="浏览" MKCode="BS0022801" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0022802" />
+			<ZMKQX QXName="删除" MKCode="BS0022803" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0022804" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0022805" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="工作计划审核" ZMKCode="BS00229">
+			<ZMKQX QXName="浏览" MKCode="BS0022901" />
+			<ZMKQX QXName="审核" MKCode="BS0022902" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0022903" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="费用报销单审核" ZMKCode="BS00230">
+			<ZMKQX QXName="浏览" MKCode="BS0023001" />
+			<ZMKQX QXName="审核" MKCode="BS0023002" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0023003" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="总部营销--总部预订单录入" ZMKCode="BS00231">
+			<ZMKQX QXName="浏览" MKCode="BS0023101" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0023102" />
+			<ZMKQX QXName="删除" MKCode="BS0023103" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0023104" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0023105" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="总部营销--总部预订单审核" ZMKCode="BS00232">
+			<ZMKQX QXName="浏览" MKCode="BS0023201" />
+			<ZMKQX QXName="审核" MKCode="BS0023202" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0023203" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="返利额度变更申请单" ZMKCode="BS00233">
+			<ZMKQX QXName="浏览" MKCode="BS0023301" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0023302" />
+			<ZMKQX QXName="删除" MKCode="BS0023303" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0023304" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0023305" />
+			<ZMKQX QXName="导出" MKCode="BS0023306" />
+			<ZMKQX QXName="批量提交/撤销" MKCode="BS0023307" />
+			<ZMKQX QXName="复制" MKCode="BS0023308" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="返利额度变更申请单审核" ZMKCode="BS00234">
+			<ZMKQX QXName="浏览" MKCode="BS0023401" />
+			<ZMKQX QXName="审核" MKCode="BS0023402" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0023403" />
+			<ZMKQX QXName="批量审核" MKCode="BS0023404" />
+			<ZMKQX QXName="弃审" MKCode="BS0023405" />
+			<ZMKQX QXName="批量弃审" MKCode="BS0023406" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		
+		<ZMK ZMKName="总部营销--结算单维护" ZMKCode="BS00235">
+			<ZMKQX QXName="浏览" MKCode="BS0023501" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0023502" />
+			<ZMKQX QXName="删除" MKCode="BS0023503" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0023504" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0023505" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="总部营销--结算单审核" ZMKCode="BS00236">
+			<ZMKQX QXName="浏览" MKCode="BS0023601" />
+			<ZMKQX QXName="审核" MKCode="BS0023602" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0023603" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		
+		<ZMK ZMKName="总部营销--营销卡券销售-维护" ZMKCode="BS00237">
+			<ZMKQX QXName="浏览" MKCode="BS0023701" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0023702" />
+			<ZMKQX QXName="删除" MKCode="BS0023703" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0023704" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0023705" />
+			<ZMKQX QXName="子表开启关闭" MKCode="BS0023706" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		
+		<ZMK ZMKName="总部营销--营销卡券销售-审核" ZMKCode="BS00238">
+			<ZMKQX QXName="浏览" MKCode="BS0023801" />
+			<ZMKQX QXName="审核" MKCode="BS0023802" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0023803" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="总部营销--顾客现场签到" ZMKCode="BS00239">
+			<ZMKQX QXName="浏览" MKCode="BS0023901" />
+			<ZMKQX QXName="签到/修改" MKCode="BS0023902" />
+			<ZMKQX QXName="签出" MKCode="BS0023903" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+	</FMK>
+    <FMK MKNum="2" FMKName="渠道管理" FMKCode="BS003" MKSM="BS">
+        <ZMK ZMKName="装修申请单审核" ZMKCode="BS00301">
+			<ZMKQX QXName="浏览" MKCode="BS0030101" />
+			<ZMKQX QXName="审核" MKCode="BS0030102" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0030103" />
+			<ZMKQX QXName="修改" MKCode="BS0030104" />
+			<ZMKQX QXName="报销标准"    MKCode="BS0030105" />
+			<ZMKQX QXName="报销承担方式" MKCode="BS0030106" />
+			<ZMKQX QXName="商场位置类别" MKCode="BS0030107" />
+			<ZMKQX QXName="金额说明"    MKCode="BS0030108" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构"   JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构"   JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门"   JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门"   JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员"   JBValue="6">1=1</QXJB>
+		</ZMK>
+		
+		<ZMK ZMKName="专卖店转分销店申请单审核" ZMKCode="BS00302">
+			<ZMKQX QXName="浏览" MKCode="BS0030201" />
+			<ZMKQX QXName="审核" MKCode="BS0030202" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0030203" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="装修报销申请单审核" ZMKCode="BS00303">
+			<ZMKQX QXName="浏览" MKCode="BS0030301" />
+			<ZMKQX QXName="审核" MKCode="BS0030302" />
+			<ZMKQX QXName="流程跟踪"    MKCode="BS0030303" />
+			<ZMKQX QXName="修改"       MKCode="BS0030304" />
+			<ZMKQX QXName="实际报销金额" MKCode="BS0030305" />
+			<ZMKQX QXName="金额说明"    MKCode="BS0030306" />
+			<ZMKQX QXName="门店使用面积" MKCode="BS0030307" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="专卖店撤店及终止申请单维护" ZMKCode="BS00304">
+			<ZMKQX QXName="浏览" MKCode="BS0030401" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0030402" />
+			<ZMKQX QXName="删除" MKCode="BS0030403" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0030404" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0030405" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="专卖店撤店及终止申请单审核" ZMKCode="BS00305">
+			<ZMKQX QXName="浏览" MKCode="BS0030501" />
+			<ZMKQX QXName="审核" MKCode="BS0030502" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0030503" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		
+		<ZMK ZMKName="装修补贴标准维护" ZMKCode="BS00306">
+			<ZMKQX QXName="浏览" MKCode="BS0030601" />
+		    <ZMKQX QXName="新增/维护" MKCode="BS0030602" />
+			<ZMKQX QXName="删除" MKCode="BS0030603" />
+			<ZMKQX QXName="启用/停用" MKCode="BS0030604" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		
+		<ZMK ZMKName="装修验收单维护" ZMKCode="BS00307">
+			<ZMKQX QXName="浏览" MKCode="BS0030701" />
+		    <ZMKQX QXName="新增/维护" MKCode="BS0030702" />
+			<ZMKQX QXName="删除" MKCode="BS0030703" />
+			<ZMKQX QXName="生成整改单" MKCode="BS0030704" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		
+		<ZMK ZMKName="装修整改单维护" ZMKCode="BS00308">
+			<ZMKQX QXName="浏览" MKCode="BS0030801" />
+		    <ZMKQX QXName="新增/维护" MKCode="BS0030802" />
+			<ZMKQX QXName="删除" MKCode="BS0030803" />
+			<ZMKQX QXName="确认" MKCode="BS0030804" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+				
+		<ZMK ZMKName="开业大礼包申请单审核" ZMKCode="BS00309">
+			<ZMKQX QXName="浏览" MKCode="BS0030901" />
+			<ZMKQX QXName="审核" MKCode="BS0030902" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0030903" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		
+		<ZMK ZMKName="装修整改验收单维护" ZMKCode="BS00310">
+			<ZMKQX QXName="浏览" MKCode="BS0031001" />
+			<ZMKQX QXName="验收" MKCode="BS0031002" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		
+		<ZMK ZMKName="专卖店转分销店申请单维护" ZMKCode="BS00311">
+			<ZMKQX QXName="浏览" MKCode="BS0031101" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0031102" />
+			<ZMKQX QXName="删除" MKCode="BS0031103" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0031104" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0031105" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">ORG_ID in (#DJGXXIDS#)</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+
+		</ZMK>
+		<ZMK ZMKName="门店精致化检查结果审核" ZMKCode="BS00312">
+			<ZMKQX QXName="浏览" MKCode="BS0031201" />
+			<ZMKQX QXName="审核" MKCode="BS0031202" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0031203" />
+			<ZMKQX QXName="保存" MKCode="BS0031204" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="培训课程维护" ZMKCode="BS00313">
+			<ZMKQX QXName="浏览" MKCode="BS0031301" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0031302" />
+			<ZMKQX QXName="删除" MKCode="BS0031303" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0031304" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0031305" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">ORG_ID in (#DJGXXIDS#)</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="渠道培训申请单审核" ZMKCode="BS00314">
+			<ZMKQX QXName="浏览" MKCode="BS0031401" />
+			<ZMKQX QXName="审核" MKCode="BS0031402" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0031403" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="渠道培训结果反馈" ZMKCode="BS00315">
+			<ZMKQX QXName="浏览" MKCode="BS0031501" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0031502" />
+			<ZMKQX QXName="删除" MKCode="BS0031503" />					
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">ORG_ID in (#DJGXXIDS#)</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+ 
+		<ZMK ZMKName="渠道培训申请单维护" ZMKCode="BS00316">
+			<ZMKQX QXName="浏览" MKCode="BS0031601" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0031602" />
+			<ZMKQX QXName="删除" MKCode="BS0031603" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0031604" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0031605" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		
+		
+		<ZMK ZMKName="装修申请单维护" ZMKCode="BS00317">
+			<ZMKQX QXName="浏览"       MKCode="BS0031701" />
+			<ZMKQX QXName="新增/修改"   MKCode="BS0031702" />
+			<ZMKQX QXName="删除"       MKCode="BS0031703" />
+			<ZMKQX QXName="提交/撤销"   MKCode="BS0031706" />
+			<ZMKQX QXName="流程跟踪"    MKCode="BS0031709" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="装修报销申请单维护" ZMKCode="BS00318">
+			<ZMKQX QXName="浏览" MKCode="BS0031801" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0031802" />
+			<ZMKQX QXName="删除" MKCode="BS0031803" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0031804" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0031805" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		
+		<ZMK ZMKName="开业大礼包申请单维护" ZMKCode="BS00319">
+			<ZMKQX QXName="浏览" MKCode="BS0031901" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0031902" />
+			<ZMKQX QXName="删除" MKCode="BS0031903" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0031904" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0031905" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="门店精致化检查结果维护" ZMKCode="BS00320">
+			<ZMKQX QXName="浏览" MKCode="BS0032001" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0032002" />
+			<ZMKQX QXName="删除" MKCode="BS0032003" />
+			<ZMKQX QXName="导入" MKCode="BS0032004" />
+			<ZMKQX QXName="启用/停用" MKCode="BS0032005" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+ 
+        <ZMK ZMKName="新开门店申请单维护" ZMKCode="BS00321">
+			<ZMKQX QXName="浏览" MKCode="BS0032101" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0032102" />
+			<ZMKQX QXName="删除" MKCode="BS0032103" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0032104" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0032105" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+				
+		<ZMK ZMKName="新开门店申请单审核" ZMKCode="BS00322">
+			<ZMKQX QXName="浏览" MKCode="BS0032201" />
+			<ZMKQX QXName="审核" MKCode="BS0032202" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0032203" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		
+		 <ZMK ZMKName="门店变更申请单维护" ZMKCode="BS00323">
+			<ZMKQX QXName="浏览" MKCode="BS0032301" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0032302" />
+			<ZMKQX QXName="删除" MKCode="BS0032303" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0032304" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0032305" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+				
+		<ZMK ZMKName="门店变更申请单审核" ZMKCode="BS00324">
+			<ZMKQX QXName="浏览" MKCode="BS0032401" />
+			<ZMKQX QXName="审核" MKCode="BS0032402" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0032403" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		
+		<ZMK ZMKName="工作计划维护" ZMKCode="BS00325">
+			<ZMKQX QXName="浏览" MKCode="BS0032501" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0032502" />
+			<ZMKQX QXName="删除" MKCode="BS0032503" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0032504" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0032505" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="工作计划审核" ZMKCode="BS00326">
+			<ZMKQX QXName="浏览" MKCode="BS0032601" />
+			<ZMKQX QXName="审核" MKCode="BS0032602" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0032603" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="检查方案维护" ZMKCode="BS00327">
+			<ZMKQX QXName="浏览" MKCode="BS0032701" />
+		    <ZMKQX QXName="新增/维护" MKCode="BS0032702" />
+			<ZMKQX QXName="删除" MKCode="BS0032703" />
+			<ZMKQX QXName="启用/停用" MKCode="BS0032704" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		
+		 <ZMK ZMKName="拓展拜访表维护" ZMKCode="BS00328">
+			<ZMKQX QXName="浏览" MKCode="BS0032801" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0032802" />
+			<ZMKQX QXName="删除" MKCode="BS0032803" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0032804" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0032805" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>		
+		<ZMK ZMKName="加盟商拜访表维护" ZMKCode="BS00329">
+			<ZMKQX QXName="浏览" MKCode="BS0032901" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0032902" />
+			<ZMKQX QXName="删除" MKCode="BS0032903" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0032904" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0032905" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		
+		<ZMK ZMKName="门店拜访表维护" ZMKCode="BS00330">
+			<ZMKQX QXName="浏览" MKCode="BS0033001" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0033002" />
+			<ZMKQX QXName="删除" MKCode="BS0033003" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0033004" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0033005" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		
+		 <ZMK ZMKName="拓展拜访表审核" ZMKCode="BS00331">
+			<ZMKQX QXName="浏览" MKCode="BS0033101" />
+			<ZMKQX QXName="审核" MKCode="BS0033102" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0033103" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="加盟商拜访表审核" ZMKCode="BS00332">
+			<ZMKQX QXName="浏览" MKCode="BS0033201" />
+			<ZMKQX QXName="审核" MKCode="BS0033202" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0033203" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		
+		<ZMK ZMKName="门店拜访表审核" ZMKCode="BS00333">
+			<ZMKQX QXName="浏览" MKCode="BS0033301" />
+			<ZMKQX QXName="审核" MKCode="BS0033302" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0033303" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>	
+		
+		<ZMK ZMKName="月度拜访计划维护" ZMKCode="BS00334">
+			<ZMKQX QXName="浏览" MKCode="BS0033401" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0033402" />
+			<ZMKQX QXName="删除" MKCode="BS0033403" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0033404" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0033405" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="月度拜访计划审核" ZMKCode="BS00335">
+			<ZMKQX QXName="浏览" MKCode="BS0033501" />
+			<ZMKQX QXName="审核" MKCode="BS0033502" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0033503" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>	
+		<ZMK ZMKName="个人工作计划维护" ZMKCode="BS00336">
+			<ZMKQX QXName="浏览" MKCode="BS0033601" />
+			<ZMKQX QXName="新增/维护" MKCode="BS0033602" />
+			<ZMKQX QXName="删除" MKCode="BS0033603" />
+			<ZMKQX QXName="提交" MKCode="BS0033604" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0033605" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>		
+		<ZMK ZMKName="个人工作计划审核" ZMKCode="BS00337">
+			<ZMKQX QXName="浏览" MKCode="BS0033701" />
+			<ZMKQX QXName="审核" MKCode="BS0033702" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0033703" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>	
+		<ZMK ZMKName="加盟商门店指标" ZMKCode="BS00338">
+			<ZMKQX QXName="浏览" MKCode="BS0033801" />
+			<ZMKQX QXName="新增/维护" MKCode="BS0033802" />
+			<ZMKQX QXName="删除" MKCode="BS0033803" />
+			<ZMKQX QXName="提交" MKCode="BS0033804" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0033805" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>		
+		<ZMK ZMKName="渠道合同上传" ZMKCode="BS00339">
+			<ZMKQX QXName="浏览" MKCode="BS0033901" />
+			<ZMKQX QXName="新增/维护" MKCode="BS0033902" />
+			<ZMKQX QXName="删除" MKCode="BS0033903" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="意向客户拜访/评估单维护" ZMKCode="BS00340">
+			<ZMKQX QXName="浏览" MKCode="BS0034001" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0034002" />
+			<ZMKQX QXName="删除" MKCode="BS0034003" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0034004" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0034005" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="意向客户拜访/评估单审核" ZMKCode="BS00341">
+			<ZMKQX QXName="浏览" MKCode="BS0034101" />
+			<ZMKQX QXName="审核" MKCode="BS0034102" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0034103" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="分销渠道信息登记维护" ZMKCode="BS00342">
+			<ZMKQX QXName="浏览" MKCode="BS0034201" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0034202" />
+			<ZMKQX QXName="删除" MKCode="BS0034203" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0034204" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0034205" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+				
+		<ZMK ZMKName="分销渠道信息登记审核" ZMKCode="BS00343">
+			<ZMKQX QXName="浏览" MKCode="BS0034301" />
+			<ZMKQX QXName="审核" MKCode="BS0034302" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0034303" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		
+		<ZMK ZMKName="分销商购货月报维护" ZMKCode="BS00344">
+			<ZMKQX QXName="浏览" MKCode="BS0034401" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0034402" />
+			<ZMKQX QXName="删除" MKCode="BS0034403" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0034404" />	
+			<ZMKQX QXName="流程跟踪"  MKCode="BS0034405" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>		
+		<ZMK ZMKName="加盟商营销经理评价表审核" ZMKCode="BS00345">
+			<ZMKQX QXName="浏览" MKCode="BS0034501" />
+			<ZMKQX QXName="审核" MKCode="BS0034502" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0034503" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		
+			<ZMK ZMKName="营销经理日报表维护" ZMKCode="BS00346">
+			<ZMKQX QXName="浏览" MKCode="BS0034601" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0034602" />
+			<ZMKQX QXName="删除" MKCode="BS0034603" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0034604" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0034605" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		<ZMK ZMKName="营销经理日报表审核" ZMKCode="BS00347">
+			<ZMKQX QXName="浏览" MKCode="BS0034701" />
+			<ZMKQX QXName="审核" MKCode="BS0034702" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0034703" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+		
+		<ZMK ZMKName="加盟商终止合作申请维护" ZMKCode="BS00348">
+			<ZMKQX QXName="浏览" MKCode="BS0034801" />
+			<ZMKQX QXName="新增/修改" MKCode="BS0034802" />
+			<ZMKQX QXName="删除" MKCode="BS0034803" />
+			<ZMKQX QXName="提交/撤销" MKCode="BS0034804" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0034805" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+				
+		<ZMK ZMKName="加盟商终止合作申请审核" ZMKCode="BS00349">
+			<ZMKQX QXName="浏览" MKCode="BS0034901" />
+			<ZMKQX QXName="审核" MKCode="BS0034902" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0034903" />
+			<ZMKQX QXName="保证金余额" MKCode="BS0034904" />
+			<ZMKQX QXName="账面余额" MKCode="BS0034905" />
+			<ZMKQX QXName="退货金额" MKCode="BS0034906" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="装修申请单审核(门店建设)" ZMKCode="BS00350">
+			<ZMKQX QXName="浏览" MKCode="BS0035001" />
+			<ZMKQX QXName="审核" MKCode="BS0035002" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0035003" />
+			<ZMKQX QXName="修改"    MKCode="BS0035004" />
+			<ZMKQX QXName="报销标准"    MKCode="BS0035005" />
+			<ZMKQX QXName="报销承担方式" MKCode="BS0035006" />
+			<ZMKQX QXName="商场位置类别" MKCode="BS0035007" />
+			<ZMKQX QXName="金额说明"    MKCode="BS0035008" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构"   JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构"   JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门"   JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门"   JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员"   JBValue="6">1=1</QXJB>
+		</ZMK>
+		
+		<ZMK ZMKName="分销商购货月报审核" ZMKCode="BS00351">
+			<ZMKQX QXName="浏览" MKCode="BS0035101" />
+			<ZMKQX QXName="审核" MKCode="BS0035102" />
+			<ZMKQX QXName="流程跟踪" MKCode="BS0035103" />
+			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>
+			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>
+			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>
+			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>
+		</ZMK>
+	</FMK>
+	<FMK MKNum="3" FMKName="O2O业务" FMKCode="BS004" MKSM="BS">
+	</FMK>
+	<FMK MKNum="4" FMKName="报表中心" FMKCode="BS005" MKSM="BS">
+		<ZMK ZMKName="销售报表" ZMKCode="BS00501">
+			<ZMKQX QXName="浏览" MKCode="BS0050101" />
+			<ZMKQX QXName="生产情况查询" MKCode="BS0050102" />
+			<ZMKQX QXName="退货单跟踪查询" MKCode="BS0050103" />
+			<ZMKQX QXName="销售订单出货统计明细表" MKCode="BS0050104" />
+			<ZMKQX QXName="订货订单信息 " MKCode="BS0050105" />
+			<ZMKQX QXName="出货统计汇总表" MKCode="BS0050106" />
+			<ZMKQX QXName="库存生产状态查询" MKCode="BS0050107" />
+			<ZMKQX QXName="销售订单的生产状态查询" MKCode="BS0050108" />
+			<ZMKQX QXName="发货及时率的报表" MKCode="BS0050109" />
+			<ZMKQX QXName="装箱率月统计" MKCode="BS0050110" />
+			<ZMKQX QXName="销售订单生产组织对照表" MKCode="BS0050111" />
+			<ZMKQX QXName="月份、发货统计" MKCode="BS0050112" />
+			<ZMKQX QXName="每月售后投诉报表" MKCode="BS0050113" />
+			<ZMKQX QXName="撤店退货统计" MKCode="BS0050114" />
+			<ZMKQX QXName="返修费用统计" MKCode="BS0050115" />
+			<ZMKQX QXName="退货跟踪查询" MKCode="BS0050116" />
+			<ZMKQX QXName="发货情况统计表" MKCode="BS0050117" />
+			<ZMKQX QXName="订单发货状态跟踪查询" MKCode="BS0050118" />
+			<ZMKQX QXName="返利抵扣查询" MKCode="BS0050119" />
+			<ZMKQX QXName="TOP10产品" MKCode="BS0050120" />
+			<ZMKQX QXName="销量统计比例" MKCode="BS0050121" />
+			<ZMKQX QXName="分类销量统计" MKCode="BS0050122" />
+			<ZMKQX QXName="原发运单查询" MKCode="BS0050123" />
+			<ZMKQX QXName="总部销售报表"  MKCode="BS0050124" />
+			<ZMKQX QXName="工作计划上交率" MKCode="BS0050125" />
+		</ZMK>
+		<ZMK ZMKName="库存报表" ZMKCode="BS00502">
+			<ZMKQX QXName="浏览" MKCode="BS0050201" />
+			<ZMKQX QXName="库存查询" MKCode="BS0050202" />
+			<ZMKQX QXName="渠道库存实时查询" MKCode="BS0050203" />
+		</ZMK>
+		<ZMK ZMKName="财务报表" ZMKCode="BS00503">
+			<ZMKQX QXName="浏览" MKCode="BS0050301" />
+			<ZMKQX QXName="应收余额查询" MKCode="BS0050302" />
+			<ZMKQX QXName="信用报表查询" MKCode="BS0050303" />
+			<ZMKQX QXName="合同执行情况表" MKCode="BS0050304" />
+			<ZMKQX QXName="收款情况查询" MKCode="BS0050305" />
+			<ZMKQX QXName="渠道财务进销存" MKCode="BS0050306" />
+			<ZMKQX QXName="信用流水账查看" MKCode="BS0050307" />
+			<ZMKQX QXName="返款情况查询" MKCode="BS0050308" />
+			<ZMKQX QXName="订单冻结信用查询" MKCode="BS0050309" />
+			<ZMKQX QXName="返利订单扣除信用查询" MKCode="BS0050310" />
+			<ZMKQX QXName="总部对账单查询"   MKCode="BS0050311" />
+			<ZMKQX QXName="年度返利汇总"   MKCode="BS0050312" />
+		</ZMK>
+		<ZMK ZMKName="报表抄送查看" ZMKCode="BS00506">
+			<ZMKQX QXName="浏览" MKCode="BS0050601" />
+			<ZMKQX QXName="删除" MKCode="BS0050602" />
+			<ZMKQX QXName="启用/停用" MKCode="BS0050603" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+<!--		<ZMK ZMKName="销售订单生产状态查询" ZMKCode="BS00507">-->
+<!--			<ZMKQX QXName="浏览" MKCode="BS0050108" />-->
+<!--			<QXJB JBName="机构集中" JBValue="0">ORG_ID in (#JGXXIDS#)</QXJB>-->
+<!--			<QXJB JBName="多机构" JBValue="1">ORG_ID in (#DJGXXIDS#)</QXJB>-->
+<!--			<QXJB JBName="本机构" JBValue="2">ORG_ID ='#JGXXID#'</QXJB>-->
+<!--			<QXJB JBName="部门集中" JBValue="3">DEPT_ID in (#BMXXIDS#)</QXJB>-->
+<!--			<QXJB JBName="多部门" JBValue="4">DEPT_ID in(#DBMXXIDS#)</QXJB>-->
+<!--			<QXJB JBName="本部门" JBValue="5">DEPT_ID='#BMXXID#'</QXJB>-->
+<!--			<QXJB JBName="本人员" JBValue="6">CREATOR='#XTYHID#'</QXJB>-->
+<!--		</ZMK>	-->
+		<ZMK ZMKName="通用报表查询" ZMKCode="BS00508">
+			<ZMKQX QXName="浏览" MKCode="BS0050801" />
+			<QXJB JBName="机构集中" JBValue="0">1=1</QXJB>
+			<QXJB JBName="多机构" JBValue="1">1=1</QXJB>
+			<QXJB JBName="本机构" JBValue="2">1=1</QXJB>
+			<QXJB JBName="部门集中" JBValue="3">1=1</QXJB>
+			<QXJB JBName="多部门" JBValue="4">1=1</QXJB>
+			<QXJB JBName="本部门" JBValue="5">1=1</QXJB>
+			<QXJB JBName="本人员" JBValue="6">1=1</QXJB>
+		</ZMK>
+		<ZMK ZMKName="营销报表" ZMKCode="BS00509">
+			<ZMKQX QXName="浏览" MKCode="BS0050901" />
+			<ZMKQX QXName="总部销售报表" MKCode="BS0050902" />
+			<ZMKQX QXName="终端门店零售报表" MKCode="BS0050903" />
+			<ZMKQX QXName="销售计划达成率报表" MKCode="BS0050904" />
+			<ZMKQX QXName="月度拜访工作计划达成率表" MKCode="BS0050905" />
+			<ZMKQX QXName="各战区季度有效门店达成数" MKCode="BS0050906" />
+			<ZMKQX QXName="拜访达成考核目标"      MKCode="BS0050907" />
+			<ZMKQX QXName="活动销售报表"         MKCode="BS0050908" />
+			<ZMKQX QXName="活动提成查询报表"      MKCode="BS0050909" />
+			<ZMKQX QXName="加盟商推广费用使用明细" MKCode="BS0050910" />
+			<ZMKQX QXName="战区推广费" MKCode="BS0050911" />
+			<ZMKQX QXName="加盟商推广费"    MKCode="BS0050912" />
+			<ZMKQX QXName="区域推广费"    MKCode="BS0050913" />
+			<ZMKQX QXName="卡券销售清单"    MKCode="BS0050914" />
+			<ZMKQX QXName="直营办零售数据跟踪"    MKCode="BS0050915" />
+			<ZMKQX QXName="每月售后投诉报表"    MKCode="BS0050916" />
+			<ZMKQX QXName="床垫季/年度售后投诉报表"    MKCode="BS0050917" />
+			<ZMKQX QXName="软床季/年度售后投诉报表"    MKCode="BS0050918" />
+			<ZMKQX QXName="床头柜季/年度售后投诉报表"    MKCode="BS0050919" />
+			<ZMKQX QXName="营销经理日报表"             MKCode="BS0050920" />
+			<ZMKQX QXName="加盟商营销经理评分表"        MKCode="BS0050921" />
+			<ZMKQX QXName="国内销售民用产品预估表"        MKCode="BS0050922" />
+			<ZMKQX QXName="偏差率"        MKCode="BS0050923" />
+		</ZMK>
+	</FMK>
+	
+     <FMK MKNum="5" FMKName="拜访管理" FMKCode="BS006" MKSM="BS">
+	</FMK>
+	
+	 
+</MKList>

@@ -1,0 +1,437 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author glw
+@function 
+@version 2013-08-17 17:07:03
+-->
+<sqlMap  namespace="Storeoutfewnotice">
+<!-- 定义StoreoutfewnoticeModel,StoreoutfewnoticeModelChld -->
+<typeAlias type="com.hoperun.drp.store.storeoutfewnotice.model.StoreoutfewnoticeModel" alias="StoreoutfewnoticeModel"/>
+<typeAlias type="com.hoperun.drp.store.storeoutfewnotice.model.StoreoutfewnoticeModelChld" alias="StoreoutfewnoticeModelChld" />
+<!-- 使用StoreoutfewnoticeModel装载结果集 -->
+<resultMap id="StoreoutfewnoticeModel" class="StoreoutfewnoticeModel">
+    <result column="FEW_STOREOUT_REQ_ID" property="FEW_STOREOUT_REQ_ID" />
+</resultMap>
+<!-- 使用StoreinnoticeModelChld装载结果集 -->
+<resultMap id="StoreoutfewnoticeModelChld" class="StoreoutfewnoticeModelChld">
+    <result column="FEW_STOREOUT_REQ_DTL_ID" property="FEW_STOREOUT_REQ_DTL_ID" />
+</resultMap>
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  <isNotEmpty prepend="and" property="FEW_STOREOUT_REQ_NO">
+    u.FEW_STOREOUT_REQ_NO like '%'||#FEW_STOREOUT_REQ_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STOREOUT_STORE_NO">
+    u.STOREOUT_STORE_NO like '%'||#STOREOUT_STORE_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STOREOUT_STORE_NAME">
+    u.STOREOUT_STORE_NAME like '%'||#STOREOUT_STORE_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="BUSS_PSON_NAME">
+    u.BUSS_PSON_NAME like '%'||#BUSS_PSON_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="BUSS_DEPT_NAME">
+    u.BUSS_DEPT_NAME like '%'||#BUSS_DEPT_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_BEG">
+     <![CDATA[u.CRE_TIME >=to_date(#CRE_TIME_BEG#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="CRE_TIME_END">
+     <![CDATA[u.CRE_TIME <=  to_date(#CRE_TIME_END#,'yyyy-MM-DD HH24:MI:SS')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="DEL_FLAG">
+	u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="QXJBCON">
+	$QXJBCON$
+  </isNotEmpty>
+  <isNotEmpty prepend="and " property="LEDGER_ID">
+	u.LEDGER_ID = #LEDGER_ID#
+  </isNotEmpty>
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select u.FEW_STOREOUT_REQ_ID,
+	       u.FEW_STOREOUT_REQ_NO,
+	       u.BILL_TYPE,
+	       u.STOREOUT_STORE_ID,
+	       u.STOREOUT_STORE_NO,
+	       u.STOREOUT_STORE_NAME,
+	       u.BUSS_PSON_ID,
+	       u.BUSS_PSON_NAME,
+	       u.BUSS_DEPT_ID,
+	       u.BUSS_DEPT_NAME,
+	       u.STATE,
+	       u.REMARK,
+	       u.CREATOR,
+	       u.CRE_NAME,
+	       to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+	       u.UPDATOR,
+	       u.UPD_NAME,
+	       to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+	       u.DEPT_ID,
+	       u.DEPT_NAME,
+	       u.ORG_ID,
+	       u.ORG_NAME,
+	       u.LEDGER_ID,
+	       u.LEDGER_NAME,
+	       u.DEL_FLAG
+	  from DRP_FEW_STOREOUT_REQ u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM DRP_FEW_STOREOUT_REQ u ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_FEW_STOREOUT_REQ(
+		FEW_STOREOUT_REQ_ID,
+		FEW_STOREOUT_REQ_NO,
+		BILL_TYPE,
+		STOREOUT_STORE_ID,
+		STOREOUT_STORE_NO,
+		STOREOUT_STORE_NAME,
+		BUSS_PSON_ID,
+		BUSS_PSON_NAME,
+		BUSS_DEPT_ID,
+		BUSS_DEPT_NAME,
+		STATE,
+		REMARK,
+		CREATOR,
+		CRE_NAME,
+		CRE_TIME,
+		DEPT_ID,
+		DEPT_NAME,
+		ORG_ID,
+		ORG_NAME,
+		LEDGER_ID,
+		LEDGER_NAME,
+		DEL_FLAG
+	   )values(
+			#FEW_STOREOUT_REQ_ID#,
+			#FEW_STOREOUT_REQ_NO#,
+			#BILL_TYPE#,
+			#STOREOUT_STORE_ID#,
+			#STOREOUT_STORE_NO#,
+			#STOREOUT_STORE_NAME#,
+			#BUSS_PSON_ID#,
+			#BUSS_PSON_NAME#,
+			#BUSS_DEPT_ID#,
+			#BUSS_DEPT_NAME#,
+			#STATE#,
+			#REMARK#,
+			#CREATOR#,
+			#CRE_NAME#,
+			sysdate,
+			#DEPT_ID#,
+			#DEPT_NAME#,
+			#ORG_ID#,
+			#ORG_NAME#,
+			#LEDGER_ID#,
+			#LEDGER_NAME#,
+			#DEL_FLAG#
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update DRP_FEW_STOREOUT_REQ ]]>
+	<dynamic prepend="set">
+	<isNotNull property="STOREOUT_STORE_ID" prepend=","><![CDATA[STOREOUT_STORE_ID = #STOREOUT_STORE_ID# ]]></isNotNull>
+	<isNotNull property="STOREOUT_STORE_NO" prepend=","><![CDATA[STOREOUT_STORE_NO = #STOREOUT_STORE_NO# ]]></isNotNull>
+    <isNotNull property="STOREOUT_STORE_NAME" prepend=","><![CDATA[STOREOUT_STORE_NAME = #STOREOUT_STORE_NAME# ]]></isNotNull>
+    <isNotNull property="BUSS_PSON_ID" prepend=","><![CDATA[BUSS_PSON_ID = #BUSS_PSON_ID# ]]></isNotNull>
+    <isNotNull property="BUSS_PSON_NAME" prepend=","><![CDATA[BUSS_PSON_NAME = #BUSS_PSON_NAME# ]]></isNotNull>
+    <isNotNull property="BUSS_DEPT_ID" prepend=","><![CDATA[BUSS_DEPT_ID = #BUSS_DEPT_ID# ]]></isNotNull>
+    <isNotNull property="BUSS_DEPT_NAME" prepend=","><![CDATA[BUSS_DEPT_NAME = #BUSS_DEPT_NAME# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+    <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+     </dynamic>
+	<![CDATA[ where FEW_STOREOUT_REQ_ID = #FEW_STOREOUT_REQ_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update DRP_FEW_STOREOUT_REQ 
+	               set DEL_FLAG = #DEL_FLAG#
+                      ,UPD_NAME=#UPD_NAME#
+                     ,UPDATOR=#UPDATOR#
+                      ,UPD_TIME=sysdate
+ 	  where 
+	     FEW_STOREOUT_REQ_ID = #FEW_STOREOUT_REQ_ID:VARCHAR# 
+    ]]>
+</delete>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	select u.FEW_STOREOUT_REQ_ID,
+	       u.FEW_STOREOUT_REQ_NO,
+	       u.BILL_TYPE,
+	       u.STOREOUT_STORE_ID,
+	       u.STOREOUT_STORE_NO,
+	       u.STOREOUT_STORE_NAME,
+	       u.BUSS_PSON_ID,
+	       u.BUSS_PSON_NAME,
+	       u.BUSS_DEPT_ID,
+	       u.BUSS_DEPT_NAME,
+	       u.STATE,
+	       u.REMARK,
+	       u.CREATOR,
+	       u.CRE_NAME,
+	       to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+	       u.UPDATOR,
+	       u.UPD_NAME,
+	       to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+	       u.DEPT_ID,
+	       u.DEPT_NAME,
+	       u.ORG_ID,
+	       u.ORG_NAME,
+	       u.LEDGER_ID,
+	       u.LEDGER_NAME,
+	       u.DEL_FLAG
+	  from DRP_FEW_STOREOUT_REQ u
+	  where 
+		u.FEW_STOREOUT_REQ_ID = #FEW_STOREOUT_REQ_ID#
+	]]>
+</select>
+<!-- 明细操作开始-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+     select 
+		u.FEW_STOREOUT_REQ_DTL_ID,
+		u.FEW_STOREOUT_REQ_ID,
+		u.PRD_ID,
+		u.PRD_NO,
+		u.PRD_NAME,
+		u.PRD_SPEC,
+		u.BRAND,
+		u.STD_UNIT,
+		u.NOTICE_NUM,
+		u.SPCL_TECH_ID,
+		u.REMARK,
+		u.DEL_FLAG,
+		a.DM_SPCL_TECH_NO,
+		a.SPCL_SPEC_REMARK,
+		a.SPCL_TECH_FLAG
+		from DRP_FEW_STOREOUT_REQ_DTL u 
+		left join DRP_SPCL_TECH a on a.SPCL_TECH_ID=u.SPCL_TECH_ID and a.USE_FLAG=1
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.FEW_STOREOUT_REQ_ID=#FEW_STOREOUT_REQ_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+	        u.FEW_STOREOUT_REQ_DTL_ID in ($FEW_STOREOUT_REQ_DTL_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+<!--明细表插入 -->
+<insert id="insertChld" parameterClass="map">
+  <![CDATA[
+	 insert into DRP_FEW_STOREOUT_REQ_DTL(
+	 	FEW_STOREOUT_REQ_DTL_ID,
+		FEW_STOREOUT_REQ_ID,
+		PRD_ID,
+		PRD_NO,
+		PRD_NAME,
+		PRD_SPEC,
+		BRAND,
+		STD_UNIT,
+		NOTICE_NUM,
+		SPCL_TECH_ID,
+		REMARK,
+		DEL_FLAG
+	 )values(
+	 	#FEW_STOREOUT_REQ_DTL_ID#,
+		#FEW_STOREOUT_REQ_ID#,
+		#PRD_ID#,
+		#PRD_NO#,
+		#PRD_NAME#,
+		#PRD_SPEC#,
+		#BRAND#,
+		#STD_UNIT#,
+		#NOTICE_NUM#,
+		#SPCL_TECH_ID#,
+		#REMARK#,
+		#DEL_FLAG#
+	 )
+   ]]>
+</insert>
+<!--明细表更新 -->
+<update id="updateChldById" parameterClass="map">
+	<![CDATA[ update DRP_FEW_STOREOUT_REQ_DTL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="PRD_ID" prepend=","><![CDATA[PRD_ID = #PRD_ID# ]]></isNotNull>
+    <isNotNull property="PRD_NO" prepend=","><![CDATA[PRD_NO = #PRD_NO# ]]></isNotNull>
+    <isNotNull property="PRD_NAME" prepend=","><![CDATA[PRD_NAME = #PRD_NAME# ]]></isNotNull>
+    <isNotNull property="PRD_SPEC" prepend=","><![CDATA[PRD_SPEC = #PRD_SPEC# ]]></isNotNull>
+    <isNotNull property="PRD_COLOR" prepend=","><![CDATA[PRD_COLOR = #PRD_COLOR# ]]></isNotNull>
+    <isNotNull property="BRAND" prepend=","><![CDATA[BRAND = #BRAND# ]]></isNotNull>
+    <isNotNull property="STD_UNIT" prepend=","><![CDATA[STD_UNIT = #STD_UNIT# ]]></isNotNull>
+    <isNotNull property="NOTICE_NUM" prepend=","><![CDATA[NOTICE_NUM = #NOTICE_NUM# ]]></isNotNull>
+    <isNotNull property="SPCL_TECH_ID" prepend=","><![CDATA[SPCL_TECH_ID = #SPCL_TECH_ID# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where FEW_STOREOUT_REQ_DTL_ID = #FEW_STOREOUT_REQ_DTL_ID#]]>
+</update>
+<!--根据明细IDs删除明细 -->
+<delete id="deleteChldByIds" parameterClass="map">
+	<![CDATA[ update DRP_FEW_STOREOUT_REQ_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      FEW_STOREOUT_REQ_DTL_ID in ($FEW_STOREOUT_REQ_DTL_IDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细 -->
+<delete id="delChldByFkId" parameterClass="map">
+	<![CDATA[ update DRP_FEW_STOREOUT_REQ_DTL 
+	               set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	      FEW_STOREOUT_REQ_ID = #FEW_STOREOUT_REQ_ID:VARCHAR#
+    ]]>
+</delete>
+<insert id="insertStoreOut" parameterClass="map">
+	<![CDATA[
+		insert into Drp_Storeout(
+			   STOREOUT_ID,
+			   STOREOUT_NO,
+			   BILL_TYPE,
+			   FROM_BILL_ID,
+			   FROM_BILL_NO,
+			   STOREOUT_STORE_ID,
+			   STOREOUT_STORE_NO,
+			   STOREOUT_STORE_NAME,
+			   SALE_PSON_ID,
+			   SALE_PSON_NAME,
+			   REMARK,
+			   CREATOR,
+			   CRE_NAME,
+			   CRE_TIME,
+			   DEPT_ID,
+			   DEPT_NAME,
+			   ORG_ID,
+			   ORG_NAME,
+			   LEDGER_ID,
+			   LEDGER_NAME,
+			   STATE,
+			   DEL_FLAG
+		)
+	  select #STOREOUT_ID#,
+	         #STOREOUT_NO#,
+	         BILL_TYPE,
+	         FEW_STOREOUT_REQ_ID,
+	         FEW_STOREOUT_REQ_NO,
+	         STOREOUT_STORE_ID,
+	         STOREOUT_STORE_NO,
+	         STOREOUT_STORE_NAME,
+	         BUSS_PSON_ID,
+	         BUSS_PSON_NAME,
+	         REMARK,
+	         #CREATOR#,
+	         #CRE_NAME#,
+	         sysdate,
+	         #DEPT_ID#,
+	         #DEPT_NAME#,
+	         #ORG_ID#,
+	         #ORG_NAME#,
+	         #LEDGER_ID#,
+	         #LEDGER_NAME#,
+	         #STATE#,
+	         #DEL_FLAG#
+	    from DRP_FEW_STOREOUT_REQ
+	   where FEW_STOREOUT_REQ_ID = #FEW_STOREOUT_REQ_ID#
+		
+	]]>
+</insert>
+<insert id="insertStoreOutChld" parameterClass="map">
+	<![CDATA[
+		insert into DRP_STOREOUT_DTL(
+			   STOREOUT_DTL_ID,
+			   STOREOUT_ID,
+			   PRD_ID,
+			   PRD_NO,
+			   PRD_NAME,
+			   PRD_SPEC,
+			   BRAND,
+			   STD_UNIT,
+			   NOTICE_NUM,
+			   REMARK,
+			   DEL_FLAG,
+			   FROM_BILL_DTL_ID,
+			   SPCL_TECH_ID)
+			  select RAWTOHEX(SYS_GUID()) AS UUID,
+			         #STOREOUT_ID#,
+			         PRD_ID,
+			         PRD_NO,
+			         PRD_NAME,
+			         PRD_SPEC,
+			         BRAND,
+			         STD_UNIT,
+			         NOTICE_NUM,
+			         REMARK,
+			         #DEL_FLAG#,
+			         FEW_STOREOUT_REQ_DTL_ID,
+			         SPCL_TECH_ID
+			    from DRP_FEW_STOREOUT_REQ_DTL
+			   where FEW_STOREOUT_REQ_ID = #FEW_STOREOUT_REQ_ID#
+			     and DEL_FLAG = #DEL_FLAG#
+		
+	]]>
+</insert>
+</sqlMap>

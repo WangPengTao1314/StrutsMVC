@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="RoleInfo"> 
+	
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="roleName">
+			r.ROLE_NAME like '%$roleName$%'
+		</isNotEmpty> 
+		<isNotEmpty prepend="and" property="orgId">
+			exists(select '' from ${PUB}.USER_INFO u where u.USER_ID=r.USER_ID and u.ORG_ID=#orgId:VARCHAR#) 
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="roleId">
+			r.ROLE_ID = #roleId#
+		</isNotEmpty>
+	</sql>
+
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[ select r.*,ROW_NUMBER() OVER(ORDER BY ROLE_ID) AS rn from ${PUB}.ROLE_INFO r ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<![CDATA[ order by r.ROLE_ID ]]>
+	</sql>
+
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(role_id) cnt FROM ${PUB}.ROLE_INFO r ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${PUB}.ROLE_INFO(ROLE_ID, ROLE_NAME, ROLE_LVL, ROLE_TYPE, INDEX_URL, ROLE_DESC)
+		 values(#roleId#, #roleName#, #roleLvl:VARCHAR:NULL#, #roleType:VARCHAR:NULL#, #indexUrl:VARCHAR:NULL#, 
+		 #roleDesc:VARCHAR:NULL#)
+		]]>
+	</insert>
+
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${PUB}.ROLE_INFO ]]>
+		<!-- CHANAME, CHADES,CHADATE,CHASTU -->
+		<dynamic prepend="set">
+			<isNotNull property="roleName" prepend=","><![CDATA[ROLE_NAME = #roleName#]]></isNotNull>
+			<isNotNull property="roleLvl" prepend=","><![CDATA[ROLE_LVL = #roleLvl#]]></isNotNull>
+			<isNotNull property="roleType" prepend=","><![CDATA[ROLE_TYPE = #roleType#]]></isNotNull>
+			<isNotNull property="indexUrl" prepend=","><![CDATA[INDEX_URL = #indexUrl#]]></isNotNull>
+			<isNotNull property="roleDesc" prepend=","><![CDATA[ROLE_DESC = #roleDesc#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where ROLE_ID = #roleId# ]]>
+	</update>
+
+	<!-- 删除角色 -->
+	<delete id="delete" parameterClass="map">
+		<![CDATA[ delete from ${PUB}.ROLE_INFO where ROLE_ID = #roleId:VARCHAR# ]]>
+	</delete> 
+
+	<!-- 查询所有 -->
+	<select id="findAll" resultClass="java.util.HashMap"> 
+		<![CDATA[ select * from ${PUB}.ROLE_INFO order by ROLE_ID ]]>
+	</select>
+
+	<!-- 加载角色 -->
+	<select id="loadById" parameterClass="string" resultClass="java.util.HashMap"> 
+		<![CDATA[ select * from ${PUB}.ROLE_INFO where ROLE_ID = #roleId:VARCHAR# ]]>
+	</select>
+
+	<select id="query" parameterClass="map" resultClass="java.util.HashMap"> 
+		<include refid="coreSql" /> 
+	</select>	
+	
+	<!-- 删除角色与菜单关联关系 -->
+	<delete id="deleteRoleMenus" parameterClass="map">
+		<![CDATA[ delete from ${PUB}.ROLE_MENU rm where rm.ROLE_ID = #roleId:VARCHAR# ]]>
+	</delete>
+	<!-- 增加角色与菜单关联关系 -->
+	<insert id="alotMenus" parameterClass="map">
+		<![CDATA[ insert into ${PUB}.ROLE_MENU (ROLE_ID,MENU_ID) values (#roleId:VARCHAR#, #menuId:VARCHAR#) ]]>
+	</insert> 
+	
+	<delete id="deleteRoleUsers" parameterClass="map">
+		<![CDATA[ delete from ${PUB}.USER_ROLE r ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</delete>	
+	<insert id="alotUsers" parameterClass="map">
+		<![CDATA[ insert into ${PUB}.USER_ROLE (ROLE_ID,USER_ID) values (#roleId:VARCHAR#, #userId:VARCHAR#) ]]>
+	</insert>
+	
+</sqlMap>
+

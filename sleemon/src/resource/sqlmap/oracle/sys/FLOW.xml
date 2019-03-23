@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+  *@module 系统模块 
+  *@func 系统模块 
+  *@version 1.1
+  *@author 朱晓文
+ -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="flow">
+
+	<insert id="insertmod" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.T_SYS_FLOWMODEL( flowModelId, modelNumber, modelName, modelType, modelState, businessType, remark, jgxxid)
+		 values(#flowModelId#,#modelNumber#,#modelName#,#modelType#,#modelState#,#businessType#,#remark#,#jgxxid#)
+		]]>
+	</insert>
+	<insert id="insertnod" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.T_SYS_FLOWNODE(  flowNodeId, flowModelId, backFlag, jumpFlag, expandFlag, editFlag, cancleFlag, agentFlag, delayFlag, delayTime, allFlag, remark, nodeX, nodeY, nodeOperationId, operationer, operationerId)
+		 values(#flowNodeId#,#flowModelId#,#backFlag#,#jumpFlag#,#expandFlag#,#editFlag#,#cancleFlag#,#agentFlag#,#delayFlag#,#delayTime#,#allFlag#,#remark#,#nodeX#,#nodeY#,#nodeOperationId#,#operationer#,#operationerId#)
+		]]>
+	</insert>
+	<insert id="insertpath" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.T_SYS_NODEPATH(nodePathId, startNodeId, endNodeId, flowModelId)
+		 values(#nodePathId#,#startNodeId#,#endNodeId#,#flowModelId#)
+		]]>
+	</insert>
+	<delete id="deletemod" parameterClass="map">
+		<![CDATA[ delete from ${SYSSCHEMA}.T_SYS_FLOWMODEL where flowModelId = #FLOWMODELID:VARCHAR# ]]>
+	</delete>
+	<delete id="deletenod" parameterClass="map">
+		<![CDATA[ delete from ${SYSSCHEMA}.T_SYS_FLOWNODE where flowModelId = #FLOWMODELID:VARCHAR# ]]>
+	</delete>
+	<delete id="deletepath" parameterClass="map">
+		<![CDATA[ delete from ${SYSSCHEMA}.T_SYS_NODEPATH where flowModelId = #FLOWMODELID:VARCHAR# ]]>
+	</delete>
+	<update id="updatemodById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_FLOWMODEL ]]>
+		<!-- CHANAME, CHADES,CHADATE,CHASTU -->
+		<dynamic prepend="set">
+			<isNotNull property="MODELNUMBER" prepend=","><![CDATA[MODELNUMBER = #MODELNUMBER#]]></isNotNull>
+			<isNotNull property="MODELNAME" prepend=","><![CDATA[MODELNAME = #MODELNAME#]]></isNotNull>
+			<isNotNull property="BUSINESSTYPE" prepend=","><![CDATA[BUSINESSTYPE = #BUSINESSTYPE#]]></isNotNull>
+			<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK#]]></isNotNull>
+			<isNotNull property="MODELTYPE" prepend=","><![CDATA[MODELTYPE = #MODELTYPE#]]></isNotNull>
+			<isNotNull property="JGXXID" prepend=","><![CDATA[JGXXID = #JGXXID#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where FLOWMODELID = #FLOWMODELID# ]]>
+	</update>
+	<update id="updatenodeById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_FLOWNODE ]]>
+		<dynamic prepend="set">
+			<isNotNull property="operationerId" prepend=","><![CDATA[operationerId = #operationerId#]]></isNotNull>
+			<isNotNull property="backFlag" prepend=","><![CDATA[backFlag = #backFlag#]]></isNotNull>
+			<isNotNull property="jumpFlag" prepend=","><![CDATA[jumpFlag = #jumpFlag#]]></isNotNull>
+			<isNotNull property="expandFlag" prepend=","><![CDATA[expandFlag = #expandFlag#]]></isNotNull>
+			<isNotNull property="editFlag" prepend=","><![CDATA[editFlag = #editFlag#]]></isNotNull>
+			<isNotNull property="cancleFlag" prepend=","><![CDATA[cancleFlag = #cancleFlag#]]></isNotNull>
+			<isNotNull property="agentFlag" prepend=","><![CDATA[agentFlag = #agentFlag#]]></isNotNull>
+			<isNotNull property="delayFlag" prepend=","><![CDATA[delayFlag = #delayFlag#]]></isNotNull>
+			<isNotNull property="delayTime" prepend=","><![CDATA[delayTime = #delayTime#]]></isNotNull>
+			<isNotNull property="allFlag" prepend=","><![CDATA[allFlag = #allFlag#]]></isNotNull>
+			<isNotNull property="nodeOperationId" prepend=","><![CDATA[nodeOperationId = #nodeOperationId#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where flowNodeId = #flowNodeId# ]]>
+	</update>
+	<insert id="instrace" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.T_SYS_FLOWTRACE(FLOWTRACEID, BUSINESSID, OPERATION, OPERATOR, OPERATORNAME, NEXTOPERATOR, NEXTOPERATORNAME,OPERATORTYPE,OPERATETIME,REMARK)
+		 values(#FLOWTRACEID#, #BUSINESSID#, #OPERATION#, #OPERATOR#, #OPERATORNAME#, 
+		 #NEXTOPERATOR#, #NEXTOPERATORNAME#, #OPERATORTYPE#, sysdate,#REMARK#)
+		]]>
+	</insert>
+	<insert id="insMeg" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.T_SYS_MESSAGE(MESSAGEID,SENDID,SENDER,MSGINFO,SENDTIME,RECEIVEID,RECEIVER)
+		 values(#MESSAGEID#, #SENDID#, #SENDER#, #MSGINFO#,sysdate, #RECEIVEID#, #RECEIVER#)
+		]]>
+	</insert>
+	<select id="checkInfo" parameterClass="map" resultClass="int">
+		select count(1) cnt from T_SYS_FLOWMODEL a where a.BUSINESSTYPE=#BUSINESSTYPE# 
+		and NVL(a.JGXXID,'null')=NVL(#JGXXID#,'null') and NVL(a.MODELTYPE,'null')=NVL(#MODELTYPE#,'null') 
+		and FLOWMODELID!=#FLOWMODELID#
+	</select>
+</sqlMap>
+

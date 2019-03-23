@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ *@module 基础资料
+ *@func 
+ *@version 1.1
+ *@author 刘曰刚
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Drppromoteprice">
+
+	<typeAlias type="com.hoperun.drp.base.drppromoteprice.model.DrppromotepriceModel" alias="DrppromotepriceModel" />
+
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="DrppromotepriceModel" class="DrppromotepriceModel">
+		<result column="PROMOTE_PRICE_ID" property="PROMOTE_PRICE_ID" />
+	</resultMap>
+	<!-- 动态查询 and 列表排序 -->
+	<sql id="queryDynSql"> 
+	  <isNotEmpty prepend="and " property="seachFlag">$seachFlag$</isNotEmpty>
+		<isNotEmpty prepend="and " property="priceFlag">$priceFlag$</isNotEmpty>
+	    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	   </isNotEmpty>
+		<isNotEmpty prepend="and " property="PROMOTE_ID">PROMOTE_ID =#PROMOTE_ID#</isNotEmpty>
+		<isNotEmpty prepend="and " property="PAR_PRD_NAMEQuery">PRD_ID in (select PRD_ID from BASE_PRODUCT where DEL_FLAG=0 $PAR_PRD_NAMEQuery$)</isNotEmpty>
+		<isNotEmpty prepend="and " property="PAR_PRD_NOQuery">PRD_ID in (select PRD_ID from BASE_PRODUCT where DEL_FLAG=0 $PAR_PRD_NOQuery$)</isNotEmpty>
+		<isNotEmpty prepend="  " property="PRD_NOQuery">$PRD_NOQuery$</isNotEmpty>
+		<isNotEmpty prepend="  " property="PRD_NAMEQuery">$PRD_NAMEQuery$</isNotEmpty>
+	</sql>
+	<sql id="prdQueryDynSql"> 
+	   <isNotEmpty prepend="and " property="seachFlag">$seachFlag$</isNotEmpty>
+		<isNotEmpty prepend="and " property="prdFlag">$prdFlag$</isNotEmpty>
+		<isNotEmpty prepend="  " property="PAR_PRD_NAMEQuery">$PAR_PRD_NAMEQuery$</isNotEmpty>
+		<isNotEmpty prepend="  " property="PRD_NOQuery">$PRD_NOQuery$</isNotEmpty>
+		<isNotEmpty prepend="  " property="PRD_NAMEQuery">$PRD_NAMEQuery$</isNotEmpty>
+		<isNotEmpty prepend="and" property="sql">$sql$</isNotEmpty>
+		
+	</sql>
+    <sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField"> $orderField$</isNotEmpty>
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[
+			  select '' PROMOTE_PRICE_ID,
+			         '' PROMOTE_ID,
+			         p.PRD_ID,
+			         p.PRD_NO,
+			         p.PRD_NAME,
+			         p.PRD_SPEC,
+			         p.BRAND,
+			         p.STD_UNIT,
+			         p.PRVD_PRICE PRICE,
+			         1 DECT_RATE,
+			         p.PRVD_PRICE DECT_PRICE,
+			         '' UPDATOR,
+			         '' UPD_NAME,
+			         '' UPD_TIME
+			  from BASE_PRODUCT p 
+			  where prd_id not in (select PRD_ID from DRP_PROMOTE_PRICE where DEL_FLAG = 0
+				]]>
+		<dynamic prepend=" and ">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<![CDATA[
+			) 
+		]]>
+		<dynamic prepend=" and ">
+			<include refid="prdQueryDynSql" />
+		</dynamic>
+		<![CDATA[
+			union 
+				select 
+				    PROMOTE_PRICE_ID,
+					PROMOTE_ID,
+					PRD_ID,
+					PRD_NO,
+					PRD_NAME,
+					PRD_SPEC,
+					BRAND,
+					STD_UNIT,
+					PRICE,
+					DECT_RATE,
+					DECT_PRICE,
+					UPDATOR,
+					UPD_NAME,
+					to_char(UPD_TIME,'yyyy-MM-DD HH24:MI:SS')UPD_TIME
+			  from DRP_PROMOTE_PRICE 
+			  where DEL_FLAG=0
+		]]>
+		<dynamic prepend=" and ">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[
+		select count(1) cnt from (
+			  select '' PROMOTE_PRICE_ID,
+			         '' PROMOTE_ID,
+			         p.PRD_ID,
+			         p.PRD_NO,
+			         p.PRD_NAME,
+			         p.PRD_SPEC,
+			         p.BRAND,
+			         p.STD_UNIT,
+			         p.PRVD_PRICE PRICE,
+			         1 DECT_RATE,
+			         p.PRVD_PRICE DECT_PRICE,
+			         '' UPDATOR,
+			         '' UPD_NAME,
+			         '' UPD_TIME
+			  from BASE_PRODUCT p 
+			  where prd_id not in (select PRD_ID from DRP_PROMOTE_PRICE where DEL_FLAG = 0
+				]]>
+		<dynamic prepend=" and ">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<![CDATA[
+			) 
+		]]>
+		<dynamic prepend=" and ">
+			<include refid="prdQueryDynSql" />
+		</dynamic>
+		<![CDATA[
+			union 
+				select 
+				    PROMOTE_PRICE_ID,
+					PROMOTE_ID,
+					PRD_ID,
+					PRD_NO,
+					PRD_NAME,
+					PRD_SPEC,
+					BRAND,
+					STD_UNIT,
+					PRICE,
+					DECT_RATE,
+					DECT_PRICE,
+					UPDATOR,
+					UPD_NAME,
+					to_char(UPD_TIME,'yyyy-MM-DD HH24:MI:SS')UPD_TIME
+			  from DRP_PROMOTE_PRICE 
+			  where DEL_FLAG=0
+		]]>
+		<dynamic prepend=" and ">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+		<![CDATA[
+			)
+		]]>
+	</select>
+
+   <!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+			insert into DRP_PROMOTE_PRICE(
+				PROMOTE_PRICE_ID,
+				PROMOTE_ID,
+				PRD_ID,
+				PRD_NO,
+				PRD_NAME,
+				PRD_SPEC,
+				BRAND,
+				STD_UNIT,
+				PRICE,
+				DECT_RATE,
+				DECT_PRICE,
+				DEL_FLAG,
+				UPDATOR,
+				UPD_NAME,
+				UPD_TIME
+			)
+			select 
+				#PROMOTE_PRICE_ID#,
+				#PROMOTE_ID#,
+				PRD_ID,
+				PRD_NO,
+				PRD_NAME,
+				PRD_SPEC,
+				BRAND,
+				STD_UNIT,
+				#PRICE#,
+				#DECT_RATE#,
+				#DECT_PRICE#,
+				#DEL_FLAG#,
+				#UPDATOR#,
+				#UPD_NAME#,
+				sysdate
+			from BASE_PRODUCT where PRD_ID=#PRD_ID#
+		]]>
+	</insert>
+	<!-- // 0156117 End 刘曰刚 2014/06/16// -->
+	<update id="updateById" parameterClass="map">
+		 <![CDATA[ update DRP_PROMOTE_PRICE ]]>
+		<dynamic prepend="set">
+			<isNotNull property="DECT_PRICE" prepend=","><![CDATA[DECT_PRICE = #DECT_PRICE#]]></isNotNull>
+			<isNotNull property="DECT_RATE" prepend=","><![CDATA[DECT_RATE = #DECT_RATE#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where PROMOTE_PRICE_ID = #PROMOTE_PRICE_ID# ]]>
+	</update>
+</sqlMap>

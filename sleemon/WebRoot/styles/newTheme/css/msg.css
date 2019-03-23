@@ -1,0 +1,21 @@
+body{background: #EDF7FE;}
+body,table,td{font-size: 12px;}
+table.panel{
+  background-color: #E5EEF5;
+
+}
+body {
+	margin:5px;
+    background-color:#EDF7FE;font-size:12px;}
+ 
+
+img {/* border style for all images */
+  border: 0;
+}
+input.btn {
+	border: 1px solid #a9c2c9;
+	background-color:#e0f2f6;
+	height: 20px;
+	cursor: pointer;
+	background-repeat: no-repeat;
+}

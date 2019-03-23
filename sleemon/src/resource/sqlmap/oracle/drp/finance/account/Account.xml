@@ -1,0 +1,718 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zhuxw
+@function 库存月结
+@version 20140909
+-->
+<sqlMap namespace="account">
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+   <isNotEmpty prepend="and" property="LEDGER_ID">
+     u.LEDGER_ID in $LEDGER_IDS$
+   </isNotEmpty>
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	        select 
+			   u.MONTH_ACCT_NOTE_ID,
+			   u.YEAR,
+			   u.MONTH,
+			   u.UPD_NAME,
+			   to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+			   u.LEDGER_ID,
+			   u.STATE,
+			   a.CHANN_NO,
+			   a.CHANN_NAME
+			 from BASE_CHANN a,DRP_MONTH_ACCT_NOTE u 
+		   where a.CHANN_ID=u.LEDGER_ID
+   ]]>
+    <dynamic prepend="">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM DRP_MONTH_ACCT_NOTE u ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_STORE(
+		 STORE_ID,
+         STORE_NO,
+         STORAGE_FLAG,
+         STORE_TYPE,
+         STORE_NAME,
+         BEL_CHANN_NAME,
+         REMARK,
+         BEL_CHANN_NO,
+         TERM_STROE_FLAG,
+         PAR_STORE_ID,
+         CRE_NAME,
+         CREATOR,
+         CRE_TIME,
+         UPD_NAME,
+         UPDATOR,
+         UPD_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         STATE,
+         DEL_FLAG,
+         BEL_CHANN_ID,
+         DTL_ADDR,
+         FREEZE_FLAG,
+         TOTAL_VOLUME
+         
+	   )values(
+		#STORE_ID#,
+        #STORE_NO#,
+        #STORAGE_FLAG#,
+        #STORE_TYPE#,
+        #STORE_NAME#,
+        #BEL_UNIT_NAME#,
+        #REMARK#,
+        #BEL_UNIT_ID#,
+        #TERM_STROE_FLAG#,
+        #PAR_STORE_ID#,
+        #CRE_NAME#,
+        #CREATOR#,
+	    sysdate, 
+        #UPD_NAME#,
+        #UPDATOR#,
+		sysdate, 
+        #DEPT_ID#,
+        #DEPT_NAME#,
+        #ORG_ID#,
+        #ORG_NAME#,
+        #LEDGER_ID#,
+        #LEDGER_NAME#,
+        #STATE#,
+		#DEL_FLAG#,
+		#BEL_CHANN_NO#,
+		#DTL_ADDR#,
+		#FREEZE_FLAG#,
+		#TOTAL_VOLUME#
+		)
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update DRP_STORE ]]>
+	<dynamic prepend="set">
+    <isNotNull property="STORE_NO" prepend=","><![CDATA[STORE_NO = #STORE_NO# ]]></isNotNull>
+    <isNotNull property="STORAGE_FLAG" prepend=","><![CDATA[STORAGE_FLAG = #STORAGE_FLAG# ]]></isNotNull>
+    <isNotNull property="STORE_TYPE" prepend=","><![CDATA[STORE_TYPE = #STORE_TYPE# ]]></isNotNull>
+    <isNotNull property="STORE_NAME" prepend=","><![CDATA[STORE_NAME = #STORE_NAME# ]]></isNotNull>
+    <isNotNull property="BEL_UNIT_NAME" prepend=","><![CDATA[BEL_CHANN_NAME = #BEL_UNIT_NAME# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    <isNotNull property="BEL_UNIT_ID" prepend=","><![CDATA[BEL_CHANN_NO = #BEL_UNIT_ID# ]]></isNotNull>
+    <isNotNull property="TERM_STROE_FLAG" prepend=","><![CDATA[TERM_STROE_FLAG = #TERM_STROE_FLAG# ]]></isNotNull>
+    <isNotNull property="PAR_STORE_ID" prepend=","><![CDATA[PAR_STORE_ID = #PAR_STORE_ID# ]]></isNotNull>
+    <isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME# ]]></isNotNull>
+    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPD_TIME = sysdate ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    <isNotNull property="BEL_CHANN_NO" prepend=","><![CDATA[BEL_CHANN_ID = #BEL_CHANN_NO# ]]></isNotNull>
+    <isNotNull property="DTL_ADDR" prepend=","><![CDATA[DTL_ADDR = #DTL_ADDR# ]]></isNotNull>
+    <isNotNull property="TOTAL_VOLUME" prepend=","><![CDATA[TOTAL_VOLUME = #TOTAL_VOLUME# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where STORE_ID = #STORE_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update DRP_STORE 
+	               set DEL_FLAG = #DEL_FLAG#
+                      ,UPD_NAME=#UPD_NAME#
+                     ,UPDATOR=#UPDATOR#
+                      ,UPD_TIME=sysdate
+ 	  where 
+	     STORE_ID = #STORE_ID:VARCHAR# 
+    ]]>
+</delete>
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.STORE_ID,
+		u.STORE_NO,
+		u.STORE_NAME,
+		u.STORE_TYPE,
+		u.PAR_STORE_ID,
+		to_char (r.STORE_NO)PAR_STORE_NO,
+		to_char (r.STORE_NAME)PAR_STORE_NAME,
+		u.TERM_STROE_FLAG,
+		u.BEL_CHANN_ID,
+		u.BEL_CHANN_NO,
+		u.BEL_CHANN_NAME,
+		u.STORAGE_FLAG,
+		u.REMARK,
+		u.CRE_NAME,
+		u.CREATOR,
+		to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS')CRE_TIME,
+		u.UPD_NAME,
+		u.UPDATOR,
+		to_char(u.UPD_TIME,'yyyy-MM-DD HH24:MI:SS')UPD_TIME,
+		u.DEPT_ID,
+		u.DEPT_NAME,
+		u.ORG_ID,
+		u.ORG_NAME,
+		u.LEDGER_ID,
+		u.LEDGER_NAME,
+		u.STATE,
+		u.DEL_FLAG,
+		u.DTL_ADDR,
+		u.TOTAL_VOLUME
+	  from
+       DRP_STORE u LEFT JOIN DRP_STORE r
+      on u.PAR_STORE_ID = r.STORE_ID 
+	  where 
+		u.STORE_ID = #STORE_ID#
+	]]>
+</select>
+<!--启用/停用-->
+<update id="updStusById" parameterClass="map">	
+     <![CDATA[ 
+	  update DRP_STORE 
+	       set STATE = #STATE#
+              ,UPD_NAME=#UPD_NAME#
+              ,UPDATOR=#UPDATOR#
+              ,UPD_TIME=sysdate
+ 	  where 
+	     STORE_ID = #STORE_ID:VARCHAR# 
+    ]]>
+</update>
+<!-- 明细操作开始-->
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlChld">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>  
+<!-- 查询SQL -->
+<sql id="orderSqlChld">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<sql id="coreSqlChld">
+	<![CDATA[ 
+     select 
+		u.STORG_ID,
+		u.STORE_ID,
+		u.STORG_NO,
+		u.STORG_NAME,
+		u.LAY_ADDR,
+		u.FLOOR,
+		u.STATE,
+		u.DEL_FLAG
+       from DRP_STORAGE u 
+   ]]>
+</sql>
+ <!-- 根据主表ID查询明细 -->
+  <select id="queryChldByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+			u.STORE_ID=#STORE_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+ <!--根据明细表IDS查询明细 -->
+ <select id="loadChldByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlChld"/>
+	  <dynamic prepend="where">
+	        u.STORG_ID in ($STORG_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlChld" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlChld"/>
+	  </isNotNull>
+  </select>
+  <select id="getChannInfo" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		    select INIT_YEAR,INIT_MONTH, COST_TYPE from BASE_CHANN where  CHANN_ID=#LEDGER_ID#
+		]]>
+  </select>
+  <select id="chkAccount" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		select sum(THE_NUM)THE_NUM,sum(PRE_NUM)PRE_NUM 
+		from 
+		(
+		    select count(*) THE_NUM ,0 PRE_NUM   from DRP_MONTH_ACCT_NOTE where LEDGER_ID=#LEDGER_ID#  and YEAR=#YEAR#  and MONTH=#MONTH# and STATE=#STATE#
+          union all
+            select 0 THE_NUM, count(*) PRE_NUM  from DRP_MONTH_ACCT_NOTE where LEDGER_ID=#LEDGER_ID# and YEAR=#PRE_YEAR# and MONTH=#PRE_MONTH#  and STATE=#STATE#
+         )temp
+		]]>
+  </select>
+  <select id="chkNotice" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		    select count(*) IS_NOTICE_FLAG from DRP_MONTH_ACCT_NOTE where LEDGER_ID=#LEDGER_ID#  and YEAR=#YEAR#  and MONTH=#MONTH# 
+        ]]>
+  </select>
+  <select id="chkPreAccount" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		    select count(*) IS_ACCT_FLAG from DRP_MONTH_ACCT_NOTE where LEDGER_ID=#LEDGER_ID#  and YEAR=#NEX_YEAR#  and MONTH=#NEX_MONTH# and STATE='已月结'
+        ]]>
+  </select>
+  <update id="updNotice" parameterClass="map">
+		<![CDATA[ update DRP_MONTH_ACCT_NOTE set STATE = '已月结', UPD_NAME = #UPD_NAME#, UPD_TIME = sysdate where LEDGER_ID=#LEDGER_ID# and YEAR=#YEAR# and MONTH=#MONTH#  ]]>
+  </update>
+   <update id="updCancleAmount" parameterClass="map">
+		<![CDATA[ update DRP_MONTH_ACCT_NOTE set STATE = '取消月结', UPD_NAME = #UPD_NAME#, UPD_TIME = sysdate where LEDGER_ID=#LEDGER_ID# and YEAR=#YEAR# and MONTH=#MONTH# and STATE='已月结' ]]>
+  </update>
+  <insert id="insNotice" parameterClass="map">
+		<![CDATA[
+		 insert into DRP_MONTH_ACCT_NOTE(MONTH_ACCT_NOTE_ID,YEAR,MONTH,UPD_NAME,UPD_TIME,LEDGER_ID,STATE)
+		values
+		 (#MONTH_ACCT_NOTE_ID#,#YEAR#,#MONTH#,#UPD_NAME#,sysdate,#LEDGER_ID#,'已月结')
+		]]>
+  </insert>
+  <delete id="delInvoc" parameterClass="map">
+		<![CDATA[ delete from  DRP_INVOC_ACCT  where LEDGER_ID=#LEDGER_ID#  and YEAR=#YEAR#  and MONTH=#MONTH#  ]]>
+  </delete>
+  <delete id="delCostPrice" parameterClass="map">
+		<![CDATA[ delete from  DRP_COST_PRICE  where LEDGER_ID=#LEDGER_ID#  and YEAR=#YEAR#  and MONTH=#MONTH#  ]]>
+  </delete>
+  <insert id="insInvoc" parameterClass="map">
+  <![CDATA[
+	  insert into 
+		DRP_INVOC_ACCT
+		(INVOC_ACCT_ID,PRD_ID,STORE_ID,SPCL_TECH_ID,YEAR,MONTH,PER_LEFT_NUM,PER_LEFT_PRICE,PER_LEFT_AMOUNT,CUR_PUR_NUM,CUR_PUR_AMOUNT,
+		CUR_CUST_RETURN_NUM,CUR_CUST_RETURN_AMOUNT,CUR_OTHER_RETURN_NUM,CUR_OTHER_RETURN_AMOUNT,CUR_REPAIR_BACK_NUM,CUR_REPAIR_BACK_AMOUNT,
+		CUR_DUMP_IN_NUM,CUR_TERM_SALE_NUM,CUR_TERM_REAL_SALE_AMOUNT,CUR_RETUN_NUM,CUR_REAL_RETUN_AMOUNT,CUR_OTHER_SALE_NUM,
+		CUR_OTHER_REAL_SALE_AMOUNT,CUR_REPAIR_NUM,CUR_REAL_REPAIR_AMOUNT,CUR_DUMP_OUT_NUM,CUR_INV_ADD_NUM,CUR_INV_REDUCE_NUM,CUR_END_NUM,LEDGER_ID,
+		CUR_COST_ADJUST_AMOUNT,CUR_FEW_STOREOUT_NUM, TO_SALE_COST 
+		)
+		select 
+		 SYS_GUID(),
+		 a.PRD_ID,
+		 a.STORE_ID,
+		 NVL(a.SPCL_TECH_ID,'NONE'),
+		 #YEAR#  YEAR,
+		 #MONTH# MONTH,
+		 NVL(b.CUR_END_NUM,0) PER_LEFT_NUM,
+		 NVL(b.CUR_END_PRICE,0)  PER_LEFT_PRICE,
+		 NVL(b.CUR_END_AMOUNT,0) PER_LEFT_AMOUNT,
+		 NVL(c.CUR_PUR_NUM,0) CUR_PUR_NUM,
+		 NVL(c.CUR_PUR_AMOUNT,0)CUR_PUR_AMOUNT,
+		 NVL(c.CUR_CUST_RETURN_NUM,0)CUR_CUST_RETURN_NUM,
+		 NVL(c.CUR_CUST_RETURN_AMOUNT,0)CUR_CUST_RETURN_AMOUNT,
+		 NVL(c.CUR_OTHER_RETURN_NUM,0)CUR_OTHER_RETURN_NUM,
+		 NVL(c.CUR_OTHER_RETURN_AMOUNT,0)CUR_OTHER_RETURN_AMOUNT,
+		 NVL(c.CUR_REPAIR_BACK_NUM,0)CUR_REPAIR_BACK_NUM,
+		 NVL(c.CUR_REPAIR_BACK_AMOUNT,0)CUR_REPAIR_BACK_AMOUNT,
+		 NVL(c.CUR_DUMP_IN_NUM,0)CUR_DUMP_IN_NUM,
+		 NVL(c.CUR_TERM_SALE_NUM,0)CUR_TERM_SALE_NUM,
+		 NVL(c.CUR_TERM_REAL_SALE_AMOUNT,0)CUR_TERM_REAL_SALE_AMOUNT,
+		 NVL(c.CUR_RETUN_NUM,0)CUR_RETUN_NUM,
+		 NVL(c.CUR_REAL_RETUN_AMOUNT,0)CUR_REAL_RETUN_AMOUNT,
+		 NVL(c.CUR_OTHER_SALE_NUM,0)CUR_OTHER_SALE_NUM,
+		 NVL(c.CUR_OTHER_REAL_SALE_AMOUNT,0)CUR_OTHER_REAL_SALE_AMOUNT,
+		 NVL(c.CUR_REPAIR_NUM,0)CUR_REPAIR_NUM,
+		 NVL(c.CUR_REAL_REPAIR_AMOUNT,0)CUR_REAL_REPAIR_AMOUNT,
+		 NVL(c.CUR_DUMP_OUT_NUM,0)CUR_DUMP_OUT_NUM,
+		 NVL(c.CUR_INV_ADD_NUM,0)CUR_INV_ADD_NUM,
+		 NVL(c.CUR_INV_REDUCE_NUM,0)CUR_INV_REDUCE_NUM,
+		 NVL(b.CUR_END_NUM,0)+ NVL(c.CUR_PUR_NUM,0)+ NVL(c.CUR_CUST_RETURN_NUM,0)+ NVL(c.CUR_OTHER_RETURN_NUM,0)+ NVL(c.CUR_REPAIR_BACK_NUM,0)
+		 +NVL(c.CUR_DUMP_IN_NUM,0)- NVL(c.CUR_TERM_SALE_NUM,0)-NVL(c.CUR_RETUN_NUM,0)-NVL(c.CUR_OTHER_SALE_NUM,0)- NVL(c.CUR_REPAIR_NUM,0)-
+		 NVL(c.CUR_DUMP_OUT_NUM,0)+ NVL(c.CUR_INV_ADD_NUM,0)-NVL(c.CUR_INV_REDUCE_NUM,0)-NVL(c.CUR_FEW_STOREOUT_NUM,0) CUR_END_NUM,
+		 #LEDGER_ID#,NVL(c.COST_ADJUST_AMOUNT, 0) CUR_COST_ADJUST_AMOUNT,NVL(c.CUR_FEW_STOREOUT_NUM,0) CUR_FEW_STOREOUT_NUM,
+		 0 TO_SALE_COST 
+		from 
+		    DRP_STORE_ACCT a
+		  left join 
+		    DRP_INVOC_ACCT b  
+		        on a.STORE_ID=b.STORE_ID and a.PRD_ID=b.PRD_ID and NVL(a.SPCL_TECH_ID,'NONE')=NVL(b.SPCL_TECH_ID,'NONE') and a.LEDGER_ID = b.LEDGER_ID
+		        and b.YEAR=#PRE_YEAR# and b.MONTH=#PRE_MONTH# 
+		  left join 
+		(
+		 select 
+		    u.STORE_ID, 
+		    u.PRD_ID,
+		    NVL(u.SPCL_TECH_ID,'NONE')SPCL_TECH_ID,
+		    u.LEDGER_ID,
+		    sum(decode(u.IN_OUT_TYPE,'手工新增入库',NVL(u.IN_OUT_NUM,0),'订货入库',NVL(u.IN_OUT_NUM,0),0)) CUR_PUR_NUM,
+		    sum(decode(u.IN_OUT_TYPE,'手工新增入库',NVL(u.IN_OUT_AMOUNT,0),'订货入库',NVL(u.NO_TAX_DECT_AMOUNT,0),0)) CUR_PUR_AMOUNT,
+		    sum(decode(u.IN_OUT_TYPE,'终端退货入库',NVL(u.IN_OUT_NUM,0),0))  CUR_CUST_RETURN_NUM,
+		    sum(decode(u.IN_OUT_TYPE,'终端退货入库',NVL(u.IN_OUT_NUM*b.prvd_price,0),0)) CUR_CUST_RETURN_AMOUNT,
+		    sum(decode(u.IN_OUT_TYPE,'下级退货入库',NVL(u.IN_OUT_NUM,0),0))  CUR_OTHER_RETURN_NUM,
+		    sum(decode(u.IN_OUT_TYPE,'下级退货入库',NVL(u.IN_OUT_NUM*b.prvd_price,0),0)) CUR_OTHER_RETURN_AMOUNT,
+		    sum(decode(u.IN_OUT_TYPE,'返修入库',NVL(u.IN_OUT_NUM,0),0))  CUR_REPAIR_BACK_NUM,
+		    sum(decode(u.IN_OUT_TYPE,'返修入库',NVL(u.IN_OUT_NUM*b.prvd_price,0),0)) CUR_REPAIR_BACK_AMOUNT,
+		    sum(decode(u.IN_OUT_TYPE,'转储入库',NVL(u.IN_OUT_NUM,0),0))  CUR_DUMP_IN_NUM,
+		        
+		    sum(decode(u.IN_OUT_TYPE,'终端销售出库',NVL(u.IN_OUT_NUM,0),0))  CUR_TERM_SALE_NUM,
+		    sum(decode(u.IN_OUT_TYPE,'终端销售出库',NVL(u.NO_TAX_DECT_AMOUNT,0),0)) CUR_TERM_REAL_SALE_AMOUNT,
+		     sum(decode(u.IN_OUT_TYPE,'退货出库',NVL(u.IN_OUT_NUM,0),0))  CUR_RETUN_NUM,
+		    sum(decode(u.IN_OUT_TYPE,'退货出库',NVL(u.NO_TAX_DECT_AMOUNT,0),0)) CUR_REAL_RETUN_AMOUNT,
+		    sum(decode(u.IN_OUT_TYPE,'下级销售出库',NVL(u.IN_OUT_NUM,0),0))  CUR_OTHER_SALE_NUM,
+		    sum(decode(u.IN_OUT_TYPE,'下级销售出库',NVL(u.NO_TAX_DECT_AMOUNT,0),0)) CUR_OTHER_REAL_SALE_AMOUNT,
+		   
+		    sum(decode(u.IN_OUT_TYPE,'转储出库',NVL(u.IN_OUT_NUM,0),0))  CUR_DUMP_OUT_NUM,
+		    sum(decode(u.IN_OUT_TYPE,'返修出库',NVL(u.IN_OUT_NUM,0),'下级退货入库',NVL(u.IN_OUT_NUM,0),0))  CUR_REPAIR_NUM,
+		    sum(decode(u.IN_OUT_TYPE,'返修出库',NVL(u.NO_TAX_DECT_AMOUNT,0),'下级退货入库',NVL(u.IN_OUT_AMOUNT,0),0)) CUR_REAL_REPAIR_AMOUNT,
+		    sum(decode(u.IN_OUT_TYPE,'盘盈',NVL(u.IN_OUT_NUM,0),0))  CUR_INV_ADD_NUM,
+		    sum(decode(u.IN_OUT_TYPE,'盘亏',NVL(u.IN_OUT_NUM,0),0))  CUR_INV_REDUCE_NUM,
+		    
+		    sum(decode(u.IN_OUT_TYPE,'成本调整',NVL(u.IN_OUT_AMOUNT,0),0))  COST_ADJUST_AMOUNT,
+		    sum(decode(u.IN_OUT_TYPE,'零星出库',NVL(u.IN_OUT_NUM,0),0))  CUR_FEW_STOREOUT_NUM
+		    
+		  from DRP_JOURNAL_ACCT u left join   BASE_PRODUCT b   on u.PRD_ID = b.PRD_ID
+		  where 
+		        u.YEAR_MONTH=#YEAR_MONTH#
+		    and u.LEDGER_ID=#LEDGER_ID#
+		    and u.IN_OUT_TYPE in('手工新增入库','订货入库','终端退货入库','下级退货入库','转储入库','返修入库','盘盈','盘亏',
+		     '终端销售出库','下级销售出库','退货出库','返修出库','转储出库','成本调整','零星出库')
+		 group by 
+		    u.PRD_ID,NVL(u.SPCL_TECH_ID,'NONE') ,u.STORE_ID,u.LEDGER_ID
+		    
+		)c  on a.STORE_ID=c.STORE_ID and a.PRD_ID=c.PRD_ID and NVL(a.SPCL_TECH_ID,'NONE')=NVL(c.SPCL_TECH_ID,'NONE')
+		
+		where 
+		    a.LEDGER_ID=#LEDGER_ID#
+		    
+		]]>
+  </insert> 
+  
+  <insert id="insInvoc_no_rate" parameterClass="map">
+  <![CDATA[
+	  insert into 
+		DRP_INVOC_ACCT
+		(INVOC_ACCT_ID,PRD_ID,STORE_ID,SPCL_TECH_ID,YEAR,MONTH,PER_LEFT_NUM,PER_LEFT_PRICE,PER_LEFT_AMOUNT,CUR_PUR_NUM,CUR_PUR_AMOUNT,
+		CUR_CUST_RETURN_NUM,CUR_CUST_RETURN_AMOUNT,CUR_OTHER_RETURN_NUM,CUR_OTHER_RETURN_AMOUNT,CUR_REPAIR_BACK_NUM,CUR_REPAIR_BACK_AMOUNT,
+		CUR_DUMP_IN_NUM,CUR_TERM_SALE_NUM,CUR_TERM_REAL_SALE_AMOUNT,CUR_RETUN_NUM,CUR_REAL_RETUN_AMOUNT,CUR_OTHER_SALE_NUM,
+		CUR_OTHER_REAL_SALE_AMOUNT,CUR_REPAIR_NUM,CUR_REAL_REPAIR_AMOUNT,CUR_DUMP_OUT_NUM,CUR_INV_ADD_NUM,CUR_INV_REDUCE_NUM,CUR_END_NUM,LEDGER_ID,
+		CUR_COST_ADJUST_AMOUNT,CUR_FEW_STOREOUT_NUM
+		)
+		select 
+		 SYS_GUID(),
+		 a.PRD_ID,
+		 a.STORE_ID,
+		 NVL(a.SPCL_TECH_ID,'NONE'),
+		 #YEAR#  YEAR,
+		 #MONTH# MONTH,
+		 NVL(b.CUR_END_NUM,0) PER_LEFT_NUM,
+		 NVL(b.CUR_END_PRICE,0)  PER_LEFT_PRICE,
+		 NVL(b.CUR_END_AMOUNT,0) PER_LEFT_AMOUNT,
+		 NVL(c.CUR_PUR_NUM,0) CUR_PUR_NUM,
+		 NVL(c.CUR_PUR_AMOUNT,0)CUR_PUR_AMOUNT,
+		 NVL(c.CUR_CUST_RETURN_NUM,0)CUR_CUST_RETURN_NUM,
+		 NVL(c.CUR_CUST_RETURN_AMOUNT,0)CUR_CUST_RETURN_AMOUNT,
+		 NVL(c.CUR_OTHER_RETURN_NUM,0)CUR_OTHER_RETURN_NUM,
+		 NVL(c.CUR_OTHER_RETURN_AMOUNT,0)CUR_OTHER_RETURN_AMOUNT,
+		 NVL(c.CUR_REPAIR_BACK_NUM,0)CUR_REPAIR_BACK_NUM,
+		 NVL(c.CUR_REPAIR_BACK_AMOUNT,0)CUR_REPAIR_BACK_AMOUNT,
+		 NVL(c.CUR_DUMP_IN_NUM,0)CUR_DUMP_IN_NUM,
+		 NVL(c.CUR_TERM_SALE_NUM,0)CUR_TERM_SALE_NUM,
+		 NVL(c.CUR_TERM_REAL_SALE_AMOUNT,0)CUR_TERM_REAL_SALE_AMOUNT,
+		 NVL(c.CUR_RETUN_NUM,0)CUR_RETUN_NUM,
+		 NVL(c.CUR_REAL_RETUN_AMOUNT,0)CUR_REAL_RETUN_AMOUNT,
+		 NVL(c.CUR_OTHER_SALE_NUM,0)CUR_OTHER_SALE_NUM,
+		 NVL(c.CUR_OTHER_REAL_SALE_AMOUNT,0)CUR_OTHER_REAL_SALE_AMOUNT,
+		 NVL(c.CUR_REPAIR_NUM,0)CUR_REPAIR_NUM,
+		 NVL(c.CUR_REAL_REPAIR_AMOUNT,0)CUR_REAL_REPAIR_AMOUNT,
+		 NVL(c.CUR_DUMP_OUT_NUM,0)CUR_DUMP_OUT_NUM,
+		 NVL(c.CUR_INV_ADD_NUM,0)CUR_INV_ADD_NUM,
+		 NVL(c.CUR_INV_REDUCE_NUM,0)CUR_INV_REDUCE_NUM,
+		 NVL(b.CUR_END_NUM,0)+ NVL(c.CUR_PUR_NUM,0)+ NVL(c.CUR_CUST_RETURN_NUM,0)+ NVL(c.CUR_OTHER_RETURN_NUM,0)+ NVL(c.CUR_REPAIR_BACK_NUM,0)
+		 +NVL(c.CUR_DUMP_IN_NUM,0)- NVL(c.CUR_TERM_SALE_NUM,0)-NVL(c.CUR_RETUN_NUM,0)-NVL(c.CUR_OTHER_SALE_NUM,0)- NVL(c.CUR_REPAIR_NUM,0)-
+		 NVL(c.CUR_DUMP_OUT_NUM,0)+ NVL(c.CUR_INV_ADD_NUM,0)-NVL(c.CUR_INV_REDUCE_NUM,0)-NVL(c.CUR_FEW_STOREOUT_NUM,0) CUR_END_NUM,
+		 #LEDGER_ID#,NVL(c.COST_ADJUST_AMOUNT, 0) CUR_COST_ADJUST_AMOUNT,
+		 NVL(c.CUR_FEW_STOREOUT_NUM,0) CUR_FEW_STOREOUT_NUM
+		from 
+		    DRP_STORE_ACCT a
+		  left join 
+		    DRP_INVOC_ACCT b  
+		        on a.STORE_ID=b.STORE_ID and a.PRD_ID=b.PRD_ID and NVL(a.SPCL_TECH_ID,'NONE')=NVL(b.SPCL_TECH_ID,'NONE') and a.LEDGER_ID = b.LEDGER_ID
+		        and b.YEAR=#PRE_YEAR# and b.MONTH=#PRE_MONTH# 
+		  left join 
+		(
+		 select 
+		    u.STORE_ID, 
+		    u.PRD_ID,
+		    NVL(u.SPCL_TECH_ID,'NONE')SPCL_TECH_ID,
+		    u.LEDGER_ID,
+		    sum(decode(u.IN_OUT_TYPE,'手工新增入库',NVL(u.IN_OUT_NUM,0),'订货入库',NVL(u.IN_OUT_NUM,0),0)) CUR_PUR_NUM,
+		    sum(decode(u.IN_OUT_TYPE,'手工新增入库',NVL(u.NO_TAX_DECT_AMOUNT,0),'订货入库',NVL(u.NO_TAX_DECT_AMOUNT,0),0)) CUR_PUR_AMOUNT,
+		    sum(decode(u.IN_OUT_TYPE,'终端退货入库',NVL(u.IN_OUT_NUM,0),0))  CUR_CUST_RETURN_NUM,
+		    sum(decode(u.IN_OUT_TYPE,'终端退货入库',NVL( round(u.IN_OUT_NUM*b.prvd_price,2),0),0)) CUR_CUST_RETURN_AMOUNT,
+		    sum(decode(u.IN_OUT_TYPE,'下级退货入库',NVL(u.IN_OUT_NUM,0),0))  CUR_OTHER_RETURN_NUM,
+		    sum(decode(u.IN_OUT_TYPE,'下级退货入库',NVL(round(u.IN_OUT_NUM*b.prvd_price,2) ,0),0)) CUR_OTHER_RETURN_AMOUNT,
+		    sum(decode(u.IN_OUT_TYPE,'返修入库',NVL(u.IN_OUT_NUM,0),0))  CUR_REPAIR_BACK_NUM,
+		    sum(decode(u.IN_OUT_TYPE,'返修入库',NVL(u.NO_TAX_DECT_AMOUNT,0),0)) CUR_REPAIR_BACK_AMOUNT,
+		    sum(decode(u.IN_OUT_TYPE,'转储入库',NVL(u.IN_OUT_NUM,0),0))  CUR_DUMP_IN_NUM,
+		        
+		    sum(decode(u.IN_OUT_TYPE,'终端销售出库',NVL(u.IN_OUT_NUM,0),0))  CUR_TERM_SALE_NUM,
+		    sum(decode(u.IN_OUT_TYPE,'终端销售出库',NVL(u.NO_TAX_DECT_AMOUNT,0),0)) CUR_TERM_REAL_SALE_AMOUNT,
+		    sum(decode(u.IN_OUT_TYPE,'退货出库',NVL(u.IN_OUT_NUM,0),0))  CUR_RETUN_NUM,
+		    sum(decode(u.IN_OUT_TYPE,'退货出库',NVL(u.NO_TAX_DECT_AMOUNT,0),0)) CUR_REAL_RETUN_AMOUNT,
+		    sum(decode(u.IN_OUT_TYPE,'下级销售出库',NVL(u.IN_OUT_NUM,0),0))  CUR_OTHER_SALE_NUM,
+		    sum(decode(u.IN_OUT_TYPE,'下级销售出库',NVL(u.NO_TAX_DECT_AMOUNT,0),0)) CUR_OTHER_REAL_SALE_AMOUNT,
+		   
+		    sum(decode(u.IN_OUT_TYPE,'转储出库',NVL(u.IN_OUT_NUM,0),0))  CUR_DUMP_OUT_NUM,
+		    sum(decode(u.IN_OUT_TYPE,'返修出库',NVL(u.IN_OUT_NUM,0),'下级退货入库',NVL(u.IN_OUT_NUM,0),0))  CUR_REPAIR_NUM,
+		    sum(decode(u.IN_OUT_TYPE,'返修出库',NVL(u.NO_TAX_DECT_AMOUNT,0),'下级退货入库',NVL(u.NO_TAX_DECT_AMOUNT,0),0)) CUR_REAL_REPAIR_AMOUNT,
+		    sum(decode(u.IN_OUT_TYPE,'盘盈',NVL(u.IN_OUT_NUM,0),0))  CUR_INV_ADD_NUM,
+		    sum(decode(u.IN_OUT_TYPE,'盘亏',NVL(u.IN_OUT_NUM,0),0))  CUR_INV_REDUCE_NUM,
+		    sum(decode(u.IN_OUT_TYPE,'成本调整',NVL(u.IN_OUT_AMOUNT,0),0)) COST_ADJUST_AMOUNT,
+		    sum(decode(u.IN_OUT_TYPE,'零星出库',NVL(u.IN_OUT_NUM,0),0))  CUR_FEW_STOREOUT_NUM
+		    
+		  from DRP_JOURNAL_ACCT u left join   BASE_PRODUCT b   on u.PRD_ID = b.PRD_ID
+		  where 
+		        u.YEAR_MONTH=#YEAR_MONTH#
+		    and u.LEDGER_ID=#LEDGER_ID#
+		    and u.IN_OUT_TYPE in('手工新增入库','订货入库','终端退货入库','下级退货入库','转储入库','返修入库','盘盈','盘亏',
+		     '终端销售出库','下级销售出库','退货出库','返修出库','转储出库','零星出库')
+		 group by 
+		    u.PRD_ID,NVL(u.SPCL_TECH_ID,'NONE') ,u.STORE_ID,u.LEDGER_ID
+		    
+		)c  on a.STORE_ID=c.STORE_ID and a.PRD_ID=c.PRD_ID and NVL(a.SPCL_TECH_ID,'NONE')=NVL(c.SPCL_TECH_ID,'NONE')
+		
+		where 
+		    a.LEDGER_ID=#LEDGER_ID#
+		]]>
+  </insert> 
+  <!--update id="updCostAjust" parameterClass="map">
+	<![CDATA[ 
+			
+	    update DRP_INVOC_ACCT  c set CUR_COST_ADJUST_PRICE=NVL((
+		 select 
+		     (case when adjust.COST_ADJUST_AMOUNT=0 or invoc.CUR_END_NUM=0 then 0 else round(adjust.COST_ADJUST_AMOUNT/invoc.CUR_END_NUM,6) end )
+		from 
+		
+		(select  
+		     sum( NVL(u.IN_OUT_AMOUNT, 0)) COST_ADJUST_AMOUNT, u.PRD_ID, NVL(u.SPCL_TECH_ID, 'NONE') SPCL_TECH_ID
+		 from DRP_JOURNAL_ACCT u 
+		       where u.YEAR_MONTH = #YEAR_MONTH# 
+		       and u.LEDGER_ID = #LEDGER_ID#
+		       and u.IN_OUT_TYPE ='成本调整' 
+		       group by u.PRD_ID, NVL(u.SPCL_TECH_ID, 'NONE') ) adjust ,
+		(select  
+		 sum(b.CUR_END_NUM)CUR_END_NUM, b.PRD_ID, NVL(b.SPCL_TECH_ID, 'NONE') SPCL_TECH_ID 
+		  from 
+		     DRP_INVOC_ACCT b
+		where   b.YEAR = #YEAR#
+		       and b.MONTH=#MONTH#
+		       and b.LEDGER_ID = #LEDGER_ID#  
+		 group by    b.PRD_ID, NVL(b.SPCL_TECH_ID, 'NONE')) invoc 
+		 
+		 where  adjust.PRD_ID=invoc.PRD_ID
+		   and adjust.SPCL_TECH_ID=invoc.SPCL_TECH_ID 
+		   and c.PRD_ID=invoc.PRD_ID
+		   and NVL(c.SPCL_TECH_ID, 'NONE')=NVL(invoc.SPCL_TECH_ID, 'NONE')
+		   ),0)
+		where
+		        c.YEAR = #YEAR#
+		    and c.MONTH=#MONTH#
+		    and c.LEDGER_ID = #LEDGER_ID#  
+	    ]]>
+  </update-->
+  <insert id="insCostPrice_no_rate" parameterClass="map">
+  <![CDATA[
+     insert into DRP_COST_PRICE(COST_PRICE_ID,PRD_ID,SPCL_TECH_ID,MONTH,YEAR,COST_PRICE,LEDGER_ID)
+     select   SYS_GUID(),
+         u.PRD_ID,
+         NVL(u.SPCL_TECH_ID,'NONE'),
+         u.MONTH,
+         u.YEAR,  
+         (case
+           when   TOL_NUM> 0 then
+            round(TOL_AMOUNT /TOL_NUM,6)
+           else
+            decode(NVL(w.COST_PRICE, 0),
+                   0,
+                   NVL(b.PRVD_PRICE, 0)/1.17,
+                   NVL(w.COST_PRICE, 0))
+         end) COST_PRICE,
+         u.LEDGER_ID
+         
+from( 
+   select PRD_ID,
+          NVL(SPCL_TECH_ID,'NONE')SPCL_TECH_ID,
+          MONTH,
+          YEAR,
+         sum(NVL(PER_LEFT_NUM, 0) + NVL(CUR_PUR_NUM, 0) +
+                NVL(CUR_CUST_RETURN_NUM, 0) +
+                NVL(CUR_OTHER_RETURN_NUM, 0) +
+                NVL(CUR_REPAIR_BACK_NUM, 0)) TOL_NUM,
+         sum(NVL(PER_LEFT_AMOUNT, 0) + NVL(CUR_PUR_AMOUNT, 0) +
+                  NVL(CUR_CUST_RETURN_AMOUNT, 0) +
+                  NVL(CUR_OTHER_RETURN_AMOUNT, 0) +
+                  NVL(CUR_REPAIR_BACK_AMOUNT, 0) +
+                  NVL(CUR_COST_ADJUST_AMOUNT, 0)
+                   )TOL_AMOUNT ,
+          LEDGER_ID
+    from DRP_INVOC_ACCT u
+  where  YEAR=#YEAR#
+	  and	  MONTH=#MONTH#
+      and LEDGER_ID=#LEDGER_ID#
+    group by   PRD_ID, NVL(SPCL_TECH_ID,'NONE'), MONTH, YEAR,LEDGER_ID
+   ) u  left join BASE_PRODUCT b  on u.PRD_ID = b.PRD_ID  
+   left join DRP_COST_PRICE w on 
+       u.PRD_ID=w.PRD_ID and NVL(u.SPCL_TECH_ID,'NONE')=NVL(w.SPCL_TECH_ID,'NONE') and u.LEDGER_ID = w.LEDGER_ID
+       and w.YEAR=#PRE_YEAR# and w.MONTH=#PRE_MONTH# 
+
+ ]]>
+  </insert> 
+  <insert id="insCostPrice" parameterClass="map">
+  <![CDATA[
+     insert into DRP_COST_PRICE(COST_PRICE_ID,PRD_ID,SPCL_TECH_ID,MONTH,YEAR,COST_PRICE,LEDGER_ID)
+     select   SYS_GUID(),
+         u.PRD_ID,
+         NVL(u.SPCL_TECH_ID,'NONE'),
+         u.MONTH,
+         u.YEAR,  
+         (case
+           when   TOL_NUM> 0 then
+            round(TOL_AMOUNT /TOL_NUM,6)
+           else
+            decode(NVL(w.COST_PRICE, 0),
+                   0,
+                   NVL(b.PRVD_PRICE, 0),
+                   NVL(w.COST_PRICE, 0))
+         end) COST_PRICE,
+         u.LEDGER_ID
+         
+from( 
+   select PRD_ID,
+          NVL(SPCL_TECH_ID,'NONE')SPCL_TECH_ID,
+          MONTH,
+          YEAR,
+         sum(NVL(PER_LEFT_NUM, 0) + NVL(CUR_PUR_NUM, 0) +
+                NVL(CUR_CUST_RETURN_NUM, 0) +
+                NVL(CUR_OTHER_RETURN_NUM, 0) +
+                NVL(CUR_REPAIR_BACK_NUM, 0)) TOL_NUM,
+         sum(NVL(PER_LEFT_AMOUNT, 0) + NVL(CUR_PUR_AMOUNT, 0) +
+                  NVL(CUR_CUST_RETURN_AMOUNT, 0) +
+                  NVL(CUR_OTHER_RETURN_AMOUNT, 0) +
+                  NVL(CUR_REPAIR_BACK_AMOUNT, 0) +
+                  NVL(CUR_COST_ADJUST_AMOUNT, 0)
+                   )TOL_AMOUNT ,
+          LEDGER_ID
+    from DRP_INVOC_ACCT u
+  where  YEAR=#YEAR#
+	  and	  MONTH=#MONTH#
+      and LEDGER_ID=#LEDGER_ID#
+    group by   PRD_ID, NVL(SPCL_TECH_ID,'NONE'), MONTH, YEAR,LEDGER_ID
+   ) u  left join BASE_PRODUCT b  on u.PRD_ID = b.PRD_ID  
+   left join DRP_COST_PRICE w on 
+       u.PRD_ID=w.PRD_ID and NVL(u.SPCL_TECH_ID,'NONE')=NVL(w.SPCL_TECH_ID,'NONE') and u.LEDGER_ID = w.LEDGER_ID
+       and w.YEAR=#PRE_YEAR# and w.MONTH=#PRE_MONTH# 
+
+ ]]>
+  </insert> 
+  <update id="updInvoc1" parameterClass="map">
+	<![CDATA[ 
+		 update DRP_INVOC_ACCT u 
+		     set CUR_END_PRICE=NVL((select COST_PRICE from DRP_COST_PRICE b where u.LEDGER_ID=b.LEDGER_ID 
+		       and  u.MONTH=b.MONTH and u.YEAR=b.YEAR  and  u.PRD_ID=b.PRD_ID and NVL(u.SPCL_TECH_ID,'NONE')=NVL(b.SPCL_TECH_ID,'NONE') ),0)
+		 where
+		    u.YEAR=#YEAR#
+		    and u.MONTH=#MONTH#
+		    and u.LEDGER_ID=#LEDGER_ID#
+		]]>
+  </update>
+  <update id="updInvoc2" parameterClass="map">
+	<![CDATA[ 
+	update DRP_INVOC_ACCT u set
+    CUR_PUR_PRICE= decode(NVL(u.CUR_PUR_NUM,0),0,0,round(NVL(u.CUR_PUR_AMOUNT,0)/NVL(u.CUR_PUR_NUM,0),6)),
+    CUR_CUST_RETURN_PRICE= decode(NVL(u.CUR_CUST_RETURN_NUM,0),0,0,round(NVL(u.CUR_CUST_RETURN_AMOUNT,0)/NVL(u.CUR_CUST_RETURN_NUM,0),6)),
+    CUR_REPAIR_BACK_PRICE= decode(NVL(u.CUR_REPAIR_BACK_NUM,0),0,0,round(NVL(u.CUR_REPAIR_BACK_AMOUNT,0)/NVL(u.CUR_REPAIR_BACK_NUM,0),6)),
+    CUR_OTHER_RETURN_PRICE=decode(NVL(u.CUR_OTHER_RETURN_NUM,0),0,0,round(NVL(u.CUR_OTHER_RETURN_AMOUNT,0)/NVL(u.CUR_OTHER_RETURN_NUM,0),6)),
+    CUR_DUMP_IN_PRICE=CUR_END_PRICE,
+    CUR_DUMP_IN_AMOUNT=NVL(u.CUR_END_PRICE,0)*NVL(u.CUR_DUMP_IN_NUM,0),
+    CUR_TERM_SALE_PRICE=CUR_END_PRICE,
+    CUR_TERM_SALE_AMOUNT=NVL(u.CUR_END_PRICE,0)*NVL(u.CUR_TERM_SALE_NUM,0),
+    CUR_OTHER_SALE_PRICE=CUR_END_PRICE,
+    CUR_OTHER_REAL_SALE_AMOUNT=NVL(u.CUR_END_PRICE,0)*NVL(u.CUR_OTHER_SALE_NUM,0),
+    CUR_RETUN_PRICE=CUR_END_PRICE,
+    CUR_REAL_RETUN_AMOUNT=NVL(u.CUR_END_PRICE,0)*NVL(u.CUR_RETUN_NUM,0),
+    CUR_REPAIR_PRICE=CUR_END_PRICE,
+    CUR_REPAIR_AMOUNT=NVL(u.CUR_END_PRICE,0)*NVL(u.CUR_REPAIR_NUM,0),
+    CUR_DUMP_OUT_PRICE=CUR_END_PRICE,
+    CUR_DUMP_OUT_AMOUNT=NVL(u.CUR_END_PRICE,0)*NVL(u.CUR_DUMP_OUT_NUM,0),
+    CUR_INV_ADD_PRICE=CUR_END_PRICE,
+    CUR_INV_ADD_AMOUNT=NVL(u.CUR_END_PRICE,0)*NVL(u.CUR_INV_ADD_NUM,0),
+    CUR_INV_REDUCE_PRICE=CUR_END_PRICE,
+    CUR_INV_REDUCE_AMOUNT=NVL(u.CUR_END_PRICE,0)*NVL(u.CUR_INV_REDUCE_NUM,0),
+    CUR_FEW_STOREOUT_PRICE=CUR_END_PRICE,
+    CUR_FEW_STOREOUT_AMOUNT=NVL(u.CUR_END_PRICE,0)*NVL(u.CUR_FEW_STOREOUT_NUM,0)
+  where
+   u.YEAR=#YEAR#
+    and u.MONTH=#MONTH#
+    and u.LEDGER_ID=#LEDGER_ID# 
+	]]>
+  </update>
+  <update id="updInvoc3" parameterClass="map">
+	<![CDATA[ 
+   update DRP_INVOC_ACCT u set
+    CUR_END_AMOUNT=NVL(u.PER_LEFT_AMOUNT,0)+NVL(u.CUR_PUR_AMOUNT,0) +NVL(u.CUR_CUST_RETURN_AMOUNT,0)+NVL(u.CUR_OTHER_RETURN_AMOUNT,0) 
+    +NVL(u.CUR_REPAIR_BACK_AMOUNT,0) -NVL(u.CUR_TERM_SALE_AMOUNT,0)  -NVL(u.CUR_OTHER_SALE_AMOUNT,0) +NVL(u.CUR_DUMP_IN_AMOUNT,0)-
+    NVL(u.CUR_RETUN_AMOUNT,0)-NVL(u.CUR_REPAIR_AMOUNT,0)-NVL(u.CUR_DUMP_OUT_AMOUNT,0)+NVL(u.CUR_INV_ADD_AMOUNT,0)-NVL(u.CUR_INV_REDUCE_AMOUNT,0)
+    -NVL(u.CUR_QUO_AMOUNT,0)+  NVL(u.CUR_COST_ADJUST_AMOUNT,0),
+    CUR_END_PRICE=(case when NVL(u.CUR_END_NUM,0)=0 then 0 else  round((NVL(u.PER_LEFT_AMOUNT,0)+NVL(u.CUR_PUR_AMOUNT,0) +NVL(u.CUR_CUST_RETURN_AMOUNT,0)+NVL(u.CUR_OTHER_RETURN_AMOUNT,0) 
+    +NVL(u.CUR_REPAIR_BACK_AMOUNT,0) -NVL(u.CUR_TERM_SALE_AMOUNT,0)  -NVL(u.CUR_OTHER_SALE_AMOUNT,0) +NVL(u.CUR_DUMP_IN_AMOUNT,0)-
+    NVL(u.CUR_RETUN_AMOUNT,0)-NVL(u.CUR_REPAIR_AMOUNT,0)-NVL(u.CUR_DUMP_OUT_AMOUNT,0)+NVL(u.CUR_INV_ADD_AMOUNT,0)-NVL(u.CUR_INV_REDUCE_AMOUNT,0)
+    -NVL(u.CUR_QUO_AMOUNT,0)+  NVL(u.CUR_COST_ADJUST_AMOUNT,0))/NVL(u.CUR_END_NUM,0),6) end )
+  where
+   u.YEAR=#YEAR#
+    and u.MONTH=#MONTH#
+    and u.LEDGER_ID=#LEDGER_ID#
+	]]>
+  </update>
+  <update id="updInvoc4" parameterClass="map">
+	<![CDATA[ 
+	update DRP_INVOC_ACCT u set  TO_SALE_COST=CUR_END_AMOUNT*-1,  CUR_END_AMOUNT=0
+  where
+    u.YEAR=#YEAR#
+    and u.MONTH=#MONTH#
+    and u.LEDGER_ID=#LEDGER_ID#
+    and u.PRD_ID||u.SPCL_TECH_ID in (
+	   select 
+	     temp.PRD_ID||temp.SPCL_TECH_ID from  
+	   ( 
+	    select  sum(NVL(b.CUR_END_NUM,0)) CUR_END_NUM,b.PRD_ID,b.SPCL_TECH_ID
+	      from DRP_INVOC_ACCT b where  YEAR=#YEAR# and MONTH=#MONTH# and LEDGER_ID=#LEDGER_ID#
+	     group by  b.PRD_ID,b.SPCL_TECH_ID  ) temp where temp.CUR_END_NUM=0  )
+	]]>
+  </update>
+  <delete id="updInvoc5" parameterClass="map">
+		<![CDATA[ 
+		   delete from  DRP_INVOC_ACCT  where LEDGER_ID=#LEDGER_ID#  and YEAR=#YEAR#  and MONTH=#MONTH# 
+		and abs(PER_LEFT_NUM)+abs(PER_LEFT_AMOUNT)+abs(CUR_PUR_NUM)+abs(CUR_PUR_AMOUNT)+abs(CUR_TERM_SALE_NUM)
+		+abs(CUR_TERM_SALE_AMOUNT)+abs(CUR_OTHER_SALE_NUM)+abs(CUR_OTHER_SALE_AMOUNT)+abs(CUR_DUMP_OUT_NUM)
+		+abs(CUR_DUMP_OUT_AMOUNT)+abs(CUR_DUMP_IN_NUM)+abs(CUR_DUMP_IN_AMOUNT)+abs(CUR_RETUN_NUM)+abs(CUR_RETUN_AMOUNT)
+		+abs(CUR_REPAIR_NUM)+abs(CUR_REPAIR_AMOUNT)+abs(CUR_CUST_RETURN_NUM)+abs(CUR_CUST_RETURN_AMOUNT)+abs(CUR_INV_ADD_NUM)
+		+abs(CUR_INV_ADD_AMOUNT)+abs(CUR_INV_REDUCE_NUM)  +abs(CUR_QUO_NUM)+abs(CUR_QUO_AMOUNT)+abs(CUR_REPAIR_BACK_AMOUNT)
+		+abs(CUR_REPAIR_BACK_NUM)+abs(CUR_OTHER_RETURN_NUM)+abs(CUR_TERM_REAL_SALE_AMOUNT)+abs(CUR_INV_REDUCE_AMOUNT)
+		+abs(CUR_COST_ADJUST_AMOUNT)+abs(CUR_FEW_STOREOUT_NUM)+abs(CUR_FEW_STOREOUT_AMOUNT)+abs(TO_SALE_COST)=0
+		
+		 ]]>
+  </delete>
+</sqlMap>

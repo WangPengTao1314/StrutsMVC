@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="Parameter">
+	
+	<resultMap id="var-map" class="java.util.HashMap">
+		<result column="var_name" property="name" />
+		<result column="var_value" property="value" />
+		<result column="var_id"  property="id" />
+	</resultMap> 
+
+	<sql id="byVarIdCondition">
+		<![CDATA[ var_id = #varId:VARCHAR# ]]>
+	</sql> 
+	
+	<!--参数类表代码SQL -->
+	<select id="findAllRoot" resultMap="var-map">
+		<![CDATA[ select * from ${PUB}.SYS_VAR where length(var_id)<=4 order by var_id ]]>
+	</select> 
+
+	<!-- 添加SQL -->
+	<insert id="insert" parameterClass="map">
+		<![CDATA[ insert into ${PUB}.SYS_VAR (var_id,var_name,var_type,var_value,var_desc,var_sort) 
+			values(#varId#,#varName#,#varType#,#varValue:VARCHAR:NULL#,#varDesc:VARCHAR:NULL#,#varSort:INTEGER:NULL#)]]>
+	</insert> 
+
+	<!-- 修改SQL -->
+	<update id="update" parameterClass="map">
+		<![CDATA[ update ${PUB}.SYS_VAR ]]>
+		<dynamic prepend="SET">
+			<isNotNull property="varName" prepend=","><![CDATA[var_name = #varName#]]></isNotNull>
+			<isNotNull property="varType" prepend=","><![CDATA[var_type = #varType#]]></isNotNull>
+			<isNotNull property="varValue" prepend=","><![CDATA[var_value = #varValue#]]></isNotNull>
+			<isNotNull property="varDesc" prepend=","><![CDATA[var_desc = #varDesc#]]></isNotNull>
+			<isNotNull property="varSort" prepend=","><![CDATA[var_sort = #varSort#]]></isNotNull>
+		</dynamic>
+		<dynamic prepend="WHERE"> 
+			<include refid="byVarIdCondition" />
+		</dynamic>
+	</update> 
+	
+	<!-- 删除SQL -->
+	<delete id="delete" parameterClass="String">
+		<![CDATA[ delete from ${PUB}.SYS_VAR ]]>
+		<dynamic prepend="WHERE">
+			<include refid="byVarIdCondition" />
+		</dynamic>
+	</delete> 
+	
+	<!-- 按参数编号查找 -->
+	<select id="load" parameterClass="String" resultClass="hashmap">
+		<![CDATA[ select * from ${PUB}.SYS_VAR ]]>
+		<dynamic prepend="WHERE">
+			<include refid="byVarIdCondition" />
+		</dynamic>
+	</select>	
+	
+	<!-- 按参数类别查找 -->
+	<select id="findByVarTyp" parameterClass="String" resultMap="var-map">
+		<![CDATA[ select * from ${PUB}.SYS_VAR where var_type = #varType# order by var_sort ]]>
+	</select>	
+	
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="varId">
+			a.var_id = #varId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="varName">
+			a.var_name like '%'||#varName:VARCHAR#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="varType">
+			a.var_Type = #varType:VARCHAR#
+		</isNotEmpty>
+	</sql>
+
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[ 
+			select rownumber() over( order by  a.var_id ) rn ,a.*,b.VAR_NAME root_name 
+			from ${PUB}.sys_var a 
+			left join pub.sys_var b 
+			on a.VAR_TYPE = b.VAR_ID
+		 ]]>
+		<dynamic prepend="WHERE">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</sql> 
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select> 
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[ select count(1) cnt FROM ${PUB}.sys_var a ]]>
+		<dynamic prepend="WHERE">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+	
+</sqlMap>
+

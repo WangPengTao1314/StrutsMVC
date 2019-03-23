@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author chenj
+@function 
+@version 2014-01-25 19:49:05
+-->
+<sqlMap  namespace="ChannvisitMX">
+<typeAlias type="com.hoperun.drp.visit.channvisit.model.ChannVisitDtlModel" alias="ChannVisitDtlModel"/>
+<!-- 使用Promoreim装载结果集 -->
+<resultMap id="ChannVisitDtlModel" class="ChannVisitDtlModel">
+    <result column="CHANN_VISIT_DTL_ID" property="CHANN_VISIT_DTL_ID" />
+</resultMap>
+<!-- 动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  u.DEL_FLAG = 0 
+  and u.STATE = '未提交'
+  <isNotEmpty prepend="" property="CHANN_VISIT_NO">
+      and  u.CHANN_VISIT_NO  like '%'||#CHANN_VISIT_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CHANN_NO">
+      and  u.CHANN_NO  like '%'||#CHANN_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CHANN_NAME">
+      and  u.CHANN_NAME like '%'||#CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="AREA_MANAGE_NAME">
+      and  u.AREA_MANAGE_NAME = #AREA_MANAGE_NAME#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="AREA_NAME">
+      and  u.AREA_NAME  like '%'||#AREA_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CITY">
+      and  u.CITY like '%'||#CITY#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="VISIT_PEOPLE">
+      and  u.VISIT_PEOPLE = #VISIT_PEOPLE#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="STATE">
+      and  u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="SVISIT_DATE">
+       <![CDATA[ and u.VISIT_DATE>=to_date(#SVISIT_DATE#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="EVISIT_DATE">
+       <![CDATA[ and u.VISIT_DATE<=to_date(#EVISIT_DATE#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="QXJBCON">
+	  and   $QXJBCON$  
+  </isNotEmpty>
+</sql>
+
+<sql id="queryDynSqlT">
+  u.DEL_FLAG = 0 
+  <isNotEmpty prepend="" property="CHANN_VISIT_NO">
+      and  u.CHANN_VISIT_NO  like '%'||#CHANN_VISIT_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CHANN_NO">
+      and  u.CHANN_NO  like '%'||#CHANN_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CHANN_NAME">
+      and  u.CHANN_NAME like '%'||#CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="AREA_MANAGE_NAME">
+      and  u.AREA_MANAGE_NAME = #AREA_MANAGE_NAME#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="AREA_NAME">
+      and  u.AREA_NAME  like '%'||#AREA_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CITY">
+      and  u.CITY like '%'||#CITY#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="VISIT_PEOPLE">
+      and  u.VISIT_PEOPLE = #VISIT_PEOPLE#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="STATE">
+      and  u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="SVISIT_DATE">
+       <![CDATA[ and u.VISIT_DATE>=to_date(#SVISIT_DATE#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="EVISIT_DATE">
+       <![CDATA[ and u.VISIT_DATE<=to_date(#EVISIT_DATE#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="QXJBCON">
+	  and   $QXJBCON$  
+  </isNotEmpty>
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		 u.CHANN_VISIT_ID,
+		 u.CHANN_VISIT_NO,
+		 to_char(u.VISIT_DATE,'yyyy-MM-DD') VISIT_DATE,
+         u.CHANN_ID,
+         u.CHANN_NO,
+         u.CHANN_NAME,
+         u.CHANN_PERSON_CON,
+         u.CHANN_TEL,
+         u.AREA_ID,
+         u.AREA_NO,
+         u.AREA_NAME,
+         u.AREA_MANAGE_NAME,
+         u.CITY,
+         u.VISIT_PEOPLE,
+         u.STATE
+         from ERP_CHANN_VISIT u 
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+<sql id="coreSqlT">
+  <![CDATA[ 
+	select 
+		 u.CHANN_VISIT_ID,
+		 u.CHANN_VISIT_NO,
+		 to_char(u.VISIT_DATE,'yyyy-MM-DD') VISIT_DATE,
+         u.CHANN_ID,
+         u.CHANN_NO,
+         u.CHANN_NAME,
+         u.CHANN_PERSON_CON,
+         u.CHANN_TEL,
+         u.AREA_ID,
+         u.AREA_NO,
+         u.AREA_NAME,
+         u.AREA_MANAGE_NAME,
+         u.CITY,
+         u.VISIT_PEOPLE,
+         u.STATE
+         from ERP_CHANN_VISIT u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSqlT" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+
+
+<!-- 分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+<select id="pageQueryT" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSqlT" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt 
+            from ERP_CHANN_VISIT u
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+
+<select id="pageCountT" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt 
+            from ERP_CHANN_VISIT u
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSqlT"/>
+	</dynamic>
+</select>
+ <!-- 查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+
+    <select id="queryChildById" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<![CDATA[ 
+	       SELECT    t.CHANN_VISIT_DTL_ID,
+					 t.CHANN_VISIT_ID,
+					 t.VISIT_DATE,
+			         t.PRO_NAME,
+			         t.MAIN_TYPE,
+			         t.SUB_TYPE,
+			         t.SIT_ANALYSIS,
+			         t.ACTION_PLAN,
+			         to_char(t.COMPLETE_TIME,'yyyy-MM-DD') COMPLETE_TIME,
+			         t.OTHER_INFO
+                     FROM ERP_CHANN_VISIT_DTL t  
+                     where 
+		             t.DEL_FLAG='0' AND t.CHANN_VISIT_ID = #CHANN_VISIT_ID#  
+	]]>
+	</select>
+	
+	
+	
+<select id="queryChildByIdT" parameterClass="map"
+		resultClass="ChannVisitDtlModel">
+		<![CDATA[ 
+	       SELECT    t.CHANN_VISIT_DTL_ID,
+					 t.CHANN_VISIT_ID,
+					 t.VISIT_DATE,
+			         t.PRO_NAME,
+			         t.MAIN_TYPE,
+			         t.SUB_TYPE,
+			         t.SIT_ANALYSIS,
+			         t.ACTION_PLAN,
+			         to_char(t.COMPLETE_TIME,'yyyy-MM-DD') COMPLETE_TIME,
+			         t.OTHER_INFO
+                     FROM ERP_CHANN_VISIT_DTL t  
+                     where 
+		             t.DEL_FLAG='0' AND t.CHANN_VISIT_ID = #CHANN_VISIT_ID#  
+	]]>
+</select>
+ 
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_CHANN_VISIT_DTL(
+		 CHANN_VISIT_DTL_ID,
+		 CHANN_VISIT_ID,
+         VISIT_DATE,
+         PRO_NAME,
+         MAIN_TYPE,
+         SUB_TYPE,
+         SIT_ANALYSIS,
+         ACTION_PLAN,
+         COMPLETE_TIME,
+         OTHER_INFO,
+         DEL_FLAG 
+	   )values(
+		 #CHANN_VISIT_DTL_ID#,
+		 #CHANN_VISIT_ID#,
+         to_date(#VISIT_DATE#,'yyyy-MM-DD'),
+         #PRO_NAME#,
+         #MAIN_TYPE#,
+         #SUB_TYPE#,
+         #SIT_ANALYSIS#,
+         #ACTION_PLAN#,
+         to_date(#COMPLETE_TIME#,'yyyy-MM-DD'),
+         #OTHER_INFO#,
+         #DEL_FLAG# 
+		)
+   ]]>
+</insert>
+
+<update id="update" parameterClass="map">
+	<![CDATA[ update ERP_CHANN_VISIT_DTL ]]>
+	<dynamic prepend="set">
+		<isNotNull property="CHANN_VISIT_ID" prepend=","><![CDATA[CHANN_VISIT_ID = #CHANN_VISIT_ID#]]></isNotNull>
+	    <isNotNull property="VISIT_DATE" prepend=","><![CDATA[VISIT_DATE = to_date(#VISIT_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+	    <isNotNull property="PRO_NAME" prepend=","><![CDATA[PRO_NAME = #PRO_NAME# ]]></isNotNull>
+	    <isNotNull property="MAIN_TYPE" prepend=","><![CDATA[MAIN_TYPE = #MAIN_TYPE# ]]></isNotNull>
+	    <isNotNull property="SUB_TYPE" prepend=","><![CDATA[SUB_TYPE = #SUB_TYPE# ]]></isNotNull>
+	    <isNotNull property="SIT_ANALYSIS" prepend=","><![CDATA[SIT_ANALYSIS = #SIT_ANALYSIS# ]]></isNotNull>
+	    <isNotNull property="COMPLETE_TIME" prepend=","><![CDATA[COMPLETE_TIME = to_date(#COMPLETE_TIME#,'yyyy-MM-DD') ]]></isNotNull>
+	    <isNotNull property="ACTION_PLAN" prepend=","><![CDATA[ACTION_PLAN = #ACTION_PLAN# ]]></isNotNull>
+	    <isNotNull property="OTHER_INFO" prepend=","><![CDATA[OTHER_INFO = #OTHER_INFO# ]]></isNotNull>
+	    <isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where CHANN_VISIT_DTL_ID = #CHANN_VISIT_DTL_ID#]]>
+</update>
+ 
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update ERP_EXPAND_VISIT
+	               set DEL_FLAG = #DEL_FLAG#
+ 	          where 
+	          EXPAND_VISIT_ID = #EXPAND_VISIT_ID# 
+    ]]>
+</delete>
+
+<select id="loadByConfId" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[ 
+	    select 
+		 u.EXPAND_VISIT_ID,
+		 u.EXPAND_VISIT_NO,
+         u.VISIT_DATE,
+         u.COUNTRY,
+         u.PROVINCE,
+         u.CITY,
+         u.INPUT_PERSON_ID,
+         u.INPUT_PERSON_NAME,
+         u.POPULATION,
+         u.GDP,
+         u.FURNITURE_CONSUMPTION,
+         u.BRAND,
+         u.PROPAGANDA,
+         u.SHARE_RATE,
+         u.REMARK,
+         u.STATE,
+         u.CREATOR,
+         u.CRE_NAME,
+         to_char(u.CRE_TIME,'yyyy-MM-DD') CRE_TIME,
+         u.UPDATOR,
+         u.UPD_NAME,
+         u.UPD_TIME,
+         u.DEPT_ID,
+         u.DEPT_NAME,
+         u.ORG_ID,
+         u.ORG_NAME,
+         u.LEDGER_ID,
+         u.LEDGER_NAME,
+         u.DEL_FLAG
+         from  ERP_EXPAND_VISIT u 
+         where 
+		 u.EXPAND_VISIT_ID = #EXPAND_VISIT_ID#
+	]]>
+	</select>
+
+<select id="loadByIds" parameterClass="String" resultClass="ChannVisitDtlModel">
+	<![CDATA[ 
+	  select 
+		u.CHANN_VISIT_DTL_ID,
+		u.CHANN_VISIT_ID,
+		u.VISIT_DATE,
+		u.PRO_NAME,
+		u.MAIN_TYPE,
+		u.SUB_TYPE,
+		u.SIT_ANALYSIS,
+		u.ACTION_PLAN,
+		to_char(u.COMPLETE_TIME,'yyyy-MM-DD') COMPLETE_TIME,
+		u.OTHER_INFO
+        from ERP_CHANN_VISIT_DTL u 
+	    where 
+		u.CHANN_VISIT_DTL_ID in ($CHANN_VISIT_DTL_ID$)
+	]]>
+</select>
+<!--启用/停用-->
+<update id="updStusById" parameterClass="map">	
+     <![CDATA[ 
+	  update ERP_PRMT_COST_REIT 
+	       set STATE = #STATE#
+              ,UPD_NAME=#UPD_NAME#
+              ,UPDATOR=#UPDATOR#
+              ,UPD_TIME=sysdate
+ 	  where 
+	     PRMT_COST_REIT_ID = #PRMT_COST_REIT_ID:VARCHAR# 
+    ]]>
+</update>
+
+<update id="deleteByIds" parameterClass="map">
+	<![CDATA[ 
+         update ERP_CHANN_VISIT_DTL
+             set DEL_FLAG = #DEL_FLAG#
+	         where 
+             CHANN_VISIT_DTL_ID in ($CHANN_VISIT_DTL_ID$)
+   ]]>
+</update>
+
+
+</sqlMap>

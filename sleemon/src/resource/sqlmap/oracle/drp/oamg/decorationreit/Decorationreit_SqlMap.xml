@@ -1,0 +1,1088 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author zcx
+@function   渠道管理-装修管理-装修报销申请单维护
+@version 2014-05-20 11:13:12
+-->
+<sqlMap  namespace="Decorationreit">
+<typeAlias type="com.hoperun.drp.oamg.decorationreit.model.DecorationreitModel" alias="DecorationreitModel"/>
+<!-- 使用Resvstore装载结果集 -->
+<resultMap id="DecorationreitModel" class="DecorationreitModel">
+    <result column="CHANN_RNVTN_ID" property="CHANN_RNVTN_ID" />
+</resultMap>
+<!-- 动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  u.DEL_FLAG = 0
+  <isNotEmpty prepend="" property="channChrg">
+     and u.CHANN_ID in($channChrg$)
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CHANN_RNVTN_NO">
+    and  u.CHANN_RNVTN_NO like '%'||#CHANN_RNVTN_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="RNVTN_REIT_REQ_NO">
+    and  u.RNVTN_REIT_REQ_NO  like '%'||#RNVTN_REIT_REQ_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty  prepend="" property="CHANN_RNVTN_ID">
+    and  u.CHANN_RNVTN_ID = #CHANN_RNVTN_ID#
+  </isNotEmpty>
+  <isNotEmpty  prepend="" property="STATE">
+    and  u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend=""  property="TERM_NO">
+    and  u.TERM_NO like '%'||#TERM_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="TERM_NAME">
+    and  u.TERM_NAME like '%'||#TERM_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="AREA_NAME">
+    and  u.AREA_NAME like '%'||#AREA_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend=""  property="AREA_MANAGE_NAME">
+    and  u.AREA_MANAGE_NAME like '%'||#AREA_MANAGE_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend=""  property="RNVTN_PROP">
+    and  u.RNVTN_PROP = #RNVTN_PROP#
+  </isNotEmpty>
+  <isNotEmpty prepend=""  property="CHANN_NAME">
+    and   u.CHANN_NAME  like '%'||#CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend=""  property="CHANN_NO">
+    and   u.CHANN_NO = #CHANN_NO#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="searchSTATE">
+    and  u.STATE in ($searchSTATE$)
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="STATES">
+    and  u.STATE in ($STATES$)
+  </isNotEmpty>
+ <isNotEmpty prepend=""  property="QXJBCON">
+	and  $QXJBCON$
+ </isNotEmpty>
+
+</sql>
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	 select 
+       u.RNVTN_REIT_REQ_ID,
+       u.RNVTN_REIT_REQ_NO,
+       u.CHANN_RNVTN_ID,
+       u.CHANN_RNVTN_NO,
+       p.DATA_DTL_NAME RNVTN_PROP,
+       u.CHANN_ID,
+       u.CHANN_NO,
+       u.CHANN_NAME,
+       u.TERM_ID,
+       u.TERM_NO,
+       u.TERM_NAME,
+       u.AREA_ID,
+       u.AREA_NO,
+       u.AREA_NAME,
+       u.AREA_MANAGE_ID,
+       u.AREA_MANAGE_NAME,
+       u.AREA_MANAGE_TEL,
+       u.REIT_AMOUNT_PS,
+       u.REIT_AMOUNT,
+       u.DRAW_AREA,
+       u.DRAW_REIT_AMOUNT_PS,
+       to_char(u.DRAW_FISH_DATE,'yyyy-MM-DD') DRAW_FISH_DATE,
+       to_char(u.RNVTN_FISH_DATE,'yyyy-MM-DD') RNVTN_FISH_DATE,
+       u.PUNISH_REMARK,
+       u.DEPOSIT,
+       u.RNVTN_DAYS,
+       u.DEPOSIT_RETURN_AMOUNT,
+       u.REAL_REIT_AMOUNT,
+       u.REIT_POLICY,
+       u.TOTAL_REITED_NUM,
+       u.REITED_NUM,
+       u.REITED_RATE,
+       u.CAN_RETURN_AMOUNT,
+       u.TOTAL_RETURN_AMOUNT,
+       u.LEFT_CAN_RETURN_AMOUNT,
+       u.SALE_COMPACT_AMOUNT,
+       u.REQ_ID,
+       u.REQ_NAME,
+       to_char(u.REQ_DATE,'yyyy-MM-DD')REQ_DATE,
+       u.STATE,
+       u.REMARK,
+       (case when length(u.REMARK)>20 then substr(u.REMARK, 0, 20)||'...' else u.REMARK end )SHORT_REMARK,
+	   u.CRE_NAME,
+	   u.CREATOR,
+	   to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+	   u.DEPT_ID,
+	   u.DEPT_NAME,
+	   u.ORG_ID,
+	   u.ORG_NAME,
+	   u.LEDGER_ID,
+	   u.LEDGER_NAME,
+	   u.DEL_FLAG,
+	   b.ATT_ID,
+       b.ATT_PATH,
+       c.CHANN_PERSON_CON,
+       c.CHANN_TEL,
+       u.TOTAL_REIT_AMOUNT,
+       u.AMOUNT_DESC
+       from DRP_RNVTN_REIT_REQ u
+       left join BASE_ATT b on u.RNVTN_REIT_REQ_ID = b.FROM_BILL_ID
+       left join DRP_CHANN_RNVTN  c  on c.chann_rnvtn_id = u.chann_rnvtn_id
+       left join PROJECT_DATA_DICTIONARY_DTL p on p.DATA_DTL_CODE = u.RNVTN_PROP
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+
+<sql id="coreSqlT">
+  <![CDATA[ 
+	select 
+	   u.RNVTN_REIT_REQ_ID,
+       u.RNVTN_REIT_REQ_NO,
+       u.CHANN_RNVTN_ID,
+       u.CHANN_RNVTN_NO,
+       p.DATA_DTL_NAME RNVTN_PROP,
+       u.CHANN_ID,
+       u.CHANN_NO,
+       u.CHANN_NAME,
+       u.TERM_ID,
+       u.TERM_NO,
+       u.TERM_NAME,
+       u.AREA_ID,
+       u.AREA_NO,
+       u.AREA_NAME,
+       u.AREA_MANAGE_ID,
+       u.AREA_MANAGE_NAME,
+       u.AREA_MANAGE_TEL,
+       u.REIT_AMOUNT_PS,
+       u.REIT_AMOUNT,
+       u.DRAW_AREA,
+       u.DRAW_REIT_AMOUNT_PS,
+       to_char(u.DRAW_FISH_DATE,'yyyy-MM-DD') DRAW_FISH_DATE,
+       to_char(u.RNVTN_FISH_DATE,'yyyy-MM-DD') RNVTN_FISH_DATE,
+       u.PUNISH_REMARK,
+       u.DEPOSIT,
+       u.RNVTN_DAYS,
+       u.DEPOSIT_RETURN_AMOUNT,
+       u.REAL_REIT_AMOUNT,
+       u.REIT_POLICY,
+       u.TOTAL_REITED_NUM,
+       u.REITED_NUM,
+       u.REITED_RATE,
+       u.CAN_RETURN_AMOUNT,
+       u.TOTAL_RETURN_AMOUNT,
+       u.LEFT_CAN_RETURN_AMOUNT,
+       u.SALE_COMPACT_AMOUNT,
+       u.REQ_ID,
+       u.REQ_NAME,
+       to_char(u.REQ_DATE,'yyyy-MM-DD')REQ_DATE,
+       u.STATE,
+       u.REMARK,
+       (case when length(u.REMARK)>20 then substr(u.REMARK, 0, 20)||'...' else u.REMARK end )SHORT_REMARK,
+	   u.CRE_NAME,
+	   u.CREATOR,
+	   to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+	   u.DEPT_ID,
+	   u.DEPT_NAME,
+	   u.ORG_ID,
+	   u.ORG_NAME,
+	   u.LEDGER_ID,
+	   u.LEDGER_NAME,
+	   u.DEL_FLAG,
+	   b.ATT_ID,
+       b.ATT_PATH,
+       u.TOTAL_REIT_AMOUNT,
+       u.AMOUNT_DESC
+       from DRP_RNVTN_REIT_REQ u
+       left join BASE_ATT b on u.RNVTN_REIT_REQ_ID = b.FROM_BILL_ID
+       left join PROJECT_DATA_DICTIONARY_DTL p on p.DATA_DTL_CODE = u.RNVTN_PROP
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+<select id="queryReitCount" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[ 
+        select count(*) DRP_RNVTN_REIT_DTL u 
+        where    u.del_flag = 0 and u.CHANN_RNVTN_ID=#CHANN_RNVTN_ID#
+	]]>
+</select>
+
+<select id="queryRowcount" parameterClass="String" resultClass="int">
+   select 
+	   count(*)
+       from DRP_CHANN_RNVTN c  
+       LEFT JOIN BASE_AREA  a
+       on a.AREA_ID = c.AREA_NO
+       where c.DEL_FLAG=0 and c.STATE = '审核通过'
+</select>
+
+<!-- 分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSqlT" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt 
+            from DRP_RNVTN_REIT_REQ u 
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+ <!-- 查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into DRP_RNVTN_REIT_REQ(
+	   RNVTN_REIT_REQ_ID,
+       RNVTN_REIT_REQ_NO,
+       CHANN_RNVTN_ID,
+       CHANN_RNVTN_NO,
+       RNVTN_PROP,
+       CHANN_ID,
+       CHANN_NO,
+       CHANN_NAME,
+       TERM_ID,
+       TERM_NO,
+       TERM_NAME,
+       AREA_ID,
+       AREA_NO,
+       AREA_NAME,
+       AREA_MANAGE_ID,
+       AREA_MANAGE_NAME,
+       AREA_MANAGE_TEL,
+       REIT_AMOUNT_PS,
+       REIT_AMOUNT,
+       DRAW_AREA,
+       DRAW_REIT_AMOUNT_PS,
+       DRAW_FISH_DATE,
+       RNVTN_FISH_DATE,
+       PUNISH_REMARK,
+       DEPOSIT,
+       RNVTN_DAYS,
+       DEPOSIT_RETURN_AMOUNT,
+       REAL_REIT_AMOUNT,
+       REIT_POLICY,
+       TOTAL_REITED_NUM,
+       REITED_NUM,
+       REITED_RATE,
+       CAN_RETURN_AMOUNT,
+       TOTAL_RETURN_AMOUNT,
+       LEFT_CAN_RETURN_AMOUNT,
+       SALE_COMPACT_AMOUNT,
+       REQ_ID,
+       REQ_NAME,
+       REQ_DATE,
+       STATE,
+       REMARK,
+	   CRE_NAME,
+	   CREATOR,
+	   CRE_TIME,
+	   DEPT_ID,
+	   DEPT_NAME,
+	   ORG_ID,
+	   ORG_NAME,
+	   LEDGER_ID,
+	   LEDGER_NAME,
+	   DEL_FLAG,
+	   OPEN_SALE_YEAR,
+	   DESIGN_PERSON,
+	   SALE_STORE_ID,
+	   SALE_STORE_NAME,
+	   ADDRESS,
+	   BUSS_SCOPE,
+	   USE_AREA,
+	   LOCAL_TYPE,
+	   IS_NORTH,
+	   BUDGET_ITEM_ID,
+	   BUDGET_ITEM_NO,
+	   BUDGET_ITEM_NAME,
+	   BUDGET_QUOTA_ID,
+	   YEAR_GOODS_AMOUNT,
+	   QUARTER_RATE,
+	   IS_VIOLATE_REMARK,
+	   DESIGN_ID,
+	   FROM_BILL_FLAG,
+	   TOTAL_REIT_AMOUNT,
+	   AMOUNT_DESC
+	   )values(
+	   #RNVTN_REIT_REQ_ID#,
+       #RNVTN_REIT_REQ_NO#,
+       #CHANN_RNVTN_ID#,
+       #CHANN_RNVTN_NO#,
+       #RNVTN_PROP#,
+       #CHANN_ID#,
+       #CHANN_NO#,
+       #CHANN_NAME#,
+       #TERM_ID#,
+       #TERM_NO#,
+       #TERM_NAME#,
+       #AREA_ID#,
+       #AREA_NO#,
+       #AREA_NAME#,
+       #AREA_MANAGE_ID#,
+       #AREA_MANAGE_NAME#,
+       #AREA_MANAGE_TEL#,
+       #REIT_AMOUNT_PS#,
+       #REIT_AMOUNT#,
+       #DRAW_AREA#,
+       #DRAW_REIT_AMOUNT_PS#,
+       to_date(#DRAW_FISH_DATE#,'yyyy-MM-DD'),
+       to_date(#RNVTN_FISH_DATE#,'yyyy-MM-DD'),
+       #PUNISH_REMARK#,
+       #DEPOSIT#,
+       #RNVTN_DAYS#,
+       #DEPOSIT_RETURN_AMOUNT#,
+       #REAL_REIT_AMOUNT#,
+       #REIT_POLICY#,
+       #TOTAL_REITED_NUM#,
+       #REITED_NUM#,
+       #REITED_RATE#,
+       #CAN_RETURN_AMOUNT#,
+       #TOTAL_RETURN_AMOUNT#,
+       #LEFT_CAN_RETURN_AMOUNT#,
+       #SALE_COMPACT_AMOUNT#,
+       #REQ_ID#,
+       #REQ_NAME#,
+       to_date(#REQ_DATE#,'yyyy-MM-DD'),
+       #STATE#,
+       #REMARK#,
+	   #CRE_NAME#,
+	   #CREATOR#,
+	   to_date(#CRE_TIME#,'yyyy-MM-DD HH24:MI:SS'),
+	   #DEPT_ID#,
+	   #DEPT_NAME#,
+	   #ORG_ID#,
+	   #ORG_NAME#,
+	   #LEDGER_ID#,
+	   #LEDGER_NAME#,
+	   #DEL_FLAG#,
+	   #OPEN_SALE_YEAR#,
+	   #DESIGN_PERSON#,
+	   #SALE_STORE_ID#,
+	   #SALE_STORE_NAME#,
+	   #ADDRESS#,
+	   #BUSS_SCOPE#,
+	   #USE_AREA#,
+	   #LOCAL_TYPE#,
+	   #IS_NORTH#,
+	   #BUDGET_ITEM_ID#,
+	   #BUDGET_ITEM_NO#,
+	   #BUDGET_ITEM_NAME#,
+	   #BUDGET_QUOTA_ID#,
+	   #YEAR_GOODS_AMOUNT#,
+	   #QUARTER_RATE#,
+	   #IS_VIOLATE_REMARK#,
+	   #DESIGN_ID#,
+	   #FROM_BILL_FLAG#,
+	   #TOTAL_REIT_AMOUNT#,
+	   #AMOUNT_DESC#
+	  )
+   ]]>
+</insert>
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update DRP_RNVTN_REIT_REQ ]]>
+	<dynamic prepend="set">
+    <isNotNull property="CHANN_RNVTN_ID" prepend=","><![CDATA[CHANN_RNVTN_ID = #CHANN_RNVTN_ID# ]]></isNotNull>
+    <isNotNull property="CHANN_RNVTN_NO" prepend=","><![CDATA[CHANN_RNVTN_NO = #CHANN_RNVTN_NO# ]]></isNotNull>
+    <isNotNull property="RNVTN_PROP" prepend=","><![CDATA[RNVTN_PROP = #RNVTN_PROP# ]]></isNotNull>
+    <isNotNull property="CHANN_ID" prepend=","><![CDATA[CHANN_ID = #CHANN_ID# ]]></isNotNull>
+    <isNotNull property="CHANN_NO" prepend=","><![CDATA[CHANN_NO = #CHANN_NO# ]]></isNotNull>
+    <isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME# ]]></isNotNull>
+    <isNotNull property="TERM_ID" prepend=","><![CDATA[TERM_ID = #TERM_ID# ]]></isNotNull>
+    <isNotNull property="TERM_NAME" prepend=","><![CDATA[TERM_NAME = #TERM_NAME# ]]></isNotNull>
+    <isNotNull property="TERM_NO" prepend=","><![CDATA[TERM_NO = #TERM_NO# ]]></isNotNull>
+    <isNotNull property="AREA_ID" prepend=","><![CDATA[AREA_ID = #AREA_ID# ]]></isNotNull>
+    <isNotNull property="AREA_NO" prepend=","><![CDATA[AREA_NO = #AREA_NO# ]]></isNotNull>
+    <isNotNull property="AREA_NAME" prepend=","><![CDATA[AREA_NAME = #AREA_NAME# ]]></isNotNull>
+    
+    <isNotNull property="AREA_MANAGE_ID" prepend=","><![CDATA[AREA_MANAGE_ID = #AREA_MANAGE_ID# ]]></isNotNull>
+    <isNotNull property="AREA_MANAGE_NAME" prepend=","><![CDATA[AREA_MANAGE_NAME = #AREA_MANAGE_NAME# ]]></isNotNull>
+    <isNotNull property="AREA_MANAGE_TEL" prepend=","><![CDATA[AREA_MANAGE_TEL = #AREA_MANAGE_TEL# ]]></isNotNull>
+    <isNotNull property="REIT_AMOUNT_PS" prepend=","><![CDATA[REIT_AMOUNT_PS = #REIT_AMOUNT_PS# ]]></isNotNull>
+    <isNotNull property="REIT_AMOUNT" prepend=","><![CDATA[REIT_AMOUNT = #REIT_AMOUNT# ]]></isNotNull>
+    <isNotNull property="AMOUNT_DESC" prepend=","><![CDATA[AMOUNT_DESC = #AMOUNT_DESC# ]]></isNotNull>
+    <isNotNull property="DRAW_AREA" prepend=","><![CDATA[DRAW_AREA = #DRAW_AREA# ]]></isNotNull>
+    <isNotNull property="DRAW_REIT_AMOUNT_PS" prepend=","><![CDATA[DRAW_REIT_AMOUNT_PS = #DRAW_REIT_AMOUNT_PS# ]]></isNotNull>
+    <isNotNull property="DRAW_FISH_DATE" prepend=","><![CDATA[DRAW_FISH_DATE = to_date(#DRAW_FISH_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+    <isNotNull property="RNVTN_FISH_DATE" prepend=","><![CDATA[RNVTN_FISH_DATE = to_date(#RNVTN_FISH_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+    
+    <isNotNull property="PUNISH_REMARK" prepend=","><![CDATA[PUNISH_REMARK = #PUNISH_REMARK# ]]></isNotNull>
+    <isNotNull property="DEPOSIT" prepend=","><![CDATA[DEPOSIT = #DEPOSIT# ]]></isNotNull>
+    <isNotNull property="RNVTN_DAYS" prepend=","><![CDATA[RNVTN_DAYS = #RNVTN_DAYS# ]]></isNotNull>
+    <isNotNull property="DEPOSIT_RETURN_AMOUNT" prepend=","><![CDATA[DEPOSIT_RETURN_AMOUNT = #DEPOSIT_RETURN_AMOUNT# ]]></isNotNull>
+    <isNotNull property="REAL_REIT_AMOUNT" prepend=","><![CDATA[REAL_REIT_AMOUNT = #REAL_REIT_AMOUNT# ]]></isNotNull>
+    <isNotNull property="REIT_POLICY" prepend=","><![CDATA[REIT_POLICY = #REIT_POLICY# ]]></isNotNull>
+    
+    <isNotNull property="TOTAL_REITED_NUM" prepend=","><![CDATA[TOTAL_REITED_NUM = #TOTAL_REITED_NUM# ]]></isNotNull>
+    <isNotNull property="REITED_NUM" prepend=","><![CDATA[REITED_NUM = #REITED_NUM# ]]></isNotNull>
+    <isNotNull property="REITED_RATE" prepend=","><![CDATA[REITED_RATE = #REITED_RATE# ]]></isNotNull>
+    
+    <isNotNull property="CAN_RETURN_AMOUNT" prepend=","><![CDATA[CAN_RETURN_AMOUNT = #CAN_RETURN_AMOUNT# ]]></isNotNull>
+    <isNotNull property="TOTAL_RETURN_AMOUNT" prepend=","><![CDATA[TOTAL_RETURN_AMOUNT = #TOTAL_RETURN_AMOUNT# ]]></isNotNull>
+    <isNotNull property="LEFT_CAN_RETURN_AMOUNT" prepend=","><![CDATA[LEFT_CAN_RETURN_AMOUNT = #LEFT_CAN_RETURN_AMOUNT# ]]></isNotNull>
+    
+    <isNotNull property="SALE_COMPACT_AMOUNT" prepend=","><![CDATA[SALE_COMPACT_AMOUNT = #SALE_COMPACT_AMOUNT# ]]></isNotNull>
+    <isNotNull property="REQ_ID" prepend=","><![CDATA[REQ_ID = #REQ_ID# ]]></isNotNull>
+    <isNotNull property="REQ_NAME" prepend=","><![CDATA[REQ_NAME = #REQ_NAME# ]]></isNotNull>
+    
+    <isNotNull property="REQ_DATE" prepend=","><![CDATA[REQ_DATE = to_date(#REQ_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE# ]]></isNotNull>
+    <isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG# ]]></isNotNull>
+    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK# ]]></isNotNull>
+    
+    <isNotNull property="OPEN_SALE_YEAR" prepend=","><![CDATA[OPEN_SALE_YEAR =  #OPEN_SALE_YEAR# ]]></isNotNull>
+    <isNotNull property="DESIGN_PERSON" prepend=","><![CDATA[DESIGN_PERSON = #DESIGN_PERSON# ]]></isNotNull>
+    <isNotNull property="DESIGN_ID" prepend=","><![CDATA[DESIGN_ID = #DESIGN_ID# ]]></isNotNull>
+    
+    <isNotNull property="SALE_STORE_ID" prepend=","><![CDATA[SALE_STORE_ID = #SALE_STORE_ID# ]]></isNotNull>
+    <isNotNull property="SALE_STORE_NAME" prepend=","><![CDATA[SALE_STORE_NAME = #SALE_STORE_NAME# ]]></isNotNull>
+    <isNotNull property="ADDRESS" prepend=","><![CDATA[ADDRESS = #ADDRESS# ]]></isNotNull>
+    <isNotNull property="BUSS_SCOPE" prepend=","><![CDATA[BUSS_SCOPE = #BUSS_SCOPE# ]]></isNotNull>
+    <isNotNull property="USE_AREA" prepend=","><![CDATA[USE_AREA = #USE_AREA# ]]></isNotNull>
+    <isNotNull property="LOCAL_TYPE" prepend=","><![CDATA[LOCAL_TYPE = #LOCAL_TYPE# ]]></isNotNull>
+    <isNotNull property="IS_NORTH" prepend=","><![CDATA[IS_NORTH = #IS_NORTH# ]]></isNotNull>
+    <isNotNull property="BUDGET_ITEM_ID" prepend=","><![CDATA[BUDGET_ITEM_ID = #BUDGET_ITEM_ID# ]]></isNotNull>
+    <isNotNull property="BUDGET_ITEM_NO" prepend=","><![CDATA[BUDGET_ITEM_NO = #BUDGET_ITEM_NO# ]]></isNotNull>
+    <isNotNull property="BUDGET_ITEM_NAME" prepend=","><![CDATA[BUDGET_ITEM_NAME = #BUDGET_ITEM_NAME# ]]></isNotNull>
+    <isNotNull property="BUDGET_QUOTA_ID" prepend=","><![CDATA[BUDGET_QUOTA_ID = #BUDGET_QUOTA_ID# ]]></isNotNull>
+    <isNotNull property="YEAR_GOODS_AMOUNT" prepend=","><![CDATA[YEAR_GOODS_AMOUNT = #YEAR_GOODS_AMOUNT# ]]></isNotNull>
+    <isNotNull property="QUARTER_RATE" prepend=","><![CDATA[QUARTER_RATE= #QUARTER_RATE# ]]></isNotNull>
+    <isNotNull property="IS_VIOLATE_REMARK" prepend=","><![CDATA[IS_VIOLATE_REMARK = #IS_VIOLATE_REMARK# ]]></isNotNull>
+    <isNotNull property="FROM_BILL_FLAG"    prepend=","><![CDATA[FROM_BILL_FLAG = #FROM_BILL_FLAG# ]]></isNotNull>
+    <isNotNull property="TOTAL_REIT_AMOUNT" prepend=","><![CDATA[TOTAL_REIT_AMOUNT = #TOTAL_REIT_AMOUNT# ]]></isNotNull>
+    
+    </dynamic>
+	<![CDATA[ where RNVTN_REIT_REQ_ID = #RNVTN_REIT_REQ_ID#]]>
+</update>
+ 
+
+<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	      select 
+     u.RNVTN_REIT_REQ_ID,
+       u.RNVTN_REIT_REQ_NO,
+       u.CHANN_RNVTN_ID,
+       u.CHANN_RNVTN_NO,
+       u.CHANN_ID,
+       u.CHANN_NO,
+       u.CHANN_NAME,
+       u.TERM_ID,
+       u.TERM_NO,
+       u.TERM_NAME,
+       u.AREA_ID,
+       u.AREA_NO,
+       u.AREA_NAME,
+       u.AREA_MANAGE_ID,
+       u.AREA_MANAGE_NAME,
+       u.AREA_MANAGE_TEL,
+       u.REIT_AMOUNT_PS,
+       u.REIT_AMOUNT,
+       u.DRAW_AREA,
+       u.DRAW_REIT_AMOUNT_PS,
+       to_char(u.DRAW_FISH_DATE,'yyyy-MM-DD') DRAW_FISH_DATE,
+       to_char(u.RNVTN_FISH_DATE,'yyyy-MM-DD') RNVTN_FISH_DATE,
+       u.PUNISH_REMARK,
+       u.DEPOSIT,
+       u.RNVTN_DAYS,
+       u.DEPOSIT_RETURN_AMOUNT,
+       u.REAL_REIT_AMOUNT,
+       u.REIT_POLICY,
+       u.TOTAL_REITED_NUM,
+       u.REITED_NUM,
+       NVL(u.REITED_RATE,0)REITED_RATE,
+       u.CAN_RETURN_AMOUNT,
+       u.TOTAL_RETURN_AMOUNT,
+       u.LEFT_CAN_RETURN_AMOUNT,
+       u.SALE_COMPACT_AMOUNT,
+       u.REQ_ID,
+       u.REQ_NAME,
+       to_char(u.REQ_DATE,'yyyy-MM-DD') REQ_DATE,
+       u.STATE,
+       u.REMARK,
+     u.CRE_NAME,
+     u.CREATOR,
+     to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+     u.DEPT_ID,
+     u.DEPT_NAME,
+     u.ORG_ID,
+     u.ORG_NAME,
+     u.LEDGER_ID,
+     u.LEDGER_NAME,
+       u.DEL_FLAG,
+       b.ATT_ID,
+       b.ATT_PATH,
+       t.CHANN_PERSON_CON,
+       t.CHANN_TEL,
+       u.OPEN_SALE_YEAR,
+       u.DESIGN_PERSON,
+       u.DESIGN_ID,
+       u.SALE_STORE_ID,
+       u.SALE_STORE_NAME,
+       u.ADDRESS,
+       (SELECT p.DATA_DTL_NAME FROM PROJECT_DATA_DICTIONARY_DTL p where p.DATA_DTL_CODE = u.BUSS_SCOPE AND p.DELFLAG=0) BUSS_SCOPE,
+       u.USE_AREA,
+       (SELECT p.DATA_DTL_NAME FROM PROJECT_DATA_DICTIONARY_DTL p where p.DATA_DTL_CODE = u.LOCAL_TYPE AND p.DELFLAG=0) LOCAL_TYPE,
+       (SELECT p.DATA_DTL_NAME FROM PROJECT_DATA_DICTIONARY_DTL p where p.DATA_DTL_CODE = u.RNVTN_PROP AND p.DELFLAG=0) RNVTN_PROP,
+       u.IS_NORTH,
+       u.BUDGET_ITEM_ID,
+       u.BUDGET_ITEM_NO,
+       u.BUDGET_ITEM_NAME,
+       u.BUDGET_QUOTA_ID,
+       u.YEAR_GOODS_AMOUNT,
+       u.QUARTER_RATE,
+       u.IS_VIOLATE_REMARK,
+       u.FROM_BILL_FLAG,
+       u.AMOUNT_DESC ,
+       u.TOTAL_REIT_AMOUNT
+       from DRP_RNVTN_REIT_REQ u 
+       left join BASE_ATT b on u.RNVTN_REIT_REQ_ID = b.FROM_BILL_ID
+       left join drp_chann_rnvtn t on t.chann_rnvtn_id = u.chann_rnvtn_id
+	   where 
+	   u.RNVTN_REIT_REQ_ID = #RNVTN_REIT_REQ_ID# 
+	]]>
+</select>
+
+<select id="loadT" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+	   u.RNVTN_REIT_REQ_ID,
+       u.RNVTN_REIT_REQ_NO,
+       u.CHANN_RNVTN_ID,
+       u.CHANN_RNVTN_NO,
+       p.DATA_DTL_NAME RNVTN_PROP,
+       u.CHANN_ID,
+       u.CHANN_NO,
+       u.CHANN_NAME,
+       u.TERM_ID,
+       u.TERM_NO,
+       u.TERM_NAME,
+       u.AREA_ID,
+       u.AREA_NO,
+       u.AREA_NAME,
+       u.AREA_MANAGE_ID,
+       u.AREA_MANAGE_NAME,
+       u.AREA_MANAGE_TEL,
+       u.REIT_AMOUNT_PS,
+       u.REIT_AMOUNT,
+       u.DRAW_AREA,
+       u.DRAW_REIT_AMOUNT_PS,
+       to_char(u.DRAW_FISH_DATE,'yyyy-MM-DD') DRAW_FISH_DATE,
+       to_char(u.RNVTN_FISH_DATE,'yyyy-MM-DD') RNVTN_FISH_DATE,
+       u.PUNISH_REMARK,
+       u.DEPOSIT,
+       u.RNVTN_DAYS,
+       u.DEPOSIT_RETURN_AMOUNT,
+       u.REAL_REIT_AMOUNT,
+       u.REIT_POLICY,
+       u.TOTAL_REITED_NUM,
+       u.REITED_NUM,
+       NVL(u.REITED_RATE,0)REITED_RATE,
+       u.CAN_RETURN_AMOUNT,
+       u.TOTAL_RETURN_AMOUNT,
+       u.LEFT_CAN_RETURN_AMOUNT,
+       u.SALE_COMPACT_AMOUNT,
+       u.REQ_ID,
+       u.REQ_NAME,
+       to_char(u.REQ_DATE,'yyyy-MM-DD') REQ_DATE,
+       u.STATE,
+       u.REMARK,
+	   u.CRE_NAME,
+	   u.CREATOR,
+	   to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+	   u.DEPT_ID,
+	   u.DEPT_NAME,
+	   u.ORG_ID,
+	   u.ORG_NAME,
+	   u.LEDGER_ID,
+	   u.LEDGER_NAME,
+       u.DEL_FLAG,
+       b.ATT_ID,
+       b.ATT_PATH,
+       t.CHANN_PERSON_CON,
+       t.CHANN_TEL,
+       u.OPEN_SALE_YEAR,
+       u.DESIGN_PERSON,
+       u.DESIGN_ID,
+       u.SALE_STORE_ID,
+       u.SALE_STORE_NAME,
+       u.ADDRESS,
+       u.USE_AREA,
+       u.LOCAL_TYPE,
+       u.IS_NORTH,
+       u.BUDGET_ITEM_ID,
+       u.BUDGET_ITEM_NO,
+       u.BUDGET_ITEM_NAME,
+       u.BUDGET_QUOTA_ID,
+       u.YEAR_GOODS_AMOUNT,
+	   u.QUARTER_RATE,
+	   u.IS_VIOLATE_REMARK,
+	   u.FROM_BILL_FLAG,
+	   u.TOTAL_REIT_AMOUNT,
+	   u.AMOUNT_DESC
+       from DRP_RNVTN_REIT_REQ u 
+       left join BASE_ATT b on u.RNVTN_REIT_REQ_ID = b.FROM_BILL_ID
+       left join drp_chann_rnvtn t on t.chann_rnvtn_id = u.chann_rnvtn_id
+       left join PROJECT_DATA_DICTIONARY_DTL p on p.DATA_DTL_CODE = u.RNVTN_PROP
+	   where 
+		u.RNVTN_REIT_REQ_ID = #RNVTN_REIT_REQ_ID# 
+	]]>
+</select>
+
+
+<select id="loadTt" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+	   u.RNVTN_REIT_REQ_ID,
+       u.RNVTN_REIT_REQ_NO,
+       u.CHANN_RNVTN_ID,
+       u.CHANN_RNVTN_NO,
+       u.CHANN_ID,
+       u.CHANN_NO,
+       u.CHANN_NAME,
+       u.TERM_ID,
+       u.TERM_NO,
+       u.TERM_NAME,
+       u.AREA_ID,
+       u.AREA_NO,
+       u.AREA_NAME,
+       u.AREA_MANAGE_ID,
+       u.AREA_MANAGE_NAME,
+       u.AREA_MANAGE_TEL,
+       u.REIT_AMOUNT_PS,
+       u.REIT_AMOUNT,
+       u.DRAW_AREA,
+       u.DRAW_REIT_AMOUNT_PS,
+       to_char(u.DRAW_FISH_DATE,'yyyy-MM-DD') DRAW_FISH_DATE,
+       to_char(u.RNVTN_FISH_DATE,'yyyy-MM-DD') RNVTN_FISH_DATE,
+       u.PUNISH_REMARK,
+       u.DEPOSIT,
+       u.RNVTN_DAYS,
+       u.DEPOSIT_RETURN_AMOUNT,
+       u.REAL_REIT_AMOUNT,
+       u.REIT_POLICY,
+       u.TOTAL_REITED_NUM,
+       u.REITED_NUM,
+       NVL(u.REITED_RATE,0)REITED_RATE,
+       u.CAN_RETURN_AMOUNT,
+       u.TOTAL_RETURN_AMOUNT,
+       u.LEFT_CAN_RETURN_AMOUNT,
+       u.SALE_COMPACT_AMOUNT,
+       u.REQ_ID,
+       u.REQ_NAME,
+       to_char(u.REQ_DATE,'yyyy-MM-DD') REQ_DATE,
+       u.STATE,
+       u.REMARK,
+	   u.CRE_NAME,
+	   u.CREATOR,
+	   to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+	   u.DEPT_ID,
+	   u.DEPT_NAME,
+	   u.ORG_ID,
+	   u.ORG_NAME,
+	   u.LEDGER_ID,
+	   u.LEDGER_NAME,
+       u.DEL_FLAG,
+       b.ATT_ID,
+       b.ATT_PATH,
+       t.CHANN_PERSON_CON,
+       t.CHANN_TEL,
+       u.OPEN_SALE_YEAR,
+       u.DESIGN_PERSON,
+       u.DESIGN_ID,
+       u.SALE_STORE_ID,
+       u.SALE_STORE_NAME,
+       u.ADDRESS,
+       u.USE_AREA,
+       p.DATA_DTL_NAME LOCAL_TYPE,
+       u.IS_NORTH,
+       u.BUDGET_ITEM_ID,
+       u.BUDGET_ITEM_NO,
+       u.BUDGET_ITEM_NAME,
+       u.BUDGET_QUOTA_ID,
+       (u.YEAR_GOODS_AMOUNT/10000) YEAR_GOODS_AMOUNT,
+	   u.QUARTER_RATE,
+	   u.IS_VIOLATE_REMARK,
+	   u.FROM_BILL_FLAG,
+	   u.TOTAL_REIT_AMOUNT,
+	   u.AMOUNT_DESC
+       from DRP_RNVTN_REIT_REQ u 
+       left join BASE_ATT b on u.RNVTN_REIT_REQ_ID = b.FROM_BILL_ID
+       left join drp_chann_rnvtn t on t.chann_rnvtn_id = u.chann_rnvtn_id
+       left join PROJECT_DATA_DICTIONARY_DTL p on p.DATA_DTL_CODE = u.LOCAL_TYPE
+	   where 
+		u.RNVTN_REIT_REQ_ID = #RNVTN_REIT_REQ_ID# 
+	]]>
+</select>
+
+
+<select id="loadByIdT" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+	   u.RNVTN_REIT_REQ_ID,
+       u.RNVTN_REIT_REQ_NO,
+       u.CHANN_RNVTN_ID,
+       u.CHANN_RNVTN_NO,
+       u.RNVTN_PROP,
+       u.CHANN_ID,
+       u.CHANN_NO,
+       u.CHANN_NAME,
+       u.TERM_ID,
+       u.TERM_NO,
+       u.TERM_NAME,
+       u.AREA_ID,
+       u.AREA_NO,
+       u.AREA_NAME,
+       u.AREA_MANAGE_ID,
+       u.AREA_MANAGE_NAME,
+       u.AREA_MANAGE_TEL,
+       u.REIT_AMOUNT_PS,
+       u.REIT_AMOUNT,
+       u.DRAW_AREA,
+       u.DRAW_REIT_AMOUNT_PS,
+       to_char(u.DRAW_FISH_DATE,'yyyy-MM-DD') DRAW_FISH_DATE,
+       to_char(u.RNVTN_FISH_DATE,'yyyy-MM-DD') RNVTN_FISH_DATE,
+       u.PUNISH_REMARK,
+       u.DEPOSIT,
+       u.RNVTN_DAYS,
+       u.DEPOSIT_RETURN_AMOUNT,
+       u.REAL_REIT_AMOUNT,
+       u.REIT_POLICY,
+       u.TOTAL_REITED_NUM,
+       u.REITED_NUM,
+       NVL(u.REITED_RATE,0)REITED_RATE,
+       u.CAN_RETURN_AMOUNT,
+       u.TOTAL_RETURN_AMOUNT,
+       u.LEFT_CAN_RETURN_AMOUNT,
+       u.SALE_COMPACT_AMOUNT,
+       u.REQ_ID,
+       u.REQ_NAME,
+       to_char(u.REQ_DATE,'yyyy-MM-DD') REQ_DATE,
+       u.STATE,
+       u.REMARK,
+	   u.CRE_NAME,
+	   u.CREATOR,
+	   to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+	   u.DEPT_ID,
+	   u.DEPT_NAME,
+	   u.ORG_ID,
+	   u.ORG_NAME,
+	   u.LEDGER_ID,
+	   u.LEDGER_NAME,
+       u.DEL_FLAG,
+       b.ATT_ID,
+       b.ATT_PATH,
+       t.CHANN_PERSON_CON,
+       t.CHANN_TEL,
+       u.OPEN_SALE_YEAR,
+       u.DESIGN_PERSON,
+       u.DESIGN_ID,
+       u.SALE_STORE_ID,
+       u.SALE_STORE_NAME,
+       u.ADDRESS,
+       u.BUSS_SCOPE,
+       u.USE_AREA,
+       u.LOCAL_TYPE,
+       u.IS_NORTH,
+       u.BUDGET_ITEM_ID,
+       u.BUDGET_ITEM_NO,
+       u.BUDGET_ITEM_NAME,
+       u.BUDGET_QUOTA_ID,
+       u.YEAR_GOODS_AMOUNT,
+	   u.QUARTER_RATE,
+	   u.IS_VIOLATE_REMARK,
+	   u.FROM_BILL_FLAG,
+	   u.AMOUNT_DESC,
+	   u.TOTAL_REIT_AMOUNT
+       from DRP_RNVTN_REIT_REQ u 
+       left join BASE_ATT b on u.RNVTN_REIT_REQ_ID = b.FROM_BILL_ID
+       left join drp_chann_rnvtn t on t.chann_rnvtn_id = u.chann_rnvtn_id
+	   where 
+		u.RNVTN_REIT_REQ_ID = #RNVTN_REIT_REQ_ID# 
+	]]>
+</select>
+
+<select id="loadRnvinReitDtl" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	 select RNVTN_REIT_DTL_ID,CHANN_RNVTN_ID,RNVTN_REIT_NO,RNVTN_SCALE,REIT_DAYS_CON,REIT_REMARK,DEL_FLAG
+	 from DRP_RNVTN_REIT_DTL
+	 where del_flag= 0 and CHANN_RNVTN_ID = #CHANN_RNVTN_ID#
+	 order by RNVTN_REIT_NO ASC
+ 
+	]]>
+</select>
+
+<select id="queryTermState" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	   select * from BASE_TERMINAL t where t.BUSS_STATE  = '正常营业' and  t.TERM_ID = #TERM_ID#
+	]]>
+</select>
+
+<select id="sumCanReturnAmout" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[ 
+       select  NVL(sum(t.CAN_RETURN_AMOUNT),0) TOTAL_RETURN_AMOUNT  from  DRP_RNVTN_REIT_REQ t 
+      where t.CHANN_RNVTN_ID=#CHANN_RNVTN_ID#
+	]]>
+</select>
+
+<insert id="insertFileUpload" parameterClass="map">
+    insert into BASE_ATT(ATT_ID,ATT_PATH,FROM_BILL_ID,CREATOR,CRE_NAME,CRE_TIME,DEL_FLAG)values(
+     #ATT_ID#,#ATT_PATH#,#FROM_BILL_ID#,#CREATOR#,#CRE_NAME#,
+     to_date(#CRE_TIME#,'yyyy-MM-DD HH24:MI:SS'),
+     #DEL_FLAG#
+    )
+</insert>
+
+<update id="updateFileUpload" parameterClass="map">
+	<![CDATA[ update BASE_ATT ]]>
+	<dynamic prepend="set">
+    <isNotNull property="ATT_PATH" prepend=","><![CDATA[ATT_PATH = #ATT_PATH# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where FROM_BILL_ID = #FROM_BILL_ID#]]>
+</update>
+
+<update id="updateTerm" parameterClass="map">
+	<![CDATA[ update BASE_TERMINAL ]]>
+	<dynamic prepend="set">
+    <isNotNull property="LAST_DECOR_TIME" prepend=","><![CDATA[LAST_DECOR_TIME = to_date(#LAST_DECOR_TIME#,'yyyy-MM-DD HH24:MI:SS') ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where TERM_ID = #TERM_ID#]]>
+</update>
+
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update DRP_RNVTN_REIT_REQ 
+	               set DEL_FLAG = #DEL_FLAG#
+                      ,UPD_NAME=#UPD_NAME#
+                     ,UPDATOR=#UPDATOR#
+                      ,UPD_TIME=to_date(#sysdate#,'yyyy-MM-DD HH24:MI:SS')
+ 	  where 
+	     RNVTN_REIT_REQ_ID = #RNVTN_REIT_REQ_ID# 
+    ]]>
+</delete>
+
+<!-- 查询SQL -->
+<select id="selectBrothers" parameterClass="map" resultClass="DecorationreitModel">
+	<include refid="coreSql" />
+</select>
+
+
+<select id="queryJudgeModelT" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[  
+	    select (sum(decode(c.IS_FREE_FLAG, 1, 0, b.DECT_AMOUNT))/10000) DECT_AMOUNT
+		  from ERP_STOREOUT a
+		  left join ERP_STOREOUT_PRD_DTL b
+		  on a.STOREOUT_ID = b.STOREOUT_ID
+		  and b.Del_Flag = 0
+		  left join ERP_SALE_ORDER_DTL c
+		  on b.SALE_ORDER_DTL_ID = c.SALE_ORDER_DTL_ID
+		  where a.DEL_FLAG = 0
+		  and a.ORDER_CHANN_ID = #CHANN_ID#
+		  and to_char(a.Storeout_Time, 'yyyy') = #YEAR#
+   ]]>
+</select>
+
+<select id="selectFnshRate" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[      
+select
+ (case
+   when NVL(d.YEAR_PLAN_AMOUNT, 0) > 0 then
+    round(temp.DECT_AMOUNT / d.YEAR_PLAN_AMOUNT, 2)
+   else
+    (case
+      when temp.DECT_AMOUNT > 0 then
+       1
+      else
+       0
+    end)
+ end) FNSH_RATE
+  from (select sum(decode(c.IS_FREE_FLAG, 1, 0, b.DECT_AMOUNT)) DECT_AMOUNT,
+               ORDER_CHANN_ID,
+               to_char(a.Storeout_Time, 'yyyy') THE_YEAR
+          from ERP_STOREOUT a
+          left join ERP_STOREOUT_PRD_DTL b
+            on a.STOREOUT_ID = b.STOREOUT_ID
+           and b.Del_Flag = 0
+          left join ERP_SALE_ORDER_DTL c
+            on b.SALE_ORDER_DTL_ID = c.SALE_ORDER_DTL_ID
+         where a.DEL_FLAG = 0
+           and a.ORDER_CHANN_ID = #CHANN_ID#
+           and to_char(a.Storeout_Time, 'yyyy') = #YEAR#
+         group by a.ORDER_CHANN_ID, to_char(a.Storeout_Time, 'yyyy')) temp
+  left join ERP_SALE_PLAN d
+    on temp.Order_Chann_Id = d.CHANN_ID
+   and temp.THE_YEAR = d.PLAN_YEAR
+    ]]>
+</select>
+
+
+<select id="selectYearAmount" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[      
+       select e.YEAR_PLAN_AMOUNT YEAR_AMOUNT 
+              from ERP_SALE_PLAN e 
+              where e.PLAN_YEAR=#PLAN_YEAR# and e.CHANN_ID = #CHANN_ID#
+    ]]>
+</select>
+
+<select id="expertExcel" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+	  select 
+       u.RNVTN_REIT_REQ_ID,
+       u.RNVTN_REIT_REQ_NO,
+       u.CHANN_RNVTN_ID,
+       u.CHANN_RNVTN_NO,
+       (SELECT d.DATA_DTL_NAME FROM  PROJECT_DATA_DICTIONARY_DTL d WHERE d.DATA_DTL_CODE = u.RNVTN_PROP and d.DELFLAG=0) RNVTN_PROP,
+       u.CHANN_ID,
+       u.CHANN_NO,
+       u.CHANN_NAME,
+       u.TERM_ID,
+       u.TERM_NO,
+       u.TERM_NAME,
+       u.AREA_ID,
+       u.AREA_NO,
+       u.AREA_NAME,
+       u.AREA_MANAGE_ID,
+       u.AREA_MANAGE_NAME,
+       u.AREA_MANAGE_TEL,
+       u.REIT_AMOUNT_PS,
+       u.REIT_AMOUNT,
+       u.DRAW_AREA,
+       u.DRAW_REIT_AMOUNT_PS,
+       to_char(u.DRAW_FISH_DATE,'yyyy-MM-DD') DRAW_FISH_DATE,
+       to_char(u.RNVTN_FISH_DATE,'yyyy-MM-DD') RNVTN_FISH_DATE,
+       u.PUNISH_REMARK,
+       u.DEPOSIT,
+       u.RNVTN_DAYS,
+       u.DEPOSIT_RETURN_AMOUNT,
+       u.REAL_REIT_AMOUNT,
+       u.REIT_POLICY,
+       ( case  when u.TOTAL_REITED_NUM =1 then '一次性100%'  when u.TOTAL_REITED_NUM=2 then '二次50%、50%'  when u.TOTAL_REITED_NUM=3 then '三次50%、25%、25%' end) as TOTAL_REITED_NUM,
+       ( case  when u.REITED_NUM =1 then '第一次'  when u.REITED_NUM=2 then '第二次'  when u.REITED_NUM=3 then '第三次' end) as REITED_NUM,
+       u.REITED_NUM,
+       NVL(u.REITED_RATE,0)REITED_RATE,
+       u.CAN_RETURN_AMOUNT,
+       u.TOTAL_RETURN_AMOUNT,
+       u.LEFT_CAN_RETURN_AMOUNT,
+       u.SALE_COMPACT_AMOUNT,
+       u.REQ_ID,
+       u.REQ_NAME,
+       to_char(u.REQ_DATE,'yyyy-MM-DD') REQ_DATE,
+       u.STATE,
+       u.REMARK,
+       u.CRE_NAME,
+       u.CREATOR,
+       to_char(u.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+       u.DEPT_ID,
+       u.DEPT_NAME,
+       u.ORG_ID,
+       u.ORG_NAME,
+       u.LEDGER_ID,
+       u.LEDGER_NAME,
+       u.DEL_FLAG,
+       u.OPEN_SALE_YEAR,
+       u.DESIGN_PERSON,
+       u.DESIGN_ID,
+       u.SALE_STORE_ID,
+       u.SALE_STORE_NAME,
+       u.ADDRESS,
+       (SELECT d.DATA_DTL_NAME FROM  PROJECT_DATA_DICTIONARY_DTL d WHERE d.DATA_DTL_CODE = u.BUSS_SCOPE AND d.DELFLAG=0) BUSS_SCOPE,
+       u.USE_AREA,
+       (SELECT d.DATA_DTL_NAME FROM  PROJECT_DATA_DICTIONARY_DTL d WHERE d.DATA_DTL_CODE = u.LOCAL_TYPE AND d.DELFLAG=0) LOCAL_TYPE,
+       ( case  when u.IS_NORTH=1 then '是' else '否' end) as IS_NORTH,
+       u.BUDGET_ITEM_ID,
+       u.BUDGET_ITEM_NO,
+       u.BUDGET_ITEM_NAME,
+       u.BUDGET_QUOTA_ID,
+       u.YEAR_GOODS_AMOUNT,
+       u.QUARTER_RATE,
+       u.IS_VIOLATE_REMARK
+       from DRP_RNVTN_REIT_REQ u 
+       
+	]]>
+	<dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+</select>
+
+<select id="queryGZZXXID" parameterClass="map" resultClass="String">
+    <![CDATA[ 
+	   select distinct u.GZZXXID
+			  from T_SYS_GZZXX u
+			  left join (select a.Gzzxxid, b.YHBH, b.YHM
+              from T_SYS_GZZCY a
+              left join T_SYS_XTYH b
+              on a.xtyhid = b.xtyhid
+              and b.delflag = 0
+              where a.delflag = 0
+              order by a.xtyhid) c
+              on u.Gzzxxid = c.Gzzxxid
+              WHERE u.GZZMC LIKE '%门店建设经理%'
+	]]>
+</select>
+
+<select id="queryZWT" parameterClass="map" resultClass="int">
+  SELECT  count(0)
+          FROM T_SYS_GZZCY U
+          LEFT JOIN T_SYS_XTYH T
+          ON U.XTYHID = T.XTYHID
+          left join T_SYS_RYXX a
+          on a.RYXXID = t.RYXXID
+          and a.DELFLAG = 0
+          where u.DELFLAG = 0
+          and u.GZZXXID = #GZZXXID#
+          and a.RYXXID = #RYXXID#
+</select>
+ 
+ <select id="queryName" parameterClass="map" resultClass="String">
+	<![CDATA[ 
+	    select p.DATA_DTL_NAME 
+	    from  PROJECT_DATA_DICTIONARY_DTL  p
+	    where p.DATA_DTL_CODE=#DATA_DTL_CODE#
+	]]>
+</select>
+
+ <select id="queryWareaName" parameterClass="map" resultClass="String">
+	<![CDATA[ 
+	     SELECT a.AREA_NAME_P FROM BASE_AREA a where
+	     a.DEL_FLAG=0 and a.state='启用'
+	     and
+	     a.AREA_ID = #AREA_ID# 
+	]]>
+</select>
+
+ <select id="queryRealReitAmount" parameterClass="map" resultClass="String">
+	<![CDATA[ 
+	     SELECT 
+	     u.REAL_REIT_AMOUNT
+	     from DRP_RNVTN_REIT_REQ u
+	     where
+	     u.RNVTN_REIT_REQ_ID = #RNVTN_REIT_REQ_ID#
+	     AND u.DEL_FLAG=0
+	]]>
+</select>
+
+<!-- 根据主表ID查询明细 -->
+<select id="queryById" parameterClass="map" resultClass="java.util.HashMap">
+  <include refid="coreSql"/>
+  <dynamic prepend="and">
+		u.RNVTN_REIT_REQ_ID=#RNVTN_REIT_REQ_ID#
+  </dynamic>
+</select>
+
+</sqlMap>

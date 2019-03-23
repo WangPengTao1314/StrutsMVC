@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+	<!--
+		*@module 系统管理 *@fuc 路线信息主表sql *@version 1.0 *@author 王栋斌
+	-->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="HAULWAY">
+
+	<typeAlias type="com.hoperun.base.haulway.model.HaulwayModel"
+		alias="HaulwayModel" />
+
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="HaulwayModel" class="HaulwayModel">
+		<result column="HAULWAY_ID" property="HAULWAY_ID" />
+	</resultMap>
+
+	<!-- 动态查询 and 列表排序 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="HAULWAY_NO">
+			u.HAULWAY_NO like
+			'%'||#HAULWAY_NO#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="HAULWAY_NAME">
+			u.HAULWAY_NAME like
+			'%'||#HAULWAY_NAME#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="DELV_CITY">
+			u.DELV_CITY like
+			'%'||#DELV_CITY#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="ARRV_CITY">
+			u.ARRV_CITY like
+			'%'||#ARRV_CITY#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CRE_TIME_FROM">
+			<![CDATA[CRE_TIME >=
+			to_date(#CRE_TIME_FROM#,'yyyy-MM-DD HH24:MI:SS')]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CRE_TIME_TO">
+			<![CDATA[CRE_TIME <=
+			to_date(#CRE_TIME_TO#,'yyyy-MM-DD HH24:MI:SS')]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="STATE">
+			STATE = #STATE#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="DEL_FLAG">
+			u.DEL_FLAG = #DEL_FLAG#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="SHIP_POIT_NO">
+			u.SHIP_POIT_NO like '%'||#SHIP_POIT_NO#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="SHIP_POIT_NO">
+			u.SHIP_POIT_NAME like '%'||#SHIP_POIT_NAME#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CHANN_NO">
+			u.CHANN_NO like '%'||#CHANN_NO#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="CHANN_NAME">
+			u.CHANN_NAME like '%'||#CHANN_NAME#||'%'
+		</isNotEmpty>
+	</sql>
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField">
+			$orderField$,
+		</isNotEmpty>
+		u.CRE_TIME DESC
+	</sql>
+	<!-- 列表查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[
+				select HAULWAY_ID,HAULWAY_NO,HAULWAY_NAME,DELV_CITY,SHIP_POIT_NAME,ARRV_CITY,CHANN_NAME,LENGTH,DAYS,CRE_NAME,to_char(U.CRE_TIME,'yyyy-MM-DD HH24:MI:SS')CRE_TIME,STATE
+				from ${SYSSCHEMA}.BASE_HAULWAY u 
+		]]>
+		<dynamic prepend="where ">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql" />
+		</dynamic>
+	</sql>
+
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[select count(u.HAULWAY_ID) from BASE_HAULWAY  u]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+
+	<!-- 查询 -->
+	<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	<!-- 详细信息查询 -->
+	<select id="loadById" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[  
+			 select  u.HAULWAY_ID,u.HAULWAY_NO,u.HAULWAY_NAME,u.DELV_CITY,u.ARRV_CITY,u.SHIP_POIT_ID,u.SHIP_POIT_NO,u.SHIP_POIT_NAME,u.CHANN_ID,u.CHANN_NO,u.CHANN_NAME,u.LENGTH,u.DAYS,u.CRE_NAME,to_char(U.CRE_TIME,'yyyy-MM-DD HH24:MI:SS')CRE_TIME,u.UPD_NAME,to_char(U.UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,u.DEPT_NAME,u.ORG_NAME,u.STATE,u.REMARK 
+			 from ${SYSSCHEMA}.BASE_HAULWAY u where u.HAULWAY_ID = #HAULWAY_ID#]]>
+	</select>
+
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		  insert into ${SYSSCHEMA}.BASE_HAULWAY(HAULWAY_ID,HAULWAY_NO,HAULWAY_NAME,DELV_CITY,SHIP_POIT_ID,SHIP_POIT_NO,SHIP_POIT_NAME,ARRV_CITY,CHANN_ID,CHANN_NO,CHANN_NAME,LENGTH,DAYS,STATE,REMARK,CREATOR,CRE_NAME,CRE_TIME,DEPT_ID,DEPT_NAME,ORG_ID,ORG_NAME,DEL_FLAG,UPDATOR,UPD_NAME,UPD_TIME)
+		 values(#HAULWAY_ID#,#HAULWAY_NO#,#HAULWAY_NAME#,#DELV_CITY#,#SHIP_POIT_ID#,#SHIP_POIT_NO#,#SHIP_POIT_NAME#,#ARRV_CITY#,#CHANN_ID#,#CHANN_NO#,#CHANN_NAME#,#LENGTH#,#DAYS#,#STATE#,#REMARK#,#CREATOR#,#CRE_NAME#,sysdate,#DEPT_ID#,#DEPT_NAME#,#ORG_ID#,#ORG_NAME#,#DEL_FLAG#,#UPDATOR#,#UPD_NAME#,sysdate)
+		]]>
+	</insert>
+
+
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.BASE_HAULWAY ]]>
+		<!-- CHANAME, CHADES,CHADATE,CHASTU -->
+		<dynamic prepend="set">
+			<isNotNull property="HAULWAY_NO" prepend=","><![CDATA[HAULWAY_NO = #HAULWAY_NO#]]></isNotNull>
+			<isNotNull property="HAULWAY_NAME" prepend=","><![CDATA[HAULWAY_NAME = #HAULWAY_NAME#]]></isNotNull>
+			<isNotNull property="DELV_CITY" prepend=","><![CDATA[DELV_CITY = #DELV_CITY#]]></isNotNull>
+			<isNotNull property="ARRV_CITY" prepend=","><![CDATA[ARRV_CITY = #ARRV_CITY#]]></isNotNull>
+			<isNotNull property="SHIP_POIT_ID" prepend=","><![CDATA[SHIP_POIT_ID = #SHIP_POIT_ID#]]></isNotNull>
+			<isNotNull property="SHIP_POIT_NO" prepend=","><![CDATA[SHIP_POIT_NO = #SHIP_POIT_NO#]]></isNotNull>
+			<isNotNull property="SHIP_POIT_NAME" prepend=","><![CDATA[SHIP_POIT_NAME = #SHIP_POIT_NAME#]]></isNotNull>
+			<isNotNull property="CHANN_ID" prepend=","><![CDATA[CHANN_ID = #CHANN_ID#]]></isNotNull>
+			<isNotNull property="CHANN_NO" prepend=","><![CDATA[CHANN_NO = #CHANN_NO#]]></isNotNull>
+			<isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME#]]></isNotNull>
+			<isNotNull property="LENGTH" prepend=","><![CDATA[LENGTH = #LENGTH#]]></isNotNull>
+			<isNotNull property="DAYS" prepend=","><![CDATA[DAYS = #DAYS#]]></isNotNull>
+			<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[where HAULWAY_ID = #HAULWAY_ID# ]]>
+	</update>
+
+	<!-- 删除菜单 -->
+	<update id="delete" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.BASE_HAULWAY set DEL_FLAG = #DEL_FLAG# ]]>
+		<dynamic prepend="">
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where HAULWAY_ID = #HAULWAY_ID# ]]>
+	</update>
+
+	<!-- 状态变更 -->
+	<update id="updateState" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.BASE_HAULWAY]]>
+		<dynamic prepend="set">
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where HAULWAY_ID = #HAULWAY_ID# ]]>
+	</update>
+	
+	<!-- 编号重复性查询 -->
+	<select id="check" parameterClass="map" resultClass="int">
+		<![CDATA[
+			select 
+				count(HAULWAY_ID)
+			from 
+				${SYSSCHEMA}.BASE_HAULWAY
+			where
+				HAULWAY_NO = #HAULWAY_NO#
+		]]>
+	</select>
+</sqlMap>

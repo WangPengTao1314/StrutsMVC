@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  
+/**
+ * @module 系统管理
+ * @func 机构信息
+ * @version 1.1
+ * @author 蔡瑾钊
+ */
+-->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="newsingtable">
+
+	<typeAlias type="com.hoperun.sample.newsingletable.model.NewSingleTableModel" alias="singleTableModel" />
+
+	<!-- 使用JGXX装载结果集 -->
+	<resultMap id="singleTableModel" class="singleTableModel">
+		<result column="JGXXID" property="JGXXID" />
+	</resultMap>
+
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="JGXXID">
+			(u.JGXXID = #JGXXID# OR u.SJJG = #JGXXID#)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="JGMC">
+			u.JGMC like '%'||#JGMC#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="JGJC">
+			u.JGJC like '%'||#JGJC#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="JGBH">
+			u.JGBH like '%'||#JGBH#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="SJJG">
+			u.SJJG like '%'||#SJJG#||'%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="JGZT">
+			u.JGZT =#JGZT#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="ZTXXID">
+			u.ZTXXID = #ZTXXID#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="XH">
+		    u.XH = #XH#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="DELFLAG">
+			u.DELFLAG = #DELFLAG#
+		</isNotEmpty>
+		<isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	    </isNotEmpty>
+	</sql>
+    <!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[  select u.FGCWRYID,u.FGCWRYXM,u.JGXXID,u.JGBH,u.JGMC,u.JGJC,u.SJJG,u.YZBM,u.ZTXXID,u.JGZT,a.GJ,a.SF,a.CS,b.JGBH as SJJGBH,
+		b.JGMC SJJGMC,c.ZTMC,U.CRENAME,u.CRETIME,
+		row_number() over(order by ]]>
+		<isNotEmpty prepend=" " property="orderField">
+			 $orderField$
+		</isNotEmpty>
+		<isEmpty prepend=" " property="orderField">
+			u.CRETIME DESC
+		</isEmpty>
+		<![CDATA[ ) rownum_  from ${SYSSCHEMA}.T_SYS_JGXX u 
+						left join ${SYSSCHEMA}.T_SYS_DZXX a on u.DZXXID = a.DZXXID
+						left join ${SYSSCHEMA}.T_SYS_JGXX b on u.sjjg=b.jgxxid 
+						left join ${SYSSCHEMA}.T_SYS_ZTXX c on u.ztxxid=c.ztxxid]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</sql>
+
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(u.JGXXID) cnt FROM ${SYSSCHEMA}.T_SYS_JGXX u left join ${SYSSCHEMA}.T_SYS_JGXX b on u.sjjg=b.jgxxid]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+
+	<!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+    <!--新增-->
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.T_SYS_JGXX(JGXXID,DZXXID,ZTXXID,JGBH,JGMC,JGJC,FRDB,DH,CZ,DZYJ,ZYDZ,SJJG,JGZT,QTSM,XXDZ,
+		           YZBM,JGYWMC,JGYWJC,JGYWXXDZ,XH,CREATER,CRENAME,CRETIME,UPDATER,UPDTIME,NFYF,DELFLAG,FGCWRYID,FGCWRYXM)
+		 values(#JGXXID:VARCHAR:NULL#,#DZXXID:VARCHAR:NULL#,#ZTXXID:VARCHAR:NULL#,#JGBH:VARCHAR:NULL#,#JGMC:VARCHAR:NULL#,#JGJC:VARCHAR:NULL#,#FRDB:VARCHAR:NULL#,
+		 		#DH:VARCHAR:NULL#,#CZ:VARCHAR:NULL#,#DZYJ:VARCHAR:NULL#,#ZYDZ:VARCHAR:NULL#,#SJJG:VARCHAR:NULL#,#JGZT:VARCHAR:NULL#,#QTSM:VARCHAR:NULL#,#XXDZ:VARCHAR:NULL#,
+		 		#YZBM:VARCHAR:NULL#,#JGYWMC:VARCHAR:NULL#,#JGYWJC:VARCHAR:NULL#,#JGYWXXDZ:VARCHAR:NULL#,#XH:VARCHAR:NULL#,#CREATER:VARCHAR:NULL#,#CRENAME:VARCHAR:NULL#,CONVERT(varchar(100), GETDATE(), 20),
+		 		#UPDATER:VARCHAR:NULL#,CONVERT(varchar(100), GETDATE(), 20),#NFYF:VARCHAR:NULL#,0,#FGCWRYID#,#FGCWRYXM#)
+		]]>
+	</insert>
+    <!--修改-->
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_JGXX ]]>
+		<!-- CHANAME, CHADES,CHADATE,CHASTU -->
+		<dynamic prepend="set">
+			<isNotNull property="DZXXID" prepend=","><![CDATA[DZXXID = #DZXXID#]]></isNotNull>
+			<isNotNull property="ZTXXID" prepend=","><![CDATA[ZTXXID = #ZTXXID#]]></isNotNull>
+			<isNotNull property="JGBH" prepend=","><![CDATA[JGBH = #JGBH#]]></isNotNull>
+			<isNotNull property="JGMC" prepend=","><![CDATA[JGMC = #JGMC#]]></isNotNull>
+			<isNotNull property="JGJC" prepend=","><![CDATA[JGJC = #JGJC#]]></isNotNull>
+			<isNotNull property="FRDB" prepend=","><![CDATA[FRDB = #FRDB#]]></isNotNull>
+			<isNotNull property="DH" prepend=","><![CDATA[DH = #DH#]]></isNotNull>
+			<isNotNull property="CZ" prepend=","><![CDATA[CZ = #CZ#]]></isNotNull>
+			<isNotNull property="DZYJ" prepend=","><![CDATA[DZYJ = #DZYJ#]]></isNotNull>
+			<isNotNull property="ZYDZ" prepend=","><![CDATA[ZYDZ = #ZYDZ#]]></isNotNull>
+			<isNotNull property="SJJG" prepend=","><![CDATA[SJJG = #SJJG#]]></isNotNull>
+			<isNotNull property="JGZT" prepend=","><![CDATA[JGZT = #JGZT#]]></isNotNull>
+			<isNotNull property="QTSM" prepend=","><![CDATA[QTSM = #QTSM#]]></isNotNull>
+			<isNotNull property="XXDZ" prepend=","><![CDATA[XXDZ = #XXDZ#]]></isNotNull>
+			<isNotNull property="YZBM" prepend=","><![CDATA[YZBM = #YZBM#]]></isNotNull>
+			<isNotNull property="FGCWRYID" prepend=","><![CDATA[FGCWRYID = #FGCWRYID#]]></isNotNull>
+			<isNotNull property="FGCWRYXM" prepend=","><![CDATA[FGCWRYXM = #FGCWRYXM#]]></isNotNull>
+            <isNotNull property="JGYWMC" prepend=","><![CDATA[JGYWMC = #JGYWMC#]]></isNotNull>
+			<isNotNull property="JGYWJC" prepend=","><![CDATA[JGYWJC = #JGYWJC#]]></isNotNull>
+			<isNotNull property="JGYWXXDZ" prepend=","><![CDATA[JGYWXXDZ = #JGYWXXDZ#]]></isNotNull>
+			<isNotNull property="XH" prepend=","><![CDATA[XH = #XH#]]></isNotNull>
+			<isNotNull property="UPDATER" prepend=","><![CDATA[UPDATER = #UPDATER#]]></isNotNull>
+			<isNotNull property="UPDTIME" prepend=","><![CDATA[UPDTIME = CONVERT(varchar(100), GETDATE(), 20)]]></isNotNull>
+			<isNotNull property="DELFLAG" prepend=","><![CDATA[DELFLAG = #DELFLAG#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where JGXXID = #JGXXID# ]]>
+	</update>
+	<!-- 软删除 只是更新状态-->
+	<delete id="delete" parameterClass="String">
+		      delete from ${SYSSCHEMA}.T_SYS_JGXX  where JGXXID = #JGXXID#
+        <!--delete from ${SYSSCHEMA}.T_SYS_JGXX where JGXXID = #JGXXID#-->
+	</delete>
+	<!--把删除数据移到回车站-->
+	<insert id="insertDelDate" parameterClass="map">
+	    insert into ${SYSSCHEMA}.t_sys_datarecycle(DATARECYCLEID,DELETOR,DELTIME,BUSINESSTYPE,DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10,DF11,DF12,DF13,DF14,DF15,DF16,DF17,DF18,DF19,DF20,DF21,DF22,DF23,DF24,DF25,DF26,DF27,DF28,DF29)
+	    select #DATARECYCLEID#,#DELETOR#,CONVERT(varchar(100), GETDATE(), 20),'机构信息维护',JGXXID,DZXXID,ZTXXID,JGBH,JGMC,JGJC,FRDB,DH,CZ,DZYJ,ZYDZ,SJJG,JGZT,QTSM,XXDZ,YZBM,JGYWMC,JGYWJC,JGYWXXDZ,XH,CREATER,CRENAME,CRETIME,UPDATER,UPDTIME,NFYF,DELFLAG,FGCWRYID,FGCWRYXM
+        from ${SYSSCHEMA}.T_SYS_JGXX
+	    where JGXXID = #JGXXID#
+	</insert>
+	<!--详细查询-->
+	<select id="loadById" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[  select  u.FGCWRYID,u.FGCWRYXM,u.JGXXID,u.JGBH,u.JGMC,u.JGJC,u.FRDB,u.DH,u.CZ,u.DZYJ,u.ZYDZ,u.XXDZ,u.SJJG,u.YZBM,u.ZTXXID,u.DZXXID,u.JGZT,u.JGYWMC,u.JGYWJC,u.JGYWXXDZ,u.XH,a.JGBH as SJJGBH,a.JGMC as SJJGMC,b.GJ,b.SF,b.CS,c.ZTMC,u.CRENAME,u.CRETIME 
+					from ${SYSSCHEMA}.T_SYS_JGXX u 
+						left join ${SYSSCHEMA}.T_SYS_JGXX a on u.sjjg=a.jgxxid 
+						left join ${SYSSCHEMA}.T_SYS_DZXX b on u.dzxxid=b.dzxxid  
+						left join ${SYSSCHEMA}.T_SYS_ZTXX c on u.ztxxid=c.ztxxid
+					where u.JGXXID = #JGXXID#]]>
+	</select>
+	<!--启用/停用-->
+	<update id="updStusById" parameterClass="map">	
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_JGXX ]]>
+		<dynamic prepend="set">
+			<isNotNull property="JGZT" prepend=","><![CDATA[JGZT = #JGZT#]]></isNotNull>
+			<isNotNull property="UPDATER" prepend=","><![CDATA[UPDATER = #UPDATER#]]></isNotNull>
+			<isNotNull property="UPDTIME" prepend=","><![CDATA[UPDTIME = CONVERT(varchar(100), GETDATE(), 20)]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where JGXXID = #JGXXID#  ]]>	
+	</update>
+</sqlMap>
+

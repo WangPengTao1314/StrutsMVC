@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="UserInfo">
+
+	<typeAlias type="com.hoperun.commons.model.system.UserInfo"
+		alias="userInfo" />
+
+	<!-- 使用UserInfo装载结果集 -->
+	<resultMap id="user-info" class="userInfo">
+		<result column="USER_ID" property="userId" />
+		<result column="USER_NAME" property="userName" />
+		<result column="ORG_ID" property="orgId" />
+	</resultMap>
+
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="roleId">
+			exists(select '' from ${PUB}.USER_ROLE ur where
+			ur.USER_ID=u.USER_ID and ur.ROLE_ID=#roleId#)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userName">
+			u.USER_NAME like '%$userName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userPos">
+			u.USER_POS = #userPos#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userType">
+			u.USER_TYPE = #userType#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userStus">
+			u.USER_STUS = #userStus#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="orgId">
+			u.ORG_ID = #orgId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userId">
+			u.USER_ID = #userId#
+		</isNotEmpty>
+	</sql>
+
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[ select u.*,o.ORG_NAME ,ROW_NUMBER() OVER(ORDER BY USER_ID) AS rn  from ${PUB}.user_info u left join ${PUB}.organ o on u.org_id = o.org_id ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</sql>
+
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(user_id) cnt FROM ${PUB}.USER_INFO u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${PUB}.USER_INFO(USER_ID, USER_NAME, ORG_ID, USER_POS, EMAIL,PHONE,USER_STUS,RPT_RIGHT)
+		 values(#userId#, #userName#, #orgId#,#userPos:VARCHAR:NULL#, #eMail#,#phone#,#userStus:VARCHAR:NULL#,#rptRight:VARCHAR:NULL#)
+		]]>
+	</insert>
+
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${PUB}.USER_INFO ]]>
+		<!-- USER_NAME, USER_TYPE, ORG_ID, USER_PWD, USER_STUS -->
+		<dynamic prepend="set">
+			<isNotNull property="userPwd" prepend=","><![CDATA[USER_PWD = #userPwd#]]></isNotNull>
+			<isNotNull property="userName" prepend=","><![CDATA[USER_NAME = #userName#]]></isNotNull>
+			<isNotNull property="orgId" prepend=","><![CDATA[ORG_ID = #orgId#]]></isNotNull>
+			<isNotNull property="userPos" prepend=","><![CDATA[USER_POS = #userPos#]]></isNotNull>
+			<isNotNull property="eMail" prepend=","><![CDATA[EMAIL = #eMail#]]></isNotNull>
+			<isNotNull property="phone" prepend=","><![CDATA[PHONE = #phone#]]></isNotNull>
+			<isNotNull property="userStus" prepend=","><![CDATA[USER_STUS = #userStus#]]></isNotNull>
+			<isNotNull property="rptRight" prepend=","><![CDATA[RPT_RIGHT = #rptRight#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where USER_ID = #userId# ]]>
+	</update>
+
+	<!-- 加载 -->
+	<select id="loadById" parameterClass="string"
+		resultClass="java.util.HashMap">
+		<![CDATA[ select u.*,o.ORG_NAME from ${PUB}.user_info u 
+					left join ${PUB}.organ o on u.org_id = o.org_id
+		 			where USER_ID = #userId:VARCHAR# ]]>
+	</select>
+
+	<!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	<!-- 删除 -->
+	<delete id="delete" parameterClass="map">
+		<![CDATA[ delete from ${PUB}.USER_INFO  where USER_ID = #userId# ]]>
+	</delete>
+	
+	<!-- 加载角色 -->
+	<select id="loadRoleById" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<![CDATA[ select * from ${PUB}.USER_INFO u where USER_ID = #userId:VARCHAR# ]]>
+	</select>
+</sqlMap>
+

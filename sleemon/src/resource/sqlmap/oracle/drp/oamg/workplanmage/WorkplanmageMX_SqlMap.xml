@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+	@author zcx
+	@function 工作计划维护
+	@version 2014-05-20 11:13:12
+-->
+<sqlMap namespace="workplanmageMX">
+	<typeAlias
+		type="com.hoperun.drp.oamg.workplanmage.model.WorkplanmagedtlModel"
+		alias="WorkplanmagedtlModel" />
+	<!-- 使用Resvstore装载结果集 -->
+	<resultMap id="WorkplanmagedtlModel" class="WorkplanmagedtlModel">
+		<result column="WORK_PLAN_DTL_ID" property="WORK_PLAN_DTL_ID" />
+	</resultMap>
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		u.DEL_FLAG = 0
+		<isNotEmpty property="RNVTN_CHECK_NO">
+			and u.RNVTN_CHECK_NO like '%'||#RNVTN_CHECK_NO#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="CHANN_RNVTN_NO">
+			and u.CHANN_RNVTN_NO like '%'||#CHANN_RNVTN_NO#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="TERM_NO">
+			and u.TERM_NO like '%'||#TERM_NO#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="TERM_NAME">
+			and u.TERM_NAME like '%'||#TERM_NAME#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="AREA_NAME">
+			and u.AREA_NAME like '%'||#AREA_NAME#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="AREA_MANAGE_NAME">
+			and u.AREA_MANAGE_NAME like '%'||#AREA_MANAGE_NAME#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="RNVTN_PROP">
+			and u.RNVTN_PROP like '%'||#RNVTN_PROP#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="STATE">
+			and u.STATE like '%'||#STATE#||'%'
+		</isNotEmpty>
+		<isNotEmpty property="LEDGER_ID">
+			and u.LEDGER_ID = #LEDGER_ID#
+		</isNotEmpty>
+		<isNotEmpty property="QXJBCON">and $QXJBCON$</isNotEmpty>
+
+	</sql>
+	<sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField">
+			$orderField$
+		</isNotEmpty>
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[ 
+		select
+		   u.WORK_PLAN_DTL_ID,
+	       u.WORK_PLAN_ID,
+	       u.RYXXID,
+	       u.RYBH,
+	       u.XM
+	       from DRP_WORK_PLAN_DTL u
+   ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql" />
+		</dynamic>
+	</sql>
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[
+	   select count(0) cnt 
+            from DRP_WORK_PLAN_DTL u 
+		   ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+	</select>
+	<!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		  insert into ERP_WORK_PLAN_DTL(
+			 WORK_PLAN_DTL_ID,
+			 WORK_PLAN_ID,
+			 RYXXID,
+			 RYBH,
+			 RYMC,
+			 UP_REPORT_NUM,
+			 DEL_FLAG
+		   )values(
+			#WORK_PLAN_DTL_ID#,
+			#WORK_PLAN_ID#,
+			#RYXXID#,
+			#RYBH#,
+			#RYMC#,
+			#UP_REPORT_NUM#,
+			#DEL_FLAG#
+			)
+	   ]]>
+	</insert>
+
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ERP_WORK_PLAN_DTL ]]>
+		<dynamic prepend="set">
+			<isNotNull property="WORK_PLAN_ID" prepend=","><![CDATA[WORK_PLAN_ID = #WORK_PLAN_ID# ]]></isNotNull>
+			<isNotNull property="RYXXID" prepend=","><![CDATA[RYXXID = #RYXXID# ]]></isNotNull>
+			<isNotNull property="RYBH" prepend=","><![CDATA[RYBH = #RYBH# ]]></isNotNull>
+			<isNotNull property="RYMC" prepend=","><![CDATA[RYMC = #RYMC# ]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where WORK_PLAN_DTL_ID = #WORK_PLAN_DTL_ID#]]>
+	</update>
+
+	<select id="queryChildById" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<![CDATA[ 
+	         select 
+	            t.WORK_PLAN_DTL_ID,
+	            t.WORK_PLAN_ID ,
+	            t.RYXXID,
+	            t.RYBH,
+	            t.XM
+	            from DRP_WORK_PLAN_DTL t  
+	            where 
+		        t.DEL_FLAG='0' AND t.ORK_PLAN_ID = #ORK_PLAN_ID#
+	]]>
+	</select>
+	
+	<select id="loadById" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[ 
+	  select 
+		   t.WORK_PLAN_DTL_ID,
+           t.WORK_PLAN_ID ,
+           t.RYXXID,
+           t.RYBH,
+           t.XM
+           from DRP_WORK_PLAN_DTL t  
+	       where 
+		   t.WORK_PLAN_ID = #WORK_PLAN_ID#
+	]]>
+	</select>
+	
+	
+	<!-- 根据主表ID查询明细  left join ERP_SALE_ORDER t on u.SALE_ORDER_ID = t.SALE_ORDER_ID  -->
+	<select id="childQuery" parameterClass="map" resultClass="WorkplanmagedtlModel">
+		  <![CDATA[ 
+	      select 
+           t.WORK_PLAN_DTL_ID,
+	       t.WORK_PLAN_ID,
+	       t.RYXXID,
+	       t.RYBH,
+	       t.RYMC,
+	       t.UP_REPORT_NUM,
+	       t.DEL_FLAG
+	       from ERP_WORK_PLAN_DTL t where t.WORK_PLAN_ID=#WORK_PLAN_ID# and t.DEL_FLAG=0
+	      ]]>
+	  </select>
+	
+	<update id="deleteByIds" parameterClass="map">
+		<![CDATA[ 
+	      update DRP_WORK_PLAN_DTL
+	         set DEL_FLAG = #DEL_FLAG#
+ 	         where 
+	         WORK_PLAN_DTL_ID in ($WORK_PLAN_DTL_ID$)
+    ]]>
+	</update>
+
+	<insert id="insertMX" parameterClass="map">
+	   insert into ${SYSSCHEMA}.t_sys_datarecycle(DATARECYCLEID,DELETOR,DELTIME,BUSINESSTYPE,DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10,DF11,DF12,DF13,DF14)
+	                                      select #DATARECYCLEID#||rownum,#DELETOR#,sysdate,'装修验收单维护',RNVTN_CHECK_DTL_ID,RNVTN_CHECK_ID,PRJ_TYPE,PRJ_NAME,PRJ_SCORE,CHECK_SCORE,CHECK_REMARK,DEL_FLAG,IS_REFORM_FLAG,CREATER,CRETIME,UPDATER,UPDTIME,STATE
+        from DRP_RNVTN_CHECK_DTL  where  RNVTN_CHECK_DTL_ID in ($RNVTN_CHECK_DTL_ID$)
+	</insert>
+	
+	<delete id="deleteCheck" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.DRP_RNVTN_CHECK ]]>
+		<dynamic prepend="set">
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where RNVTN_CHECK_ID = #RNVTN_CHECK_ID# ]]>
+	</delete>
+     
+    <delete id="delete" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.DRP_RNVTN_CHECK_DTL ]]>
+		<dynamic prepend="set">
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where RNVTN_CHECK_DTL_ID in ($RNVTN_CHECK_DTL_ID$)]]>
+	</delete> 
+    
+    
+	<select id="queryReformTtl" parameterClass="map"
+		resultClass="RnvtncheckChildModel">
+		<![CDATA[  
+	 	 select d.RNVTN_CHECK_DTL_ID,d.prj_type,d.prj_name,d.prj_score, d.RNVTN_CHECK_ID,d.CHECK_SCORE,d.check_remark,d.IS_REFORM_FLAG from DRP_RNVTN_CHECK_DTL d where d.DEL_FLAG=0 and d.RNVTN_CHECK_ID  =  #RNVTN_CHECK_ID#
+	 	]]>
+	</select>
+	
+	<select id="queryTypeAndName" parameterClass="map"
+		resultClass="RnvtncheckChildModel">
+		<![CDATA[  
+              select d.rnvtn_check_dtl_id,d.rnvtn_check_id  from DRP_RNVTN_CHECK_DTL d where d.PRJ_TYPE =#PRJ_TYPE# and d.PRJ_NAME=#PRJ_NAME# and d.del_flag=0
+              and d.RNVTN_CHECK_ID = #RNVTN_CHECK_ID#
+        ]]>
+	</select>
+
+	
+	<select id="queryTtl" parameterClass="map"
+		resultClass="RnvtncheckChildModel">
+		<![CDATA[  
+              select d.rnvtn_check_dtl_id,d.rnvtn_check_id from  DRP_RNVTN_CHECK_DTL d where d.rnvtn_check_id =  #RNVTN_CHECK_ID#	 	]]>
+	</select>
+ 
+     
+	<select id="loadByIds" parameterClass="String"
+		resultClass="RnvtncheckChildModel">
+		<![CDATA[  
+	 	 select 
+		  u.rnvtn_check_dtl_id,
+		  u.rnvtn_check_id,
+		  u.prj_type,
+		  u.prj_name,
+		  u.prj_score,
+		  u.check_score,
+		  u.check_remark,
+		  u.del_flag,
+		  u.is_reform_flag
+		  from  DRP_RNVTN_CHECK_DTL u
+	            where u.rnvtn_check_dtl_id in ($rnvtn_check_dtl_id$)]]>
+	</select>
+	
+	<select id="loadByCheckId" parameterClass="String" resultClass="RnvtncheckModel">
+		<![CDATA[  
+	 	        select c.rnvtn_check_id,c.rnvtn_check_no,c.chann_rnvtn_id,c.chann_rnvtn_no,
+	 	        c.rnvtn_principal,c.rnvtn_check_date ,c.term_id,c.term_no,c.term_name,c.rnvtn_prop,
+	 	        c.plan_sbuss_date,c.sale_store_id,c.sale_store_name,c.local_type,c.buss_scope,c.spcl_store_type ,c.state
+	 	        from DRP_RNVTN_CHECK c
+	            where c.RNVTN_CHECK_ID in ('$RNVTN_CHECK_ID$')]]>
+	</select>
+
+	<select id="loadByIds1" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<![CDATA[  
+	 	select  t.RNVTN_CHECK_ID ,
+	 	        t.RNVTN_CHECK_DTL_ID,
+	            t.PRJ_TYPE,
+	            t.PRJ_NAME,
+	            t.PRJ_SCORE,
+	            t.CHECK_SCORE,
+	            t.CHECK_REMARK,
+	            t.IS_REFORM_FLAG
+	            from DRP_RNVTN_CHECK_DTL t left join DRP_RNVTN_CHECK d on t.rnvtn_check_id = d.RNVTN_CHECK_ID
+	            where t.RNVTN_CHECK_ID in ('$RNVTN_CHECK_ID$')]]>
+	</select>
+	
+	
+	<!-- 查询SQL -->
+	<select id="selectBrothers" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[  
+	 	 select s.RYXXID,s.RYBH,s.XM RYMC from t_sys_bmxx t  
+	 	 left join T_SYS_RYXX s on s.bmxxid = t.bmxxid
+	 	 where t.delflag=0 and s.delflag=0 and  t.bmxxid=#WAREA_ID#]]>
+	</select>
+
+	<!-- 查询重复 -->
+	<select id="queryBhForInt" parameterClass="map" resultClass="int">
+		select count(u.CHANN_RNVTN_ID) from DRP_CHANN_RNVTN u where
+		u.CHANN_RNVTN_ID=#CHANN_RNVTN_ID#
+		<isNotEmpty prepend="and" property="CHANN_NAME">
+			u.CHANN_NAME != #CHANN_NAME#
+		</isNotEmpty>
+
+	</select>
+	
+   <!-- 查询人员信息是否重复 -->
+   <select id="queryRYForInt" parameterClass="map" resultClass="int">
+		select count(*) from ERP_WORK_PLAN_DTL u where
+		u.WORK_PLAN_ID =#WORK_PLAN_ID#
+		and u.RYBH = #RYBH#
+
+	</select>
+	
+	<select id="loadByIdsT" parameterClass="String" resultClass="WorkplanmagedtlModel">
+		<![CDATA[  
+	 	 select 
+		  u.WORK_PLAN_DTL_ID,
+		  u.RYXXID,
+		  u.RYBH,
+		  u.RYMC,
+		  u.UP_REPORT_NUM
+		  from ERP_WORK_PLAN_DTL u
+	      where u.WORK_PLAN_DTL_ID in ($WORK_PLAN_DTL_IDs$)]]>
+	</select>
+</sqlMap>

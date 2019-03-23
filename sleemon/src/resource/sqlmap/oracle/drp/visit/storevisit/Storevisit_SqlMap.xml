@@ -1,0 +1,724 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author chenj
+@function 
+@version 2014-01-25 19:49:05
+-->
+<sqlMap  namespace="Storevisit">
+<typeAlias type="com.hoperun.drp.visit.storevisit.model.StoreVisitModel" alias="StoreVisitModel"/>
+<!-- 使用Promoreim装载结果集 -->
+<resultMap id="StoreVisitModel" class="StoreVisitModel">
+    <result column="STORE_VISIT_ID" property="STORE_VISIT_ID" />
+</resultMap>
+<!-- 动态查询 and 列表分页 -->
+<sql id="queryDynSql">
+  u.DEL_FLAG = 0 
+  <isNotEmpty  property="CHANNS_CHARG">
+    and  u.CHANN_ID in $CHANNS_CHARG$
+  </isNotEmpty>  
+  <isNotEmpty prepend="" property="STORE_VISIT_NO">
+      and  u.STORE_VISIT_NO  like '%'||#STORE_VISIT_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="TERM_NO">
+      and  u.TERM_NO  like '%'||#TERM_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="STORE_NAME">
+      and  u.STORE_NAME like '%'||#STORE_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CHANN_NAME">
+      and  u.CHANN_NAME  like '%'||#CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="VISIT_PEOPLE">
+      and  u.VISIT_PEOPLE like '%'||#VISIT_PEOPLE#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="STATE">
+      and  u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="SVISIT_DATE">
+       <![CDATA[ and u.VISIT_DATE>=to_date(#SVISIT_DATE#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="EVISIT_DATE">
+       <![CDATA[ and u.VISIT_DATE<=to_date(#EVISIT_DATE#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="QXJBCON">
+	  and   $QXJBCON$  
+  </isNotEmpty>
+</sql>
+
+<sql id="queryDynSqlT">
+  u.DEL_FLAG = 0 
+  <isNotEmpty  property="CHANNS_CHARG">
+    and  u.CHANN_ID in $CHANNS_CHARG$
+  </isNotEmpty>  
+  <isNotEmpty prepend="" property="STORE_VISIT_NO">
+      and  u.STORE_VISIT_NO  like '%'||#STORE_VISIT_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="TERM_NO">
+      and  u.TERM_NO  like '%'||#TERM_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="STORE_NAME">
+      and  u.STORE_NAME like '%'||#STORE_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CHANN_NAME">
+      and  u.CHANN_NAME  like '%'||#CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="VISIT_PEOPLE">
+      and  u.VISIT_PEOPLE like '%'||#VISIT_PEOPLE#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="STATE">
+      and  u.STATE = #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="SVISIT_DATE">
+       <![CDATA[ and u.VISIT_DATE>=to_date(#SVISIT_DATE#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="EVISIT_DATE">
+       <![CDATA[ and u.VISIT_DATE<=to_date(#EVISIT_DATE#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="QXJBCON">
+	  and   $QXJBCON$  
+  </isNotEmpty>
+</sql>
+
+<sql id="qDynSql">
+    and   temp.CORRELATIONID = u.STORE_VISIT_ID 
+  <isNotEmpty  property="CHANNS_CHARG">
+    and  u.CHANN_ID in $CHANNS_CHARG$
+  </isNotEmpty>  
+  <isNotEmpty prepend="" property="STORE_VISIT_NO">
+      and  u.STORE_VISIT_NO  like '%'||#STORE_VISIT_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="TERM_NO">
+      and  u.TERM_NO  like '%'||#TERM_NO#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="STORE_NAME">
+      and  u.STORE_NAME like '%'||#STORE_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="CHANN_NAME">
+      and  u.CHANN_NAME  like '%'||#CHANN_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="VISIT_PEOPLE">
+      and  u.VISIT_PEOPLE like '%'||#VISIT_PEOPLE#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="STATE">
+      and  u.STATE IN #STATE#
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="SVISIT_DATE">
+       <![CDATA[ and u.VISIT_DATE>=to_date(#SVISIT_DATE#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="" property="EVISIT_DATE">
+       <![CDATA[ and u.VISIT_DATE<=to_date(#EVISIT_DATE#,'yyyy-MM-DD')]]>
+  </isNotEmpty>
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+	     DISTINCT
+		 u.STORE_VISIT_ID,
+         u.STORE_VISIT_NO,
+         u.STORE_NAME,  
+         u.CHANN_NAME,
+         u.TITLE,
+         u.TERM_NO,
+         u.APPLY_PERSON,
+         u.CITY,
+         u.VISIT_DATE,
+         u.VISIT_PEOPLE,
+         u.STATE
+         from ERP_STORE_VISIT u ,
+   ]]>
+    <isNotEmpty prepend="" property="QXJBCON">
+	   $QXJBCON$  
+    </isNotEmpty>
+	<include refid="qDynSql" />
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+<sql id="coreSqlT">
+  <![CDATA[ 
+	select 
+		 u.STORE_VISIT_ID,
+         u.STORE_VISIT_NO,
+         u.TERM_NO,
+         u.STORE_NAME,
+         u.CHANN_NAME,
+         u.APPLY_PERSON,
+         u.CITY,
+         u.VISIT_DATE,
+         u.VISIT_PEOPLE,
+         u.STATE
+          from ERP_STORE_VISIT u
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSqlT" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+
+
+<!-- 分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+<select id="pageQueryT" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSqlT" />
+		<include refid="public.pageEnd" />
+	</select>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+	<![CDATA[
+	    SELECT COUNT(*) FROM (SELECT DISTINCT *
+            from ERP_STORE_VISIT u,
+		   ]]>
+	<isNotEmpty prepend="" property="QXJBCON">
+       $QXJBCON$  
+    </isNotEmpty>
+	<include refid="qDynSql" />
+	<![CDATA[
+	   ) u
+	]]>
+</select>
+
+<select id="pageCountT" parameterClass="map" resultClass="int">
+	<![CDATA[
+	   select count(0) cnt 
+            from ERP_STORE_VISIT u
+		   ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSqlT"/>
+	</dynamic>
+</select>
+ <!-- 查询 -->
+<select id="query" parameterClass="map" resultClass="java.util.HashMap">
+	<include refid="coreSql" />
+</select>
+
+
+
+<select id="queryPro" parameterClass="String"
+		resultClass="String">
+		<![CDATA[ 
+	      select DATA_DTL_NAME from project_data_dictionary_dtl t where t.delflag=0 and  t.DATA_DTL_ID = #DATA_DTL_ID#
+	]]>
+</select>
+
+<select id="queryChildById" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<![CDATA[ 
+	       SELECT    t.STORE_VISIT_DTL_ID,
+					 t.STORE_VISIT_ID,
+					 t.PRO_NAME,
+			         t.MAIN_TYPE,
+			         t.SIT_ANALYSIS,
+			         t.ACTION_PLAN,
+			         to_char(t.COMPLETE_TIME,'yyyy-MM-DD') COMPLETE_TIME,
+			         t.OTHER_INFO
+                     FROM ERP_STORE_VISIT_DTL t  
+                     where 
+		             t.DEL_FLAG='0' AND t.STORE_VISIT_ID = #STORE_VISIT_ID#  
+	]]>
+	</select>
+
+
+
+<insert id="insert" parameterClass="map">
+  <![CDATA[
+	  insert into ERP_STORE_VISIT(
+		 STORE_VISIT_ID,
+		 STORE_VISIT_NO,
+         TITLE,
+         EME_DEGREE,
+         APPLY_PERSON,
+         APPLY_DEP,
+         APPLY_DATE,
+         VISIT_PEOPLE,
+         VISIT_DATE,
+         CITY,
+         CHANN_ID,
+         CHANN_NO,
+         CHANN_NAME,
+         STORE_NAME,
+         STORE_STROKES,
+         LIGHT_BOX,
+         GROUND,
+         PRODUCTS,
+         PROPERTIES,
+         SOFT_DECORATION,
+         BLANKETS,
+         TELEVISION,
+         LIGHT_LAMP,
+         MATERIALS,
+         WATER_MACHINE,
+         FIGURE,
+         MANNER,
+         TECHNICAL,
+         EXECUTE_ACTION_TOPIC,
+         EXECUTE_ACTION_DATE,
+         EXECUTE_ACTION_ADDR,
+         ACTION_PLAN,
+         ACTION_REALITY_RATE,
+         ACTION_RATE,
+         ACTION_RIGHT,
+         ACTION_BAD,
+         MONTH_ORDER_NUM,
+         MONTH_REALITY_RATE,
+         MONTH_RATE,
+         SEASON_ORDER_NUM,
+         SEASON_REALITY_RATE,
+         SEASON_RATE,
+         EVALUATION_MONTH,
+         EVALUATION_SEASON,
+         ACTION_PLAN_TOPIC,
+         ACTION_PLAN_DATE,
+         ACTION_PLAN_ADDR,
+         EXPECTED_GOAL,
+         COMPETITION_INFO,
+         SUPPORT_DEMAND,
+         PROCESS,
+         REMARK,
+         STATE,
+         CREATOR,
+         CRE_NAME,
+         CRE_TIME,
+         UPDATOR,
+         UPD_NAME,
+         UPD_TIME,
+         DEPT_ID,
+         DEPT_NAME,
+         ORG_ID,
+         ORG_NAME,
+         LEDGER_ID,
+         LEDGER_NAME,
+         DEL_FLAG,
+         TERM_ID,
+         TERM_NO,
+         VISIT_TYPE,
+         ACTUAL_INVESTMENT,
+         FORECAST_INVESTMENT,
+         VISIT_PEOPLE_ID
+	   )values(
+         
+         #STORE_VISIT_ID#,
+		 #STORE_VISIT_NO#,
+         #TITLE#,
+         #EME_DEGREE#,
+         #APPLY_PERSON#,
+         #APPLY_DEP#,
+         to_date(#APPLY_DATE#,'yyyy-MM-DD'),
+         #VISIT_PEOPLE#,
+         to_date(#VISIT_DATE#,'yyyy-MM-DD'),
+         #CITY#,
+         #CHANN_ID#,
+         #CHANN_NO#,
+         #CHANN_NAME#,
+         #STORE_NAME#,
+         #STORE_STROKES#,
+         #LIGHT_BOX#,
+         #GROUND#,
+         #PRODUCTS#,
+         #PROPERTIES#,
+         #SOFT_DECORATION#,
+         #BLANKETS#,
+         #TELEVISION#,
+         #LIGHT_LAMP#,
+         #MATERIALS#,
+         #WATER_MACHINE#,
+         #FIGURE#,
+         #MANNER#,
+         #TECHNICAL#,
+         #EXECUTE_ACTION_TOPIC#,
+         to_date(#EXECUTE_ACTION_DATE#,'yyyy-MM-DD'),
+         #EXECUTE_ACTION_ADDR#,
+         #ACTION_PLAN#,
+         #ACTION_REALITY_RATE#,
+         #ACTION_RATE#,
+         #ACTION_RIGHT#,
+         #ACTION_BAD#,
+         #MONTH_ORDER_NUM#,
+         #MONTH_REALITY_RATE#,
+         #MONTH_RATE#,
+         #SEASON_ORDER_NUM#,
+         #SEASON_REALITY_RATE#,
+         #SEASON_RATE#,
+         #EVALUATION_MONTH#,
+         #EVALUATION_SEASON#,
+         #ACTION_PLAN_TOPIC#,
+         to_date( #ACTION_PLAN_DATE#,'yyyy-MM-DD'),
+         #ACTION_PLAN_ADDR#,
+         #EXPECTED_GOAL#,
+         #COMPETITION_INFO#,
+         #SUPPORT_DEMAND#,
+         #PROCESS#,
+         #REMARK#,
+         #STATE#, 
+         #CREATOR#,
+         #CRE_NAME#,
+         sysdate,
+         #UPDATOR#,
+         #UPD_NAME#,
+         #UPD_TIME#,
+         #DEPT_ID#,
+         #DEPT_NAME#,
+         #ORG_ID#,
+         #ORG_NAME#,
+         #LEDGER_ID#,
+         #LEDGER_NAME#,
+         #DEL_FLAG#,
+         #TERM_ID#,
+         #TERM_NO#,
+         #VISIT_TYPE#,
+         #ACTUAL_INVESTMENT#,
+         #FORECAST_INVESTMENT#,
+         #VISIT_PEOPLE_ID#
+		)
+   ]]>
+</insert>
+
+<update id="updateById" parameterClass="map">
+	<![CDATA[ update ERP_STORE_VISIT ]]>
+	 <dynamic prepend="set">
+	    <isNotNull property="TITLE" prepend=","><![CDATA[TITLE = #TITLE#]]></isNotNull>
+   	    <isNotNull property="EME_DEGREE" prepend=","><![CDATA[EME_DEGREE = #EME_DEGREE#]]></isNotNull>
+   	    <isNotNull property="APPLY_PERSON" prepend=","><![CDATA[APPLY_PERSON = #APPLY_PERSON#]]></isNotNull>
+   	    <isNotNull property="APPLY_DEP" prepend=","><![CDATA[APPLY_DEP = #APPLY_DEP#]]></isNotNull>
+   	    <isNotNull property="APPLY_DATE" prepend=","><![CDATA[APPLY_DATE = to_date(#APPLY_DATE#,'yyyy-MM-DD')]]></isNotNull>
+   	    <isNotNull property="VISIT_PEOPLE" prepend=","><![CDATA[VISIT_PEOPLE =  #VISIT_PEOPLE#]]></isNotNull>
+   	    <isNotNull property="VISIT_DATE" prepend=","><![CDATA[VISIT_DATE =  to_date(#VISIT_DATE#,'yyyy-MM-DD') ]]></isNotNull>
+   	    <isNotNull property="CITY" prepend=","><![CDATA[CITY =  #CITY#]]></isNotNull>
+   	    <isNotNull property="CHANN_NAME" prepend=","><![CDATA[CHANN_NAME = #CHANN_NAME#]]></isNotNull>
+   	    <isNotNull property="STORE_NAME" prepend=","><![CDATA[STORE_NAME = #STORE_NAME#]]></isNotNull>
+   	    <isNotNull property="STORE_STROKES" prepend=","><![CDATA[STORE_STROKES = #STORE_STROKES#]]></isNotNull>
+   	    <isNotNull property="GROUND" prepend=","><![CDATA[GROUND = #GROUND#]]></isNotNull>
+   	    <isNotNull property="PRODUCTS" prepend=","><![CDATA[PRODUCTS =  #PRODUCTS#]]></isNotNull>
+   	    <isNotNull property="PROPERTIES" prepend=","><![CDATA[PROPERTIES = #PROPERTIES#]]></isNotNull>
+   	    <isNotNull property="SOFT_DECORATION" prepend=","><![CDATA[SOFT_DECORATION = #SOFT_DECORATION#]]></isNotNull>
+   	    <isNotNull property="BLANKETS" prepend=","><![CDATA[BLANKETS = #BLANKETS#]]></isNotNull>
+   	    <isNotNull property="TELEVISION" prepend=","><![CDATA[TELEVISION = #TELEVISION#]]></isNotNull>
+   	    <isNotNull property="LIGHT_LAMP" prepend=","><![CDATA[LIGHT_LAMP = #LIGHT_LAMP#]]></isNotNull>
+	  
+	    <isNotNull property="MATERIALS" prepend=","><![CDATA[MATERIALS = #MATERIALS#]]></isNotNull>
+	    <isNotNull property="WATER_MACHINE" prepend=","><![CDATA[WATER_MACHINE = #WATER_MACHINE#]]></isNotNull>
+	    <isNotNull property="FIGURE" prepend=","><![CDATA[FIGURE = #FIGURE#]]></isNotNull>
+	    <isNotNull property="MANNER" prepend=","><![CDATA[MANNER = #MANNER#]]></isNotNull>
+	    <isNotNull property="TECHNICAL" prepend=","><![CDATA[TECHNICAL = #TECHNICAL#]]></isNotNull>
+	    <isNotNull property="EXECUTE_ACTION_TOPIC" prepend=","><![CDATA[EXECUTE_ACTION_TOPIC = #EXECUTE_ACTION_TOPIC#]]></isNotNull>
+	    <isNotNull property="EXECUTE_ACTION_DATE" prepend=","><![CDATA[EXECUTE_ACTION_DATE = to_date(#EXECUTE_ACTION_DATE#,'yyyy-MM-DD')]]></isNotNull>
+	    <isNotNull property="EXECUTE_ACTION_ADDR" prepend=","><![CDATA[EXECUTE_ACTION_ADDR = #EXECUTE_ACTION_ADDR#]]></isNotNull>
+   	    <isNotNull property="ACTION_PLAN" prepend=","><![CDATA[ACTION_PLAN = #ACTION_PLAN#]]></isNotNull>
+   	    <isNotNull property="ACTION_REALITY_RATE" prepend=","><![CDATA[ACTION_REALITY_RATE = #ACTION_REALITY_RATE#]]></isNotNull>
+   	    <isNotNull property="ACTION_RATE" prepend=","><![CDATA[ACTION_RATE = #ACTION_RATE#]]></isNotNull>
+   	    <isNotNull property="ACTION_RIGHT" prepend=","><![CDATA[ACTION_RIGHT = #ACTION_RIGHT#]]></isNotNull>
+   	    <isNotNull property="ACTION_BAD" prepend=","><![CDATA[ACTION_BAD = #ACTION_BAD#]]></isNotNull>
+   	    <isNotNull property="MONTH_ORDER_NUM" prepend=","><![CDATA[MONTH_ORDER_NUM = #MONTH_ORDER_NUM#]]></isNotNull>
+   	    <isNotNull property="MONTH_REALITY_RATE" prepend=","><![CDATA[MONTH_REALITY_RATE = #MONTH_REALITY_RATE#]]></isNotNull>
+   	    <isNotNull property="MONTH_RATE" prepend=","><![CDATA[MONTH_RATE = #MONTH_RATE#]]></isNotNull>
+   	    <isNotNull property="SEASON_ORDER_NUM" prepend=","><![CDATA[SEASON_ORDER_NUM = #SEASON_ORDER_NUM#]]></isNotNull>
+   	    <isNotNull property="SEASON_REALITY_RATE" prepend=","><![CDATA[SEASON_REALITY_RATE = #SEASON_REALITY_RATE#]]></isNotNull>
+   	    <isNotNull property="SEASON_RATE" prepend=","><![CDATA[SEASON_RATE = #SEASON_RATE#]]></isNotNull>
+   	    <isNotNull property="EVALUATION_MONTH" prepend=","><![CDATA[EVALUATION_MONTH = #EVALUATION_MONTH#]]></isNotNull>
+   	    <isNotNull property="EVALUATION_SEASON" prepend=","><![CDATA[EVALUATION_SEASON = #EVALUATION_SEASON#]]></isNotNull>
+   	    <isNotNull property="ACTION_PLAN_TOPIC" prepend=","><![CDATA[ACTION_PLAN_TOPIC = #ACTION_PLAN_TOPIC#]]></isNotNull>
+   	    <isNotNull property="ACTION_PLAN_DATE" prepend=","><![CDATA[ACTION_PLAN_DATE = to_date(#ACTION_PLAN_DATE#,'yyyy-MM-DD')]]></isNotNull>
+   	    <isNotNull property="ACTION_PLAN_ADDR" prepend=","><![CDATA[ACTION_PLAN_ADDR = #ACTION_PLAN_ADDR#]]></isNotNull>
+   	    <isNotNull property="EXPECTED_GOAL" prepend=","><![CDATA[EXPECTED_GOAL = #EXPECTED_GOAL#]]></isNotNull>
+   	    <isNotNull property="COMPETITION_INFO" prepend=","><![CDATA[COMPETITION_INFO = #COMPETITION_INFO#]]></isNotNull>
+   	    <isNotNull property="SUPPORT_DEMAND" prepend=","><![CDATA[SUPPORT_DEMAND = #SUPPORT_DEMAND#]]></isNotNull>
+   	    <isNotNull property="PROCESS" prepend=","><![CDATA[PROCESS = #PROCESS#]]></isNotNull>
+   	    <isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK#]]></isNotNull>
+   	    <isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+   	    <isNotNull property="TERM_ID" prepend=","><![CDATA[TERM_ID = #TERM_ID#]]></isNotNull>
+   	    <isNotNull property="TERM_NO" prepend=","><![CDATA[TERM_NO = #TERM_NO#]]></isNotNull>
+   	    <isNotNull property="CHANN_ID" prepend=","><![CDATA[CHANN_ID = #CHANN_ID#]]></isNotNull>
+   	    <isNotNull property="CHANN_NO" prepend=","><![CDATA[CHANN_NO = #CHANN_NO#]]></isNotNull>
+	    <isNotNull property="STORE_VISIT_NO" prepend=","><![CDATA[STORE_VISIT_NO = #STORE_VISIT_NO# ]]></isNotNull>
+ 	    <isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR# ]]></isNotNull>
+	    <isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>	
+	    <isNotNull property="LIGHT_BOX" prepend=","><![CDATA[LIGHT_BOX = #LIGHT_BOX#]]></isNotNull>	
+	    <isNotNull property="VISIT_PEOPLE_ID" prepend=","><![CDATA[VISIT_PEOPLE_ID = #VISIT_PEOPLE_ID# ]]></isNotNull>
+   	    <isNotNull property="ACTUAL_INVESTMENT" prepend=","><![CDATA[ACTUAL_INVESTMENT = #ACTUAL_INVESTMENT# ]]></isNotNull>
+   	    <isNotNull property="FORECAST_INVESTMENT" prepend=","><![CDATA[FORECAST_INVESTMENT = #FORECAST_INVESTMENT# ]]></isNotNull>
+        <isNotNull property="VISIT_TYPE" prepend=","><![CDATA[VISIT_TYPE = #VISIT_TYPE# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where STORE_VISIT_ID = #STORE_VISIT_ID#]]>
+</update>
+<!-- 逻辑删除 只是更新状态-->
+<delete id="delete" parameterClass="map">
+	<![CDATA[ update ERP_STORE_VISIT
+	               set DEL_FLAG = #DEL_FLAG#
+ 	          where 
+	          STORE_VISIT_ID = #STORE_VISIT_ID# 
+    ]]>
+</delete>
+
+<select id="loadByConfId" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[ 
+	       select 
+	              u.store_visit_id,
+	              u.store_visit_no,
+                  u.title,
+                  u.eme_degree,
+                  u.apply_person,
+                  u.apply_dep,
+                  u.apply_date,
+                  u.visit_people,
+                  u.visit_date,
+                  u.city,
+                  u.chann_id,
+                  u.chann_no,
+                  u.chann_name,
+                  u.TERM_ID,
+                  u.TERM_NO,
+                  u.store_name,
+                  u.store_strokes,
+                  u.light_box,
+                  u.ground,
+                  u.products,
+                  u.properties,
+                  u.soft_decoration,
+                  u.blankets,
+                  u.television,
+                  u.light_lamp,
+                  u.materials,
+                  u.water_machine,
+                  u.figure,
+                  u.manner,
+                  u.technical,
+                  u.execute_action_topic,
+                  u.execute_action_date,
+                  u.execute_action_addr,
+                  u.ACTION_PLAN_TOPIC,
+                  u.action_plan,
+                  u.action_reality_rate,
+                  u.action_rate,
+                  u.action_right,
+                  u.action_bad,
+                  u.month_order_num,
+                  u.month_reality_rate,
+                  u.month_rate,
+                  u.season_order_num,
+                  u.season_reality_rate,
+                  u.season_rate,
+                  u.evaluation_month,
+                  u.evaluation_season,
+                  u.action_plan_date, 
+                  u.action_plan_addr,
+                  u.expected_goal,
+                  u.competition_info,
+                  u.support_demand,
+                  u.process,
+                  u.remark,
+                  u.state,
+                  b.att_path,
+                  u.VISIT_TYPE,
+                  u.ACTUAL_INVESTMENT,
+                  u.FORECAST_INVESTMENT,
+                  u.VISIT_TYPE
+                  from  ERP_STORE_VISIT u left join BASE_ATT  b on u.store_visit_id = b.from_bill_id
+                  where 
+			      u.STORE_VISIT_ID = #STORE_VISIT_ID#
+	]]>
+	</select>
+	
+	
+
+<select id="loadByIds" parameterClass="String" resultClass="java.util.HashMap">
+	<![CDATA[ 
+	  select 
+		u.EXPAND_VISIT_DTL_ID,
+		u.EXPAND_VISIT_ID,
+		u.STORE_NAME,
+		u.SOFTWARE_LAYER,
+		u.LOCATION,
+		u.POPULARITY,
+		u.OPENNING_TIME,
+		u.INVESTMENT_TIME,
+		u.OTHER_INFO,
+		u.STORE_MNG_NAME,
+		u.STORE_MNG_TEL,
+		u.STORE_MNG_EMAIL,
+		u.INVESTMENT_MNG_NAME,
+		u.INVESTMENT_MNG_TEL,
+		u.INVESTMENT_MNG_EMAIL,
+		u.CUST_NAME,
+		u.CUST_STATE,
+		u.CUST_FUNDS,
+		u.BUSINESS_PHI,
+		u.CUST_OTHER_INFO,
+		u.CUST_INTENTION,
+		u.FOLLOW_WAY
+        from ERP_EXPAND_VISIT_DTL u 
+	    where 
+		u.EXPAND_VISIT_DTL_ID in ($EXPAND_VISIT_DTL_ID$)
+	]]>
+</select>
+<!--启用/停用-->
+<update id="updStusById" parameterClass="map">	
+     <![CDATA[ 
+	  update ERP_PRMT_COST_REIT 
+	       set STATE = #STATE#
+              ,UPD_NAME=#UPD_NAME#
+              ,UPDATOR=#UPDATOR#
+              ,UPD_TIME=sysdate
+ 	  where 
+	     PRMT_COST_REIT_ID = #PRMT_COST_REIT_ID:VARCHAR# 
+    ]]>
+</update>
+
+<select id="expertExcel" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+	      select   DISTINCT
+	               u.store_visit_id,
+			       u.store_visit_no,
+			       u.title,
+			       u.eme_degree,
+			       u.apply_person,
+			       u.apply_dep,
+			       u.apply_date,
+			       u.visit_people,
+			       u.visit_date,
+			       u.city,
+			       u.chann_id,
+			       u.chann_no,
+			       u.chann_name,
+			       u.TERM_ID,
+			       u.TERM_NO,
+			       u.store_name,
+			       u.store_strokes,
+			       u.light_box,
+			       u.ground,
+			       u.products,
+			       u.properties,
+			       u.soft_decoration,
+			       u.blankets,
+			       u.television,
+			       u.light_lamp,
+			       u.materials,
+			       u.water_machine,
+			       u.figure,
+			       u.manner,
+			       u.technical,
+			       u.execute_action_topic,
+			       u.execute_action_date,
+			       u.execute_action_addr,
+			       u.ACTION_PLAN_TOPIC,
+			       u.action_plan,
+			       u.action_reality_rate,
+			       u.action_rate,
+			       u.action_right,
+			       u.action_bad,
+			       u.month_order_num,
+			       u.month_reality_rate,
+			       u.month_rate,
+			       u.season_order_num,
+			       u.season_reality_rate,
+			       u.season_rate,
+			       u.evaluation_month,
+			       u.evaluation_season,
+			       u.action_plan_date,
+			       u.action_plan_addr,
+			       u.expected_goal,
+			       u.competition_info,
+			       u.support_demand,
+			       u.process,
+			       u.remark,
+			       u.state,
+			       u.VISIT_TYPE,
+			       u.ACTUAL_INVESTMENT,
+			       u.FORECAST_INVESTMENT,
+			       u.VISIT_TYPE,
+			       (SELECT TERM_NAME FROM BASE_TERMINAL WHERE TERM_ID = u.TERM_ID) TERM_NAME
+			       from ERP_STORE_VISIT u
+	]]>
+	<dynamic prepend="where">
+	  <include refid="queryDynSqlT"/>
+	</dynamic>
+</select>
+
+<select id="expertExcelSH" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+	      select   
+	               DISTINCT
+	               u.store_visit_id,
+			       u.store_visit_no,
+			       u.title,
+			       u.eme_degree,
+			       u.apply_person,
+			       u.apply_dep,
+			       u.apply_date,
+			       u.visit_people,
+			       u.visit_date,
+			       u.city,
+			       u.chann_id,
+			       u.chann_no,
+			       u.chann_name,
+			       u.TERM_ID,
+			       u.TERM_NO,
+			       u.store_name,
+			       u.store_strokes,
+			       u.light_box,
+			       u.ground,
+			       u.products,
+			       u.properties,
+			       u.soft_decoration,
+			       u.blankets,
+			       u.television,
+			       u.light_lamp,
+			       u.materials,
+			       u.water_machine,
+			       u.figure,
+			       u.manner,
+			       u.technical,
+			       u.execute_action_topic,
+			       u.execute_action_date,
+			       u.execute_action_addr,
+			       u.ACTION_PLAN_TOPIC,
+			       u.action_plan,
+			       u.action_reality_rate,
+			       u.action_rate,
+			       u.action_right,
+			       u.action_bad,
+			       u.month_order_num,
+			       u.month_reality_rate,
+			       u.month_rate,
+			       u.season_order_num,
+			       u.season_reality_rate,
+			       u.season_rate,
+			       u.evaluation_month,
+			       u.evaluation_season,
+			       u.action_plan_date,
+			       u.action_plan_addr,
+			       u.expected_goal,
+			       u.competition_info,
+			       u.support_demand,
+			       u.process,
+			       u.remark,
+			       u.state,
+			       u.VISIT_TYPE,
+			       u.ACTUAL_INVESTMENT,
+			       u.FORECAST_INVESTMENT,
+			       u.VISIT_TYPE,
+			       (SELECT TERM_NAME FROM BASE_TERMINAL WHERE TERM_ID = u.TERM_ID) TERM_NAME
+			       from ERP_STORE_VISIT u,
+	]]>
+	<isNotEmpty prepend="" property="QXJBCON">
+	   $QXJBCON$  
+    </isNotEmpty>
+    <include refid="qDynSql" />
+</select>
+
+</sqlMap>

@@ -1,0 +1,111 @@
+@charset "utf-8";
+/* CSS Document */
+/*
+body,div,a,img,p,form,h1,h2,h3,h4,h5,h6,input,textarea,ul,li,dt,dd,dl,strong{
+	margin:0;
+	padding:0;}
+	
+#logo,#nav,#banner,#content,#footer{width:auto; margin:0 auto;}
+
+
+body{ font-family: Arial,"微软雅黑" ;
+	  font-size:18px;
+	  color:#595656;
+	  width:auto;}
+	  
+span {line-height:40px;}
+   
+.indent {text-indent:2em;} 
+   
+.center{margin:0px auto;}
+.central{text-align:center !important;}
+.left{float:left;}
+.right{float:right;}
+.textleft{ text-align:left; }
+.textright{ text-align:right; }
+.middle{vertical-align:middle;}
+.clear{clear:both;}
+.hide{display:none;}
+.inline{ display:inline; }
+.hand{cursor:pointer;}
+.bold{font-weight:bold;}
+.red{color:#F00;}
+
+a img{border:none;}	  
+a{text-decoration:none;} 链接无下划线,有为underline  
+a:link {color:#595656; text-decoration:none;}  未访问的链接 
+a:visited {color:#900; text-decoration: none;}
+a:hover{color:#06f; text-decoration:none;}  鼠标在链接上  
+a:active {color: #fff; text-decoration: none;} 点击激活链接 
+
+.bg{width:1400px;}
+
+.bg01{background-image:url(../images/login/bg_001.png);
+    height:280px;
+	width:1400px;}
+	
+.bg02{background-image:url(../images/login/bg_002.png);
+      height:400px;
+      width:700px;
+	  float:left;}
+	  
+.bg03{background-image:url(../images/login/bg_003.png);
+      height:400px;
+      width:700px;
+	  float:left;}
+	  
+.bg04{background-image:url(../images/login/bg_004.png);
+    height:88px;
+	width:1400px;}
+	
+.login{width:450px;
+       height:300px;
+	   background-image:url(image/login_bg02.png);
+	   float:left;
+	   margin-left:7%}
+	   
+.sr{height:30px; width:200px;
+    background-color:#b09f70;
+	border:0px;}
+	   
+.user{width:300px;
+      height:30px;
+	  text-align:left;
+	  line-height:30px;
+	  margin:80px 100px 0 100px;}
+	  
+.password{width:300px;
+      height:30px;
+	  text-align:left;
+	  line-height:30px;
+	  margin:20px 100px;}
+	  
+.lobu{ width:380px;
+       height:50px;
+	   margin:40px 35px;}
+
+.lobutton{width:160px;
+      height:50px;
+	  text-align:left;
+	  line-height:30px;
+	  float:left;}
+
+.lobutton a{height:50px;
+        width:160px;
+        background-image:url(../images/login/button01.png);
+		margin:0;
+		padding:0;
+		color:#fff;
+		line-height:50px;
+		text-align:center;
+		display:block;
+		float:left;}
+		
+.lobutton a:hover {
+	background-image:url(../images/login/button02.png);
+	font-weight: bold;}
+	
+.kg {width:60px;
+     height:50px;
+	 float:left;}
+*/

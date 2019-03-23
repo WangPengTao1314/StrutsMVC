@@ -1,0 +1,164 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<!--
+@author ghx
+@function 
+@version 2014-07-07
+-->
+<sqlMap  namespace="Traincourse">
+
+<!-- 主表查询SQL -->
+<sql id="coreSql">
+  <![CDATA[ 
+	select 
+		u.TRAIN_COURSE_ID,
+		u.TRAIN_COURSE_NO,		
+		u.TRAIN_COURSE_NAME,
+		u.TRAIN_TYPE,
+		u.FIXED_PSON_NUM,
+		to_char(u.TRAIN_TIME_BEG,'yyyy-MM-DD HH24:MI') TRAIN_TIME_BEG,
+		to_char(u.TRAIN_TIME_END,'yyyy-MM-DD HH24:MI') TRAIN_TIME_END, 
+		u.TRAIN_ADDR,
+		u.TRAIN_GOAL,
+		u.TRAIN_CONTENT,				
+		u.STATE,
+		u.REMARK,
+		(select c.ATT_PATH  from BASE_ATT c where c.FROM_BILL_ID = u.TRAIN_COURSE_ID and c.DEL_FLAG = 0 and rownum = 1) ATT_PATH 
+      from ERP_TRAIN_COURSE u 
+   ]]>
+    <dynamic prepend="where">
+	   <include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+	   <include refid="orderSql"/>
+	</dynamic>
+</sql>
+
+<sql id="orderSql">
+   <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+
+
+<!--主表动态查询 and 列表分页 -->
+<sql id="queryDynSql">  
+  <isNotEmpty prepend="and" property="TRAIN_COURSE_NO">
+    u.TRAIN_COURSE_NO like '%'||#TRAIN_COURSE_NO#||'%'
+  </isNotEmpty>
+   <isNotEmpty prepend="and" property="TRAIN_COURSE_NAME">
+    u.TRAIN_COURSE_NAME like '%'||#TRAIN_COURSE_NAME#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="TRAIN_TYPE">
+    u.TRAIN_TYPE = #TRAIN_TYPE#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="TRAIN_ADDR">
+    u.TRAIN_ADDR like '%'||#TRAIN_ADDR#||'%'
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="TRAIN_GOAL">
+  	u.TRAIN_GOAL like '%'||#TRAIN_GOAL#||'%'
+  </isNotEmpty>  
+  <isNotEmpty prepend="and" property="STATE">
+    u.STATE =#STATE#
+  </isNotEmpty>  
+  <isNotEmpty prepend="and" property="LEDGER_ID">
+  	u.LEDGER_ID=#LEDGER_ID#
+  </isNotEmpty>  
+  <isNotEmpty prepend="and " property="DEL_FLAG">
+	u.DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>	 
+  <isNotEmpty prepend="and " property="QXJBCON">
+	$QXJBCON$
+  </isNotEmpty>
+</sql>
+<!-- 分页计数 -->
+<select id="pageCount" parameterClass="map" resultClass="int">
+      <![CDATA[select count(0) cnt FROM ERP_TRAIN_COURSE u ]]>
+	<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+	</dynamic>
+</select>
+<!-- 主表分页查询 -->
+<select id="pageQuery" parameterClass="map" resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+</select>
+
+<!-- 根据ID查找 -->
+<select id="loadById" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<![CDATA[SELECT 
+			u.TRAIN_COURSE_ID,
+			u.TRAIN_COURSE_NO,
+			u.TRAIN_COURSE_NAME,
+			u.TRAIN_TYPE,
+			u.FIXED_PSON_NUM,
+			to_char(u.TRAIN_TIME_BEG,'yyyy-MM-DD HH24:MI') TRAIN_TIME_BEG,
+			to_char(u.TRAIN_TIME_END,'yyyy-MM-DD HH24:MI') TRAIN_TIME_END,
+			u.TRAIN_ADDR,
+			u.TRAIN_GOAL,
+			u.TRAIN_CONTENT,			
+			u.STATE,
+			u.REMARK,			
+			(select c.ATT_PATH  from BASE_ATT c where c.FROM_BILL_ID = u.TRAIN_COURSE_ID and c.DEL_FLAG = 0  and rownum = 1) ATT_PATH 
+					
+			FROM ERP_TRAIN_COURSE u 
+			WHERE u.TRAIN_COURSE_ID = #TRAIN_COURSE_ID# 
+		]]>
+</select>
+
+<!-- 新增 -->
+<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.ERP_TRAIN_COURSE(
+		 	TRAIN_COURSE_ID,TRAIN_COURSE_NO,TRAIN_COURSE_NAME,TRAIN_TYPE,FIXED_PSON_NUM,TRAIN_TIME_BEG,TRAIN_TIME_END,
+			TRAIN_ADDR,TRAIN_GOAL,TRAIN_CONTENT,STATE,REMARK,			
+			CREATOR,CRE_NAME,CRE_TIME,DEPT_ID,DEPT_NAME,ORG_ID,ORG_NAME,LEDGER_ID,LEDGER_NAME,DEL_FLAG
+		 	)
+		 values(
+		 	#TRAIN_COURSE_ID#,#TRAIN_COURSE_NO#,#TRAIN_COURSE_NAME#,#TRAIN_TYPE#,#FIXED_PSON_NUM#,
+		 	to_date(#TRAIN_TIME_BEG#,'yyyy-MM-DD HH24:MI'),to_date(#TRAIN_TIME_END#,'yyyy-MM-DD HH24:MI'),
+			#TRAIN_ADDR#,#TRAIN_GOAL#,#TRAIN_CONTENT#,#STATE#,#REMARK#,			
+			#CREATOR#,#CRE_NAME#,sysdate,#DEPT_ID#,#DEPT_NAME#,#ORG_ID#,#ORG_NAME#,#LEDGER_ID#,#LEDGER_NAME#,#DEL_FLAG#	 
+		 )
+		]]>
+</insert>
+
+<!-- 修改 -->
+<update id="updateById" parameterClass="map">
+		 <![CDATA[ update ${SYSSCHEMA}.ERP_TRAIN_COURSE ]]>
+		<dynamic prepend="set">
+			<isNotNull property="TRAIN_COURSE_ID" prepend=","><![CDATA[TRAIN_COURSE_ID = #TRAIN_COURSE_ID#]]></isNotNull>
+			<isNotNull property="TRAIN_COURSE_NO" prepend=","><![CDATA[TRAIN_COURSE_NO = #TRAIN_COURSE_NO#]]></isNotNull>
+			<isNotNull property="TRAIN_COURSE_NAME" prepend=","><![CDATA[TRAIN_COURSE_NAME = #TRAIN_COURSE_NAME#]]></isNotNull>
+			<isNotNull property="TRAIN_TYPE" prepend=","><![CDATA[TRAIN_TYPE = #TRAIN_TYPE#]]></isNotNull>
+			<isNotNull property="FIXED_PSON_NUM" prepend=","><![CDATA[FIXED_PSON_NUM = #FIXED_PSON_NUM#]]></isNotNull>
+			<isNotNull property="TRAIN_TIME_BEG" prepend=","><![CDATA[TRAIN_TIME_BEG = to_date(#TRAIN_TIME_BEG#,'yyyy-MM-DD HH24:MI')]]></isNotNull>
+			<isNotNull property="TRAIN_TIME_END" prepend=","><![CDATA[TRAIN_TIME_END = to_date(#TRAIN_TIME_END#,'yyyy-MM-DD HH24:MI')]]></isNotNull>
+			<isNotNull property="TRAIN_ADDR" prepend=","><![CDATA[TRAIN_ADDR = #TRAIN_ADDR#]]></isNotNull>
+			<isNotNull property="TRAIN_GOAL" prepend=","><![CDATA[TRAIN_GOAL = #TRAIN_GOAL#]]></isNotNull>
+			<isNotNull property="TRAIN_CONTENT" prepend=","><![CDATA[TRAIN_CONTENT = #TRAIN_CONTENT#]]></isNotNull>			
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK#]]></isNotNull>
+			
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME = sysdate]]></isNotNull>						
+		</dynamic>
+		<![CDATA[ where TRAIN_COURSE_ID = #TRAIN_COURSE_ID# ]]>
+</update>
+
+<!-- 软删除 -->
+<update id="delete" parameterClass="map">
+	<![CDATA[ update ${SYSSCHEMA}.ERP_TRAIN_COURSE ]]>
+		<dynamic prepend="set">
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where TRAIN_COURSE_ID = #TRAIN_COURSE_ID# ]]>		
+</update>
+
+
+
+</sqlMap>

@@ -1,0 +1,110 @@
+body{
+	font-family: "宋体";
+	font-size: 12px;
+	margin-left:5px;
+	margin-right:5px;
+	scrollbar-face-color: #f2dddc;
+	background-color:#f2dddc;
+	scrollbar-highlight-color: buttonhighlight;
+	scrollbar-shadow-color: buttonshadow;
+	scrollbar-3dlight-color: buttonshadow;
+	scrollbar-track-color: ButtonFace;
+	scrollbar-darkshadow-color: buttonshadow
+}
+table{
+	border-collapse:separate;
+	font-family: "宋体";
+	font-size: 12px;
+}
+tr{
+	height:22px;
+}
+td{
+	padding: 1px 5px 1px 5px;;
+}
+.th_up{
+	font-weight:normal;
+	background-image: url(../images/main/tab_bg.gif);
+	border-style:solid;
+	border-width:1 1 1 1;
+	border-top-color:buttonhighlight;
+	border-left-color:buttonhighlight;
+	border-bottom-color:buttonshadow;
+	border-right-color:buttonshadow;
+	cursor:hand;
+}
+.th_down{
+	font-weight:normal;
+	background-color:ButtonFace;
+	border-style:solid;
+	border-width:1 1 1 1;
+	border-top-color:buttonshadow;
+	border-left-color:buttonshadow;
+	border-bottom-color:buttonhighlight;
+	border-right-color:buttonhighlight;
+}
+.mdiv {
+	background-color:#f2dddc;
+	border-width:2px;
+	border-style: inset;
+}
+.lineinput {
+	ime-mode:disabled;
+	color:blue;
+	text-align:center;
+	border-top-style: none;
+	border-right-style: none;
+	border-left-style: none;
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	border-bottom-color:buttonshadow;
+	background-color: #e0f2f6;
+}
+.poplayer{
+	margin-top:10px;
+ 	z-index:10;
+	font-size:12px;
+	position:absolute;
+	width:790px;
+	height:150px;
+	top:-1000px;
+	overflow-x:hidden;
+	overflow-y:auto;
+	border:2px;
+	border-style:solid;
+	border-color:#e0f2f6;
+	background-color:#e0f2f6;
+	filter:Alpha(Opacity=85,FinishOpacity=85,Style=3,StarX=0,Stary=0,FinishX=1000,FinishY=1000);
+}
+.popInput{
+	background-color:#f2dddc;
+	font-size:12px;
+}
+.button {
+	border: 1px solid #f5cccc;
+	background-color:#f5cccc;
+	/*background-image: url(../images/main/button_bg.gif);*/
+	height: 20px;
+	cursor: pointer;
+	background-repeat: no-repeat;
+}
+tr.list_row td{
+	background-color: #f5cccc;	
+}
+table.lst {
+	background-color: gray; /**cbe9fd**/
+}
+.selected{
+	background-color: #f5cccc;
+	cursor:hand;
+}
+.notSelect{
+	background-color: #FFFFFF;
+	color: #000000;
+	cursor:hand;
+}
+.clicked{
+	background-color: #f5cccc;
+	color: #000000;
+	cursor:hand;
+}

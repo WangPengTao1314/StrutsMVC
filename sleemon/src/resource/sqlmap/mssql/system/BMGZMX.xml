@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ *@module 基础资料
+ *@func 维护编码规则
+ *@version 1.1
+ *@author 孙炜
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="BMGZMX">
+
+	<typeAlias type="com.hoperun.sys.model.BmgzMxModel"
+		alias="BmgzMxModel" />
+
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="BmgzMxModel" class="BmgzMxModel">
+		<result column="BMGZMXID" property="BMGZMXID" />
+	</resultMap>
+
+	<!-- 动态查询 and 列表分页 -->
+	<sql id="queryDynSql">
+		<isNotEmpty prepend="and" property="BMGZMXID">
+			u.BMGZMXID =#BMGZMXID#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="BMGZID">
+			u.BMGZID =#BMGZID#
+		</isNotEmpty>		
+		<isNotEmpty prepend="and" property="DELFLAG">
+			u.DELFLAG = #DELFLAG#
+		</isNotEmpty>
+	</sql>
+    <sql id="orderSql">
+		<isNotEmpty prepend="" property="orderField">
+			 $orderField$
+		</isNotEmpty>CRETIME DESC
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[  select u.BMGZMXID,u.BMGZID,u.DLX,u.DELFLAG,u.CREATER,u.CRETIME,u.UPDATER,u.UPDTIME,u.DCD,u.DT,u.NYS,u.BC,u.STATE,u.CSZ
+		  from ${SYSSCHEMA}.T_SYS_BMGZMX u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="BmgzMxModel">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(BMGZMXID) cnt FROM ${SYSSCHEMA}.T_SYS_BMGZMX u ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+
+   <!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="BmgzMxModel">
+		<include refid="coreSql" />
+	</select>
+	
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.T_SYS_BMGZMX(BMGZMXID,BMGZID,DLX,DELFLAG,CREATER,CRETIME,UPDATER,UPDTIME,DCD,DT,NYS,BC,CSZ,STATE)
+		 values(#BMGZMXID#,#BMGZID#,#DLX#,0,#CREATER#,CONVERT(varchar(100), GETDATE(), 20),#UPDATER#,CONVERT(varchar(100), GETDATE(), 20),#DCD#,#DT#,#NYS#,#BC#,
+		        #CSZ#,#STATE#)
+		]]>
+	</insert>
+
+	<update id="updateById" parameterClass="map">
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_BMGZMX set UPDTIME = convert(varchar, getdate(), 20) ]]>
+		<!-- CHANAME, CHADES,CHADATE,CHASTU -->
+		<dynamic prepend="">
+			<isNotNull property="BMGZID" prepend=","><![CDATA[BMGZID = #BMGZID#]]></isNotNull>
+			<isNotNull property="DLX" prepend=","><![CDATA[DLX = #DLX#]]></isNotNull>
+			<isNotNull property="DELFLAG" prepend=","><![CDATA[DELFLAG = #DELFLAG#]]></isNotNull>
+			<isNotNull property="UPDATER" prepend=","><![CDATA[UPDATER = #UPDATER#]]></isNotNull>
+			<isNotNull property="DCD" prepend=","><![CDATA[DCD = #DCD#]]></isNotNull>
+			<isNotNull property="DT" prepend=","><![CDATA[DT = #DT#]]></isNotNull>
+			<isNotNull property="NYS" prepend=","><![CDATA[NYS = #NYS#]]></isNotNull>
+			<isNotNull property="BC" prepend=","><![CDATA[BC = #BC#]]></isNotNull>
+			<isNotNull property="CSZ" prepend=","><![CDATA[CSZ = #CSZ#]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where BMGZMXID = #BMGZMXID# ]]>
+	</update>
+	<!-- 删除菜单 -->
+	<delete id="deleteByFkId" parameterClass="String">
+		<!--  delete from ${SYSSCHEMA}.T_SYS_BMGZMX where BMGZID = #BMGZID:VARCHAR#  -->
+		<![CDATA[ update ${SYSSCHEMA}.T_SYS_BMGZMX set DELFLAG =1 where BMGZID = #BMGZID:VARCHAR# ]]>
+	</delete>
+	<delete id="deleteByIds" parameterClass="String">
+		<!-- delete from ${SYSSCHEMA}.T_SYS_BMGZMX where BMGZMXID in ($CMLMXIDS$)  -->
+		<![CDATA[ delete from ${SYSSCHEMA}.T_SYS_BMGZMX where BMGZMXID in ($bmgzMxIds$) ]]>
+	</delete>
+	<insert id="insertBMGZMX" parameterClass="map">
+	   insert into ${SYSSCHEMA}.t_sys_datarecycle(DATARECYCLEID,DELETOR,DELTIME,BUSINESSTYPE,DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10,DF11,DF12,DF13,DF14)
+	    select #DATARECYCLEID#+convert(varchar,row_number() over(order by BMGZMXID)),#DELETOR#,CONVERT(varchar(100), GETDATE(), 20),'编码规则明细信息维护',BMGZMXID,BMGZID,DLX,DCD,DT,NYS,BC,CSZ,DELFLAG,CREATER,CRETIME,UPDATER,UPDTIME,STATE
+        from ${SYSSCHEMA}.T_SYS_BMGZMX  where  BMGZMXID in ($bmgzMxIds$)
+	</insert>
+	<select id="loadById" parameterClass="map" resultClass="java.util.HashMap">
+		<![CDATA[  select u.BMGZMXID,u.BMGZID,u.DLX,u.DELFLAG,u.CREATER,u.CRETIME,u.UPDATER,u.UPDTIME,u.DCD,u.DT,u.NYS,u.BC,u.STATE,u.CSZ
+		     from ${SYSSCHEMA}.T_SYS_BMGZMX u where u.BMGZMXID = #BMGZMXID#]]>
+	</select>
+	<select id="loadByIds" parameterClass="String" resultClass="BmgzMxModel">
+		<![CDATA[  
+		  select u.BMGZMXID,u.BMGZID,u.DLX,u.DELFLAG,u.CREATER,u.CRETIME,u.UPDATER,u.UPDTIME,u.DCD,u.DT,u.NYS,u.BC,u.STATE,u.CSZ
+		  from ${SYSSCHEMA}.T_SYS_BMGZMX u
+		  where u.BMGZMXID in ($BMGZMXIDS$)]]>
+	</select>
+	
+	<select id="getZcd" parameterClass="String" resultClass="int">
+		<![CDATA[  select sum(DCD)
+		     from ${SYSSCHEMA}.T_SYS_BMGZMX u where u.BMGZID = #BMGZID# and DELFLAG =0]]>
+	</select>
+	
+</sqlMap>
+

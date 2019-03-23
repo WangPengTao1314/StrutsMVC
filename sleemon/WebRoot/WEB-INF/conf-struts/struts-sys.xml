@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  
+/**
+ * @module 系统管理
+ * @fuc struts
+ * @version 1.1
+ * @author zhuxw
+ */
+-->
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://struts.apache.org/dtds/struts-config_1_2.dtd">
+<struts-config>
+	<action-mappings>
+		<!-- 登陆 -->
+		<action parameter="action" path="/login" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="index" path="/pages/index/index.jsp" />
+			<forward name="logout" path="/pages/index/logout.jsp" />
+			<forward name="login" path="/pages/index/login.jsp" />
+			<forward name="setPwd" path="/pages/index/setPwd_M.jsp" />
+			<forward name="towapindex" path="/pages/index/wapLogin.jsp" />
+		</action>
+		<!-- 首页和短消息 -->
+		<action parameter="action" path="/firstPage" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="message" path="/pages/sys/message/message.jsp" />
+			<forward name="portal" path="/pages/index/portal.jsp" />
+			<forward name="toDrpFirst" path="/pages/index/drpFirst.jsp" />
+			<forward name="toErpFirst" path="/pages/index/erpFirst.jsp" />
+			
+		</action>
+		<action parameter="action" path="/system/readxml" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="toreadXMLList" path="/pages/sys/qxcomm/readQXxml.jsp" />
+			<forward name="touserqx" path="/pages/sys/qxcomm/userQX.jsp" />
+			<forward name="toMkxxTree" path="/pages/sys/qxcomm/MKXXTree.jsp" />
+			<forward name="toxtjsqx" path="/pages/sys/qxcomm/xtjsQX.jsp" />
+			<forward name="togzzqx" path="/pages/sys/qxcomm/gzzQX.jsp" />
+		</action> 
+		<action parameter="action" path="/system/menu" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="add" path="/pages/sys/menu/menu_A.jsp" />
+			<forward name="modi" path="/pages/sys/menu/menu_M.jsp" />
+			<forward name="list" path="/pages/sys/menu/menu_L.jsp" />
+			<forward name="query" path="/pages/sys/menu/menu_Q.jsp" /> 
+		</action> 
+		<action parameter="action" path="/system/jgxx" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="toedit" path="/pages/sys/jgxx/jgxx_Edit.jsp" />
+			<forward name="view" path="/pages/sys/jgxx/jgxx_Detail.jsp" />
+			<forward name="list" path="/pages/sys/jgxx/jgxx_List.jsp" />
+			<forward name="frames" path="/pages/sys/jgxx/jgxx_Frame.jsp" />
+			<forward name="tree" path="/pages/sys/jgxx/jgxx_Tree.jsp" />
+		</action>		
+			<action parameter="action" path="/system/bmxx" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/sys/bmxx/bmxxwh_Frame.jsp" />
+			<forward name="view" path="/pages/sys/bmxx/bmxxwh_Detail.jsp" />
+			<forward name="list" path="/pages/sys/bmxx/bmxxwh_List.jsp" />
+			<forward name="toedit" path="/pages/sys/bmxx/bmxxwh_Edit.jsp" />
+			<forward name="tree" path="/pages/sys/bmxx/bmxx_Tree.jsp"></forward>
+		</action> 
+		<action parameter="action" path="/system/ztxx" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/sys/ztxxwh/ztxxwh_Frame.jsp"></forward>
+            <forward name="list" path="/pages/sys/ztxxwh/ztxxwh_List.jsp"></forward>
+            <forward name="detail" path="/pages/sys/ztxxwh/ztxxwh_Detail.jsp"></forward>
+            <forward name="toedit" path="/pages/sys/ztxxwh/ztxxwh_Edit.jsp"></forward>
+            <forward name="tree" path="/pages/sys/ztxxwh/ztwh_tree.jsp" />
+		</action>  
+		<action parameter="action" path="/system/ryxx" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/sys/ryxx/ryxxwh_Frame.jsp"></forward>
+			<forward name="list"   path="/pages/sys/ryxx/ryxxwh_List.jsp" />
+			<forward name="view"   path="/pages/sys/ryxx/ryxxwh_Detail.jsp" />
+			<forward name="toedit" path="/pages/sys/ryxx/ryxxwh_Edit.jsp"></forward>
+			<forward name="tree"   path="/pages/sys/ryxx/ryxxwh_Tree.jsp"></forward>
+		</action>
+		<action parameter="action" path="/system/ysgl" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/sys/ysgl/ysgl_Frame.jsp"></forward>
+			<forward name="list"   path="/pages/sys/ysgl/ysgl_List.jsp" />
+		</action> 
+		<action parameter="action" path="/system/xtyh" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="toedit" path="/pages/sys/xtyh/xtyh_Edit.jsp" />
+			<forward name="detail" path="/pages/sys/xtyh/xtyh_Detail.jsp" />
+			<forward name="list" path="/pages/sys/xtyh/xtyh_List.jsp" />
+			<forward name="frames" path="/pages/sys/xtyh/xtyh_Frame.jsp" />
+			<forward name="childList" path="/pages/sys/xtyh/xtyh_Mx_List.jsp" />
+			<forward name="userpower" path="/pages/sys/xtyh/userpower.jsp" />
+			<forward name="toMkxxTree" path="/pages/sys/xtyh/MKXXTree.jsp" />
+			<forward name="jgfgmx" path="/pages/sys/xtyh/xtyh_jgfg.jsp" />
+			<forward name="bmfgmx" path="/pages/sys/xtyh/xtyh_bmfg.jsp" />
+			<forward name="ztfgmx" path="/pages/sys/xtyh/xtyh_ztfg.jsp" />
+			
+			<forward name="toUserList" path="/pages/sys/xtyh/xtyh_chld__list.jsp" />
+			<forward name="userEdit" path="/pages/sys/xtyh/xtyh_chld__Edit.jsp" />
+			
+			<forward name="stepFrame" path="/pages/sys/xtyh/userstep_Frame.jsp" />
+			<forward name="top" path="/pages/sys/xtyh/userstep_top_List.jsp" />
+			<forward name="userlist" path="/pages/sys/xtyh/userstep_List.jsp" />
+			
+		</action> 
+		<action parameter="action" path="/system/xtjs" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="toedit" path="/pages/sys/xtjs/xtjs_Edit.jsp" />
+			<forward name="modi" path="/pages/sys/xtjs/xtjs_M.jsp" />
+			<forward name="list" path="/pages/sys/xtjs/xtjs_List.jsp" />
+			<forward name="query" path="/pages/sys/xtjs/xtjs_Q.jsp" /> 
+			<forward name="frames" path="/pages/sys/xtjs/xtjs_Frame.jsp" />
+			<forward name="childList" path="/pages/sys/xtjs/xtjs_Mx_List.jsp" />
+			<forward name="detail" path="/pages/sys/xtjs/xtjs_Detail.jsp" />
+			<forward name="editFrame" path="/pages/sys/xtjs/xtjs_Edit_Frame.jsp"></forward>
+			<forward name="childedit" path="/pages/sys/xtjs/xtjs_Mx_Edit.jsp"></forward>
+		</action> 
+		<action parameter="action" path="/system/gzzxx" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/sys/gzzxx/gzzxx_Frame.jsp" />
+			<forward name="childList" path="/pages/sys/gzzxx/gzzxx_Mx_List.jsp" />
+			<forward name="list" path="/pages/sys/gzzxx/gzzxx_List.jsp" />
+			<forward name="detail" path="/pages/sys/gzzxx/gzzxx_Detail.jsp" />
+			<forward name="editFrame" path="/pages/sys/gzzxx/gzzxx_Edit_Frame.jsp" />
+			<forward name="childedit" path="/pages/sys/gzzxx/gzzxx_Mx_Edit.jsp" />
+			<forward name="toedit"    path="/pages/sys/gzzxx/gzzxx_Edit.jsp" />
+
+		</action> 
+		<action parameter="action" path="/system/flow" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="list" path="/pages/sys/spflow/main_model.jsp" />
+			<forward name="toplist" path="/pages/sys/spflow/list_model.jsp" />
+			<forward name="view" path="/pages/sys/spflow/detail_model.jsp" />
+			<forward name="toadd" path="/pages/sys/spflow/add_model.jsp" />
+			<forward name="setflow" path="/pages/sys/spflow/flow.jsp" />
+			<forward name="modi" path="/pages/sys/spflow/upd_model.jsp" />
+            <forward name="addmodnode" path="/pages/sys/spflow/add_modelNode.jsp" />
+			<forward name="nodeedit" path="/pages/sys/spflow/upd_modelNode.jsp" />
+			<forward name="straight" path="/pages/sys/spflow/straightforward.jsp" />
+			<forward name="history" path="/pages/sys/spflow/history.jsp" />
+			<forward name="instance" path="/pages/sys/spflow/instance.jsp" />
+			<forward name="flowshow" path="/pages/sys/spflow/flowShow.jsp" />
+			<forward name="selnode" path="/pages/sys/spflow/selNode.jsp" />
+			<forward name="flowsuccess" path="/pages/sys/spflow/success.jsp" />
+		</action>
+		<action parameter="action" path="/common/select" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="topFrame" path="/pages/common/select/selFrame.jsp" />
+			<forward name="MainFrame" path="/pages/common/select/mainFrame.jsp" />
+			<forward name="SubFrame" path="/pages/common/select/subFrame.jsp" />
+			<forward name="MainList_T" path="/pages/common/select/preSearch.jsp" />
+			<forward name="MainList_Tother" path="/pages/common/select/mainList.jsp" />
+			<forward name="SubList" path="/pages/common/select/subList.jsp" />
+			<forward name="preSearchFrame" path="/pages/common/select/preSearchFrame.jsp" />
+			<forward name="tree" path="/pages/common/select/tree.jsp" />
+		</action>
+		
+		<!--add by zy -->
+		<action parameter="action" path="/system/sjzd" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/sys/sjzd/sjzd_Frame.jsp"/>
+			<forward name="editFrame" path="/pages/sys/sjzd/sjzd_Edit_Frame.jsp"/>
+			<forward name="list" path="/pages/sys/sjzd/sjzd_List.jsp"/>
+			<forward name="childlist" path="/pages/sys/sjzd/sjzd_Mx_List.jsp"/>
+			<forward name="childedit" path="/pages/sys/sjzd/sjzd_Mx_Edit.jsp"/>
+			<forward name="toedit" path="/pages/sys/sjzd/sjzd_Edit.jsp"/>
+			<forward name="todetail" path="/pages/sys/sjzd/sjzd_Detail.jsp"/>
+		</action>
+		<action parameter="action" path="/system/dicselect" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy"/>
+	
+		<!-- 编码规则维护 -->		
+		<action parameter="action" path="/system/bmgz" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/sys/bmgzwh/bmgz_Frame.jsp"/>
+			<forward name="editFrame" path="/pages/sys/bmgzwh/bmgz_Edit_Frame.jsp"/>
+			<forward name="list" path="/pages/sys/bmgzwh/bmgz_List.jsp"/>
+			<forward name="childlist" path="/pages/sys/bmgzwh/bmgz_Mx_List.jsp"/>
+			<forward name="childedit" path="/pages/sys/bmgzwh/bmgz_Mx_Edit.jsp"/>
+			<forward name="toedit" path="/pages/sys/bmgzwh/bmgz_Edit.jsp"/>
+			<forward name="todetail" path="/pages/sys/bmgzwh/bmgz_Detail.jsp"/>
+		</action>
+		
+		<!-- 公告信息 -->
+		<action parameter="action" path="/sys/notice" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/sys/notice/Notice_Frame.jsp" />
+			<forward name="list" path="/pages/sys/notice/Notice_List.jsp" />
+			<forward name="toedit" path="/pages/sys/notice/Notice_Edit.jsp" />
+			<forward name="todetail" path="/pages/sys/notice/Notice_Detail.jsp" />
+			<forward name="childlist" path="/pages/sys/notice/Notice_Mx_List.jsp"/>
+			<forward name="childedit" path="/pages/sys/notice/Notice_Mx_Edit.jsp"/>
+			
+			<forward name="childDeptlist" path="/pages/sys/notice/Notice_Dept_List.jsp"/>
+			<forward name="childDeptedit" path="/pages/sys/notice/Notice_Dept_Edit.jsp"/>
+			
+			
+		</action>
+		<!-- 文件上传下载 -->
+		<action parameter="action" path="/fileuploadhelper" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="upload" path="/pages/common/uploadfile/uploadfilerst.jsp" />
+		</action>
+		<!-- 用户定制画面 -->
+		<action parameter="action" path="/customized" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="setPageColumn" path="/pages/common/customized/customized.jsp" />
+		</action>
+		
+		<action parameter="action" path="/system/numformat" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="toedit" path="/pages/sys/numformat/numformat_Edit.jsp" />
+			<forward name="view" path="/pages/sys/numformat/numformat_Detail.jsp" />
+			<forward name="list" path="/pages/sys/numformat/numformat_List.jsp" />
+			<forward name="frames" path="/pages/sys/numformat/numformat_Frame.jsp" />
+		</action>
+        <!-- 自定义查询 -->
+		<action parameter="action" path="/system/customQuery" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/sys/custQuery/Custom_Frame.jsp" /> 
+			<forward name="queryList" path="/pages/sys/custQuery/Custom_Query.jsp" /> 
+			<forward name="insertEdit" path="/pages/sys/custQuery/Custom_InsertEdit.jsp" /> 
+			<forward name="nextInsertEdit" path="/pages/sys/custQuery/Custom_NextInsertEdit.jsp" /> 
+			<forward name="displayRpt" path="/pages/sys/custQuery/Custom_Display.jsp" />
+			<forward name="toFrameDisplay" path="/pages/sys/custQuery/Custom_Display_Frame.jsp" />
+			<forward name="queryListDisplay" path="/pages/sys/custQuery/Custom_Query_Display.jsp" />
+			<forward name="openWindows" path="/pages/sys/custQuery/Custom_Open.jsp" />
+			<forward name="toFrameEdit" path="/pages/sys/custQuery/Custom_Frame_Edit.jsp" />
+			<forward name="toEditTableList" path="/pages/sys/custQuery/Custom_EditTable_List.jsp" />
+			<forward name="toTableDateDtl" path="/pages/sys/custQuery/Custom_EditTable_Dtl.jsp" />
+		</action>
+		<!-- 门户首页和短消息 -->
+		<action parameter="action" path="/drpfirstPage" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="message" path="/pages/sys/message/message.jsp" />
+			<forward name="toFirst" path="/pages/drp/index/drpfirst.jsp" />
+		</action>		
+		
+		<!-- 项目数据字典维护 -->
+		<action parameter="action" path="/system/xmsjzdwh" scope="request" type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="frames" path="/pages/sys/xmsjzdwh/Sjzdwh_Frame.jsp" />
+			<forward name="list" path="/pages/sys/xmsjzdwh/Sjzdwh_List.jsp" />
+			<forward name="toedit" path="/pages/sys/xmsjzdwh/Sjzdwh_Edit.jsp" />
+			<forward name="todetail" path="/pages/sys/xmsjzdwh/Sjzdwh_Detail.jsp" />
+			<forward name="editFrame" path="/pages/sys/xmsjzdwh/Sjzdwh_Edit_Frame.jsp"/>
+			<forward name="childlist" path="/pages/sys/xmsjzdwh/Sjzdwh_List_Chld.jsp"/>
+			<forward name="childedit" path="/pages/sys/xmsjzdwh/Sjzdwh_Edit_Chld.jsp"/>
+		</action>
+		
+		<action parameter="action" path="/wap" scope="request" 
+		          type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="login" path="/pages/index/wapLogin.jsp" />
+			<forward name="wapindex" path="/pages/erp/sale/mobilecardsale/Mobile_Card_Edit.jsp" />
+			<forward name="cardlist" path="/pages/erp/sale/mobilecardsale/Mobile_Card_List.jsp" />
+			
+		</action>
+		
+
+	</action-mappings>
+</struts-config>
+

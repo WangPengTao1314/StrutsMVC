@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ *@module 基础资料
+ *@func 渠道信息
+ *@version 1.1
+ *@author 刘曰刚
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Channpunish">
+
+	<typeAlias type="com.hoperun.erp.sale.channpunish.model.ChannpunishModel"
+		alias="ChannpunishModel" />
+
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="ChannpunishModel" class="ChannpunishModel">
+		<result column="CHANN_ID" property="CHANN_ID" />
+	</resultMap>
+	<!-- 动态查询 and 列表排序 -->
+	<sql id="queryDynSql"> 
+		<isNotEmpty prepend="and " property="CHANN_NO">c.CHANN_NO like '%'||#CHANN_NO#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="CHANN_NAME">c.CHANN_NAME like '%'||#CHANN_NAME#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="CHANN_TYPE">c.CHANN_TYPE=#CHANN_TYPE#</isNotEmpty>
+		<isNotEmpty prepend="and " property="CHAA_LVL">c.CHAA_LVL=#CHAA_LVL#</isNotEmpty>
+		<isNotEmpty prepend="and " property="AREA_NO">c.AREA_NO like '%'||#AREA_NO#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="AREA_NAME">c.AREA_NAME like '%'||#AREA_NAME#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="BEGIN_DEAL_TIME">c.DEAL_TIME &gt;= to_date(#BEGIN_DEAL_TIME#,'yyyy-MM-DD HH24:MI:SS')</isNotEmpty>
+		<isNotEmpty prepend="and " property="END_DEAL_TIME">c.DEAL_TIME &lt;= to_date(#END_DEAL_TIME#,'yyyy-MM-DD HH24:MI:SS')</isNotEmpty>
+		<isNotEmpty prepend="and " property="DEL_FLAG"><![CDATA[c.DEL_FLAG=#DEL_FLAG#]]></isNotEmpty>
+		<isNotEmpty prepend="and " property="DEAL_PSON_NAME">c.DEAL_PSON_NAME like '%'||#DEAL_PSON_NAME#||'%'</isNotEmpty>
+	    <isNotEmpty prepend="and " property="QXJBCON">
+	        $QXJBCON$
+	   </isNotEmpty>
+	</sql>
+    <sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField"> $orderField$,</isNotEmpty>CHANN_NO
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[
+			select 
+				c.CHANN_ID,
+				c.CHANN_NO,
+				c.CHANN_NAME,
+				c.CHANN_TYPE,
+				c.AREA_NO,
+				c.AREA_NAME,
+				c.PUNISH_FLAG,
+				c.DEAL_PSON_NAME,
+				to_char(c.DEAL_TIME,'yyyy-MM-DD HH24:MI:SS') DEAL_TIME
+				from BASE_CHANN c
+				]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[select count(CHANN_ID) cnt from ${SYSSCHEMA}.BASE_CHANN c ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+
+   <!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	<!-- 根据ID查找 -->
+	<select id="loadById" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+			select 
+				CHANN_NO,
+				CHANN_NAME,
+				CHANN_ABBR,
+				CHANN_TYPE,
+				CHAA_LVL,
+				AREA_NO,
+				AREA_NAME,
+				PUNISH_FLAG,
+				PUNISH_REMARK,
+				LEDGER_NAME,
+				to_char(c.DEAL_TIME,'yyyy-MM-DD HH24:MI:SS') DEAL_TIME
+			from BASE_CHANN c 
+			where c.CHANN_ID = #CHANN_ID# 
+				  and c.DEL_FLAG=#DEL_FLAG#
+		]]>
+	</select>
+	<update id="updateById" parameterClass="map">
+		 <![CDATA[ update BASE_CHANN ]]>
+		<dynamic prepend="set">
+			<isNotNull property="PUNISH_FLAG" prepend=","><![CDATA[PUNISH_FLAG = #PUNISH_FLAG#]]></isNotNull>
+			<isNotNull property="PUNISH_REMARK" prepend=","><![CDATA[PUNISH_REMARK = #PUNISH_REMARK#]]></isNotNull>
+			<isNotNull property="DEAL_PSON_ID" prepend=","><![CDATA[DEAL_PSON_ID = #DEAL_PSON_ID#]]></isNotNull>
+			<isNotNull property="DEAL_PSON_NAME" prepend=","><![CDATA[DEAL_PSON_NAME = #DEAL_PSON_NAME#]]></isNotNull>
+			<isNotNull property="DEAL_TIME" prepend=","><![CDATA[DEAL_TIME = sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where CHANN_ID = #CHANN_ID# ]]>
+	</update>
+</sqlMap>

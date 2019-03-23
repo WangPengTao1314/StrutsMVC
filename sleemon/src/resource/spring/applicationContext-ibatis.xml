@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd"
+	default-autowire="byName"> 
+	<!--TOMCAT-->
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:oracle.properties</value>
+			</list>
+		</property>
+	</bean>
+	<!-- 定义使用C3P0连接池的数据源 -->
+	<bean id="ds-ibatis" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<!-- 指定连接数据库的JDBC驱动 -->
+		<property name="driverClass">
+			<value>${driverClass}</value>
+		</property>
+		<!-- 连接数据库所用的URL -->
+		<property name="jdbcUrl">
+			<value>${jdbcUrl}</value>
+		</property>
+		<!-- 连接数据库的用户名 -->
+		<property name="user">
+			<value>${user}</value>
+		</property>
+		<!-- 连接数据库的密码 -->
+		<property name="password">
+			<value>${password}</value>
+		</property>
+		<!-- 设置数据库连接池的最大连接数 -->
+		<property name="maxPoolSize">
+			<value>50</value>
+		</property>
+		<!-- 设置数据库连接池的最小连接数 -->
+		<property name="minPoolSize">
+			<value>2</value>
+		</property>
+		<!-- 设置数据库连接池的初始化连接数 -->
+		<property name="initialPoolSize">
+			<value>2</value>
+		</property>
+		<!-- 设置数据库连接池的连接的最大空闲时间,单位为秒 -->
+		<property name="maxIdleTime">
+			<value>20</value>
+		</property>
+	</bean>
+	
+	<!--
+    <bean id="ds-ibatis" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName">
+			<value>java:comp/env/jdbc/sleemon</value>
+		</property>
+	</bean>
+	
+	<bean id="ds-ods" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName">
+			<value>java:comp/env/jdbc/ODS</value>
+		</property>
+	</bean>
+   -->
+	 <!--安徽农信测试-->
+<!--	<bean id="ds-ibatis" class="org.springframework.jndi.JndiObjectFactoryBean">-->
+<!--		<property name="jndiName">-->
+<!--			<value>ERPTSS</value>-->
+<!--		</property>-->
+<!--	</bean>-->
+<!--	<bean id="ds-ods" class="org.springframework.jndi.JndiObjectFactoryBean">-->
+<!--		<property name="jndiName">-->
+<!--			<value>FinPro</value>-->
+<!--		</property>-->
+<!--	</bean>-->
+      
+   <!--江苏银行测试-->
+    <!--
+     <bean id="ds-ibatis" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName">
+			<value>jdbc/FINPRO</value>
+		</property>
+	</bean>
+	 -->
+	<!--  
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">   
+	    <property name="driverClassName">   
+	        <value>oracle.jdbc.driver.OracleDriver</value>   
+	    </property>   
+	    <property name="url">              
+	        <value>jdbc:oracle:thin:@odmetl:1521/odm</value>   
+	     </property>   
+	    <property name="username">   
+	        <value>odm</value>   
+	    </property>   
+	    <property name="password">   
+	        <value>odm</value>   
+	    </property>   
+	</bean>	-->	
+
+	<bean id="lobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler" />		
+	<bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation">
+		  
+			<value>classpath:sqlmap/oracle/sql-map-config.xml</value>
+			
+			 <!-- 	
+			<value>classpath:sqlmap/mssql/sql-map-config.xml</value>
+			--> 
+		
+		</property>
+		<property name="dataSource" ref="ds-ibatis" />
+		<property name="lobHandler" ref="lobHandler"/> 
+	</bean>
+
+	<bean id="tm-ibatis" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="ds-ibatis" />
+	</bean>
+
+	<!-- 配置事务特性 -->
+	<tx:advice id="tx-ibatis" transaction-manager="tm-ibatis">
+		<tx:attributes>
+			<tx:method name="tx*" propagation="REQUIRED" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- 以AspectJ方式 定义 AOP -->
+	<!-- 
+		如果service没有基于接口，使用cgilib来实现AOP，定义proxy-target-class="true" 
+		设置proxy-target-class="true" 其实就是强制spring使用CGLIB代理！这里我们service基于接口编程就变的毫无意义
+	-->
+	<aop:config proxy-target-class="true">
+		<aop:advisor pointcut="execution(* *..service.impl.*ServiceImpl.*(..))" advice-ref="tx-ibatis" />
+		<aop:advisor pointcut="execution(* *..service.impl.*FlowInterface.*(..))" advice-ref="tx-ibatis" />
+		<aop:advisor pointcut="execution(* com.hoperun.commons.util.impl.*ServiceImpl.*(..))" advice-ref="tx-ibatis" />
+		<aop:advisor pointcut="execution(* com.hoperun.commons.util.NewInterImpl.*(..))" advice-ref="tx-ibatis" />
+	</aop:config>
+
+	<!-- Generic Dao - can be used when doing standard CRUD -->
+	<bean id="ibatisDao" class="com.hoperun.commons.dao.BaseDao">
+		<property name="dataSource" ref="ds-ibatis" />
+		<property name="sqlMapClient" ref="sqlMapClient" />
+	</bean>
+	
+		<!--
+		<bean id="ibatisOds" class="com.hoperun.commons.dao.BaseDao">
+		<property name="dataSource" ref="ds-ods" />
+		<property name="sqlMapClient" ref="sqlMapClient" />
+	</bean>
+-->
+	
+	<bean id="IBaseService" class="com.hoperun.commons.service.IBaseService" abstract="true"/>
+</beans>

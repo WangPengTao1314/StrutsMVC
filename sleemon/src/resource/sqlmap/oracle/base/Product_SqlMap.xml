@@ -1,0 +1,1038 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ *@module 基础资料
+ *@func 货品信息
+ *@version 1.1
+ *@author 刘曰刚
+ *  -->
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="product">
+
+	<typeAlias type="com.hoperun.base.product.model.ProductModel"
+		alias="ProductModel" />
+
+	<!-- 使用LLGL装载结果集 -->
+	<resultMap id="ProductModel" class="ProductModel">
+		<result column="PRD_ID" property="PRD_ID" />
+	</resultMap>
+	<!-- 动态查询 and 列表排序 -->
+	<sql id="queryDynSql"> 
+		<isNotEmpty prepend="and" property="productid">
+			(p.BRAND = #productid# or p.PAR_PRD_ID = #productid# or p.PAR_PRD_NO = #productid# or p.PAR_PRD_NAME=#productid#)			
+		</isNotEmpty>
+		<isNotEmpty prepend="and " property="PRD_NO">p.PRD_NO like '%'||#PRD_NO#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="PRD_COLOR">p.PRD_COLOR like '%'||#PRD_COLOR#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="BRAND">p.BRAND=#BRAND#</isNotEmpty>
+		<isNotEmpty prepend="and " property="PRD_NAME">p.PRD_NAME like '%'||#PRD_NAME#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="PRD_SPEC">p.PRD_SPEC like '%'||#PRD_SPEC#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="STD_UNIT">p.STD_UNIT like '%'||#STD_UNIT#||'%'</isNotEmpty>
+		<isNotEmpty prepend="and " property="STATE">p.STATE =#STATE#</isNotEmpty>
+		<isNotEmpty prepend="and " property="BEGIN_CRE_TIME">p.CRE_TIME&gt;= to_date(#BEGIN_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')</isNotEmpty>
+		<isNotEmpty prepend="and " property="END_CRE_TIME">P.CRE_TIME&lt;= to_date(#END_CRE_TIME#,'yyyy-MM-DD HH24:MI:SS')</isNotEmpty>
+		<isNotEmpty prepend="and " property="DEL_FLAG"><![CDATA[p.DEL_FLAG=#DEL_FLAG#]]></isNotEmpty>
+		<isNotEmpty prepend="and " property="FINAL_NODE_FLAG"><![CDATA[p.FINAL_NODE_FLAG=#FINAL_NODE_FLAG#]]></isNotEmpty>
+		<isNotEmpty prepend="  " property="PAR_PRD_NOQuery">$PAR_PRD_NOQuery$</isNotEmpty>
+		<isNotEmpty prepend="  " property="PAR_PRD_NAMEQuery">$PAR_PRD_NAMEQuery$</isNotEmpty>
+		<isNotEmpty prepend="and " property="LEDGERSQL">$LEDGERSQL$</isNotEmpty>
+		
+		<isNotEmpty prepend=" and " property="seachSTATE"><![CDATA[p.STATE=#seachSTATE#]]></isNotEmpty>
+		
+		<isNotEmpty prepend=" and " property="QXJBCON">
+	        $QXJBCON$
+		</isNotEmpty>
+	</sql>
+    <sql id="orderSql">
+		<isNotEmpty prepend=" " property="orderField"> $orderField$</isNotEmpty>
+	</sql>
+	<!-- 查询SQL -->
+	<sql id="coreSql">
+		<![CDATA[select p.PRD_ID,p.PRD_NO,p.PRD_NAME,p.PRD_SPEC,p.STD_UNIT,p.VOLUME,p.PRD_COLOR,
+		                p.PAR_PRD_NAME,p.BRAND,p.CRE_NAME,to_char(p.CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+		                p.DEPT_NAME,p.STATE,p.PRD_TYPE,p.PAR_PRD_NO,p.PRD_SUIT_FLAG,
+		                NVL(p.IS_SCAN,0)IS_SCAN
+				from BASE_PRODUCT p
+				]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql" />
+		</dynamic>
+		<dynamic prepend="order by ">
+			<include refid="orderSql"/>
+		</dynamic>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="pageQuery" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="public.pageBegin" />
+		<include refid="coreSql" />
+		<include refid="public.pageEnd" />
+	</select>
+
+	<!-- 分页计数 -->
+	<select id="pageCount" parameterClass="map" resultClass="int">
+		<![CDATA[SELECT count(PRD_ID) cnt FROM ${SYSSCHEMA}.BASE_PRODUCT p ]]>
+		<dynamic prepend="where">
+			<include refid="queryDynSql"/>
+		</dynamic>
+	</select>
+
+   <!-- 查询 -->
+	<select id="query" parameterClass="map"
+		resultClass="java.util.HashMap">
+		<include refid="coreSql" />
+	</select>
+	<!-- 根据ID查找 -->
+	<select id="loadById" parameterClass="String"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT
+			PRD_ID,
+			PRD_NO,
+			PRD_NAME,
+			PRD_SPEC,
+			PRD_COLOR,
+			BRAND,
+			STD_UNIT,
+			MEAS_UNIT,
+			RATIO,
+			PAR_PRD_ID,
+			PAR_PRD_NO,
+			PAR_PRD_NAME,
+			PRD_TYPE,
+			VOLUME,
+			LENGTH,
+			WIDTH,
+			HEIGHT,
+			FACT_PRICE,
+			RET_PRICE_MIN,
+			to_char(BEG_DATE,'yyyy-mm-dd') BEG_DATE,
+			BAR_CODE,
+			BAR_CODE_OLD,
+			U_CMP_CODE,
+			PRD_SUIT_FLAG,
+			PIC_PATH,
+			FINAL_NODE_FLAG,
+			STATE,
+			REMARK,
+			CREATOR,
+			CRE_NAME,
+			to_char(CRE_TIME,'yyyy-MM-DD HH24:MI:SS') CRE_TIME,
+			UPDATOR,
+			UPD_NAME,
+			to_char(UPD_TIME,'yyyy-MM-DD HH24:MI:SS') UPD_TIME,
+			DEPT_ID,
+			DEPT_NAME,
+			ORG_ID,
+			ORG_NAME,
+			DEL_FLAG,
+			DTL_PATH,
+			PRD_MATL,
+			PRVD_PRICE,
+			NVL(IS_SCAN,0)IS_SCAN,
+			AUTO_BACKUP_FLG,
+			IS_CAN_FREE_FLAG,
+			IS_REPORT_FLAG,
+			IS_DISTRIBUT_FLAG,
+			IS_REBATE_FLAG
+			 FROM ${SYSSCHEMA}.BASE_PRODUCT p WHERE p.PRD_ID = #PRD_ID# and DEL_FLAG=0]]>
+	</select>
+	<!-- 查询主表是否存在重复编号 -->
+	<select id="getCountPRD_NO" parameterClass="map" resultClass="int">
+	    select count(PRD_NO) from ${SYSSCHEMA}.BASE_PRODUCT 
+	    where  PRD_NO=#PRD_NO#  
+	</select>
+	<!-- 查询子表货品计量单位是否存在重复编号 -->
+	<select id="getCountNuitMEAS_UNIT_NO" parameterClass="map" resultClass="int">
+	    select count(MEAS_UNIT_NO) from ${SYSSCHEMA}.BASE_PRD_UNIT where MEAS_UNIT_NO=#MEAS_UNIT_NO# and PRD_ID=#PRD_ID#
+	</select>
+	<!-- 查询子表货品套是否存在重复编号 -->
+	<select id="getCountSuitPRD_NO" parameterClass="map" resultClass="int">
+	    select count(PRD_NO) from ${SYSSCHEMA}.BASE_PRD_SUIT where PRD_NO=#PRD_NO# and MAIN_PRD_ID=#MAIN_PRD_ID#
+	</select>
+	<!-- 未找到 -->
+	<select id="loadSTATE" parameterClass="String" resultClass="String">
+		<![CDATA[ select STATE from ${SYSSCHEMA}.BASE_PRODUCT p WHERE p.PRD_ID = #PRD_ID# and DEL_FLAG=0]]>
+	</select>
+	
+	
+	<insert id="insert" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.BASE_PRODUCT(
+		 	PRD_ID,PRD_NO,PRD_NAME,PRD_SPEC,PRD_COLOR,BRAND,STD_UNIT,MEAS_UNIT,RATIO,PAR_PRD_ID,
+		 	PAR_PRD_NO,PAR_PRD_NAME,PRD_TYPE,VOLUME,LENGTH,WIDTH,HEIGHT,FACT_PRICE,RET_PRICE_MIN,BEG_DATE,
+		 	BAR_CODE,BAR_CODE_OLD,U_CMP_CODE,PRD_SUIT_FLAG,PIC_PATH,FINAL_NODE_FLAG,STATE,REMARK,CREATOR,CRE_NAME,
+		 	CRE_TIME,DEPT_ID,DEPT_NAME,ORG_ID,ORG_NAME,DEL_FLAG,DTL_PATH,PRD_MATL,LEDGER_ID,COMM_FLAG,PRVD_PRICE,IS_CAN_FREE_FLAG,IS_NO_STAND_FLAG,
+		 	IS_DISTRIBUT_FLAG,IS_REBATE_FLAG)
+		 values(
+		 	#PRD_ID#,#PRD_NO#,#PRD_NAME#,#PRD_SPEC#,#PRD_COLOR#,#BRAND#,#STD_UNIT#,#MEAS_UNIT#,#RATIO#,#PAR_PRD_ID#,
+		 	#PAR_PRD_NO#,#PAR_PRD_NAME#,#PRD_TYPE#,#VOLUME#,#LENGTH#,#WIDTH#,#HEIGHT#,#FACT_PRICE#,#RET_PRICE_MIN#,
+		 	to_date(#BEG_DATE#,'yyyy-mm-dd'),#BAR_CODE#,#BAR_CODE_OLD#,#U_CMP_CODE#,#PRD_SUIT_FLAG#,#PIC_PATH#,#FINAL_NODE_FLAG#,
+		 	#STATE#,#REMARK#,#CREATOR#,#CRE_NAME#,sysdate,#DEPT_ID#,#DEPT_NAME#,#ORG_ID#,#ORG_NAME#,#DEL_FLAG#,#DTL_PATH#,
+		 	#PRD_MATL#,#LEDGER_ID#,#COMM_FLAG#,#PRVD_PRICE#,#IS_CAN_FREE_FLAG#,#IS_NO_STAND_FLAG#,#IS_DISTRIBUT_FLAG#,#IS_REBATE_FLAG#
+		 )
+		]]>
+	</insert>
+	
+	<insert id="insertPrdSpclTech" parameterClass="map">
+		<![CDATA[
+		 insert into ${SYSSCHEMA}.PRD_SPCL_TECH(
+		 	PRD_SPCL_TECH_ID,PRD_ID,SPCL_TECH_NAME,SPCL_TECH_TYPE,
+		 	CURRT_VAL,CURRT_VAL_TURN_BEG,CURRT_VAL_TURN_END,
+		 	PRICE_TURN_TYPE,PRICE_TURN_VAL,TUENED_VALS,DEL_FLAG,REMARK,TURN_TYPE)
+		 values(
+		 	#PRD_SPCL_TECH_ID#,#PRD_ID#,#SPCL_TECH_NAME#,#SPCL_TECH_TYPE#,#CURRT_VAL#,#CURRT_VAL_TURN_BEG#,#CURRT_VAL_TURN_END#,#PRICE_TURN_TYPE#,
+		 	#PRICE_TURN_VAL#,#TUENED_VALS#,#DEL_FLAG#,#REMARK#,#TURN_TYPE#
+		 )
+		]]>
+	</insert>
+
+	<update id="updatePrdSpclTech" parameterClass="map">
+		 <![CDATA[ update ${SYSSCHEMA}.PRD_SPCL_TECH ]]>
+		<dynamic prepend="set">
+			<isNotNull property="PRD_ID" prepend=","><![CDATA[PRD_ID = #PRD_ID#]]></isNotNull>
+			<isNotNull property="SPCL_TECH_NAME" prepend=","><![CDATA[SPCL_TECH_NAME = #SPCL_TECH_NAME#]]></isNotNull>
+			<isNotNull property="SPCL_TECH_TYPE" prepend=","><![CDATA[SPCL_TECH_TYPE = #SPCL_TECH_TYPE#]]></isNotNull>
+			<isNotNull property="CURRT_VAL" prepend=","><![CDATA[CURRT_VAL = #CURRT_VAL#]]></isNotNull>
+			<isNotNull property="CURRT_VAL_TURN_BEG" prepend=","><![CDATA[CURRT_VAL_TURN_BEG = #CURRT_VAL_TURN_BEG#]]></isNotNull>
+			<isNotNull property="CURRT_VAL_TURN_END" prepend=","><![CDATA[CURRT_VAL_TURN_END = #CURRT_VAL_TURN_END#]]></isNotNull>
+			<isNotNull property="PRICE_TURN_TYPE" prepend=","><![CDATA[PRICE_TURN_TYPE = #PRICE_TURN_TYPE#]]></isNotNull>
+			<isNotNull property="PRICE_TURN_VAL" prepend=","><![CDATA[PRICE_TURN_VAL = #PRICE_TURN_VAL#]]></isNotNull>
+			<isNotNull property="TUENED_VALS" prepend=","><![CDATA[TUENED_VALS = #TUENED_VALS#]]></isNotNull>
+			<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK#]]></isNotNull>
+			<isNotNull property="DEL_FLAG" prepend=","><![CDATA[DEL_FLAG = #DEL_FLAG#]]></isNotNull>
+			<isNotNull property="TURN_TYPE" prepend=","><![CDATA[TURN_TYPE = #TURN_TYPE#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where PRD_SPCL_TECH_ID = #PRD_SPCL_TECH_ID# ]]>
+	</update>
+
+	<update id="updateById" parameterClass="map">
+		 <![CDATA[ update ${SYSSCHEMA}.BASE_PRODUCT ]]>
+		<dynamic prepend="set">
+			<isNotNull property="PRD_NAME" prepend=","><![CDATA[PRD_NAME = #PRD_NAME#]]></isNotNull>
+			<isNotNull property="PRD_SPEC" prepend=","><![CDATA[PRD_SPEC = #PRD_SPEC#]]></isNotNull>
+			<isNotNull property="PRD_COLOR" prepend=","><![CDATA[PRD_COLOR = #PRD_COLOR#]]></isNotNull>
+			<isNotNull property="BRAND" prepend=","><![CDATA[BRAND = #BRAND#]]></isNotNull>
+			<isNotNull property="STD_UNIT" prepend=","><![CDATA[STD_UNIT = #STD_UNIT#]]></isNotNull>
+			<isNotNull property="MEAS_UNIT" prepend=","><![CDATA[MEAS_UNIT = #MEAS_UNIT#]]></isNotNull>
+			<isNotNull property="RATIO" prepend=","><![CDATA[RATIO = #RATIO#]]></isNotNull>
+			<isNotNull property="PAR_PRD_ID" prepend=","><![CDATA[PAR_PRD_ID = #PAR_PRD_ID#]]></isNotNull>
+			<isNotNull property="PAR_PRD_NO" prepend=","><![CDATA[PAR_PRD_NO = #PAR_PRD_NO#]]></isNotNull>
+			<isNotNull property="PAR_PRD_NAME" prepend=","><![CDATA[PAR_PRD_NAME = #PAR_PRD_NAME#]]></isNotNull>
+			<isNotNull property="PRD_TYPE" prepend=","><![CDATA[PRD_TYPE = #PRD_TYPE#]]></isNotNull>
+			<isNotNull property="VOLUME" prepend=","><![CDATA[VOLUME = #VOLUME#]]></isNotNull>
+			<isNotNull property="LENGTH" prepend=","><![CDATA[LENGTH = #LENGTH#]]></isNotNull>
+			<isNotNull property="WIDTH" prepend=","><![CDATA[WIDTH = #WIDTH#]]></isNotNull>
+			<isNotNull property="HEIGHT" prepend=","><![CDATA[HEIGHT = #HEIGHT#]]></isNotNull>
+			<isNotNull property="FACT_PRICE" prepend=","><![CDATA[FACT_PRICE = #FACT_PRICE#]]></isNotNull>
+			<isNotNull property="RET_PRICE_MIN" prepend=","><![CDATA[RET_PRICE_MIN = #RET_PRICE_MIN#]]></isNotNull>
+			<isNotNull property="BEG_DATE" prepend=","><![CDATA[BEG_DATE = to_date(#BEG_DATE#,'yyyy-mm-dd')]]></isNotNull>
+			<isNotNull property="BAR_CODE" prepend=","><![CDATA[BAR_CODE = #BAR_CODE#]]></isNotNull>
+			<isNotNull property="BAR_CODE_OLD" prepend=","><![CDATA[BAR_CODE_OLD = #BAR_CODE_OLD#]]></isNotNull>
+			<isNotNull property="U_CMP_CODE" prepend=","><![CDATA[U_CMP_CODE = #U_CMP_CODE#]]></isNotNull>
+			<isNotNull property="PRD_SUIT_FLAG" prepend=","><![CDATA[PRD_SUIT_FLAG = #PRD_SUIT_FLAG#]]></isNotNull>
+			<isNotNull property="PIC_PATH" prepend=","><![CDATA[PIC_PATH = #PIC_PATH#]]></isNotNull>
+			<isNotNull property="FINAL_NODE_FLAG" prepend=","><![CDATA[FINAL_NODE_FLAG = #FINAL_NODE_FLAG#]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME=sysdate]]></isNotNull>
+			<isNotNull property="DTL_PATH" prepend=","><![CDATA[DTL_PATH=#DTL_PATH#]]></isNotNull>
+			<isNotNull property="PRD_MATL" prepend=","><![CDATA[PRD_MATL=#PRD_MATL#]]></isNotNull>
+			<isNotNull property="IS_CAN_FREE_FLAG" prepend=","><![CDATA[IS_CAN_FREE_FLAG=#IS_CAN_FREE_FLAG#]]></isNotNull>
+			<isNotNull property="PRVD_PRICE" prepend=","><![CDATA[PRVD_PRICE=#PRVD_PRICE#]]></isNotNull>
+			<isNotNull property="IS_SCAN" prepend=","><![CDATA[IS_SCAN=#IS_SCAN#]]></isNotNull>
+			<isNotNull property="IS_DISTRIBUT_FLAG" prepend=","><![CDATA[IS_DISTRIBUT_FLAG=#IS_DISTRIBUT_FLAG#]]></isNotNull>
+			<isNotNull property="IS_REBATE_FLAG" prepend=","><![CDATA[IS_REBATE_FLAG=#IS_REBATE_FLAG#]]></isNotNull>
+			
+		</dynamic>
+		<![CDATA[ where PRD_ID = #PRD_ID# ]]>
+	</update>
+	
+	<update id="updateByNo" parameterClass="map">
+		 <![CDATA[ update ${SYSSCHEMA}.BASE_PRODUCT ]]>
+		<dynamic prepend="set">
+			<isNotNull property="PRD_NAME" prepend=","><![CDATA[PRD_NAME = #PRD_NAME#]]></isNotNull>
+			<isNotNull property="PRD_SPEC" prepend=","><![CDATA[PRD_SPEC = #PRD_SPEC#]]></isNotNull>
+			<isNotNull property="PRD_COLOR" prepend=","><![CDATA[PRD_COLOR = #PRD_COLOR#]]></isNotNull>
+			<isNotNull property="BRAND" prepend=","><![CDATA[BRAND = #BRAND#]]></isNotNull>
+			<isNotNull property="STD_UNIT" prepend=","><![CDATA[STD_UNIT = #STD_UNIT#]]></isNotNull>
+			<isNotNull property="MEAS_UNIT" prepend=","><![CDATA[MEAS_UNIT = #MEAS_UNIT#]]></isNotNull>
+			<isNotNull property="RATIO" prepend=","><![CDATA[RATIO = #RATIO#]]></isNotNull>
+			<isNotNull property="PAR_PRD_ID" prepend=","><![CDATA[PAR_PRD_ID = #PAR_PRD_ID#]]></isNotNull>
+			<isNotNull property="PAR_PRD_NO" prepend=","><![CDATA[PAR_PRD_NO = #PAR_PRD_NO#]]></isNotNull>
+			<isNotNull property="PAR_PRD_NAME" prepend=","><![CDATA[PAR_PRD_NAME = #PAR_PRD_NAME#]]></isNotNull>
+			<isNotNull property="PRD_TYPE" prepend=","><![CDATA[PRD_TYPE = #PRD_TYPE#]]></isNotNull>
+			<isNotNull property="VOLUME" prepend=","><![CDATA[VOLUME = #VOLUME#]]></isNotNull>
+			<isNotNull property="LENGTH" prepend=","><![CDATA[LENGTH = #LENGTH#]]></isNotNull>
+			<isNotNull property="WIDTH" prepend=","><![CDATA[WIDTH = #WIDTH#]]></isNotNull>
+			<isNotNull property="HEIGHT" prepend=","><![CDATA[HEIGHT = #HEIGHT#]]></isNotNull>
+			<isNotNull property="FACT_PRICE" prepend=","><![CDATA[FACT_PRICE = #FACT_PRICE#]]></isNotNull>
+			<isNotNull property="RET_PRICE_MIN" prepend=","><![CDATA[RET_PRICE_MIN = #RET_PRICE_MIN#]]></isNotNull>
+			<isNotNull property="BEG_DATE" prepend=","><![CDATA[BEG_DATE = to_date(#BEG_DATE#,'yyyy-mm-dd')]]></isNotNull>
+			<isNotNull property="BAR_CODE" prepend=","><![CDATA[BAR_CODE = #BAR_CODE#]]></isNotNull>
+			<isNotNull property="BAR_CODE_OLD" prepend=","><![CDATA[BAR_CODE_OLD = #BAR_CODE_OLD#]]></isNotNull>
+			<isNotNull property="U_CMP_CODE" prepend=","><![CDATA[U_CMP_CODE = #U_CMP_CODE#]]></isNotNull>
+			<isNotNull property="PRD_SUIT_FLAG" prepend=","><![CDATA[PRD_SUIT_FLAG = #PRD_SUIT_FLAG#]]></isNotNull>
+			<isNotNull property="PIC_PATH" prepend=","><![CDATA[PIC_PATH = #PIC_PATH#]]></isNotNull>
+			<isNotNull property="FINAL_NODE_FLAG" prepend=","><![CDATA[FINAL_NODE_FLAG = #FINAL_NODE_FLAG#]]></isNotNull>
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="REMARK" prepend=","><![CDATA[REMARK = #REMARK#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME=sysdate]]></isNotNull>
+			<isNotNull property="DTL_PATH" prepend=","><![CDATA[DTL_PATH=#DTL_PATH#]]></isNotNull>
+			<isNotNull property="PRD_MATL" prepend=","><![CDATA[PRD_MATL=#PRD_MATL#]]></isNotNull>
+			<isNotNull property="IS_CAN_FREE_FLAG" prepend=","><![CDATA[IS_CAN_FREE_FLAG=#IS_CAN_FREE_FLAG#]]></isNotNull>
+			<isNotNull property="PRVD_PRICE" prepend=","><![CDATA[PRVD_PRICE=#PRVD_PRICE#]]></isNotNull>
+			<isNotNull property="IS_SCAN" prepend=","><![CDATA[IS_SCAN=#IS_SCAN#]]></isNotNull>
+			<isNotNull property="IS_DISTRIBUT_FLAG" prepend=","><![CDATA[IS_DISTRIBUT_FLAG=#IS_DISTRIBUT_FLAG#]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where PRD_NO = #PRD_NO# ]]>
+	</update>
+	
+	
+	<!-- 软删除 -->
+	<update id="delete" parameterClass="map">	
+		<![CDATA[ update ${SYSSCHEMA}.BASE_PRODUCT set DEL_FLAG=#DEL_FLAG#
+		where PRD_ID in(select PRD_ID from ${SYSSCHEMA}.BASE_PRODUCT
+                           start with PRD_ID = #PRD_ID#
+                          connect by prior PRD_ID = PAR_PRD_ID) ]]>	
+	</update>
+	<!-- 修改状态 -->
+	<update id="updateStateById" parameterClass="map">	
+		<![CDATA[ update ${SYSSCHEMA}.BASE_PRODUCT ]]>
+		<dynamic prepend="set">
+			<isNotNull property="STATE" prepend=","><![CDATA[STATE = #STATE#]]></isNotNull>
+			<isNotNull property="UPDATOR" prepend=","><![CDATA[UPDATOR = #UPDATOR#]]></isNotNull>
+			<isNotNull property="UPD_NAME" prepend=","><![CDATA[UPD_NAME = #UPD_NAME#]]></isNotNull>
+			<isNotNull property="UPD_TIME" prepend=","><![CDATA[UPD_TIME=sysdate]]></isNotNull>
+		</dynamic>
+		<![CDATA[ where PRD_ID in(select PRD_ID from ${SYSSCHEMA}.BASE_PRODUCT
+                           start with PRD_ID = #PRD_ID#
+                          connect by prior PRD_ID = PAR_PRD_ID) ]]>	
+	</update>
+	<!-- 查询树 -->
+	<select id="queryTree" parameterClass="String"
+		resultClass="com.hoperun.base.product.model.ProductTree">
+  		<![CDATA[
+  		  SELECT DISTINCT p.PRD_NO id , '【' || p.PRD_NO || '】' || p.PRD_NAME name
+       FROM ${SYSSCHEMA}.BASE_PRODUCT p WHERE DEL_FLAG = 0 and STATE IN ('启用','停用','制定') and FINAL_NODE_FLAG=0
+        order  by p.PRD_NO
+			]]>
+	</select>
+	
+<!-- 明细操作开始-->
+
+<!--明细查询条件定义 -->
+<sql id="queryDynSqlDEl">
+  <isNotEmpty prepend="and" property="DEL_FLAG">
+     DEL_FLAG=#DEL_FLAG#
+  </isNotEmpty>
+</sql>
+<!-- 查询SQL -->
+<sql id="orderSqlField">
+	 <isNotEmpty prepend=" " property="orderField">$orderField$</isNotEmpty>
+</sql>
+<!-- 查询货品计量单位 -->
+	<sql id="coreSqlUnit">
+		<![CDATA[ 
+	     select 
+			PRD_UNIT_ID,
+			PRD_ID,
+			MEAS_UNIT_ID,
+			MEAS_UNIT_NO,
+			MEAS_UNIT_NAME,
+			MEAS_UNIT_TYPE,
+			RATIO
+	       from BASE_PRD_UNIT 
+	   ]]>
+	</sql>
+<!-- 查询货品套 -->
+	<sql id="coreSqlSuit">
+		<![CDATA[ 
+	     select 
+			PRD_UNIT_ID,
+			PRD_ID,
+			PRD_NO,
+			PRD_NAME,
+			PRD_SPEC,
+			PRD_COLOR,
+			BRAND,
+			STD_UNIT,
+			MAIN_PRD_ID,
+			PRVD_PRICE,
+			COMP_NUM,
+			MAIN_BOM_FLAG
+	       from BASE_PRD_SUIT
+	   ]]>
+	</sql>
+	<!-- 根据主表ID查询货品计量单位明细 -->
+ 	<select id="queryUnitByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlUnit"/>
+	  <dynamic prepend="where">
+			PRD_ID=#PRD_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlDEl" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlField"/>
+	  </isNotNull>
+  </select>
+  <!-- 根据主表ID查询货品套明细 -->
+ 	<select id="querySuitByFkId" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlSuit"/>
+	  <dynamic prepend="where">
+			MAIN_PRD_ID=#MAIN_PRD_ID#
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlDEl" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlField"/>
+	  </isNotNull>
+  </select>
+  
+  <!--根据明细表IDS查询货品计量单位明细 -->
+ <select id="loadUnitByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlUnit"/>
+	  <dynamic prepend="where">
+	        PRD_UNIT_ID in ($PRD_UNIT_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlDEl" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlField"/>
+	  </isNotNull>
+  </select>
+  <!--根据明细表IDS查询货品套明细 -->
+ <select id="loadSuitByIds" parameterClass="map" resultClass="java.util.HashMap">
+	  <include refid="coreSqlSuit"/>
+	  <dynamic prepend="where">
+	        PRD_UNIT_ID in ($PRD_UNIT_IDS$)
+	  </dynamic>
+	  <dynamic prepend="and">
+	   <include refid="queryDynSqlDEl" />
+	  </dynamic>
+	  <isNotNull prepend=" order by " property="orderField">
+			<include refid="orderSqlField"/>
+	  </isNotNull>
+  </select>
+  
+<!--货品计量单位明细表更新 -->
+<update id="updateUnitById" parameterClass="map">
+	<![CDATA[ update BASE_PRD_UNIT ]]>
+	<dynamic prepend="set">
+    <isNotNull property="PRD_ID" prepend=","><![CDATA[PRD_ID = #PRD_ID# ]]></isNotNull>
+    <isNotNull property="MEAS_UNIT_ID" prepend=","><![CDATA[MEAS_UNIT_ID = #MEAS_UNIT_ID# ]]></isNotNull>
+    <isNotNull property="MEAS_UNIT_NO" prepend=","><![CDATA[MEAS_UNIT_NO = #MEAS_UNIT_NO# ]]></isNotNull>
+    <isNotNull property="MEAS_UNIT_NAME" prepend=","><![CDATA[MEAS_UNIT_NAME = #MEAS_UNIT_NAME# ]]></isNotNull>
+    <isNotNull property="MEAS_UNIT_TYPE" prepend=","><![CDATA[MEAS_UNIT_TYPE = #MEAS_UNIT_TYPE# ]]></isNotNull>
+    <isNotNull property="RATIO" prepend=","><![CDATA[RATIO = #RATIO# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where PRD_UNIT_ID = #PRD_UNIT_ID#]]>
+</update>
+<!--货品套明细表更新 -->
+<update id="updateSuitById" parameterClass="map">
+	<![CDATA[ update BASE_PRD_SUIT ]]>
+	<dynamic prepend="set">
+    <isNotNull property="PRD_ID" prepend=","><![CDATA[PRD_ID = #PRD_ID# ]]></isNotNull>
+    <isNotNull property="PRD_NO" prepend=","><![CDATA[PRD_NO = #PRD_NO# ]]></isNotNull>
+    <isNotNull property="PRD_NAME" prepend=","><![CDATA[PRD_NAME = #PRD_NAME# ]]></isNotNull>
+    <isNotNull property="PRD_SPEC" prepend=","><![CDATA[PRD_SPEC = #PRD_SPEC# ]]></isNotNull>
+    <isNotNull property="PRD_COLOR" prepend=","><![CDATA[PRD_COLOR = #PRD_COLOR# ]]></isNotNull>
+    <isNotNull property="BRAND" prepend=","><![CDATA[BRAND = #BRAND# ]]></isNotNull>
+    <isNotNull property="STD_UNIT" prepend=","><![CDATA[STD_UNIT = #STD_UNIT# ]]></isNotNull>
+    <isNotNull property="COMP_NUM" prepend=","><![CDATA[COMP_NUM = #COMP_NUM# ]]></isNotNull>
+    <isNotNull property="PRVD_PRICE" prepend=","><![CDATA[PRVD_PRICE = #PRVD_PRICE# ]]></isNotNull>
+    <isNotNull property="MAIN_BOM_FLAG" prepend=","><![CDATA[MAIN_BOM_FLAG = #MAIN_BOM_FLAG# ]]></isNotNull>
+    </dynamic>
+	<![CDATA[ where PRD_UNIT_ID = #PRD_UNIT_ID#]]>
+</update>
+
+<!--货品计量单位明细表插入 -->
+<insert id="insertUnit" parameterClass="map">
+  <![CDATA[
+	  insert into BASE_PRD_UNIT(
+	  	PRD_UNIT_ID,PRD_ID,MEAS_UNIT_ID,MEAS_UNIT_NO,MEAS_UNIT_NAME,MEAS_UNIT_TYPE,RATIO,DEL_FLAG
+	  )values(
+		#PRD_UNIT_ID#,#PRD_ID#,#MEAS_UNIT_ID#,#MEAS_UNIT_NO#,#MEAS_UNIT_NAME#,#MEAS_UNIT_TYPE#,#RATIO#,#DEL_FLAG#
+	  )
+   ]]>
+</insert>
+
+<!--货品套明细表插入 -->
+<insert id="insertSuit" parameterClass="map">
+  <![CDATA[
+	  insert into BASE_PRD_SUIT(
+	  	PRD_UNIT_ID,PRD_ID,PRD_NO,PRD_NAME,PRD_SPEC,PRD_COLOR,BRAND,STD_UNIT,DEL_FLAG,COMP_NUM,MAIN_PRD_ID,PRVD_PRICE,MAIN_BOM_FLAG
+	  )values(
+		#PRD_UNIT_ID#,#PRD_ID#,#PRD_NO#,#PRD_NAME#,#PRD_SPEC#,#PRD_COLOR#,#BRAND#,#STD_UNIT#,#DEL_FLAG#,#COMP_NUM#,#MAIN_PRD_ID#,#PRVD_PRICE#,#MAIN_BOM_FLAG#
+	  )
+   ]]>
+</insert>
+
+<!--根据货品计量单位明细主键ID删除明细 -->
+<delete id="delUnitByFkId" parameterClass="map">
+	<![CDATA[ update BASE_PRD_UNIT 
+	                 set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	       PRD_UNIT_ID in ($PRD_UNIT_IDS$)
+    ]]>
+</delete>
+<!--根据货品套明细主键ID删除明细 -->
+<delete id="delSuitByFkId" parameterClass="map">
+	<![CDATA[ update BASE_PRD_SUIT 
+	                 set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	       PRD_UNIT_ID in ($PRD_UNIT_IDS$)
+    ]]>
+</delete>
+<!--根据主键ID删除明细的子表货品计量单位 -->
+<delete id="delGUnitByProId" parameterClass="map">
+	<![CDATA[ update BASE_PRD_UNIT 
+	                 set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	       PRD_ID = #PRD_ID#
+    ]]>
+</delete>
+<!--根据主键ID删除明细的子表货品套 -->
+<delete id="delGSuitByProId" parameterClass="map">
+	<![CDATA[ update BASE_PRD_SUIT 
+	                 set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	       PRD_ID = #PRD_ID#
+    ]]>
+</delete>
+<select id="getBrand" parameterClass="map" resultClass="string">
+	select distinct BRAND from BASE_BRAND where DEL_FLAG=#DEL_FLAG# and STATE in ($STATE$)
+</select>
+
+<select id="queryPrdId" parameterClass="map" resultClass="java.util.HashMap">
+	select PRD_SPCL_TECH_ID,PRD_ID,SPCL_TECH_NAME,SPCL_TECH_TYPE,CURRT_VAL,CURRT_VAL_TURN_BEG,CURRT_VAL_TURN_END,
+		PRICE_TURN_TYPE,PRICE_TURN_VAL,TUENED_VALS,REMARK,DEL_FLAG,TURN_TYPE from PRD_SPCL_TECH where  PRD_ID = #PRD_ID# and DEL_FLAG=#DEL_FLAG# and $WHERESQL$  
+</select>
+<select id="queryPrdSpcTechId" parameterClass="String" resultClass="java.util.HashMap">
+	select PRD_SPCL_TECH_ID,PRD_ID,SPCL_TECH_NAME,SPCL_TECH_TYPE,CURRT_VAL,CURRT_VAL_TURN_BEG,CURRT_VAL_TURN_END,
+		PRICE_TURN_TYPE,PRICE_TURN_VAL,TUENED_VALS,REMARK,DEL_FLAG,TURN_TYPE from PRD_SPCL_TECH where  PRD_SPCL_TECH_ID = #PRD_SPCL_TECH_ID#
+</select>
+<delete id="delPrdSpcTechById" parameterClass="map">
+	<![CDATA[ update PRD_SPCL_TECH 
+	                 set DEL_FLAG = #DEL_FLAG#	 
+ 	  where 
+	       PRD_SPCL_TECH_ID = #PRD_SPCL_TECH_ID#
+    ]]>
+</delete>
+<select id="queryPrdExp" parameterClass="map" resultClass="java.util.HashMap">
+	<![CDATA[
+		select p.PRD_NO,p.PRD_NAME,p.PRD_SPEC,p.PRD_TYPE,p.PRVD_PRICE,p.FACT_PRICE,p.STD_UNIT from BASE_PRODUCT p
+	]]>
+	<dynamic prepend="where">
+		<include refid="queryDynSql" />
+	</dynamic>
+	<dynamic prepend="order by ">
+		<include refid="orderSql"/>
+	</dynamic>
+</select>
+
+<update id="updateByPrdNo" parameterClass="map">
+<![CDATA[ update ${SYSSCHEMA}.BASE_PRODUCT ]]>
+	<dynamic prepend="set">
+		<isNotNull property="PRD_NAME" prepend=","><![CDATA[PRD_NAME = #PRD_NAME#]]></isNotNull>
+		<isNotNull property="PRD_SPEC" prepend=","><![CDATA[PRD_SPEC = #PRD_SPEC#]]></isNotNull>
+		<isNotNull property="PRVD_PRICE" prepend=","><![CDATA[PRVD_PRICE=#PRVD_PRICE#]]></isNotNull>
+		<isNotNull property="FACT_PRICE" prepend=","><![CDATA[FACT_PRICE=#FACT_PRICE#]]></isNotNull>
+	</dynamic>
+<![CDATA[ where PRD_NO = #PRD_NO# ]]>
+</update>
+<insert id="insertTemp" parameterClass="map">
+	insert into BASE_PRODUCT_IMP
+		  (PRD_ID,
+		   PRD_NO,
+		   PRD_NAME,
+		   PRD_SPEC,
+		   PRD_COLOR,
+		   BRAND,
+		   STD_UNIT,
+		   MEAS_UNIT,
+		   RATIO,
+		   PAR_PRD_ID,
+		   PAR_PRD_NO,
+		   PAR_PRD_NAME,
+		   PRD_TYPE,
+		   VOLUME,
+		   LENGTH,
+		   WIDTH,
+		   HEIGHT,
+		   FACT_PRICE,
+		   RET_PRICE_MIN,
+		   BEG_DATE,
+		   BAR_CODE,
+		   BAR_CODE_OLD,
+		   U_CMP_CODE,
+		   PRD_SUIT_FLAG,
+		   FINAL_NODE_FLAG,
+		   REMARK,
+		   PRVD_PRICE,
+		   IS_CAN_FREE_FLAG,
+		   SESSIONID,
+		   COMM_FLAG,
+		   IS_NO_STAND_FLAG,
+		   PRD_CLASS_TYPE,
+		   STATE,
+		   CREATOR,
+		   CRE_NAME,
+		   CRE_TIME,
+		   UPDATOR,
+		   UPD_NAME,
+		   UPD_TIME,
+		   DEPT_ID,
+		   DEPT_NAME,
+		   ORG_ID,
+		   ORG_NAME,
+		   DEL_FLAG,
+		   LEDGER_ID,
+		   IS_SCAN
+		)values(
+		   #PRD_ID#,
+		   #PRD_NO#,
+		   #PRD_NAME#,
+		   #PRD_SPEC#,
+		   #PRD_COLOR#,
+		   #BRAND#,
+		   #STD_UNIT#,
+		   #MEAS_UNIT#,
+		   #RATIO#,
+		   #PAR_PRD_ID#,
+		   #PAR_PRD_NO#,
+		   #PAR_PRD_NAME#,
+		   #PRD_TYPE#,
+		   #VOLUME#,
+		   #LENGTH#,
+		   #WIDTH#,
+		   #HEIGHT#,
+		   #FACT_PRICE#,
+		   #RET_PRICE_MIN#,
+		   to_date(#BEG_DATE#,'yyyy-mm-dd'),
+		   #BAR_CODE#,
+		   #BAR_CODE_OLD#,
+		   #U_CMP_CODE#,
+		   #PRD_SUIT_FLAG#,
+		   #FINAL_NODE_FLAG#,
+		   #REMARK#,
+		   #PRVD_PRICE#,
+		   #IS_CAN_FREE_FLAG#,
+		   #SESSIONID#,
+		   #COMM_FLAG#,
+		   #IS_NO_STAND_FLAG#,
+		   #PRD_CLASS_TYPE#,
+		   #STATE#,
+		   #CREATOR#,
+		   #CRE_NAME#,
+		   sysdate,
+		   #UPDATOR#,
+		   #UPD_NAME#,
+		   sysdate,
+		   #DEPT_ID#,
+		   #DEPT_NAME#,
+		   #ORG_ID#,
+		   #ORG_NAME#,
+		   #DEL_FLAG#,
+		   #LEDGER_ID#,
+		   #IS_SCAN#
+		   )
+
+</insert>
+<select id="checkMustFld" parameterClass="string" resultClass="java.util.HashMap">
+	select PRD_NO,PRD_NAME,BRAND,STD_UNIT,PRVD_PRICE
+  	from BASE_PRODUCT_IMP
+	where (PRD_NO is null or PRD_NO ='' )
+	or   (PRD_NAME is null or PRD_NAME ='' )
+	or   (BRAND is null or BRAND ='' )
+	or   (STD_UNIT is null or STD_UNIT ='' )
+	or   (PRVD_PRICE is null or PRVD_PRICE ='' )
+	 and SESSIONID = #SESSIONID#
+</select>
+<select id="checkDRPMustFld" parameterClass="string" resultClass="java.util.HashMap">
+	select PRD_NO,PRD_NAME,PRD_SPEC,STD_UNIT,PRVD_PRICE,FACT_PRICE
+  	from BASE_PRODUCT_IMP
+	where (PRD_NO is null or PRD_NO ='' )
+	or   (PRD_NAME is null or PRD_NAME ='' )
+	or   (PRD_SPEC is null or PRD_SPEC ='' )
+	or   (STD_UNIT is null or STD_UNIT ='' )
+	or   (PRVD_PRICE is null or PRVD_PRICE ='' )
+	or   (FACT_PRICE is null or FACT_PRICE ='' )
+	 and SESSIONID = #SESSIONID#
+</select>
+<!-- 检查是是否有重记录-->
+<select id="checkPdtRepeat" parameterClass="string" resultClass="java.util.HashMap">
+ select PRD_NO
+   from BASE_PRODUCT_IMP
+  where SESSIONID = #SESSIONID#
+  group by PRD_NO
+ having count(PRD_NO) > 1
+</select>
+<select id="checkPrdLedger" parameterClass="map" resultClass="string">
+	select a.PRD_NO
+  from BASE_PRODUCT a
+  left join BASE_PRODUCT_IMP b
+    on a.PRD_NO = b.PRD_NO
+ where a.DEL_FLAG = 0 and b.PRD_NO is not null
+ and SESSIONID = #SESSIONID#
+ and $SQL$
+</select>
+<select id="checkPrdBrand" parameterClass="string" resultClass="string">
+	select BRAND
+  from BASE_PRODUCT_IMP
+ where SESSIONID = #SESSIONID#
+   and BRAND is not null
+   and BRAND not in (select BRAND from BASE_BRAND where DEL_FLAG = 0)
+</select>
+<select id="checkPrdStdUnit" resultClass="string" parameterClass="string">
+	select STD_UNIT
+  from BASE_PRODUCT_IMP
+ where SESSIONID = #SESSIONID#
+   and STD_UNIT is not null
+   and STD_UNIT not in (select MEAS_UNIT_NAME from BASE_UNIT where DEL_FLAG = 0)
+</select>
+<select id="checkPrdMeasUnit" resultClass="string" parameterClass="string">
+	select MEAS_UNIT
+  from BASE_PRODUCT_IMP
+ where SESSIONID = #SESSIONID#
+   and MEAS_UNIT is not null
+   and MEAS_UNIT not in (select MEAS_UNIT_NAME from BASE_UNIT where DEL_FLAG = 0)
+</select>
+<!-- 验证有上级货品编号无上级货品名称的 -->
+<select id="checkNoParPrdInfo" parameterClass="string" resultClass="string">
+	select PAR_PRD_NO
+  from BASE_PRODUCT_IMP
+ where PAR_PRD_NO is not null
+   and PAR_PRD_NAME is null
+   and SESSIONID = #SESSIONID#
+   and PAR_PRD_NO not in (select PRD_NO
+                            from BASE_PRODUCT
+                           where FINAL_NODE_FLAG = 0
+                             and DEL_FLAG = 0)
+</select>
+<!-- 验证无上级货品编号有上级货品名称的 -->
+<select id="checkNameParPrdInfo" parameterClass="string" resultClass="string">
+	select PAR_PRD_NAME
+  from BASE_PRODUCT_IMP
+ where PAR_PRD_NAME is not null
+   and PAR_PRD_NO is null
+   and SESSIONID = #SESSIONID#
+   and PAR_PRD_NAME not in (select PRD_NAME
+                            from BASE_PRODUCT
+                           where FINAL_NODE_FLAG = 0
+                             and DEL_FLAG = 0)
+</select>
+<!-- 验证有上级货品编号有上级货品名称的 -->
+<select id="checkParPrdInfo" parameterClass="string" resultClass="java.util.HashMap">
+	select PAR_PRD_NO,PAR_PRD_NAME
+  from BASE_PRODUCT_IMP
+ where PAR_PRD_NAME is not null
+   and PAR_PRD_NO is not null
+   and SESSIONID = #SESSIONID#
+   and (PAR_PRD_NO,PAR_PRD_NAME) not in (select PRD_NO,PRD_NAME
+                            from BASE_PRODUCT
+                           where FINAL_NODE_FLAG = 0
+                             and DEL_FLAG = 0)
+</select>
+<select id="checkPrdHead" parameterClass="map" resultClass="string">
+	select PRD_NO from BASE_PRODUCT_IMP where SESSIONID = #SESSIONID# and PRD_NO not like '$LEDGER_ID$%'
+</select>
+<select id="checkPrdNum" parameterClass="string" resultClass="string">
+	select to_number(PRD_NO) from BASE_PRODUCT_IMP where SESSIONID = #SESSIONID#
+</select>
+<update id="upParPrdInfo" parameterClass="map">
+	update BASE_PRODUCT_IMP a
+   	set (PAR_PRD_ID, PAR_PRD_NO, PAR_PRD_NAME) =
+       (select b.PRD_ID, b.PRD_NO, b.PRD_NAME
+          from BASE_PRODUCT b
+         where FINAL_NODE_FLAG = 0
+           and DEL_FLAG = 0
+           and $SQL$)
+    where SESSIONID = #SESSIONID# and $MAINSQL$
+</update>
+<update id="upDrpPrdInfo" parameterClass="string">
+	update BASE_PRODUCT a
+	   set (a.PRD_NAME,
+	        a.PRD_SPEC,
+	        a.STD_UNIT,
+	        a.PRVD_PRICE,
+	        a.FACT_PRICE,
+	        a.REMARK,
+	        a.UPDATOR,
+	        a.UPD_NAME,
+	        a.UPD_TIME,
+	        a.PAR_PRD_ID,
+	        a.PAR_PRD_NO,
+	        a.PAR_PRD_NAME) =
+	       (select b.PRD_NAME,
+	               b.PRD_SPEC,
+	               b.STD_UNIT,
+	               b.PRVD_PRICE,
+	               b.FACT_PRICE,
+	               b.REMARK,
+	               b.UPDATOR,
+	               b.UPD_NAME,
+	               b.UPD_TIME,
+	               b.PAR_PRD_ID,
+	               b.PAR_PRD_NO,
+	               b.PAR_PRD_NAME
+	          from BASE_PRODUCT_IMP b
+	         where b.SESSIONID = #SESSIONID#
+	           and a.PRD_NO = b.PRD_NO)
+	 where a.DEL_FLAG = 0
+	   and a.PRD_NO in
+	       (select PRD_NO from BASE_PRODUCT_IMP where SESSIONID = #SESSIONID#)
+</update>
+<update id="upErpPrdInfo" parameterClass="string">
+update BASE_PRODUCT a
+   set (a.PRD_NAME,
+        a.PRD_SPEC,
+        a.BRAND,
+        a.STD_UNIT,
+        a.PRVD_PRICE,
+        a.PRD_COLOR,
+        a.MEAS_UNIT,
+        a.RATIO,
+        a.PAR_PRD_ID,
+        a.PAR_PRD_NO,
+        a.PAR_PRD_NAME,
+        a.VOLUME,
+        a.LENGTH,
+        a.WIDTH,
+        a.HEIGHT,
+        a.FACT_PRICE,
+        a.RET_PRICE_MIN,
+        a.IS_CAN_FREE_FLAG,
+        a.IS_SCAN,
+        a.BEG_DATE,
+        a.BAR_CODE,
+        a.BAR_CODE_OLD,
+        a.U_CMP_CODE,
+        a.REMARK,	   
+        a.UPDATOR,
+	    a.UPD_NAME,
+	    a.UPD_TIME
+        ) =
+       (select b.PRD_NAME,
+               b.PRD_SPEC,
+               b.BRAND,
+               b.STD_UNIT,
+               b.PRVD_PRICE,
+               b.PRD_COLOR,
+               b.MEAS_UNIT,
+               b.RATIO,
+               b.PAR_PRD_ID,
+               b.PAR_PRD_NO,
+               b.PAR_PRD_NAME,
+               b.VOLUME,
+               b.LENGTH,
+               b.WIDTH,
+               b.HEIGHT,
+               b.FACT_PRICE,
+               b.RET_PRICE_MIN,
+               b.IS_CAN_FREE_FLAG,
+               b.IS_SCAN,
+               b.BEG_DATE,
+               b.BAR_CODE,
+               b.BAR_CODE_OLD,
+               b.U_CMP_CODE,
+               b.REMARK,
+               b.UPDATOR,
+	   		   b.UPD_NAME,
+	           b.UPD_TIME
+          from BASE_PRODUCT_IMP b
+         where b.SESSIONID = #SESSIONID#
+           and a.PRD_NO = b.PRD_NO)
+ where a.DEL_FLAG = 0
+   and a.PRD_NO in
+       (select PRD_NO from BASE_PRODUCT_IMP where SESSIONID = #SESSIONID#)
+</update>
+<insert id="insertDrpPrdInfo" parameterClass="string">
+	insert into BASE_PRODUCT
+	  (PRD_ID,
+	   PRD_NO,
+	   PRD_NAME,
+	   PRD_SPEC,
+	   STD_UNIT,
+	   PRVD_PRICE,
+	   FACT_PRICE,
+	   REMARK,
+	   COMM_FLAG,
+	   IS_NO_STAND_FLAG,
+	   FINAL_NODE_FLAG,
+	   PRD_SUIT_FLAG,
+	   PRD_CLASS_TYPE,
+	   PRD_TYPE,
+	   STATE,
+	   CREATOR,
+	   CRE_NAME,
+	   CRE_TIME,
+	   DEPT_ID,
+	   DEPT_NAME,
+	   ORG_ID,
+	   ORG_NAME,
+	   DEL_FLAG,
+	   LEDGER_ID,
+	   PAR_PRD_ID,
+	   PAR_PRD_NO,
+	   PAR_PRD_NAME)
+	  select PRD_ID,
+	         PRD_NO,
+	         PRD_NAME,
+	         PRD_SPEC,
+	         STD_UNIT,
+	         PRVD_PRICE,
+	         FACT_PRICE,
+	         REMARK,
+	         COMM_FLAG,
+	         IS_NO_STAND_FLAG,
+	         FINAL_NODE_FLAG,
+	         PRD_SUIT_FLAG,
+	         PRD_CLASS_TYPE,
+	         PRD_TYPE,
+	         STATE,
+	         CREATOR,
+	         CRE_NAME,
+	         CRE_TIME,
+	         DEPT_ID,
+	         DEPT_NAME,
+	         ORG_ID,
+	         ORG_NAME,
+	         DEL_FLAG,
+	         LEDGER_ID,
+	         PAR_PRD_ID,
+	         PAR_PRD_NO,
+	         PAR_PRD_NAME
+	    from BASE_PRODUCT_IMP
+	   where SESSIONID = #SESSIONID#
+	     and PRD_NO not in (select PRD_NO from BASE_PRODUCT where DEL_FLAG = 0)
+</insert>
+<insert id="insertErpPrdInfo" parameterClass="string">
+	insert into BASE_PRODUCT
+		  (PRD_ID,
+		   PRD_NO,
+		   PRD_NAME,
+		   PRD_SPEC,
+		   BRAND,
+		   STD_UNIT,
+		   PRVD_PRICE,
+		   PRD_COLOR,
+		   MEAS_UNIT,
+		   RATIO,
+		   PAR_PRD_ID,
+		   PAR_PRD_NO,
+		   PAR_PRD_NAME,
+		   VOLUME,
+		   LENGTH,
+		   WIDTH,
+		   HEIGHT,
+		   FACT_PRICE,
+		   RET_PRICE_MIN,
+		   IS_CAN_FREE_FLAG,
+		   IS_SCAN,
+		   BEG_DATE,
+		   BAR_CODE,
+		   BAR_CODE_OLD,
+		   U_CMP_CODE,
+		   REMARK,
+		   COMM_FLAG,
+		   IS_NO_STAND_FLAG,
+		   FINAL_NODE_FLAG,
+		   PRD_SUIT_FLAG,
+		   PRD_CLASS_TYPE,
+		   STATE,
+		   CREATOR,
+		   CRE_NAME,
+		   CRE_TIME,
+		   DEPT_ID,
+		   DEPT_NAME,
+		   ORG_ID,
+		   ORG_NAME,
+		   DEL_FLAG,
+		   LEDGER_ID)
+		  select PRD_ID,
+		         PRD_NO,
+		         PRD_NAME,
+		         PRD_SPEC,
+		         BRAND,
+		         STD_UNIT,
+		         PRVD_PRICE,
+		         PRD_COLOR,
+		         MEAS_UNIT,
+		         RATIO,
+		         PAR_PRD_ID,
+		         PAR_PRD_NO,
+		         PAR_PRD_NAME,
+		         VOLUME,
+		         LENGTH,
+		         WIDTH,
+		         HEIGHT,
+		         FACT_PRICE,
+		         RET_PRICE_MIN,
+		         IS_CAN_FREE_FLAG,
+		         IS_SCAN,
+		         BEG_DATE,
+		         BAR_CODE,
+		         BAR_CODE_OLD,
+		         U_CMP_CODE,
+		         REMARK,
+		         COMM_FLAG,
+		         IS_NO_STAND_FLAG,
+		         FINAL_NODE_FLAG,
+		         PRD_SUIT_FLAG,
+		         PRD_CLASS_TYPE,
+		         STATE,
+		         CREATOR,
+		         CRE_NAME,
+		         CRE_TIME,
+		         DEPT_ID,
+		         DEPT_NAME,
+		         ORG_ID,
+		         ORG_NAME,
+		         DEL_FLAG,
+		         LEDGER_ID
+		    from BASE_PRODUCT_IMP
+		   where SESSIONID = #SESSIONID#
+		     and PRD_NO not in (select PRD_NO from BASE_PRODUCT where DEL_FLAG = 0)
+</insert>
+<delete id="delPrdTemp" parameterClass="string">
+	delete from BASE_PRODUCT_IMP where SESSIONID = #SESSIONID#
+</delete>
+<select id="getPrdSuitInfo" parameterClass="string" resultClass="java.util.HashMap">
+	select a.STATE,
+		   a.PRD_SUIT_FLAG,
+		   (select count(1) from BASE_PRD_SUIT b where b.MAIN_PRD_ID=a.PRD_ID and b.DEL_FLAG=0)CNT 
+	from BASE_PRODUCT a 
+	where a.PRD_ID=#PRD_ID# 
+</select>
+<select id="getPrdIdByUnitIds" parameterClass="string" resultClass="string">
+	select max(MAIN_PRD_ID) MAIN_PRD_ID from BASE_PRD_SUIT where PRD_UNIT_ID in ($PRD_UNIT_IDS$)
+</select>
+<select id="getPrdSuitPriceInfo" parameterClass="string" resultClass="java.util.HashMap">
+	select NVL(a.PRVD_PRICE,0)PRVD_PRICE,
+		   a.STATE,
+		   NVL((select sum(NVL(b.COMP_NUM,0)*NVL(b.PRVD_PRICE,0))PRICE from BASE_PRD_SUIT b where b.MAIN_PRD_ID=a.PRD_ID and b.DEL_FLAG=0 group by MAIN_PRD_ID),0)PRICE 
+	from BASE_PRODUCT a 
+	where a.PRD_ID=#PRD_ID# 
+</select>
+
+<select id="checkPrdNo" parameterClass="map" resultClass="int">
+   select count(u.PRD_NO) from BASE_PRODUCT u 
+     where u.DEL_FLAG = 0 and  u.PRD_NO=#PRD_NO#
+</select>
+
+<select id="getParPrdId" parameterClass="map" resultClass="string">
+        select PRD_ID
+               from BASE_PRODUCT u
+               where DEL_FLAG = 0
+               and FINAL_NODE_FLAG = 0
+               and PRD_NO = #PAR_PRD_NO#
+</select>
+
+</sqlMap>
